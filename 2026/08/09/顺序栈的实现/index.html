@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>顺序栈的实现（静态与动态） | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,栈">
+    <meta name="description" content="顺序栈利用一段物理地址连续的存储空间（数组）存储栈内元素，分静态和动态两种，核心区别在于底层数组容量是否可以在运行期间改变。 静态顺序栈容量在编译时就固定，通常用宏定义指定数组大小，是考试中最常见、最基础的形式。 123456#define MAXSIZE 50      &#x2F;&#x2F; 定义栈中元素的最大个数typedef struct &#123;    int data[MAXSIZE];  &#x2F;&#x2F; 存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="顺序栈的实现（静态与动态）">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="顺序栈利用一段物理地址连续的存储空间（数组）存储栈内元素，分静态和动态两种，核心区别在于底层数组容量是否可以在运行期间改变。 静态顺序栈容量在编译时就固定，通常用宏定义指定数组大小，是考试中最常见、最基础的形式。 123456#define MAXSIZE 50      &#x2F;&#x2F; 定义栈中元素的最大个数typedef struct &#123;    int data[MAXSIZE];  &#x2F;&#x2F; 存">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-09T11:06:34.695Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="栈">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">顺序栈的实现（静态与动态）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">顺序栈的实现（静态与动态）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T01:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%9D%99%E6%80%81%E9%A1%BA%E5%BA%8F%E6%A0%88"><span class="post-toc-number">1.</span> <span class="post-toc-text">静态顺序栈</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8A%A8%E6%80%81%E9%A1%BA%E5%BA%8F%E6%A0%88"><span class="post-toc-number">2.</span> <span class="post-toc-text">动态顺序栈</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A0%88%E9%A1%B6-top-%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%88%9D%E5%A7%8B%E5%8C%96%E6%96%B9%E5%BC%8F%E5%AF%B9%E6%AF%94%EF%BC%88%E8%80%83%E7%A0%94%E5%BF%85%E8%83%8C%EF%BC%89"><span class="post-toc-number">3.</span> <span class="post-toc-text">栈顶 top 的四种初始化方式对比（考研必背）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%9D%99%E6%80%81-vs-%E5%8A%A8%E6%80%81%E5%AF%B9%E6%AF%94"><span class="post-toc-number">4.</span> <span class="post-toc-text">静态 vs 动态对比</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-顺序栈的实现"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">顺序栈的实现（静态与动态）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 09:30:00" datetime="2026-08-09T01:30:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>顺序栈利用<strong>一段物理地址连续的存储空间</strong>（数组）存储栈内元素，分<strong>静态</strong>和<strong>动态</strong>两种，核心区别在于底层数组容量是否可以在运行期间改变。</p>
+<h2 id="静态顺序栈"><a href="#静态顺序栈" class="headerlink" title="静态顺序栈"></a>静态顺序栈</h2><p>容量在编译时就固定，通常用宏定义指定数组大小，是考试中最常见、最基础的形式。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAXSIZE 50      <span class="comment">// 定义栈中元素的最大个数</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAXSIZE];  <span class="comment">// 存放栈中元素的静态数组</span></span><br><span class="line">    <span class="type">int</span> top;            <span class="comment">// 栈顶指针</span></span><br><span class="line">&#125; SqStack;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>top</code> 通常初始化为 <code>-1</code>（指向栈顶元素），也可初始化为 <code>0</code>（指向栈顶元素的下一个空闲位置）。</p>
+</blockquote>
+<p><strong>核心操作</strong>（以 <code>top = 0</code> 方案为例，top 指向下一个空位）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">InitStack</span><span class="params">(SqStack &amp;S)</span> </span>&#123;</span><br><span class="line">    S.top = <span class="number">0</span>;          <span class="comment">// top 指向下标 0，表示空栈</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Push</span><span class="params">(SqStack &amp;S, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (S.top == MAXSIZE)   <span class="comment">// ① 进栈先判满</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    S.data[S.top] = x;      <span class="comment">// ② 将 x 放入当前 top 所指的空位</span></span><br><span class="line">    S.top++;                <span class="comment">// ③ 栈顶指针后移，指向下一个空位</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Pop</span><span class="params">(SqStack &amp;S, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (S.top == <span class="number">0</span>)         <span class="comment">// ① 出栈先判空</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    S.top--;                <span class="comment">// ② 栈顶指针前移，指向当前有效的栈顶元素</span></span><br><span class="line">    x = S.data[S.top];      <span class="comment">// ③ 取出元素</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始值</td>
+<td align="left"><code>S.top = 0</code></td>
+</tr>
+<tr>
+<td align="left">判空</td>
+<td align="left"><code>S.top == 0</code></td>
+</tr>
+<tr>
+<td align="left">判满</td>
+<td align="left"><code>S.top == MAXSIZE</code></td>
+</tr>
+<tr>
+<td align="left">入栈核心</td>
+<td align="left"><code>S.data[S.top] = x; S.top++</code>（先存再移）</td>
+</tr>
+<tr>
+<td align="left">出栈核心</td>
+<td align="left"><code>S.top--; x = S.data[S.top]</code>（先移再取）</td>
+</tr>
+</tbody></table>
+<p><strong>致命缺点</strong>：MAXSIZE 太小易<strong>上溢（Stack Overflow）</strong>，太大浪费空间。</p>
+<h2 id="动态顺序栈"><a href="#动态顺序栈" class="headerlink" title="动态顺序栈"></a>动态顺序栈</h2><p>栈满时自动在堆区申请更大的连续内存，将老数据搬迁过去，实现”扩容”。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> INIT_SIZE 10    <span class="comment">// 初始分配的容量</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INCREMENT 5     <span class="comment">// 每次扩容增加的增量</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> *data;          <span class="comment">// 指向动态分配数组的基址指针</span></span><br><span class="line">    <span class="type">int</span> top;            <span class="comment">// 栈顶指针（这里用作索引）</span></span><br><span class="line">    <span class="type">int</span> maxSize;        <span class="comment">// 栈当前的最大容量</span></span><br><span class="line">&#125; DynSqStack;</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心操作</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">InitStack</span><span class="params">(DynSqStack &amp;S)</span> </span>&#123;</span><br><span class="line">    S.data = (<span class="type">int</span> *)<span class="built_in">malloc</span>(INIT_SIZE * <span class="built_in">sizeof</span>(<span class="type">int</span>)); <span class="comment">// ① 堆区分配连续空间</span></span><br><span class="line">    <span class="keyword">if</span> (!S.data)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;                                 <span class="comment">// ② 检查分配是否成功</span></span><br><span class="line">    S.top = <span class="number">0</span>;                                        <span class="comment">// ③ 空栈：栈顶索引置 0</span></span><br><span class="line">    S.maxSize = INIT_SIZE;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Push</span><span class="params">(DynSqStack &amp;S, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (S.top &gt;= S.maxSize) &#123;                         <span class="comment">// ① 进栈先判满</span></span><br><span class="line">        <span class="comment">// ② 追加存储空间</span></span><br><span class="line">        <span class="type">int</span> *newdata = (<span class="type">int</span> *)<span class="built_in">realloc</span>(S.data,</span><br><span class="line">            (S.maxSize + INCREMENT) * <span class="built_in">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">        <span class="keyword">if</span> (!newdata)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;                             <span class="comment">// ③ 检查是否分配成功</span></span><br><span class="line">        S.data = newdata;                             <span class="comment">// ④ 更新基址指针和总容量</span></span><br><span class="line">        S.maxSize += INCREMENT;</span><br><span class="line">    &#125;</span><br><span class="line">    S.data[S.top] = x;                                <span class="comment">// ⑤ 元素入栈</span></span><br><span class="line">    S.top++;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Pop</span><span class="params">(DynSqStack &amp;S, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (S.top == <span class="number">0</span>)         <span class="comment">// ① 出栈先判空</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    S.top--;                <span class="comment">// ② 栈顶前移，取出元素</span></span><br><span class="line">    x = S.data[S.top];</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">DestroyStack</span><span class="params">(DynSqStack &amp;S)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">free</span>(S.data);           <span class="comment">// 释放堆区数组</span></span><br><span class="line">    S.data = <span class="literal">NULL</span>;</span><br><span class="line">    S.top = <span class="number">0</span>;</span><br><span class="line">    S.maxSize = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：<code>realloc</code> 可能寻找全新空间并复制原数据，因此必须更新 <code>S.data</code> 指针；<code>S.top</code> 是索引，数据搬移后索引关系不变。</p>
+</blockquote>
+<h2 id="栈顶-top-的四种初始化方式对比（考研必背）"><a href="#栈顶-top-的四种初始化方式对比（考研必背）" class="headerlink" title="栈顶 top 的四种初始化方式对比（考研必背）"></a>栈顶 top 的四种初始化方式对比（考研必背）</h2><table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="center">从下往上 <code>top=0</code></th>
+<th align="center">从下往上 <code>top=-1</code></th>
+<th align="center">从上往下 <code>top=n</code></th>
+<th align="center">从上往下 <code>top=n-1</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>top 含义</strong></td>
+<td align="center">下一空位</td>
+<td align="center">当前栈顶</td>
+<td align="center">当前栈顶</td>
+<td align="center">下一空位</td>
+</tr>
+<tr>
+<td align="left"><strong>初始值</strong></td>
+<td align="center"><code>0</code></td>
+<td align="center"><code>-1</code></td>
+<td align="center"><code>n</code></td>
+<td align="center"><code>n-1</code></td>
+</tr>
+<tr>
+<td align="left"><strong>判空</strong></td>
+<td align="center"><code>top == 0</code></td>
+<td align="center"><code>top == -1</code></td>
+<td align="center"><code>top == n</code></td>
+<td align="center"><code>top == n-1</code></td>
+</tr>
+<tr>
+<td align="left"><strong>判满</strong></td>
+<td align="center"><code>top == MAXSIZE</code></td>
+<td align="center"><code>top == MAXSIZE-1</code></td>
+<td align="center"><code>top == 0</code></td>
+<td align="center"><code>top == -1</code></td>
+</tr>
+<tr>
+<td align="left"><strong>入栈</strong></td>
+<td align="center"><code>S[top++] = x</code></td>
+<td align="center"><code>S[++top] = x</code></td>
+<td align="center"><code>S[--top] = x</code></td>
+<td align="center"><code>S[top--] = x</code></td>
+</tr>
+<tr>
+<td align="left"><strong>出栈</strong></td>
+<td align="center"><code>x = S[--top]</code></td>
+<td align="center"><code>x = S[top--]</code></td>
+<td align="center"><code>x = S[top++]</code></td>
+<td align="center"><code>x = S[++top]</code></td>
+</tr>
+<tr>
+<td align="left"><strong>读栈顶</strong></td>
+<td align="center"><code>S[top - 1]</code></td>
+<td align="center"><code>S[top]</code></td>
+<td align="center"><code>S[top]</code></td>
+<td align="center"><code>S[top + 1]</code></td>
+</tr>
+<tr>
+<td align="left"><strong>元素个数</strong></td>
+<td align="center"><code>top</code></td>
+<td align="center"><code>top + 1</code></td>
+<td align="center"><code>n - top</code></td>
+<td align="center"><code>n - 1 - top</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考研提醒</strong>：严蔚敏教材默认 <code>top = 0</code>，但很多习题用 <code>top = -1</code>。<strong>审题时先确认题目给的 top 初始值，再推导对应代码！</strong></p>
+</blockquote>
+<h2 id="静态-vs-动态对比"><a href="#静态-vs-动态对比" class="headerlink" title="静态 vs 动态对比"></a>静态 vs 动态对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">静态顺序栈</th>
+<th align="left">动态顺序栈</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内存位置</td>
+<td align="left">系统栈区或全局&#x2F;静态数据区</td>
+<td align="left">系统堆区 (Heap)</td>
+</tr>
+<tr>
+<td align="left">容量限制</td>
+<td align="left">编译时固定，不可变</td>
+<td align="left">运行时可动态扩容 (realloc)</td>
+</tr>
+<tr>
+<td align="left">上溢风险</td>
+<td align="left">高</td>
+<td align="left">极低（仅受物理内存限制）</td>
+</tr>
+<tr>
+<td align="left">时间复杂度</td>
+<td align="left">所有操作严格 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">绝大部分 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>，扩容瞬间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-09T11:06:34.695Z" itemprop="dateUpdated">2026-08-09 19:06:34</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%88/" rel="tag">栈</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E9%93%BE%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">链栈的实现</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">循环链表与双链表</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《顺序栈的实现（静态与动态）》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

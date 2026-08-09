@@ -35,6 +35,8 @@
     <link rel="shortcut icon" href="/blog/img/avatar.jpg">
     <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
     
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
     <script>window.lazyScripts=[]</script>
 
     <!-- custom head -->
@@ -164,14 +166,14 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
-            <article id="post-搭建个人博客"
+            <article id="post-串的模式匹配-KMP算法"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-07-23 14:00:00" datetime="2026-07-23T06:00:00.000Z"  itemprop="datePublished">2026-07-23</time>
+        <time class="post-time" title="2026-08-09 12:55:00" datetime="2026-08-09T04:55:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E5%8D%9A%E5%AE%A2/">博客</a></li></ul>
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
 
 
 
@@ -182,7 +184,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/07/23/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">搭建个人博客</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-KMP%E7%AE%97%E6%B3%95/">串的模式匹配：KMP 算法</a>
     </h3>
   
 
@@ -192,22 +194,476 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        前言本博客使用 Hexo 搭建，选用 Material Design 风格的 hexo-theme-indigo 主题。
-环境准备
-Node.js：Hexo 基于 Node.js，需提前安装
-Git：用于版本管理和部署到 GitHub Pages
+        KMP 算法利用模式串自身的结构信息（next 数组），避免主串指针 i 的回溯，每次匹配失败时 j 回溯到 next[j]。匹配时间复杂度 O(n+m)。
+核心概念
+前缀：除最后一个字符外，字符串的所有头部子串
+后缀：除第一个字符外，字符串的所有尾部子串
+最长公共前后缀：前缀和后缀集合的交集中，最长的那个元素
 
-快速开始123456789101112# 安装 Hexo CLInpm install -g hexo-cli# 初始化博客hexo init ...
+
+
+
+模式串 T
+前缀
+后缀
+最长公共前后缀长度
+
+
+
+&quot;a&quo...
     
 
-        <a href="/blog/2026/07/23/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-KMP%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" rel="tag">个人博客</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%B2/" rel="tag">串</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-串的模式匹配-BF算法"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:50:00" datetime="2026-08-09T04:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-BF%E7%AE%97%E6%B3%95/">串的模式匹配：BF 算法</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        给定主串 S（长度为 n）和模式串 T（长度为 m，m≤n），在 S 中找到 T 首次出现的位置（1 索引）；匹配失败返回 0。
+算法思想从 S 的第 1 个字符开始，逐个与 T 比较，若匹配失败则 S 指针回溯到下一个位置重新开始。
+12345678910S = &quot;ababcabcacbab&quot;T = &quot;abcac&quot;第1趟: a b a b c a b...
+    
+
+        <a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-BF%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%B2/" rel="tag">串</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-外部排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:45:00" datetime="2026-08-09T04:45:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/">外部排序（多路归并、败者树与最佳归并树）</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        当数据量大到无法全部放入内存时，需要进行外部排序。外排序的基本方法是归并排序法，分为两个步骤：
+(1) 生成若干初始归并段（顺串）——文件预处理：
+① 把含有 n 个记录的文件，按内存大小 w 分成若干长度为 w 的子文件（归并段）
+② 分别将各子文件调入内存，采用有效的内排序方法排序后送回外存。产生 m=⌈n/w⌉ 个初始归并段。
+(2) 多路归并：对这些初始归并段反复进行归并，直到得到整...
+    
+
+        <a href="/blog/2026/08/09/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-基数排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:40:00" datetime="2026-08-09T04:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/">基数排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        基数排序（Radix Sorting，又称桶排序或数字排序）：按待排序记录的关键字组成成分（或”位”）进行排序。它和前面各种内部排序方法完全不同——不需要进行关键字的比较和记录的移动，借助多关键字排序思想实现单逻辑关键字的排序。
+多关键字排序思想最高位优先（MSD, Most Significant Digit first）：先按第一个关键字 K1 排序分组，再对每个子序列按 K2 排序……...
+    
+
+        <a href="/blog/2026/08/09/%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-归并排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:35:00" datetime="2026-08-09T04:35:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/">归并排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        归并排序是分治算法：将两个有序子序列合并为一个有序序列。初始时每个元素看作一个长度为 1 的有序子序列，然后两两合并，直到整个序列有序。
+排序过程示例12345初始: 49  38  65  97  76  13  27         每个元素作为一个有序段第1趟归并(段长=1): [38   49] [65   97] [13   76] [27]第2趟归并(段长=2): [38   4...
+    
+
+        <a href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-堆排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:30:00" datetime="2026-08-09T04:30:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%A0%86%E6%8E%92%E5%BA%8F/">堆排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        堆：一棵完全二叉树，满足任意非叶结点的关键字大于等于（大顶堆）或小于等于（小顶堆）其孩子结点的关键字。
+堆的四条性质：
+
+堆是一棵采用顺序存储结构的完全二叉树，k1​ 是根结点
+堆的根结点是关键字序列中的最小（或最大）值——小根堆（或大根堆）
+从根结点到每一叶子结点路径上的元素序列按值非递减（或非递增）
+堆中的任一子树也是堆
+
+利用堆顶记录关键字最大（或最小）的性质，从待排序记录中依次选取关...
+    
+
+        <a href="/blog/2026/08/09/%E5%A0%86%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-简单选择排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:25:00" datetime="2026-08-09T04:25:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/">简单选择排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        每趟从待排序部分中选出最小元素，与待排序部分的第一个元素交换。
+排序过程示例123456789初始:  [49  38  65  97  76  13  27]第1趟: 选最小 13 → 与 49 交换 → [13]  38   65   97   76  49   27第2趟: 选最小 27 → 与 38 交换 → [13   27]  65   97   76  49   38第3趟: ...
+    
+
+        <a href="/blog/2026/08/09/%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-快速排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:20:00" datetime="2026-08-09T04:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/">快速排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        快速排序是分治算法：每次选一个枢轴（pivot），将序列划分为左右两部分——左边全部 ≤ pivot，右边全部 ≥ pivot，然后递归排序左右子序列。
+算法实现12345678910111213141516171819int Partition(int a[], int low, int high) &#123;    int pivot = a[low];                ...
+    
+
+        <a href="/blog/2026/08/09/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-冒泡排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:15:00" datetime="2026-08-09T04:15:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/">冒泡排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        每趟从头到尾依次比较相邻元素，若逆序则交换——每趟把最大值”冒”到末尾。若某趟无交换，则已有序，提前结束。
+排序过程示例12345初始:  49  38  65  97  76  13  27第1趟: 38↙49  65  76↙97  13↙97  27↙97   → 38  49  65  76  13  27  [97]第2趟: 38  49  65  13↙76  27↙76 [76...
+    
+
+        <a href="/blog/2026/08/09/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-希尔排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:10:00" datetime="2026-08-09T04:10:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/">希尔排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        希尔排序（Shell Sort，又称缩小增量法）是一种分组插入排序方法。
+排序思想① 先取一个正整数 d1​（d1​&lt;n）作为第一个增量，将全部 n 个记录分成 d1​ 组，把所有相隔 d1​ 的记录放在一组中，即对于每个 k（k=1,2,…,d1​），R[k], R[d1​+k], R[2d1​+k], … 分在同一组中，在各组内进行直接插入排序。这样一次分组和排序过程称为一趟希尔排...
+    
+
+        <a href="/blog/2026/08/09/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -218,6 +674,12 @@ Git：用于版本管理和部署到 GitHub Pages
     </ul>
 
     
+<nav id="page-nav">
+    <div class="inner">
+    <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/5/">5</a><a class="extend next" rel="next" href="/blog/page/2/">下一页</a>
+    </div>
+</nav>
+
 
 </div>
 
@@ -321,6 +783,8 @@ var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
 <script src="/blog/js/search.min.js?v=1.7.2" async></script>
 
 
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
 
 
 

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>链式队列的实现 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,队列">
+    <meta name="description" content="链式队列（Linked Queue）用链表实现队列，front 指向队头、rear 指向队尾。链式队列不会满、不需要循环——天然没有假溢出问题。  核心设计原则：入队在 rear 端（尾插法）、出队在 front 端（头删法），均为 O(1)。队头必须设在链表头部（否则出队找前驱退化为 O(n)）。  结构定义1234567891011&#x2F;&#x2F; 队列的结点typedef struct QNode &amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="链式队列的实现">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="链式队列（Linked Queue）用链表实现队列，front 指向队头、rear 指向队尾。链式队列不会满、不需要循环——天然没有假溢出问题。  核心设计原则：入队在 rear 端（尾插法）、出队在 front 端（头删法），均为 O(1)。队头必须设在链表头部（否则出队找前驱退化为 O(n)）。  结构定义1234567891011&#x2F;&#x2F; 队列的结点typedef struct QNode &amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-09T11:07:18.053Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="队列">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">链式队列的实现</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">链式队列的实现</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T02:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%A6%E5%A4%B4%E7%BB%93%E7%82%B9%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%EF%BC%88408-%E6%9C%80%E5%B8%B8%E8%80%83%EF%BC%8C%E9%80%BB%E8%BE%91%E7%BB%9F%E4%B8%80%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">带头结点链式队列（408 最常考，逻辑统一）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%8D%E5%B8%A6%E5%A4%B4%E7%BB%93%E7%82%B9%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97"><span class="post-toc-number">3.</span> <span class="post-toc-text">不带头结点链式队列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%A6%E5%A4%B4-vs-%E4%B8%8D%E5%B8%A6%E5%A4%B4%E5%AF%B9%E6%AF%94"><span class="post-toc-number">4.</span> <span class="post-toc-text">带头 vs 不带头对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%93%BE%E9%98%9F-vs-%E9%A1%BA%E5%BA%8F%E9%98%9F%E5%AF%B9%E6%AF%94"><span class="post-toc-number">5.</span> <span class="post-toc-text">链队 vs 顺序队对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-链式队列的实现"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">链式队列的实现</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 10:00:00" datetime="2026-08-09T02:00:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>链式队列（Linked Queue）用链表实现队列，<code>front</code> 指向队头、<code>rear</code> 指向队尾。链式队列<strong>不会满</strong>、不需要循环——天然没有假溢出问题。</p>
+<blockquote>
+<p><strong>核心设计原则</strong>：入队在 <code>rear</code> 端（尾插法）、出队在 <code>front</code> 端（头删法），均为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。队头必须设在链表头部（否则出队找前驱退化为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>）。</p>
+</blockquote>
+<h2 id="结构定义"><a href="#结构定义" class="headerlink" title="结构定义"></a>结构定义</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 队列的结点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">QNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">QNode</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; QNode;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 链式队列（包含头尾指针）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    QNode *front;    <span class="comment">// 指向队头（带头结点时指向头结点）</span></span><br><span class="line">    QNode *rear;     <span class="comment">// 指向队尾结点</span></span><br><span class="line">&#125; LinkQueue;</span><br></pre></td></tr></table></figure>
+
+<h2 id="带头结点链式队列（408-最常考，逻辑统一）"><a href="#带头结点链式队列（408-最常考，逻辑统一）" class="headerlink" title="带头结点链式队列（408 最常考，逻辑统一）"></a>带头结点链式队列（408 最常考，逻辑统一）</h2><p>头结点不存数据，<code>front</code> 永远指向头结点，第一个数据结点由 <code>front-&gt;next</code> 访问。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitQueue</span><span class="params">(LinkQueue &amp;Q)</span> </span>&#123;</span><br><span class="line">    Q.front = Q.rear = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    Q.front-&gt;next = <span class="literal">NULL</span>;       <span class="comment">// 头结点的 next 置空</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueEmpty</span><span class="params">(LinkQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Q.front == Q.rear;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">EnQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    QNode *s = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    s-&gt;data = x;</span><br><span class="line">    s-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    Q.rear-&gt;next = s;       <span class="comment">// ① 将新结点链到队尾之后</span></span><br><span class="line">    Q.rear = s;             <span class="comment">// ② rear 后移到新结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;            <span class="comment">// 链队不会满</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)          <span class="comment">// 判空</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    QNode *p = Q.front-&gt;next;       <span class="comment">// ① 锁定队头结点（头结点之后第一个）</span></span><br><span class="line">    x = p-&gt;data;                    <span class="comment">// ② 取出数据</span></span><br><span class="line">    Q.front-&gt;next = p-&gt;next;        <span class="comment">// ③ 头结点跳过 p</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.rear == p)                <span class="comment">// ★ 若出队的恰好是最后一个元素</span></span><br><span class="line">        Q.rear = Q.front;           <span class="comment">//    rear 指回头结点，恢复空队</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);                        <span class="comment">// ④ 释放结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">GetHead</span><span class="params">(LinkQueue Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;               <span class="comment">// 队空</span></span><br><span class="line">    x = Q.front-&gt;next-&gt;data;        <span class="comment">// 头结点之后第一个结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始状态</td>
+<td align="left"><code>front</code> 和 <code>rear</code> 都指向新创建的头结点</td>
+</tr>
+<tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == Q.rear</code>（头尾指针重合）</td>
+</tr>
+<tr>
+<td align="left">入队核心</td>
+<td align="left"><code>Q.rear-&gt;next = s; Q.rear = s</code>（尾插法），空队插入无需特殊处理</td>
+</tr>
+<tr>
+<td align="left">出队核心</td>
+<td align="left"><code>p = front-&gt;next; front-&gt;next = p-&gt;next; free(p)</code></td>
+</tr>
+<tr>
+<td align="left">关键边界</td>
+<td align="left">出队最后一个元素后 <strong><code>Q.rear = Q.front</code></strong> 恢复空队</td>
+</tr>
+</tbody></table>
+<h2 id="不带头结点链式队列"><a href="#不带头结点链式队列" class="headerlink" title="不带头结点链式队列"></a>不带头结点链式队列</h2><p><code>front</code> 直接指向第一个数据结点。空队列时 <code>front = rear = NULL</code>。<strong>入队第一个元素需要特殊处理</strong>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitQueue</span><span class="params">(LinkQueue &amp;Q)</span> </span>&#123;</span><br><span class="line">    Q.front = Q.rear = <span class="literal">NULL</span>;    <span class="comment">// 两个指针都置空</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueEmpty</span><span class="params">(LinkQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Q.front == <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">EnQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    QNode *s = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    s-&gt;data = x;</span><br><span class="line">    s-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.front == <span class="literal">NULL</span>) &#123;      <span class="comment">// ★ 空队列：首尾都指向新结点</span></span><br><span class="line">        Q.front = Q.rear = s;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;                    <span class="comment">// 非空队列：正常尾插</span></span><br><span class="line">        Q.rear-&gt;next = s;</span><br><span class="line">        Q.rear = s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;                <span class="comment">// 链队不会满</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;           <span class="comment">// 队空</span></span><br><span class="line"></span><br><span class="line">    QNode *p = Q.front;         <span class="comment">// ① 锁定队头</span></span><br><span class="line">    x = p-&gt;data;</span><br><span class="line">    Q.front = p-&gt;next;          <span class="comment">// ② front 后移</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.rear == p)            <span class="comment">// ★ 出队最后一个元素</span></span><br><span class="line">        Q.rear = <span class="literal">NULL</span>;          <span class="comment">//    rear 也要置空</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == NULL</code></td>
+</tr>
+<tr>
+<td align="left">空队入队</td>
+<td align="left"><code>Q.front = Q.rear = s</code>（两指针都指向新结点）</td>
+</tr>
+<tr>
+<td align="left">出队最后元素</td>
+<td align="left">额外判断 <code>Q.rear == p</code> → <strong><code>Q.rear = NULL</code></strong></td>
+</tr>
+</tbody></table>
+<h2 id="带头-vs-不带头对比"><a href="#带头-vs-不带头对比" class="headerlink" title="带头 vs 不带头对比"></a>带头 vs 不带头对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">带头结点</th>
+<th align="left">不带头结点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始值</td>
+<td align="left"><code>front = rear = malloc(…); front-&gt;next = NULL</code></td>
+<td align="left"><code>front = rear = NULL</code></td>
+</tr>
+<tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == Q.rear</code></td>
+<td align="left"><code>Q.front == NULL</code></td>
+</tr>
+<tr>
+<td align="left">入队（空队）</td>
+<td align="left">无需特殊处理</td>
+<td align="left"><code>Q.front = Q.rear = s</code>（特殊处理）</td>
+</tr>
+<tr>
+<td align="left">出队（最后）</td>
+<td align="left"><code>Q.rear = Q.front</code></td>
+<td align="left"><code>Q.rear = NULL</code></td>
+</tr>
+<tr>
+<td align="left"><strong>考研倾向</strong></td>
+<td align="left"><strong>★ 408 最常考，逻辑统一</strong></td>
+<td align="left">需要多种边界判断</td>
+</tr>
+</tbody></table>
+<h2 id="链队-vs-顺序队对比"><a href="#链队-vs-顺序队对比" class="headerlink" title="链队 vs 顺序队对比"></a>链队 vs 顺序队对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">顺序队（循环队列）</th>
+<th align="left">链队</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">核心问题</td>
+<td align="left">假溢出 → 循环队列解决</td>
+<td align="left">无（天然动态）</td>
+</tr>
+<tr>
+<td align="left">容量</td>
+<td align="left">有限（MAXSIZE - 1）</td>
+<td align="left">无限（仅受物理内存）</td>
+</tr>
+<tr>
+<td align="left">判满</td>
+<td align="left"><code>(rear+1) % MAXSIZE == front</code></td>
+<td align="left">不存在</td>
+</tr>
+<tr>
+<td align="left">入队&#x2F;出队</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>（偶尔扩容 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>）</td>
+<td align="left">严格 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">元素个数可预估</td>
+<td align="left">元素个数未知、波动极大</td>
+</tr>
+</tbody></table>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">链队设计原则</td>
+<td align="left">入队<strong>尾插法</strong>、出队<strong>头删法</strong>均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；队头必须设在链表头部</td>
+</tr>
+<tr>
+<td align="left">带头结点链队</td>
+<td align="left">判空 front&#x3D;&#x3D;rear；<strong>出队最后元素令 rear&#x3D;front</strong> 恢复空队</td>
+</tr>
+<tr>
+<td align="left">不带头结点链队</td>
+<td align="left">判空 front&#x3D;&#x3D;NULL；<strong>空队入队 front&#x3D;rear&#x3D;s</strong> 特殊处理</td>
+</tr>
+<tr>
+<td align="left">不带头结点出队最后元素</td>
+<td align="left">判断 rear&#x3D;&#x3D;p 后令 <strong>rear&#x3D;NULL</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-09T11:07:18.053Z" itemprop="dateUpdated">2026-08-09 19:07:18</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%98%9F%E5%88%97/" rel="tag">队列</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《链式队列的实现》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《链式队列的实现》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《链式队列的实现》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">二叉树的递归遍历</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">循环队列的实现</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《链式队列的实现》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&title=《链式队列的实现》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《链式队列的实现》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

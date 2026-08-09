@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>循环链表与双链表 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,线性表">
+    <meta name="description" content="循环链表将原本指向 NULL 的尾巴重新连回头结点；双链表在每个节点多塞一个指针 prior，用空间换时间把”找前驱”从 O(n) 降到 O(1)。 循环单链表：首尾相连的衔尾蛇 普通单链表判表尾：p-&gt;next &#x3D;&#x3D; NULL 循环单链表判表尾：p-&gt;next &#x3D;&#x3D; L（下一步是否绕回起点）  尾指针（rear）策略：不设头指针、只设尾指针 rear 时，找尾节点 O(1)（直接是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="循环链表与双链表">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="循环链表将原本指向 NULL 的尾巴重新连回头结点；双链表在每个节点多塞一个指针 prior，用空间换时间把”找前驱”从 O(n) 降到 O(1)。 循环单链表：首尾相连的衔尾蛇 普通单链表判表尾：p-&gt;next &#x3D;&#x3D; NULL 循环单链表判表尾：p-&gt;next &#x3D;&#x3D; L（下一步是否绕回起点）  尾指针（rear）策略：不设头指针、只设尾指针 rear 时，找尾节点 O(1)（直接是">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T01:25:00.000Z">
+<meta property="article:modified_time" content="2026-08-09T11:06:21.745Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="线性表">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">循环链表与双链表</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">循环链表与双链表</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T01:25:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BE%AA%E7%8E%AF%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E9%A6%96%E5%B0%BE%E7%9B%B8%E8%BF%9E%E7%9A%84%E8%A1%94%E5%B0%BE%E8%9B%87"><span class="post-toc-number">1.</span> <span class="post-toc-text">循环单链表：首尾相连的衔尾蛇</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E5%BE%AA%E7%8E%AF%E5%8D%95%E9%93%BE%E8%A1%A8"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">实例：合并两个循环单链表</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BE%AA%E7%8E%AF%E5%8F%8C%E9%93%BE%E8%A1%A8%EF%BC%9A%E6%9E%81%E5%85%B6%E4%BC%98%E9%9B%85%E7%9A%84%E2%80%9D%E5%9B%9B%E9%80%9A%E5%85%AB%E8%BE%BE%E2%80%9D"><span class="post-toc-number">2.</span> <span class="post-toc-text">循环双链表：极其优雅的”四通八达”</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8F%8C%E9%93%BE%E8%A1%A8%EF%BC%88%E9%9D%9E%E5%BE%AA%E7%8E%AF%EF%BC%89%E7%9A%84%E6%8F%92%E5%85%A5%EF%BC%9A%E8%91%97%E5%90%8D%E7%9A%84%E2%80%9D%E5%9B%9B%E6%AD%A5%E8%BF%9E%E7%BA%BF%E6%B3%95%E2%80%9D"><span class="post-toc-number">3.</span> <span class="post-toc-text">双链表（非循环）的插入：著名的”四步连线法”</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8F%8C%E9%93%BE%E8%A1%A8%E7%9A%84%E5%88%A0%E9%99%A4"><span class="post-toc-number">4.</span> <span class="post-toc-text">双链表的删除</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">5.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-循环链表与双链表"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">循环链表与双链表</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 09:25:00" datetime="2026-08-09T01:25:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>循环链表将原本指向 <code>NULL</code> 的尾巴<strong>重新连回头结点</strong>；双链表在每个节点多塞一个指针 <code>prior</code>，用<strong>空间换时间</strong>把”找前驱”从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 降到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。</p>
+<h2 id="循环单链表：首尾相连的衔尾蛇"><a href="#循环单链表：首尾相连的衔尾蛇" class="headerlink" title="循环单链表：首尾相连的衔尾蛇"></a>循环单链表：首尾相连的衔尾蛇</h2><ul>
+<li><strong>普通单链表</strong>判表尾：<code>p-&gt;next == NULL</code></li>
+<li><strong>循环单链表</strong>判表尾：<strong><code>p-&gt;next == L</code></strong>（下一步是否绕回起点）</li>
+</ul>
+<p><strong>尾指针（rear）策略</strong>：不设头指针、只设尾指针 <code>rear</code> 时，找尾节点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>（直接是 rear），找头结点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>（<code>rear-&gt;next</code>）。</p>
+<h3 id="实例：合并两个循环单链表"><a href="#实例：合并两个循环单链表" class="headerlink" title="实例：合并两个循环单链表"></a>实例：合并两个循环单链表</h3><p>两个用尾指针 <code>Ta</code> 和 <code>Tb</code> 表示的带头结点循环单链表，首尾相接拼成一个大环。</p>
+<p><strong>口诀</strong>：存 A 头，A 尾接 B 头（实质数据），斩 B 头，B 尾接 A 头。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LinkList <span class="title">Merge_Circular</span><span class="params">(LNode *Ta, LNode *Tb)</span> </span>&#123;</span><br><span class="line">    LNode *p = Ta-&gt;next;         <span class="comment">// 1. 派 p 暂存 A 的头结点，防走丢</span></span><br><span class="line"></span><br><span class="line">    Ta-&gt;next = Tb-&gt;next-&gt;next;   <span class="comment">// 2. A 的尾巴连上 B 的第一个有效节点（跳过 B 的头结点）</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(Tb-&gt;next);              <span class="comment">// 3. 过河拆桥：B 的头结点没用了，物理超度</span></span><br><span class="line"></span><br><span class="line">    Tb-&gt;next = p;                <span class="comment">// 4. B 的尾巴连回 A 的头结点，形成终极大闭环</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Tb;                   <span class="comment">// 5. 返回全新的大尾巴</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="循环双链表：极其优雅的”四通八达”"><a href="#循环双链表：极其优雅的”四通八达”" class="headerlink" title="循环双链表：极其优雅的”四通八达”"></a>循环双链表：极其优雅的”四通八达”</h2><p>普通双链表在头尾插入&#x2F;删除时总要写 <code>if (p-&gt;next != NULL)</code> 防雷。<strong>循环双链表直接消灭了 NULL</strong>：头结点的 <code>prior</code> 指向尾巴，尾巴的 <code>next</code> 指向头，没有死角。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 初始化循环双链表</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitDLinkList</span><span class="params">(DLinkList *L)</span> </span>&#123;</span><br><span class="line">    *L = (DNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(DNode));</span><br><span class="line">    (*L)-&gt;prior = *L; <span class="comment">// 头的前驱是自己</span></span><br><span class="line">    (*L)-&gt;next = *L;  <span class="comment">// 头的后继也是自己</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断是否为空：自己指自己</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Empty</span><span class="params">(DLinkList L)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> L-&gt;next == L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>无脑插入</strong>（在节点 p 之后插入 s，无需边界判断）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s-&gt;next = p-&gt;next;     <span class="comment">// 1. s 的右臂拉住后面的兄弟</span></span><br><span class="line">p-&gt;next-&gt;prior = s;    <span class="comment">// 2. 后面的兄弟伸出左臂拉住 s（循环链表绝对不会报空指针错误！）</span></span><br><span class="line">s-&gt;prior = p;          <span class="comment">// 3. s 的左臂拉住大哥 p</span></span><br><span class="line">p-&gt;next = s;           <span class="comment">// 4. 大哥 p 的右臂拉住小弟 s</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="双链表（非循环）的插入：著名的”四步连线法”"><a href="#双链表（非循环）的插入：著名的”四步连线法”" class="headerlink" title="双链表（非循环）的插入：著名的”四步连线法”"></a>双链表（非循环）的插入：著名的”四步连线法”</h2><p><strong>目标</strong>：在节点 p 的<strong>后面</strong>插入新节点 s。<br><strong>口诀</strong>：<strong>“先连右边（后继），再连左边（前驱）”</strong>——绝对不能先动 <code>p-&gt;next</code>，否则大部队失联！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">DNode</span> &#123;</span><br><span class="line">    ElemType data;              <span class="comment">// 数据域</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">DNode</span> *prior;        <span class="comment">// 前驱指针（向左看）</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">DNode</span> *next;         <span class="comment">// 后继指针（向右看）</span></span><br><span class="line">&#125; DNode, *DLinkList;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">InsertNextDNode</span><span class="params">(DNode *p, DNode *s)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (p == <span class="literal">NULL</span> || s == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;               <span class="comment">// 非法参数拦截</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. s 的右臂拉住后面的兄弟</span></span><br><span class="line">    s-&gt;next = p-&gt;next;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 致命防雷点：后面的兄弟伸出左臂拉住 s</span></span><br><span class="line">    <span class="comment">// 如果 p 是最后一个节点，p-&gt;next 就是 NULL，空指针没有 prior，强行访问会崩溃！</span></span><br><span class="line">    <span class="keyword">if</span> (p-&gt;next != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        p-&gt;next-&gt;prior = s;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. s 的左臂拉住大哥 p</span></span><br><span class="line">    s-&gt;prior = p;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 大哥 p 的右臂放开原小弟，拉住新小弟 s</span></span><br><span class="line">    p-&gt;next = s;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="双链表的删除"><a href="#双链表的删除" class="headerlink" title="双链表的删除"></a>双链表的删除</h2><p>删除节点 p 的后继节点 q，只需 2 步断链，但同样要防空指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeleteNextDNode</span><span class="params">(DNode *p)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (p == <span class="literal">NULL</span> || p-&gt;next == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;           <span class="comment">// p 不存在，或 p 后面没东西可删</span></span><br><span class="line"></span><br><span class="line">    DNode *q = p-&gt;next; <span class="comment">// 派临时指针 q 锁定要被杀掉的目标</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 大哥 p 的右臂直接越过 q，拉住 q 后面的兄弟</span></span><br><span class="line">    p-&gt;next = q-&gt;next;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 致命防雷点：q 后面的兄弟伸出左臂，越过 q，拉住大哥 p</span></span><br><span class="line">    <span class="keyword">if</span> (q-&gt;next != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        q-&gt;next-&gt;prior = p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 物理毁灭 q</span></span><br><span class="line">    <span class="built_in">free</span>(q);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>核心总结</strong>：双链表的”边界地雷”就是 <code>if (p-&gt;next != NULL)</code>——最后一个节点的 next 指向 NULL，修改 NULL 的 prior 会段错误。这是双链表大题最容易丢分的细节。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">循环单链表判表尾</td>
+<td align="left">判据从 <code>p-&gt;next==NULL</code> 变为 <strong><code>p-&gt;next==L</code></strong></td>
+</tr>
+<tr>
+<td align="left">循环单链表尾指针</td>
+<td align="left">只设尾指针 rear：<strong>找头找尾均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></strong>；仅设头指针找尾 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">合并两个循环单链表</td>
+<td align="left">口诀：<strong>存 A 头、A 尾接 B 头、斩 B 头、B 尾接 A 头</strong></td>
+</tr>
+<tr>
+<td align="left">循环双链表</td>
+<td align="left">消灭 NULL，判空 <strong><code>L-&gt;next == L</code></strong>，插入无需边界判断</td>
+</tr>
+<tr>
+<td align="left">双链表插入</td>
+<td align="left">四步连线：<strong>先连后继（右臂）、再连前驱（左臂）</strong>，先动 p-&gt;next 必断链</td>
+</tr>
+<tr>
+<td align="left">双链表删除</td>
+<td align="left">边界防雷 <strong><code>if (p-&gt;next != NULL)</code></strong>（NULL 无 prior 域会段错误）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-09T11:06:21.745Z" itemprop="dateUpdated">2026-08-09 19:06:21</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&title=《循环链表与双链表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&title=《循环链表与双链表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《循环链表与双链表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">顺序栈的实现（静态与动态）</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E8%8A%82%E7%82%B9/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">单链表删除重复节点</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&title=《循环链表与双链表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&title=《循环链表与双链表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《循环链表与双链表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
