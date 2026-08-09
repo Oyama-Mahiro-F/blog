@@ -20,31 +20,50 @@ function renderMath(html) {
     return he.decode(s);
   }
 
-  // Display math: $$...$$
+  // ① Extract all paired math expressions ($$...$$ and $...$) into placeholders
+  const mathExprs = [];
   out = out.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-    try {
-      return katex.renderToString(decodeMath(math.trim()), { displayMode: true, throwOnError: false });
-    } catch (e) {
-      return `<span class="katex-error" style="color:#cc0000">$$${math}$$</span>`;
-    }
+    mathExprs.push({ math: decodeMath(math.trim()), display: true });
+    return `\x00KA_MATH_${mathExprs.length - 1}\x00`;
+  });
+  out = out.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
+    mathExprs.push({ math: decodeMath(math.trim()), display: false });
+    return `\x00KA_MATH_${mathExprs.length - 1}\x00`;
   });
 
-  // Inline math: $...$
-  out = out.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
+  // ② Escape stray dollar signs (e.g. produced by truncated excerpts) so they
+  //    never end up inside math mode
+  out = out.replace(/\$/g, '&#36;');
+
+  // ③ Render each extracted math expression back into place
+  for (let i = 0; i < mathExprs.length; i++) {
+    const { math, display } = mathExprs[i];
+    let html;
     try {
-      return katex.renderToString(decodeMath(math.trim()), { displayMode: false, throwOnError: false });
+      html = katex.renderToString(math, { displayMode: display, throwOnError: false, strict: false });
+      // Drop the MathML half of KaTeX output: it visibly doubles every formula
+      // when katex.min.css is missing, and its text (incl. the TeX annotation)
+      // leaks into strip_html() excerpts, meta description and search index.
+      html = html.replace(/<span class="katex-mathml">[\s\S]*?<\/span>(?=<span class="katex-html")/, '');
     } catch (e) {
-      return `<span class="katex-error" style="color:#cc0000">$${math}$</span>`;
+      html = `<span class="katex-error" style="color:#cc0000">$${math}$</span>`;
     }
-  });
+    out = out.replace(`\x00KA_MATH_${i}\x00`, html);
+  }
 
   // Restore protected blocks
   return out.replace(/\x00KA_BLOCK_(\d+)\x00/g, (_, i) => blocks[parseInt(i)]);
 }
 
-hexo.extend.filter.register('after_render:html', function(str) {
-  if (str.includes('$')) {
-    return renderMath(str);
+// Only process post/page content (never the full-page HTML), otherwise the
+// regex would also rewrite $...$ inside <head> meta attributes (description,
+// og:description) and break the page markup with quote-truncated attributes.
+hexo.extend.filter.register('after_post_render', function(data) {
+  if (data.content && data.content.includes('$')) {
+    data.content = renderMath(data.content);
   }
-  return str;
+  if (data.excerpt && data.excerpt.includes('$')) {
+    data.excerpt = renderMath(data.excerpt);
+  }
+  return data;
 });
