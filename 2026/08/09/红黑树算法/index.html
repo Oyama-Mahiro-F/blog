@@ -21,19 +21,21 @@
     
     
     <meta name="keywords" content="408,查找">
-    <meta name="description" content="AVL 通过严格的平衡因子（∣BF∣≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。 定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：    # 性质 说明    ① 每个结点是红色或黑色 结点增">
+    <meta name="description" content="AVL 通过严格的平衡因子（∥BF∥≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。 定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：    # 性质 说明    ① 每个结点是红色或黑色 结点增">
 <meta property="og:type" content="article">
 <meta property="og:title" content="红黑树算法">
 <meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E7%BA%A2%E9%BB%91%E6%A0%91%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
-<meta property="og:description" content="AVL 通过严格的平衡因子（∣BF∣≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。 定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：    # 性质 说明    ① 每个结点是红色或黑色 结点增">
+<meta property="og:description" content="AVL 通过严格的平衡因子（∥BF∥≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。 定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：    # 性质 说明    ① 每个结点是红色或黑色 结点增">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/251730074203156.jpg">
 <meta property="article:published_time" content="2026-08-09T03:45:00.000Z">
-<meta property="article:modified_time" content="2026-08-09T11:09:55.158Z">
+<meta property="article:modified_time" content="2026-08-11T14:54:50.256Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="查找">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/251730074203156.jpg">
     
     <link rel="shortcut icon" href="/blog/img/avatar.jpg">
     <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
@@ -198,7 +200,7 @@
 
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
-            <p>AVL 通过严格的平衡因子（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用<strong>较为宽松的平衡条件</strong>——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。</p>
+            <p>AVL 通过严格的平衡因子（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用<strong>较为宽松的平衡条件</strong>——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。</p>
 <h2 id="定义：5-条性质（必背）"><a href="#定义：5-条性质（必背）" class="headerlink" title="定义：5 条性质（必背）"></a>定义：5 条性质（必背）</h2><p><strong>红黑树</strong>是一棵满足以下 5 条性质的二叉排序树（BST）：</p>
 <table>
 <thead>
@@ -234,6 +236,14 @@
 <td align="left">即黑高（Black-Height）相等</td>
 </tr>
 </tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第7章 查找.assets/251730074203156.jpg" alt="红黑树示例" title="">
+                </div>
+                <div class="image-caption">红黑树示例</div>
+            </figure>
+
 <h2 id="结点类型定义"><a href="#结点类型定义" class="headerlink" title="结点类型定义"></a>结点类型定义</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span> RED, BLACK &#125; ColorType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> &#123;</span></span><br><span class="line">    KeyType key;                             <span class="comment">// 关键字</span></span><br><span class="line">    ColorType color;                         <span class="comment">// 结点颜色</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> *<span class="title">Lchild</span>, *<span class="title">Rchild</span>;</span>          <span class="comment">// 左、右孩子</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> *<span class="title">parent</span>;</span>                   <span class="comment">// 父结点（旋转时需回溯）</span></span><br><span class="line">&#125; RBNode;</span><br></pre></td></tr></table></figure>
 
 <h2 id="核心性质"><a href="#核心性质" class="headerlink" title="核心性质"></a>核心性质</h2><table>
@@ -302,7 +312,7 @@
 </thead>
 <tbody><tr>
 <td align="left">平衡条件</td>
-<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（严格）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（严格）</td>
 <td align="left">5 条颜色规则（宽松）</td>
 </tr>
 <tr>
@@ -366,7 +376,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-09T11:09:55.158Z" itemprop="dateUpdated">2026-08-09 19:09:55</time>
+    最后更新时间：<time datetime="2026-08-11T14:54:50.256Z" itemprop="dateUpdated">2026-08-11 22:54:50</time>
 </span><br>
 
 

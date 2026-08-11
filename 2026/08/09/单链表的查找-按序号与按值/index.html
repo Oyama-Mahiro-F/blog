@@ -21,19 +21,23 @@
     
     
     <meta name="keywords" content="408,线性表">
-    <meta name="description" content="与顺序表（数组）O(1) 的随机访问不同，单链表的物理内存是分散的。要想找到第 i 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 next 指针一节一节往后数。因此单链表只能顺序存取，查找复杂度 O(n)。 按序号查找返回带头结点的单链表 L 中第 i 个位置的结点指针： 12345678910111213141516171819202122232425LNode* GetElem(Lin">
+    <meta name="description" content="与顺序表（数组）O(1) 的随机访问不同，单链表的物理内存是分散的。要想找到第 i 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 next 指针一节一节往后数。因此单链表只能顺序存取，查找复杂度 O(n)。 遍历时指针移动的三种基本操作：  q &#x3D; p（共享同一节点）：没有产生新的物理节点，只是让 q 和 p 指向内存中的同一个实体：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="单链表的查找：按序号与按值">
 <meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%9F%A5%E6%89%BE-%E6%8C%89%E5%BA%8F%E5%8F%B7%E4%B8%8E%E6%8C%89%E5%80%BC/index.html">
 <meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
-<meta property="og:description" content="与顺序表（数组）O(1) 的随机访问不同，单链表的物理内存是分散的。要想找到第 i 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 next 指针一节一节往后数。因此单链表只能顺序存取，查找复杂度 O(n)。 按序号查找返回带头结点的单链表 L 中第 i 个位置的结点指针： 12345678910111213141516171819202122232425LNode* GetElem(Lin">
+<meta property="og:description" content="与顺序表（数组）O(1) 的随机访问不同，单链表的物理内存是分散的。要想找到第 i 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 next 指针一节一节往后数。因此单链表只能顺序存取，查找复杂度 O(n)。 遍历时指针移动的三种基本操作：  q &#x3D; p（共享同一节点）：没有产生新的物理节点，只是让 q 和 p 指向内存中的同一个实体：">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120108.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/image-20260610200251684.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120528.png">
 <meta property="article:published_time" content="2026-08-09T01:10:00.000Z">
-<meta property="article:modified_time" content="2026-08-09T11:05:56.273Z">
+<meta property="article:modified_time" content="2026-08-11T14:54:03.679Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="线性表">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120108.png">
     
     <link rel="shortcut icon" href="/blog/img/avatar.jpg">
     <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
@@ -199,6 +203,40 @@
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <p>与顺序表（数组）<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的随机访问不同，单链表的物理内存是分散的。要想找到第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 <code>next</code> 指针一节一节往后数。因此单链表只能<strong>顺序存取</strong>，查找复杂度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<p>遍历时指针移动的三种基本操作：</p>
+<ul>
+<li><strong><code>q = p</code>（共享同一节点）</strong>：没有产生新的物理节点，只是让 q 和 p 指向内存中的同一个实体：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-120108.png" alt="节点赋值 q = p" title="">
+                </div>
+                <div class="image-caption">节点赋值 q = p</div>
+            </figure>
+
+<ul>
+<li><strong><code>q = p-&gt;next</code>（探路）</strong>：q 越过 p，直接获取后继节点的地址，常用于遍历或删除前的”锁定”目标：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/image-20260610200251684.png" alt="赋值为直接后继 q = p->next" title="">
+                </div>
+                <div class="image-caption">赋值为直接后继 q = p->next</div>
+            </figure>
+
+<ul>
+<li><strong><code>p = p-&gt;next</code>（指针后移）</strong>：p 放弃当前节点，更新指向为下一个节点，是遍历链表的”履带行进”：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-120528.png" alt="指针向后移动 p = p->next" title="">
+                </div>
+                <div class="image-caption">指针向后移动 p = p->next</div>
+            </figure>
+
 <h2 id="按序号查找"><a href="#按序号查找" class="headerlink" title="按序号查找"></a>按序号查找</h2><p>返回带头结点的单链表 L 中第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 个位置的结点指针：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LNode* <span class="title">GetElem</span><span class="params">(LinkList L, <span class="type">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1. 极其关键的边界防雷</span></span><br><span class="line">    <span class="keyword">if</span> (i &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>; <span class="comment">// 位置不合法</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> L;    <span class="comment">// 如果 i=0，按惯例返回头结点（插入操作找前驱时非常有用）</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 初始化探路员 p 和计数器 j</span></span><br><span class="line">    <span class="type">int</span> j = <span class="number">1</span>;          <span class="comment">// j 表示当前 p 指向的是第几个真正的数据结点</span></span><br><span class="line">    LNode *p = L-&gt;next; <span class="comment">// p 初始指向第一个数据结点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 核心遍历：只要没找完，且前方还有路，就一直往下走</span></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span> &amp;&amp; j &lt; i) &#123;</span><br><span class="line">        p = p-&gt;next; <span class="comment">// 走到下一个结点</span></span><br><span class="line">        j++;         <span class="comment">// 计数器加 1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 返回结果</span></span><br><span class="line">    <span class="comment">// 循环结束有两种情况：</span></span><br><span class="line">    <span class="comment">// 情况 A: j == i，找到了！此时 p 指向第 i 个结点。</span></span><br><span class="line">    <span class="comment">// 情况 B: p == NULL，还没数到 i 链表就断了，返回 NULL。</span></span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -233,7 +271,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-09T11:05:56.273Z" itemprop="dateUpdated">2026-08-09 19:05:56</time>
+    最后更新时间：<time datetime="2026-08-11T14:54:03.679Z" itemprop="dateUpdated">2026-08-11 22:54:03</time>
 </span><br>
 
 

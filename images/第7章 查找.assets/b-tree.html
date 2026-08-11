@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="B树演示 (408标准)                   .btree-area { position: relative; min-height: 350px; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 30px 0; }">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="B树演示 (408标准)                   .btree-area { position: relative; min-height: 350px; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 30px 0; }">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-18T14:24:06.691Z">
+<meta property="article:modified_time" content="2026-07-18T14:24:06.689Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B树演示 (408标准)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .btree-area { position: relative; min-height: 350px; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 30px 0; }
+        .btnode {
+            display: flex; gap: 8px; padding: 8px 14px; border-radius: 0.625rem;
+            border: 2px solid #cbd5e1; background: white; transition: all 0.4s ease;
+            position: relative; align-items: center; margin: 4px 8px;
+        }
+        .btnode .key-slot {
+            width: 42px; height: 42px; border-radius: 0.375rem;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 0.9rem; background: #f1f5f9;
+            border: 1.5px solid #e2e8f0; transition: all 0.3s ease;
+        }
+        .btnode .key-slot.new-key { border-color: #8b5cf6; background: #f5f3ff; box-shadow: 0 0 0 3px rgba(139,92,246,0.25); }
+        .btnode .key-slot.split-key { border-color: #f59e0b; background: #fef3c7; box-shadow: 0 0 0 3px rgba(245,158,11,0.25); }
+        .btnode.split-target { border-color: #ef4444; background: #fef2f2; box-shadow: 0 0 0 4px rgba(239,68,68,0.2); }
+        .btnode .key-slot.delete-target { border-color: #ef4444; background: #fef2f2; }
+        .btnode .key-slot.borrow-source { border-color: #22c55e; background: #f0fdf4; }
+        .btnode .key-slot.merge-target { border-color: #f59e0b; background: #fffbeb; }
+        .btree-row { display: flex; gap: 50px; align-items: flex-start; justify-content: center; flex-wrap: wrap; position: relative; }
+        .btree-row::before {
+            content: ''; position: absolute; top: -20px; left: 0; right: 0;
+            border-top: 2px solid #e2e8f0; z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col font-sans">
+
+    <!-- 控制栏 -->
+    <div class="bg-white shadow-sm border-b p-4 flex flex-wrap gap-4 items-center justify-between z-10">
+        <div class="flex gap-4 items-center flex-wrap">
+            <h1 class="text-xl font-bold text-blue-600 mr-2">B 树演示</h1>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">阶数 m:</label>
+                <select id="input-order" class="border rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+                    <option value="3">3阶 (2-3树)</option>
+                    <option value="4" selected>4阶</option>
+                    <option value="5">5阶</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">关键字:</label>
+                <input type="number" id="input-key" value="" placeholder="数字" class="border rounded px-2 py-1 w-24 focus:outline-none focus:border-blue-500 text-sm">
+                <button onclick="doInsert()" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-sm">插入</button>
+                <button onclick="doDelete()" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm">删除</button>
+            </div>
+            <button onclick="initTree()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm">重置</button>
+            <button onclick="loadExample()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition text-sm">加载示例</button>
+        </div>
+        <span id="status-badge" class="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">就绪</span>
+    </div>
+
+    <div class="flex-1 flex overflow-hidden">
+        <div class="flex-1 p-6 overflow-auto bg-gray-50 flex flex-col gap-4">
+            <div class="bg-white p-5 rounded-lg shadow-sm border flex-1">
+                <h2 class="text-lg font-bold mb-3" id="tree-title">B树 (m=4)</h2>
+                <div class="btree-area" id="btree-area"></div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border">
+                <div class="grid grid-cols-3 gap-3 text-xs">
+                    <div class="bg-blue-50 p-2 rounded text-center border border-blue-200"><b>性质</b><br>每个结点最多 m 个孩子，最多 m-1 个关键字</div>
+                    <div class="bg-green-50 p-2 rounded text-center border border-green-200"><b>分裂</b><br>插入后若关键字数 ≥ m，将中间关键字提升到父结点</div>
+                    <div class="bg-orange-50 p-2 rounded text-center border border-orange-200"><b>删除</b><br>优先借兄弟，再合并；非叶结点用前驱/后继替代</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-80 bg-white border-l flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]">
+            <div class="p-4 border-b bg-gray-50 font-bold">执行日志</div>
+            <div id="log-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 font-mono text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        let order = 4;  // m
+        let root = null;
+        let highlightKeys = [];    // 高亮的关键字列表
+        let highlightType = '';    // 'insert','split','delete','borrow','merge'
+
+        class BTreeNode {
+            constructor(isLeaf = true) {
+                this.keys = [];        // 关键字数组
+                this.children = [];    // 孩子指针（非叶子使用）
+                this.isLeaf = isLeaf;
+            }
+        }
+
+        function initTree() {
+            root = null;
+            order = parseInt(document.getElementById('input-order').value);
+            highlightKeys = []; highlightType = '';
+            document.getElementById('tree-title').textContent = `B树 (m=${order})`;
+            document.getElementById('log-container').innerHTML = '';
+            renderBTree();
+            addLog('系统', `B树初始化完成。阶数 m=${order}，每结点最多 ${order - 1} 个关键字，最少 ${Math.ceil(order / 2) - 1} 个关键字（除根外）。`);
+            updateStatusBadge('就绪', 'bg-gray-200 text-gray-700');
+        }
+
+        function loadExample() {
+            initTree();
+            // 加载一组经典示例
+            const keys = [20, 10, 30, 40, 50, 60, 70, 80, 90, 25, 35, 15, 5, 45, 55, 65, 75, 85];
+            keys.forEach(k => {
+                root = btreeInsert(root, k, order);
+            });
+            highlightKeys = []; highlightType = '';
+            addLog('系统', `加载示例 B树 (m=${order})：插入 ${keys.join(', ')}`, 'text-blue-600');
+            renderBTree();
+        }
+
+        // ---- B树插入 ----
+        function btreeInsert(node, key, m) {
+            if (!node) {
+                const n = new BTreeNode(true);
+                n.keys.push(key);
+                return n;
+            }
+
+            // 根结点满了，先分裂
+            if (node.keys.length === m - 1) {
+                const newRoot = new BTreeNode(false);
+                newRoot.children.push(node);
+                btreeSplitChild(newRoot, 0, m);
+                node = newRoot;
+            }
+            btreeInsertNonFull(node, key, m);
+            return node;
+        }
+
+        function btreeInsertNonFull(node, key, m) {
+            let i = node.keys.length - 1;
+            if (node.isLeaf) {
+                while (i >= 0 && key < node.keys[i]) i--;
+                node.keys.splice(i + 1, 0, key);
+            } else {
+                while (i >= 0 && key < node.keys[i]) i--;
+                i++;
+                if (node.children[i].keys.length === m - 1) {
+                    btreeSplitChild(node, i, m);
+                    if (key > node.keys[i]) i++;
+                }
+                btreeInsertNonFull(node.children[i], key, m);
+            }
+        }
+
+        function btreeSplitChild(parent, idx, m) {
+            const child = parent.children[idx];
+            const mid = Math.floor((m - 1) / 2);
+            const midKey = child.keys[mid];
+
+            // 右半部分成为新结点
+            const rightNode = new BTreeNode(child.isLeaf);
+            rightNode.keys = child.keys.slice(mid + 1);
+            if (!child.isLeaf) {
+                rightNode.children = child.children.slice(mid + 1);
+            }
+
+            // child 只保留左半部分
+            child.keys = child.keys.slice(0, mid);
+            if (!child.isLeaf) {
+                child.children = child.children.slice(0, mid + 1);
+            }
+
+            // 将中间关键字提升到父结点
+            parent.keys.splice(idx, 0, midKey);
+            parent.children.splice(idx + 1, 0, rightNode);
+
+            // 记录高亮
+            highlightKeys = [midKey];
+            highlightType = 'split';
+        }
+
+        function doInsert() {
+            const val = document.getElementById('input-key').value;
+            if (!val && val !== 0) return alert('请输入关键字');
+            const num = Number(val);
+            if (isNaN(num)) return alert('请输入有效数字');
+
+            highlightKeys = [num]; highlightType = 'insert';
+            const oldRoot = root;
+            root = btreeInsert(root, num, order);
+            document.getElementById('input-key').value = '';
+
+            if (highlightType === 'split') {
+                addLog('分裂', `插入 ${num} 导致结点溢出，中间关键字 ${highlightKeys[0]} 提升到父结点。<br>(结点关键字数 ≥ ${order} 时触发分裂)`, 'text-orange-600 font-bold');
+                updateStatusBadge('分裂', 'bg-orange-100 text-orange-700');
+            } else {
+                addLog('插入', `关键字 ${num} 已插入 B树。`, 'text-gray-600');
+                updateStatusBadge('已插入 ' + num, 'bg-purple-100 text-purple-700');
+            }
+            renderBTree();
+            setTimeout(() => { highlightKeys = []; highlightType = ''; updateStatusBadge('就绪', 'bg-gray-200 text-gray-700'); renderBTree(); }, 2500);
+        }
+
+        // ---- B树删除 ----
+        function doDelete() {
+            const val = document.getElementById('input-key').value;
+            if (!val && val !== 0) return alert('请输入要删除的关键字');
+            const num = Number(val);
+            if (isNaN(num)) return alert('请输入有效数字');
+
+            if (!root) { addLog('错误', 'B树为空，无法删除。', 'text-red-600'); return; }
+
+            // 检查是否存在
+            if (!findInBTree(root, num)) {
+                addLog('错误', `关键字 ${num} 不存在于B树中。`, 'text-red-600');
+                return;
+            }
+
+            highlightKeys = [num]; highlightType = 'delete';
+            const result = btreeDelete(root, num, order);
+            if (root.keys.length === 0 && !root.isLeaf) {
+                root = root.children[0]; // 根结点变空
+            }
+
+            addLog('删除', `关键字 ${num} 已从B树删除。若删除导致关键字数不足，会优先从兄弟借或合并。`, 'text-red-600 font-bold');
+            updateStatusBadge('已删除 ' + num, 'bg-red-100 text-red-700');
+            renderBTree();
+            setTimeout(() => { highlightKeys = []; highlightType = ''; updateStatusBadge('就绪', 'bg-gray-200 text-gray-700'); renderBTree(); }, 2500);
+        }
+
+        function findInBTree(node, key) {
+            if (!node) return false;
+            let i = 0;
+            while (i < node.keys.length && key > node.keys[i]) i++;
+            if (i < node.keys.length && node.keys[i] === key) return true;
+            if (node.isLeaf) return false;
+            return findInBTree(node.children[i], key);
+        }
+
+        function btreeDelete(node, key, m) {
+            const t = Math.ceil(m / 2); // 最小度数
+            let idx = 0;
+            while (idx < node.keys.length && key > node.keys[idx]) idx++;
+
+            if (idx < node.keys.length && node.keys[idx] === key) {
+                // 情况1: 在叶结点中
+                if (node.isLeaf) {
+                    node.keys.splice(idx, 1);
+                    return;
+                }
+                // 情况2: 在内部结点中
+                // 用前驱替代
+                if (node.children[idx].keys.length >= t) {
+                    const pred = getPredecessor(node, idx);
+                    node.keys[idx] = pred;
+                    btreeDelete(node.children[idx], pred, m);
+                }
+                // 用后继替代
+                else if (node.children[idx + 1].keys.length >= t) {
+                    const succ = getSuccessor(node, idx);
+                    node.keys[idx] = succ;
+                    btreeDelete(node.children[idx + 1], succ, m);
+                }
+                // 合并
+                else {
+                    mergeChildren(node, idx, m);
+                    btreeDelete(node.children[idx], key, m);
+                }
+            } else {
+                // 在子树中
+                if (node.isLeaf) return; // 不存在
+
+                const childIdx = idx;
+                // 保证子树至少有 t 个关键字
+                if (node.children[childIdx].keys.length < t) {
+                    fillChild(node, childIdx, m);
+                }
+                // 合并后可能 childIdx 变了
+                if (childIdx > node.keys.length) {
+                    btreeDelete(node.children[childIdx - 1], key, m);
+                } else {
+                    btreeDelete(node.children[childIdx], key, m);
+                }
+            }
+        }
+
+        function getPredecessor(node, idx) {
+            let cur = node.children[idx];
+            while (!cur.isLeaf) cur = cur.children[cur.children.length - 1];
+            return cur.keys[cur.keys.length - 1];
+        }
+
+        function getSuccessor(node, idx) {
+            let cur = node.children[idx + 1];
+            while (!cur.isLeaf) cur = cur.children[0];
+            return cur.keys[0];
+        }
+
+        function mergeChildren(node, idx, m) {
+            const leftChild = node.children[idx];
+            const rightChild = node.children[idx + 1];
+            // 把父结点的 key 下移
+            leftChild.keys.push(node.keys[idx]);
+            // 把右孩子的 keys 合并到左孩子
+            leftChild.keys = leftChild.keys.concat(rightChild.keys);
+            if (!rightChild.isLeaf) {
+                leftChild.children = leftChild.children.concat(rightChild.children);
+            }
+            // 从父结点删除 key 和右孩子
+            node.keys.splice(idx, 1);
+            node.children.splice(idx + 1, 1);
+        }
+
+        function fillChild(node, idx, m) {
+            const t = Math.ceil(m / 2);
+            // 从左兄弟借
+            if (idx > 0 && node.children[idx - 1].keys.length >= t) {
+                const child = node.children[idx];
+                const leftSib = node.children[idx - 1];
+                child.keys.unshift(node.keys[idx - 1]);
+                node.keys[idx - 1] = leftSib.keys.pop();
+                if (!leftSib.isLeaf) {
+                    child.children.unshift(leftSib.children.pop());
+                }
+                highlightType = 'borrow';
+                highlightKeys = [node.keys[idx - 1]];
+            }
+            // 从右兄弟借
+            else if (idx < node.children.length - 1 && node.children[idx + 1].keys.length >= t) {
+                const child = node.children[idx];
+                const rightSib = node.children[idx + 1];
+                child.keys.push(node.keys[idx]);
+                node.keys[idx] = rightSib.keys.shift();
+                if (!rightSib.isLeaf) {
+                    child.children.push(rightSib.children.shift());
+                }
+                highlightType = 'borrow';
+                highlightKeys = [node.keys[idx]];
+            }
+            // 合并
+            else {
+                if (idx < node.children.length - 1) {
+                    mergeChildren(node, idx, m);
+                } else {
+                    mergeChildren(node, idx - 1, m);
+                }
+                highlightType = 'merge';
+            }
+        }
+
+        // ---- B树可视化 ----
+        function renderBTree() {
+            const area = document.getElementById('btree-area');
+            area.innerHTML = '';
+            if (!root) { area.innerHTML = '<div class="text-gray-400 text-center py-16">空树，请插入关键字或加载示例</div>'; return; }
+
+            // 逐层遍历
+            const levels = [];
+            let queue = [{ node: root, parentIdx: -1 }];
+            while (queue.length > 0) {
+                const levelNodes = queue.map(item => item.node);
+                levels.push(levelNodes);
+                const nextQueue = [];
+                queue.forEach((item, qi) => {
+                    const n = item.node;
+                    if (!n.isLeaf) {
+                        n.children.forEach(ch => {
+                            nextQueue.push({ node: ch, parentIdx: qi });
+                        });
+                    }
+                });
+                queue = nextQueue;
+            }
+
+            // 渲染 - 用flex布局
+            levels.forEach((levelNodes, lvlIdx) => {
+                const row = document.createElement('div');
+                row.className = 'btree-row';
+                if (lvlIdx > 0) row.style.marginTop = '20px';
+
+                levelNodes.forEach((node, ni) => {
+                    const ndiv = document.createElement('div');
+                    ndiv.className = 'btnode';
+                    node.keys.forEach(key => {
+                        const kdiv = document.createElement('div');
+                        kdiv.className = 'key-slot';
+                        kdiv.textContent = key;
+                        if (highlightKeys.includes(key)) {
+                            if (highlightType === 'insert' || highlightType === 'delete') kdiv.classList.add('new-key');
+                            else if (highlightType === 'split') kdiv.classList.add('split-key');
+                            else if (highlightType === 'borrow') kdiv.classList.add('borrow-source');
+                            else if (highlightType === 'merge') kdiv.classList.add('merge-target');
+                        }
+                        ndiv.appendChild(kdiv);
+                    });
+                    if (highlightType === 'split' && highlightKeys.some(k => node.keys.includes(k))) ndiv.classList.add('split-target');
+                    row.appendChild(ndiv);
+                });
+                area.appendChild(row);
+            });
+        }
+
+        function addLog(type, message, colorClass = 'text-gray-800') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `p-3 bg-white rounded border border-gray-100 shadow-sm ${colorClass} leading-relaxed animate-fade-in`;
+            entry.innerHTML = `<span class="inline-block px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-500 mb-1 border">${type}</span><br>${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatusBadge(text, classes) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = text; badge.className = `px-2 py-1 rounded text-xs font-bold ${classes}`;
+        }
+
+        // 初始化
+        window.onload = function () {
+            initTree();
+            loadExample();
+        };
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/b-tree.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

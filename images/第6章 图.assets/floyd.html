@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="Floyd 算法 (多源最短路径) 演示   tailwind.config &#x3D; {   theme: {     extend: {       fontFamily: { sans: [&#39;&quot;Microsoft YaHei&quot;&#39;, &#39;&quot;PingFang SC&quot;&#39;, &#39;sans-serif&#39;] }     }   } }     .node { transition: all 0.4s e">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="Floyd 算法 (多源最短路径) 演示   tailwind.config &#x3D; {   theme: {     extend: {       fontFamily: { sans: [&#39;&quot;Microsoft YaHei&quot;&#39;, &#39;&quot;PingFang SC&quot;&#39;, &#39;sans-serif&#39;] }     }   } }     .node { transition: all 0.4s e">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-19T16:03:34.910Z">
+<meta property="article:modified_time" content="2026-07-19T16:03:34.898Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floyd 算法 (多源最短路径) 演示</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['"Microsoft YaHei"', '"PingFang SC"', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  .node { transition: all 0.4s ease; }
+  .log-entry { animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .matrix-cell { transition: all 0.5s ease; font-size: 12px; }
+  .highlight-update { animation: flash 0.8s ease; }
+  @keyframes flash { 0% { transform: scale(1.3); } 50% { transform: scale(0.95); } 100% { transform: scale(1); } }
+  .k-label { transition: all 0.4s ease; }
+</style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+
+<!-- Top Control Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 bg-gray-800 border-b border-gray-700 shadow-lg">
+  <div class="flex items-center justify-between px-5 py-3 max-w-full">
+    <div class="flex items-center gap-4">
+      <span class="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Floyd 算法 (多源最短路径)</span>
+      <span class="text-sm text-gray-400 hidden sm:inline">动态规划 · D[i][j] = min(D[i][j], D[i][k] + D[k][j])</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="stepBack()" id="btnBack" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-md text-sm font-medium transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>上一步</button>
+      <button onclick="stepForward()" id="btnStep" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 rounded-md text-sm font-medium transition">单步执行</button>
+      <button onclick="autoPlay()" id="btnPlay" class="px-4 py-1.5 bg-orange-600 hover:bg-orange-500 rounded-md text-sm font-medium transition">自动播放</button>
+      <button onclick="reset()" id="btnReset" class="px-4 py-1.5 bg-gray-600 hover:bg-gray-500 rounded-md text-sm font-medium transition">重置</button>
+      <span id="speedLabel" class="text-xs text-gray-400 ml-1">速度: 1.0s</span>
+      <input type="range" min="0.3" max="2.5" step="0.1" value="1.0" oninput="updateSpeed(this.value)" class="w-20 h-1 accent-orange-500">
+    </div>
+  </div>
+  <div class="px-5 py-1.5 bg-gray-850 border-t border-gray-700 flex items-center gap-3">
+    <span class="text-sm text-gray-400">当前步骤:</span>
+    <span id="stepDesc" class="text-sm text-orange-400 font-medium">初始化 — 构造距离矩阵 D 和前驱矩阵 P</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="flex pt-28 pb-0 h-screen">
+
+  <!-- Left: Graph + Matrices -->
+  <div class="flex-1 flex flex-col p-4 overflow-hidden gap-4" style="min-width: 550px;">
+
+    <!-- Top: small graph -->
+    <div class="relative flex-shrink-0" style="height: 200px;">
+      <svg id="edgeLayer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;"></svg>
+      <div id="nodeLayer" class="relative z-10" style="width: 100%; height: 200px;"></div>
+    </div>
+
+    <!-- Bottom: Matrices -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+      <!-- Distance matrix D -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-gray-300 font-mono">
+            距离矩阵 D<sup id="kSuperscriptD" class="text-orange-400">(0)</sup>
+          </span>
+          <span class="text-xs text-gray-500">
+            <span id="kIterLabel" class="text-orange-400 font-mono">k = -1</span> (未开始)
+          </span>
+        </div>
+        <div class="overflow-auto flex-1">
+          <table id="matrixD" class="border-collapse"></table>
+        </div>
+      </div>
+
+      <!-- Predecessor matrix P -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-gray-300 font-mono">
+            前驱矩阵 P<sup id="kSuperscriptP" class="text-orange-400">(0)</sup>
+          </span>
+        </div>
+        <div class="overflow-auto flex-1">
+          <table id="matrixP" class="border-collapse"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Info Panel -->
+  <div class="w-80 flex flex-col border-l border-gray-700 bg-gray-850 overflow-hidden" style="min-width: 280px;">
+
+    <!-- Current triple-loop state -->
+    <div class="p-4 border-b border-gray-700">
+      <h3 class="text-sm font-bold text-gray-300 mb-3">当前循环状态</h3>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-gray-750 rounded p-2">
+          <span class="text-gray-500">k (中间顶点)</span>
+          <div id="curK" class="text-orange-400 font-mono text-lg font-bold">-</div>
+        </div>
+        <div class="bg-gray-750 rounded p-2">
+          <span class="text-gray-500">i (起点)</span>
+          <div id="curI" class="text-blue-400 font-mono text-lg font-bold">-</div>
+        </div>
+        <div class="bg-gray-750 rounded p-2">
+          <span class="text-gray-500">j (终点)</span>
+          <div id="curJ" class="text-green-400 font-mono text-lg font-bold">-</div>
+        </div>
+        <div class="bg-gray-750 rounded p-2">
+          <span class="text-gray-500">更新次数</span>
+          <div id="updateCount" class="text-yellow-400 font-mono text-lg font-bold">0</div>
+        </div>
+      </div>
+
+      <div class="mt-3 text-xs space-y-1">
+        <div class="flex justify-between">
+          <span class="text-gray-500">D[i][k] + D[k][j] =</span>
+          <span id="compareLeft" class="text-blue-400 font-mono">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">D[i][j] (当前) =</span>
+          <span id="compareRight" class="text-green-400 font-mono">-</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">是否更新:</span>
+          <span id="compareResult" class="font-mono font-bold">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <h3 class="text-sm font-bold text-gray-300 px-4 py-2 border-b border-gray-700">执行日志</h3>
+      <div id="logPanel" class="flex-1 overflow-y-auto p-3 space-y-1.5 text-xs font-mono"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+// 4-vertex directed weighted graph
+const nodePositions = [
+  { x: 200, y: 60  },  // 0 - top
+  { x: 380, y: 180 },  // 1 - right
+  { x: 200, y: 180 },  // 2 - bottom
+  { x: 20,  y: 180 },  // 3 - left
+];
+
+const n = 4;
+const INF = Infinity;
+
+// Graph adjacency matrix
+const graph = [
+  [  0,   3, INF,   7],  // 0
+  [  8,   0,   2, INF],  // 1
+  [  5, INF,   0,   1],  // 2
+  [  2, INF, INF,   0],  // 3
+];
+
+// Edges for SVG
+const allEdges = [];
+for (let i = 0; i < n; i++) {
+  for (let j = 0; j < n; j++) {
+    if (i !== j && graph[i][j] !== INF) {
+      allEdges.push({ from: i, to: j, weight: graph[i][j] });
+    }
+  }
+}
+
+// ==================== STATE ====================
+let D = [];   // distance matrix
+let P = [];   // predecessor matrix
+let steps = [];
+let currentStep = -1;
+let autoTimer = null;
+let playSpeed = 1000;
+
+// ==================== INIT STEPS ====================
+function initSteps() {
+  steps = [];
+
+  // Initialize D and P
+  D = [];
+  P = [];
+  for (let i = 0; i < n; i++) {
+    D[i] = [];
+    P[i] = [];
+    for (let j = 0; j < n; j++) {
+      D[i][j] = graph[i][j];
+      P[i][j] = (i !== j && graph[i][j] !== INF) ? i : -1;
+    }
+  }
+
+  steps.push({
+    type: 'init',
+    description: '初始化: D(0) = 原图的邻接矩阵, P(0) 记录直接前驱',
+    D: JSON.parse(JSON.stringify(D)),
+    P: JSON.parse(JSON.stringify(P)),
+    k: -1, i: -1, j: -1,
+    updated: false, updateInfo: null,
+    highlightCells: []
+  });
+
+  // Triple loop
+  for (let k = 0; k < n; k++) {
+    // Step announcing k
+    steps.push({
+      type: 'k-enter',
+      description: `进入 k = ${k}: 以顶点 ${k} 作为中间顶点，尝试更新所有路径 D[i][j]`,
+      D: JSON.parse(JSON.stringify(D)),
+      P: JSON.parse(JSON.stringify(P)),
+      k: k, i: -1, j: -1,
+      updated: false, updateInfo: null,
+      highlightCells: []
+    });
+
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j || i === k || j === k) {
+          // Skip diagonal and paths involving k as endpoint for self
+          // But still record for completeness in some cases
+          // We'll skip truly uninteresting ones
+          if (i === j) continue;
+          // Just log examination without update possibility for i==k or j==k
+          if (i === k || j === k) {
+            steps.push({
+              type: 'examine',
+              description: `k=${k}, i=${i}, j=${j}: 涉及中间顶点本身，跳过`,
+              D: JSON.parse(JSON.stringify(D)),
+              P: JSON.parse(JSON.stringify(P)),
+              k: k, i: i, j: j,
+              updated: false, updateInfo: null,
+              highlightCells: [[i, k, 'blue'], [k, j, 'blue'], [i, j, 'gray']]
+            });
+            continue;
+          }
+        }
+
+        const dik = D[i][k];
+        const dkj = D[k][j];
+        const dij = D[i][j];
+        const throughK = (dik === INF || dkj === INF) ? INF : dik + dkj;
+
+        if (throughK < dij) {
+          const oldVal = dij;
+          D[i][j] = throughK;
+          P[i][j] = P[k][j];
+
+          steps.push({
+            type: 'update',
+            description: `k=${k}, i=${i}, j=${j}: D[${i}][${k}]+D[${k}][${j}] = ${dik}+${dkj} = ${throughK} < D[${i}][${j}] = ${oldVal}，更新! D[${i}][${j}] = ${throughK}`,
+            D: JSON.parse(JSON.stringify(D)),
+            P: JSON.parse(JSON.stringify(P)),
+            k: k, i: i, j: j,
+            updated: true,
+            updateInfo: { i, j, oldVal, newVal: throughK, dik, dkj, throughK },
+            highlightCells: [[i, k, 'yellow'], [k, j, 'yellow'], [i, j, 'red']]
+          });
+        } else {
+          const throughKStr = throughK === INF ? '∞' : throughK;
+          const dijStr = dij === INF ? '∞' : dij;
+          // Only log if there's a potential path (not both INF)
+          if (dik !== INF && dkj !== INF) {
+            steps.push({
+              type: 'examine',
+              description: `k=${k}, i=${i}, j=${j}: D[${i}][${k}]+D[${k}][${j}] = ${dik}+${dkj} = ${throughKStr} >= D[${i}][${j}] = ${dijStr}，不更新`,
+              D: JSON.parse(JSON.stringify(D)),
+              P: JSON.parse(JSON.stringify(P)),
+              k: k, i: i, j: j,
+              updated: false, updateInfo: null,
+              highlightCells: [[i, k, 'yellow'], [k, j, 'yellow'], [i, j, 'green']]
+            });
+          }
+        }
+      }
+    }
+
+    // k iteration complete
+    steps.push({
+      type: 'k-exit',
+      description: `k = ${k} 迭代完成。D(${k + 1}) 和 P(${k + 1}) 已确定`,
+      D: JSON.parse(JSON.stringify(D)),
+      P: JSON.parse(JSON.stringify(P)),
+      k: k, i: -1, j: -1,
+      updated: false, updateInfo: null,
+      highlightCells: []
+    });
+  }
+
+  // Complete
+  steps.push({
+    type: 'complete',
+    description: 'Floyd 算法完成! 所有顶点对之间的最短路径已求出',
+    D: JSON.parse(JSON.stringify(D)),
+    P: JSON.parse(JSON.stringify(P)),
+    k: n - 1, i: -1, j: -1,
+    updated: false, updateInfo: null,
+    highlightCells: []
+  });
+}
+
+// ==================== RENDER ====================
+function render() {
+  if (currentStep < 0 || currentStep >= steps.length) return;
+  const step = steps[currentStep];
+
+  renderGraph(step);
+  renderMatrices(step);
+  renderStatus(step);
+  updateButtons();
+}
+
+function renderGraph(step) {
+  const nodeLayer = document.getElementById('nodeLayer');
+  nodeLayer.innerHTML = '';
+
+  for (let v = 0; v < n; v++) {
+    const pos = nodePositions[v];
+    let bgClass = 'bg-gray-700 border-gray-600 text-gray-300';
+
+    if (step.k >= 0 && v === step.k && (step.type === 'k-enter' || step.type === 'examine' || step.type === 'update' || step.type === 'k-exit')) {
+      bgClass = 'bg-orange-500 border-orange-300 text-white font-bold shadow-lg shadow-orange-500/40';
+    } else if (v === step.i && step.i >= 0) {
+      bgClass = 'bg-blue-500 border-blue-300 text-white shadow-lg shadow-blue-500/30';
+    } else if (v === step.j && step.j >= 0) {
+      bgClass = 'bg-green-500 border-green-300 text-white shadow-lg shadow-green-500/30';
+    }
+
+    const div = document.createElement('div');
+    div.className = `node absolute w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold border-2 cursor-default ${bgClass}`;
+    div.style.left = pos.x + 'px';
+    div.style.top = pos.y + 'px';
+    div.style.transform = 'translate(-50%, -50%)';
+
+    // Show D[v][v] - diagonal is always 0
+    div.innerHTML = `<span>${v}</span>`;
+    nodeLayer.appendChild(div);
+  }
+
+  // Render edges
+  const svg = document.getElementById('edgeLayer');
+  const sw = svg.parentElement.clientWidth;
+  const sh = svg.parentElement.clientHeight;
+  svg.setAttribute('viewBox', `0 0 ${sw} ${sh}`);
+
+  let html = `<defs>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"/>
+    </marker>
+  </defs>`;
+
+  for (const e of allEdges) {
+    const x1 = nodePositions[e.from].x;
+    const y1 = nodePositions[e.from].y;
+    const x2 = nodePositions[e.to].x;
+    const y2 = nodePositions[e.to].y;
+
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len, uy = dy / len;
+    const sx = x1 + ux * 26;
+    const sy = y1 + uy * 26;
+    const ex = x2 - ux * 28;
+    const ey = y2 - uy * 28;
+    const mx = (sx + ex) / 2, my = (sy + ey) / 2;
+
+    let stroke = '#4b5563', markerEnd = 'url(#arrowGray)', labelColor = '#6b7280';
+    let sw2 = 1.5;
+
+    // Highlight if this edge is part of current comparison
+    if (step.i >= 0 && step.j >= 0) {
+      if (e.from === step.i && e.to === step.k) {
+        stroke = '#facc15'; markerEnd = 'url(#arrowBlue)'; labelColor = '#facc15'; sw2 = 2.5;
+      } else if (e.from === step.k && e.to === step.j) {
+        stroke = '#facc15'; markerEnd = 'url(#arrowBlue)'; labelColor = '#facc15'; sw2 = 2.5;
+      } else if (e.from === step.i && e.to === step.j) {
+        stroke = '#60a5fa'; markerEnd = 'url(#arrowBlue)'; labelColor = '#60a5fa'; sw2 = 2;
+      }
+    }
+
+    const origWeight = graph[e.from][e.to];
+    html += `<line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${stroke}" stroke-width="${sw2}" marker-end="${markerEnd}" stroke-linecap="round"/>`;
+    html += `<rect x="${mx - 12}" y="${my - 10}" width="24" height="18" rx="4" fill="#1f2937" opacity="0.9"/>`;
+    html += `<text x="${mx}" y="${my + 4}" text-anchor="middle" fill="${labelColor}" font-size="11" font-weight="bold">${origWeight}</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+function renderMatrices(step) {
+  // Distance matrix D
+  const dTable = document.getElementById('matrixD');
+  let dHtml = '<thead><tr><th class="matrix-cell w-10 h-8 bg-gray-800 text-gray-500 text-xs font-mono">D</th>';
+  for (let j = 0; j < n; j++) {
+    dHtml += `<th class="matrix-cell w-14 h-8 bg-gray-800 text-gray-400 text-xs font-mono">${j}</th>`;
+  }
+  dHtml += '</tr></thead><tbody>';
+
+  for (let i = 0; i < n; i++) {
+    dHtml += '<tr>';
+    dHtml += `<td class="matrix-cell w-10 h-9 bg-gray-800 text-gray-400 text-center text-xs font-mono font-bold">${i}</td>`;
+    for (let j = 0; j < n; j++) {
+      const val = step.D[i][j];
+      const displayVal = val === INF ? '∞' : val;
+      let cellClass = 'matrix-cell w-14 h-9 text-center border border-gray-700 bg-gray-800 text-gray-400';
+
+      // Row/col highlighting for k
+      if (step.k >= 0) {
+        if (i === step.k || j === step.k) {
+          if (i === j) {
+            cellClass = 'matrix-cell w-14 h-9 text-center border border-orange-700 bg-orange-900/50 text-orange-300 font-bold';
+          } else {
+            cellClass = 'matrix-cell w-14 h-9 text-center border border-orange-800 bg-orange-900/30 text-orange-300';
+          }
+        }
+      }
+
+      // Current cell highlights
+      if (step.highlightCells && step.highlightCells.length > 0) {
+        for (const hc of step.highlightCells) {
+          if (hc[0] === i && hc[1] === j) {
+            if (hc[2] === 'red') {
+              cellClass = 'matrix-cell w-14 h-9 text-center border border-red-500 bg-red-900/60 text-red-300 font-bold highlight-update';
+            } else if (hc[2] === 'yellow') {
+              cellClass = 'matrix-cell w-14 h-9 text-center border border-yellow-500 bg-yellow-900/50 text-yellow-300';
+            } else if (hc[2] === 'green') {
+              cellClass = 'matrix-cell w-14 h-9 text-center border border-green-600 bg-green-900/40 text-green-300';
+            } else if (hc[2] === 'blue') {
+              cellClass = 'matrix-cell w-14 h-9 text-center border border-blue-500 bg-blue-900/40 text-blue-300';
+            }
+          }
+        }
+      }
+
+      // Diagonal
+      if (i === j && cellClass.indexOf('border-red') === -1 && cellClass.indexOf('border-yellow') === -1 && cellClass.indexOf('border-green') === -1) {
+        cellClass = 'matrix-cell w-14 h-9 text-center border border-gray-700 bg-gray-750 text-gray-500';
+      }
+
+      dHtml += `<td class="${cellClass}">${displayVal}</td>`;
+    }
+    dHtml += '</tr>';
+  }
+  dHtml += '</tbody>';
+  dTable.innerHTML = dHtml;
+
+  // Predecessor matrix P
+  const pTable = document.getElementById('matrixP');
+  let pHtml = '<thead><tr><th class="matrix-cell w-10 h-8 bg-gray-800 text-gray-500 text-xs font-mono">P</th>';
+  for (let j = 0; j < n; j++) {
+    pHtml += `<th class="matrix-cell w-14 h-8 bg-gray-800 text-gray-400 text-xs font-mono">${j}</th>`;
+  }
+  pHtml += '</tr></thead><tbody>';
+
+  for (let i = 0; i < n; i++) {
+    pHtml += '<tr>';
+    pHtml += `<td class="matrix-cell w-10 h-9 bg-gray-800 text-gray-400 text-center text-xs font-mono font-bold">${i}</td>`;
+    for (let j = 0; j < n; j++) {
+      const val = step.P[i][j];
+      const displayVal = val === -1 ? '-' : val;
+      let cellClass = 'matrix-cell w-14 h-9 text-center border border-gray-700 bg-gray-800 text-gray-400';
+
+      // Row/col for k
+      if (step.k >= 0 && (i === step.k || j === step.k) && i !== j) {
+        cellClass = 'matrix-cell w-14 h-9 text-center border border-orange-800 bg-orange-900/30 text-orange-300';
+      }
+
+      // Current cell highlight
+      if (step.highlightCells && step.highlightCells.length > 0) {
+        for (const hc of step.highlightCells) {
+          if (hc[0] === i && hc[1] === j) {
+            if (hc[2] === 'red') {
+              cellClass = 'matrix-cell w-14 h-9 text-center border border-red-500 bg-red-900/60 text-red-300 font-bold highlight-update';
+            }
+          }
+        }
+      }
+
+      if (i === j && !cellClass.includes('red')) {
+        cellClass = 'matrix-cell w-14 h-9 text-center border border-gray-700 bg-gray-750 text-gray-500';
+      }
+
+      pHtml += `<td class="${cellClass}">${displayVal}</td>`;
+    }
+    pHtml += '</tr>';
+  }
+  pHtml += '</tbody>';
+  pTable.innerHTML = pHtml;
+
+  // Superscripts
+  const kDisp = step.k >= 0 ? step.k + 1 : 0;
+  document.getElementById('kSuperscriptD').textContent = `(${kDisp})`;
+  document.getElementById('kSuperscriptP').textContent = `(${kDisp})`;
+  document.getElementById('kIterLabel').innerHTML = step.k >= 0 ? `k = ${step.k}` : 'k = -1 (未开始)';
+}
+
+function renderStatus(step) {
+  document.getElementById('stepDesc').textContent = step.description;
+  document.getElementById('curK').textContent = step.k >= 0 ? step.k : '-';
+  document.getElementById('curI').textContent = step.i >= 0 ? step.i : '-';
+  document.getElementById('curJ').textContent = step.j >= 0 ? step.j : '-';
+
+  // Update count
+  let uc = 0;
+  for (let s = 1; s <= currentStep; s++) {
+    if (steps[s].type === 'update') uc++;
+  }
+  document.getElementById('updateCount').textContent = uc;
+
+  // Comparison display
+  if (step.updateInfo) {
+    const ui = step.updateInfo;
+    document.getElementById('compareLeft').textContent = `${ui.dik} + ${ui.dkj} = ${ui.throughK}`;
+    document.getElementById('compareRight').textContent = ui.oldVal === INF ? '∞' : ui.oldVal;
+    document.getElementById('compareResult').textContent = '是 ✓';
+    document.getElementById('compareResult').className = 'text-red-400 font-mono font-bold';
+  } else if (step.type === 'examine' && step.i >= 0) {
+    const dik = step.D[step.i][step.k];
+    const dkj = step.D[step.k][step.j];
+    const throughK = (dik === INF || dkj === INF) ? INF : dik + dkj;
+    const throughKStr = throughK === INF ? '∞' : throughK;
+    document.getElementById('compareLeft').textContent = (dik === INF ? '∞' : dik) + ' + ' + (dkj === INF ? '∞' : dkj) + ' = ' + throughKStr;
+    const dij = step.D[step.i][step.j];
+    document.getElementById('compareRight').textContent = dij === INF ? '∞' : dij;
+    document.getElementById('compareResult').textContent = '否';
+    document.getElementById('compareResult').className = 'text-gray-400 font-mono';
+  } else {
+    document.getElementById('compareLeft').textContent = '-';
+    document.getElementById('compareRight').textContent = '-';
+    document.getElementById('compareResult').textContent = '-';
+    document.getElementById('compareResult').className = 'text-gray-400 font-mono font-bold';
+  }
+}
+
+function updateButtons() {
+  document.getElementById('btnBack').disabled = currentStep <= 0;
+  document.getElementById('btnStep').disabled = currentStep >= steps.length - 1;
+  document.getElementById('btnPlay').disabled = currentStep >= steps.length - 1;
+}
+
+// ==================== LOG ====================
+function addLog(msg, type) {
+  const panel = document.getElementById('logPanel');
+  let colorClass = 'text-gray-400';
+  if (type === 'init') colorClass = 'text-blue-400';
+  else if (type === 'k-enter') colorClass = 'text-orange-400';
+  else if (type === 'update') colorClass = 'text-red-400';
+  else if (type === 'examine') colorClass = 'text-gray-500';
+  else if (type === 'k-exit') colorClass = 'text-green-400';
+  else if (type === 'complete') colorClass = 'text-yellow-400';
+
+  const div = document.createElement('div');
+  div.className = `log-entry ${colorClass}`;
+  div.textContent = msg;
+  panel.appendChild(div);
+  panel.scrollTop = panel.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logPanel').innerHTML = '';
+}
+
+// ==================== CONTROLS ====================
+function stepForward() {
+  if (currentStep >= steps.length - 1) return;
+  currentStep++;
+  const step = steps[currentStep];
+  addLog(`[步骤 ${currentStep}] ${step.description}`, step.type);
+  render();
+  if (currentStep >= steps.length - 1) stopAuto();
+}
+
+function stepBack() {
+  if (currentStep <= 0) return;
+  currentStep--;
+  const panel = document.getElementById('logPanel');
+  if (panel.lastChild) panel.removeChild(panel.lastChild);
+  render();
+}
+
+function autoPlay() {
+  if (autoTimer) {
+    stopAuto();
+    return;
+  }
+  document.getElementById('btnPlay').textContent = '暂停';
+  document.getElementById('btnPlay').classList.remove('bg-orange-600', 'hover:bg-orange-500');
+  document.getElementById('btnPlay').classList.add('bg-red-600', 'hover:bg-red-500');
+
+  function tick() {
+    if (currentStep >= steps.length - 1) { stopAuto(); return; }
+    stepForward();
+    if (currentStep < steps.length - 1) {
+      autoTimer = setTimeout(tick, playSpeed);
+    } else { stopAuto(); }
+  }
+  autoTimer = setTimeout(tick, playSpeed);
+}
+
+function stopAuto() {
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  document.getElementById('btnPlay').textContent = '自动播放';
+  document.getElementById('btnPlay').classList.remove('bg-red-600', 'hover:bg-red-500');
+  document.getElementById('btnPlay').classList.add('bg-orange-600', 'hover:bg-orange-500');
+}
+
+function reset() {
+  stopAuto();
+  currentStep = -1;
+  clearLog();
+  initSteps();
+  currentStep = 0;
+  addLog(`[初始化] ${steps[0].description}`, 'init');
+  render();
+}
+
+function updateSpeed(val) {
+  playSpeed = parseFloat(val) * 1000;
+  document.getElementById('speedLabel').textContent = '速度: ' + parseFloat(val).toFixed(1) + 's';
+}
+
+// ==================== STARTUP ====================
+function init() {
+  initSteps();
+  currentStep = 0;
+  addLog(`[初始化] ${steps[0].description}`, 'init');
+  render();
+}
+
+window.addEventListener('resize', () => {
+  if (currentStep >= 0 && currentStep < steps.length) {
+    renderGraph(steps[currentStep]);
+  }
+});
+
+init();
+</script>
+
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/floyd.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

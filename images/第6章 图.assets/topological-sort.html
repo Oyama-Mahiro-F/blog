@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="拓扑排序演示 - 408 考研 · 数据结构                   @import url(&#39;https:&#x2F;&#x2F;fonts.googleapis.com&#x2F;css2?family&#x3D;Noto+Sans+SC:wght@400;500;700&amp;display&#x3D;swap&#39;);         * { font-family: &#39;Noto Sans SC&#39;, s">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="拓扑排序演示 - 408 考研 · 数据结构                   @import url(&#39;https:&#x2F;&#x2F;fonts.googleapis.com&#x2F;css2?family&#x3D;Noto+Sans+SC:wght@400;500;700&amp;display&#x3D;swap&#39;);         * { font-family: &#39;Noto Sans SC&#39;, s">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-19T16:06:04.165Z">
+<meta property="article:modified_time" content="2026-07-19T16:06:04.158Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拓扑排序演示 - 408 考研 · 数据结构</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        * { font-family: 'Noto Sans SC', sans-serif; }
+        .node { transition: all 0.4s ease; }
+        .node-highlight-blue  { box-shadow: 0 0 18px rgba(59,130,246,0.8); border-color: #3b82f6 !important; }
+        .node-highlight-green { box-shadow: 0 0 18px rgba(34,197,94,0.8);  border-color: #22c55e !important; }
+        .node-highlight-red   { box-shadow: 0 0 18px rgba(239,68,68,0.8);  border-color: #ef4444 !important; }
+        .node-output { opacity: 0.5; transform: scale(0.92); }
+        .arrow-line { transition: stroke 0.4s ease, stroke-width 0.3s; }
+        .arrow-line.dimmed { stroke: #374151; stroke-width: 1; }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .pulse { animation: pulse-dot 0.8s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col overflow-hidden">
+    <!-- ==================== TOP CONTROL BAR ==================== -->
+    <header class="bg-gray-900 border-b border-gray-700 px-5 py-3 flex items-center gap-4 shrink-0 flex-wrap shadow-lg z-20">
+        <h1 class="text-lg font-bold text-blue-400 tracking-wide whitespace-nowrap">
+            拓扑排序 (AOV网)
+        </h1>
+        <div class="h-6 w-px bg-gray-600 hidden sm:block"></div>
+
+        <button id="btnPrev" onclick="prevStep()"
+            class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-sm rounded border border-gray-500 transition disabled:opacity-30 disabled:cursor-not-allowed">
+            ◀ 上一步
+        </button>
+        <button id="btnNext" onclick="nextStep()"
+            class="px-4 py-1.5 bg-blue-700 hover:bg-blue-600 text-sm rounded border border-blue-500 transition font-medium">
+            下一步 ▶
+        </button>
+        <button id="btnPlay" onclick="togglePlay()"
+            class="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-sm rounded border border-emerald-500 transition font-medium w-28 text-center">
+            ▶ 自动播放
+        </button>
+        <button id="btnReset" onclick="resetAll()"
+            class="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-sm rounded border border-gray-500 transition">
+            ↻ 重置
+        </button>
+
+        <div class="h-6 w-px bg-gray-600 hidden sm:block"></div>
+        <div class="flex items-center gap-2 text-sm">
+            <span class="text-gray-400">速度:</span>
+            <input type="range" id="speedSlider" min="300" max="2000" value="900" step="100"
+                class="w-20 h-1 accent-blue-400" oninput="updateSpeed()">
+            <span id="speedLabel" class="text-gray-300 w-16">900ms</span>
+        </div>
+
+        <div class="h-6 w-px bg-gray-600 hidden sm:block"></div>
+        <label class="flex items-center gap-2 text-sm cursor-pointer select-none">
+            <input type="checkbox" id="cycleMode" onchange="toggleCycleMode()" class="accent-red-500 w-4 h-4">
+            <span class="text-gray-300">包含环 (检测用)</span>
+        </label>
+
+        <span id="stepCounter" class="ml-auto text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded font-mono">
+            步骤: 0 / 0
+        </span>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="flex flex-1 overflow-hidden">
+        <!-- ===== VISUALIZATION AREA ===== -->
+        <div class="flex-1 flex items-center justify-center overflow-auto bg-gray-950 p-4" style="min-width: 0;">
+            <div id="vizWrapper" class="relative shrink-0" style="width:760px; height:620px;">
+                <!-- SVG layer for arrows -->
+                <svg id="arrowSvg" style="position:absolute;top:0;left:0;width:760px;height:620px;z-index:1;pointer-events:none;">
+                    <defs>
+                        <marker id="arrowHead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <polygon points="0 0, 10 4, 0 8" fill="#9ca3af" />
+                        </marker>
+                        <marker id="arrowHeadBlue" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <polygon points="0 0, 10 4, 0 8" fill="#3b82f6" />
+                        </marker>
+                        <marker id="arrowHeadGreen" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <polygon points="0 0, 10 4, 0 8" fill="#22c55e" />
+                        </marker>
+                        <marker id="arrowHeadRed" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+                            <polygon points="0 0, 10 4, 0 8" fill="#ef4444" />
+                        </marker>
+                    </defs>
+                    <g id="arrowGroup"></g>
+                </svg>
+
+                <!-- Nodes rendered here -->
+                <div id="nodeLayer" style="position:absolute;top:0;left:0;width:760px;height:620px;z-index:2;"></div>
+
+                <!-- Cycle warning overlay -->
+                <div id="cycleWarning" class="absolute inset-0 flex items-center justify-center hidden" style="z-index:10;">
+                    <div class="bg-red-900/90 text-red-200 border-2 border-red-500 rounded-xl px-8 py-5 text-center shadow-2xl">
+                        <div class="text-2xl font-bold mb-2">检测到环!</div>
+                        <div class="text-sm">图中存在有向环，无法完成拓扑排序</div>
+                        <div id="cycleDetail" class="text-xs text-red-300 mt-2 font-mono"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDEBAR (LOG + ARRAYS) ===== -->
+        <aside class="w-80 bg-gray-900 border-l border-gray-700 flex flex-col shrink-0 overflow-hidden">
+            <!-- In-degree array -->
+            <div class="px-4 py-3 border-b border-gray-700">
+                <div class="text-xs text-gray-400 mb-2 font-medium">入度数组 inDegree[]</div>
+                <div id="inDegreeDisplay" class="flex flex-wrap gap-1.5"></div>
+                <div id="zeroDegreeHint" class="text-xs text-blue-400 mt-2 hidden">
+                    蓝色节点 = 入度为0，可被选择输出
+                </div>
+            </div>
+            <!-- Topological sequence -->
+            <div class="px-4 py-3 border-b border-gray-700">
+                <div class="text-xs text-gray-400 mb-2 font-medium">拓扑序列</div>
+                <div id="topoSeqDisplay" class="flex flex-wrap gap-1 min-h-[2rem] items-center">
+                    <span class="text-xs text-gray-600">等待执行...</span>
+                </div>
+            </div>
+            <!-- Log panel -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <div class="px-4 py-2 text-xs text-gray-400 font-medium border-b border-gray-700 shrink-0">
+                    执行日志
+                </div>
+                <div id="logPanel" class="flex-1 overflow-y-auto px-3 py-2 space-y-1 text-xs font-mono">
+                    <div class="text-gray-600">就绪，点击"下一步"开始...</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ==================== LEGEND BAR ==================== -->
+    <footer class="bg-gray-900 border-t border-gray-700 px-5 py-2 flex items-center gap-4 text-xs shrink-0">
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> 入度=0 (可选)</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span> 当前输出</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span> 环中顶点</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-600 inline-block"></span> 已输出</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-gray-800 border border-gray-600 inline-block"></span> 未处理</span>
+    </footer>
+
+    <script>
+        // ==================== DATA ====================
+        const nodeLabels = ['高数', '线代', 'C语言', '数据结构', '计组', '操作系统', '编译原理'];
+        const nodeFullNames = ['高等数学', '线性代数', 'C语言程序设计', '数据结构', '计算机组成原理', '操作系统', '编译原理'];
+        const N = 7;
+
+        // Edge list (directed, from prerequisite to advanced course)
+        const edgesNormal = [
+            [0,3],[0,4],   // 高数 → 数据结构, 计组
+            [1,3],         // 线代 → 数据结构
+            [2,4],[2,5],   // C语言 → 计组, 操作系统
+            [3,5],[3,6],   // 数据结构 → 操作系统, 编译原理
+            [4,5],         // 计组 → 操作系统
+            [5,6]          // 操作系统 → 编译原理
+        ];
+        // Extra back edge that creates a cycle: V6 → V2
+        const cycleEdge = [6, 2];
+
+        let edges = [...edgesNormal];
+        let cycleActive = false;
+
+        // Node center positions in the visualization area
+        const nodePos = [
+            { cx: 120, cy: 55  },   // V0 高数
+            { cx: 370, cy: 55  },   // V1 线代
+            { cx: 620, cy: 55  },   // V2 C语言
+            { cx: 180, cy: 235 },   // V3 数据结构
+            { cx: 560, cy: 235 },   // V4 计组
+            { cx: 370, cy: 400 },   // V5 操作系统
+            { cx: 370, cy: 545 },   // V6 编译原理
+        ];
+        const NODE_W = 114, NODE_H = 52;
+
+        // State
+        let inDegree = [];
+        let adj = [];
+        let visited = [];        // has been output
+        let topoSeq = [];
+        let currentVertex = -1;  // vertex being processed this step
+        let stepCount = 0;
+        let totalSteps = 0;
+        let playing = false;
+        let playTimer = null;
+        let playSpeed = 900;
+        let stepHistory = [];    // for undo
+
+        // ==================== INIT ====================
+        function buildGraph() {
+            adj = Array.from({ length: N }, () => []);
+            inDegree = new Array(N).fill(0);
+            edges.forEach(([u, v]) => {
+                adj[u].push(v);
+                inDegree[v]++;
+            });
+        }
+
+        function initState() {
+            visited = new Array(N).fill(false);
+            topoSeq = [];
+            currentVertex = -1;
+            stepCount = 0;
+            totalSteps = 0;
+            stepHistory = [];
+            // Calculate theoretical max steps
+            buildGraph();
+            totalSteps = N;
+            document.getElementById('stepCounter').textContent = `步骤: 0 / ${totalSteps}`;
+        }
+
+        // ==================== RENDER ====================
+        function renderAll() {
+            renderNodes();
+            renderArrows();
+            renderInDegree();
+            renderTopoSeq();
+            updateButtonStates();
+        }
+
+        function renderNodes() {
+            const layer = document.getElementById('nodeLayer');
+            let html = '';
+            for (let i = 0; i < N; i++) {
+                const pos = nodePos[i];
+                let borderClass = 'border-gray-600 bg-gray-800';
+                let extraClass = '';
+                let labelText = nodeLabels[i];
+                let inDegText = `入度: ${inDegree[i]}`;
+
+                if (visited[i]) {
+                    borderClass = 'border-gray-700 bg-gray-800/40 text-gray-500';
+                    extraClass = 'node-output';
+                    inDegText = '已输出';
+                } else if (i === currentVertex) {
+                    borderClass = 'border-green-400 bg-green-900/50';
+                    extraClass = 'node-highlight-green pulse';
+                } else if (inDegree[i] === 0 && !cycleDetected) {
+                    borderClass = 'border-blue-400 bg-blue-900/40';
+                    extraClass = 'node-highlight-blue';
+                }
+
+                if (cycleVertices && cycleVertices.has(i)) {
+                    borderClass = 'border-red-400 bg-red-900/50';
+                    extraClass = 'node-highlight-red';
+                }
+
+                html += `
+                <div class="node absolute ${borderClass} ${extraClass} border-2 rounded-xl flex flex-col items-center justify-center
+                    text-center cursor-default select-none"
+                    style="left:<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="mord mathnormal">os</span><span class="mord">.</span><span class="mord mathnormal">c</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/2</span></span><span class="mord mathnormal">p</span><span class="mord mathnormal">x</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mord mathnormal">o</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span></span>{pos.cy - NODE_H/2}px; width:<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span><span class="mord mathnormal">p</span><span class="mord mathnormal">x</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">h</span><span class="mord mathnormal">e</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">h</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span></span>{NODE_H}px; z-index:3;">
+                    <span class="text-xs font-bold">V${i} · ${labelText}</span>
+                    <span class="text-[10px] mt-0.5 opacity-70">${inDegText}</span>
+                </div>`;
+            }
+            layer.innerHTML = html;
+        }
+
+        function renderArrows() {
+            const g = document.getElementById('arrowGroup');
+            let svgHtml = '';
+            edges.forEach(([u, v]) => {
+                const p1 = nodePos[u], p2 = nodePos[v];
+                const pts = getArrowEndpoints(p1.cx, p1.cy, p2.cx, p2.cy);
+
+                let color = '#6b7280'; // default gray
+                let marker = 'url(#arrowHead)';
+                let width = 2;
+                let cls = 'arrow-line';
+
+                // Dim arrows from output vertices
+                if (visited[u]) {
+                    color = '#374151';
+                    width = 1;
+                    cls += ' dimmed';
+                }
+                // Highlight arrows from current vertex
+                if (u === currentVertex) {
+                    color = '#22c55e';
+                    marker = 'url(#arrowHeadGreen)';
+                    width = 3;
+                    cls += ' arrow-active';
+                }
+                // Cycle edge highlight
+                if (cycleActive && u === cycleEdge[0] && v === cycleEdge[1]) {
+                    color = '#ef4444';
+                    marker = 'url(#arrowHeadRed)';
+                    width = 3;
+                }
+
+                svgHtml += `<line x1="<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">pt</span><span class="mord mathnormal">s</span><span class="mord">.</span><span class="mord mathnormal">x</span><span class="mord">1</span></span><span class="mord">&quot;</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">&quot;</span></span></span></span>{pts.y1}" x2="<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">pt</span><span class="mord mathnormal">s</span><span class="mord">.</span><span class="mord mathnormal">x</span><span class="mord">2</span></span><span class="mord">&quot;</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">&quot;</span></span></span></span>{pts.y2}"
+                    stroke="<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">co</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal" style="margin-right:0.0278em;">or</span></span><span class="mord">&quot;</span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mord mathnormal">t</span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">&quot;</span></span></span></span>{width}" marker-end="<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord mathnormal">ma</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal" style="margin-right:0.0278em;">er</span></span><span class="mord">&quot;</span><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">a</span><span class="mord mathnormal">ss</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">&quot;</span></span></span></span>{cls}"/>`;
+
+                // Edge label (duration placeholder for topological sort — show edge index)
+                const mx = (pts.x1 + pts.x2) / 2 + 8;
+                const my = (pts.y1 + pts.y2) / 2 - 6;
+                svgHtml += `<text x="<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">m</span><span class="mord mathnormal">x</span></span><span class="mord">&quot;</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">&quot;</span></span></span></span>{my}" fill="${visited[u] ? '#4b5563' : '#9ca3af'}"
+                    font-size="10" text-anchor="start" class="pointer-events-none select-none">e<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord"><span class="mord mathnormal">u</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span></span></span></span>{v}</text>`;
+            });
+            g.innerHTML = svgHtml;
+        }
+
+        function getArrowEndpoints(cx1, cy1, cx2, cy2) {
+            const dx = cx2 - cx1;
+            const dy = cy2 - cy1;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 1) return { x1: cx1, y1: cy1, x2: cx2, y2: cy2 };
+            const ux = dx / dist;
+            const uy = dy / dist;
+            // Distance from node center to its rectangular border along direction
+            const r1 = rectHalfExtent(NODE_W, NODE_H, ux, uy);
+            const r2 = rectHalfExtent(NODE_W, NODE_H, -ux, -uy);
+            return {
+                x1: cx1 + ux * r1 + ux * 2,
+                y1: cy1 + uy * r1 + uy * 2,
+                x2: cx2 - ux * r2 - ux * 8,
+                y2: cy2 - uy * r2 - uy * 8,
+            };
+        }
+
+        function rectHalfExtent(w, h, ux, uy) {
+            const hw = w / 2;
+            const hh = h / 2;
+            if (Math.abs(ux) < 1e-9) return hh;
+            if (Math.abs(uy) < 1e-9) return hw;
+            const tx = hw / Math.abs(ux);
+            const ty = hh / Math.abs(uy);
+            return Math.min(tx, ty);
+        }
+
+        function renderInDegree() {
+            const container = document.getElementById('inDegreeDisplay');
+            let html = '';
+            for (let i = 0; i < N; i++) {
+                let bg = 'bg-gray-700';
+                if (visited[i]) bg = 'bg-gray-600/40 text-gray-500';
+                else if (inDegree[i] === 0) bg = 'bg-blue-700';
+                html += `<div class="${bg} text-xs px-2 py-1 rounded font-mono min-w-[3.2rem] text-center">
+                    V<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord"><span class="mord mathnormal">i</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span></span></span></span>{visited[i] ? '✓' : inDegree[i]}</div>`;
+            }
+            container.innerHTML = html;
+
+            const hint = document.getElementById('zeroDegreeHint');
+            if (!cycleDetected) {
+                const hasZero = inDegree.some((d, i) => d === 0 && !visited[i]);
+                hint.classList.toggle('hidden', !hasZero || topoSeq.length >= N);
+            }
+        }
+
+        function renderTopoSeq() {
+            const container = document.getElementById('topoSeqDisplay');
+            if (topoSeq.length === 0) {
+                container.innerHTML = '<span class="text-xs text-gray-600">等待执行...</span>';
+                return;
+            }
+            container.innerHTML = topoSeq.map((v, idx) =>
+                `<span class="bg-green-800 text-green-200 text-xs px-2 py-0.5 rounded font-mono">${idx+1}.V${v}</span>`
+            ).join('') + (visited.every(x => x) ? ''
+                : '<span class="text-gray-500 text-xs ml-1">→</span>');
+        }
+
+        function updateButtonStates() {
+            const finished = visited.every(x => x) || cycleDetected;
+            document.getElementById('btnNext').disabled = finished;
+            document.getElementById('btnPlay').disabled = finished;
+            if (finished && playing) stopPlay();
+        }
+
+        // ==================== STEP LOGIC ====================
+        let cycleDetected = false;
+        let cycleVertices = null;
+
+        function nextStep() {
+            if (visited.every(x => x) || cycleDetected) return;
+
+            // Save state for undo
+            stepHistory.push({
+                inDegree: [...inDegree],
+                visited: [...visited],
+                topoSeq: [...topoSeq],
+                currentVertex: currentVertex,
+                cycleDetected: cycleDetected,
+                cycleVertices: cycleVertices ? new Set(cycleVertices) : null,
+            });
+
+            // Find all vertices with in-degree 0 that are not yet output
+            const candidates = [];
+            for (let i = 0; i < N; i++) {
+                if (!visited[i] && inDegree[i] === 0) {
+                    candidates.push(i);
+                }
+            }
+
+            if (candidates.length === 0) {
+                // No vertex with in-degree 0 → cycle detected (or all done)
+                const remaining = [];
+                for (let i = 0; i < N; i++) {
+                    if (!visited[i]) remaining.push(i);
+                }
+                if (remaining.length > 0) {
+                    // CYCLE DETECTED
+                    cycleDetected = true;
+                    cycleVertices = new Set(remaining);
+                    stepCount++;
+                    document.getElementById('stepCounter').textContent =
+                        `步骤: ${stepCount} - 检测到环!`;
+                    addLog(`❌ 错误: 图中存在有向环! 剩余未输出顶点: ${remaining.map(v => 'V'+v).join(', ')}，这些顶点构成环，无法继续拓扑排序`, 'text-red-400');
+                    document.getElementById('cycleWarning').classList.remove('hidden');
+                    const detail = document.getElementById('cycleDetail');
+                    detail.textContent = `环涉及顶点: ${remaining.map(v => nodeFullNames[v]).join(' → ')}`;
+                    stopPlay();
+                    renderAll();
+                }
+                return;
+            }
+
+            // Pick the first candidate (lowest index)
+            const v = candidates[0];
+            currentVertex = v;
+            stepCount++;
+            document.getElementById('stepCounter').textContent =
+                `步骤: ${stepCount} / ${totalSteps}`;
+
+            // Log: selecting this vertex
+            if (candidates.length > 1) {
+                addLog(`📍 当前入度为0的顶点: ${candidates.map(x => 'V'+x+'('+nodeLabels[x]+')').join(', ')}，选择 V${v}(${nodeLabels[v]}) 输出`, 'text-blue-300');
+            } else {
+                addLog(`📍 唯一入度为0的顶点 V${v}(${nodeLabels[v]})，将其输出`, 'text-blue-300');
+            }
+
+            // "Output" v: mark visited, add to sequence
+            visited[v] = true;
+            topoSeq.push(v);
+
+            // Remove outgoing edges: decrement in-degree of neighbors
+            const neighbors = adj[v];
+            if (neighbors.length > 0) {
+                for (const nb of neighbors) {
+                    const oldDeg = inDegree[nb];
+                    inDegree[nb]--;
+                    addLog(`  ↳ 删除边 V${v}→V${nb}(${nodeLabels[nb]})，V${nb} 入度: ${oldDeg} → ${inDegree[nb]}${inDegree[nb] === 0 ? ' (变为0，可被选择!)' : ''}`, 'text-gray-400');
+                }
+            }
+
+            // Check if all done
+            if (visited.every(x => x)) {
+                addLog(`✅ 拓扑排序完成! 序列: ${topoSeq.map(v => 'V'+v+'('+nodeLabels[v]+')').join(' → ')}`, 'text-green-400');
+                document.getElementById('stepCounter').textContent =
+                    `步骤: ${stepCount} / ${totalSteps} - 完成!`;
+            }
+
+            // Keep currentVertex highlighted for a moment, then clear next step
+            // (it's cleared at the start of next step or after render)
+
+            renderAll();
+        }
+
+        function prevStep() {
+            if (stepHistory.length === 0) return;
+            const prev = stepHistory.pop();
+            inDegree = prev.inDegree;
+            visited = prev.visited;
+            topoSeq = prev.topoSeq;
+            currentVertex = prev.currentVertex;
+            cycleDetected = prev.cycleDetected;
+            cycleVertices = prev.cycleVertices;
+            stepCount = Math.max(0, stepCount - 1);
+
+            if (!cycleDetected) {
+                document.getElementById('cycleWarning').classList.add('hidden');
+            }
+            document.getElementById('stepCounter').textContent =
+                cycleDetected ? `步骤: ${stepCount} - 检测到环!` : `步骤: ${stepCount} / ${totalSteps}`;
+
+            addLog('↩ 撤销上一步操作', 'text-yellow-400');
+            renderAll();
+        }
+
+        // ==================== PLAY / STOP ====================
+        function togglePlay() {
+            if (playing) { stopPlay(); return; }
+            if (visited.every(x => x) || cycleDetected) return;
+            playing = true;
+            document.getElementById('btnPlay').textContent = '⏸ 暂停';
+            document.getElementById('btnPlay').classList.remove('bg-emerald-700', 'hover:bg-emerald-600');
+            document.getElementById('btnPlay').classList.add('bg-amber-700', 'hover:bg-amber-600');
+            playLoop();
+        }
+
+        function stopPlay() {
+            playing = false;
+            if (playTimer) clearTimeout(playTimer);
+            playTimer = null;
+            document.getElementById('btnPlay').textContent = '▶ 自动播放';
+            document.getElementById('btnPlay').classList.remove('bg-amber-700', 'hover:bg-amber-600');
+            document.getElementById('btnPlay').classList.add('bg-emerald-700', 'hover:bg-emerald-600');
+        }
+
+        function playLoop() {
+            if (!playing) return;
+            if (visited.every(x => x) || cycleDetected) { stopPlay(); return; }
+            // Clear the currentVertex highlight before next step
+            currentVertex = -1;
+            renderAll();
+            playTimer = setTimeout(() => {
+                nextStep();
+                if (!cycleDetected && !visited.every(x => x) && playing) {
+                    playLoop();
+                } else {
+                    stopPlay();
+                }
+            }, playSpeed);
+        }
+
+        function updateSpeed() {
+            playSpeed = parseInt(document.getElementById('speedSlider').value);
+            document.getElementById('speedLabel').textContent = playSpeed + 'ms';
+        }
+
+        // ==================== CYCLE MODE ====================
+        function toggleCycleMode() {
+            cycleActive = document.getElementById('cycleMode').checked;
+            if (cycleActive) {
+                edges = [...edgesNormal, cycleEdge];
+            } else {
+                edges = [...edgesNormal];
+            }
+            resetAll();
+        }
+
+        // ==================== RESET ====================
+        function resetAll() {
+            stopPlay();
+            buildGraph();
+            initState();
+            cycleDetected = false;
+            cycleVertices = null;
+            document.getElementById('cycleWarning').classList.add('hidden');
+            document.getElementById('logPanel').innerHTML =
+                '<div class="text-gray-600">就绪，点击"下一步"开始...</div>';
+            renderAll();
+        }
+
+        // ==================== LOG ====================
+        function addLog(msg, cls) {
+            const panel = document.getElementById('logPanel');
+            // Remove placeholder if present
+            if (panel.children.length === 1 && panel.children[0].classList.contains('text-gray-600') && panel.children[0].textContent.includes('就绪')) {
+                panel.innerHTML = '';
+            }
+            const div = document.createElement('div');
+            div.className = cls || 'text-gray-300';
+            div.textContent = msg;
+            panel.appendChild(div);
+            panel.scrollTop = panel.scrollHeight;
+        }
+
+        // ==================== KEYBOARD SHORTCUTS ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevStep();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                resetAll();
+            } else if (e.key === 'c' || e.key === 'C') {
+                e.preventDefault();
+                const cb = document.getElementById('cycleMode');
+                cb.checked = !cb.checked;
+                toggleCycleMode();
+            }
+        });
+
+        // ==================== BOOTSTRAP ====================
+        function boot() {
+            buildGraph();
+            initState();
+            renderAll();
+            addLog('📋 课程先修关系图 (AOV网): ' + nodeFullNames.join(' → '), 'text-gray-400');
+            addLog('💡 提示: 点击"下一步"逐步执行 | 空格键播放/暂停 | ← → 键前后步进 | 勾选"包含环"测试环检测', 'text-gray-500');
+            document.getElementById('speedLabel').textContent = playSpeed + 'ms';
+        }
+
+        boot();
+    </script>
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/topological-sort.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

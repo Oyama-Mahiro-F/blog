@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="顺序查找算法演示 (408标准)                   .array-box {             width: 52px; height: 52px; flex-shrink: 0;             display: flex; align-items: center; justify-content: center;">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="顺序查找算法演示 (408标准)                   .array-box {             width: 52px; height: 52px; flex-shrink: 0;             display: flex; align-items: center; justify-content: center;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-18T14:20:17.669Z">
+<meta property="article:modified_time" content="2026-07-18T14:20:17.667Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顺序查找算法演示 (408标准)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .array-box {
+            width: 52px; height: 52px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; font-weight: bold;
+            border-radius: 0.5rem; border: 2px solid #d1d5db;
+            background-color: white; transition: all 0.3s ease; position: relative;
+        }
+        .array-box.checking { border-color: #f59e0b; background-color: #fffbeb; box-shadow: 0 0 0 5px rgba(245,158,11,0.25); transform: scale(1.08); }
+        .array-box.found { border-color: #22c55e; background-color: #f0fdf4; box-shadow: 0 0 0 5px rgba(34,197,94,0.25); transform: scale(1.08); }
+        .array-box.not-found { border-color: #ef4444; background-color: #fef2f2; }
+        .array-box.sentinel { border-color: #8b5cf6; background-color: #f5f3ff; }
+        .array-row { display: flex; gap: 6px; padding: 10px 0; flex-wrap: wrap; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col font-sans">
+
+    <!-- 顶部控制栏 -->
+    <div class="bg-white shadow-sm border-b p-4 flex flex-wrap gap-4 items-center justify-between z-10">
+        <div class="flex gap-4 items-center flex-wrap">
+            <h1 class="text-xl font-bold text-blue-600 mr-2">顺序查找算法演示</h1>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">数组 (逗号分隔):</label>
+                <input type="text" id="input-array" value="8,3,9,5,2,7,1,6,4" class="border rounded px-2 py-1 w-56 focus:outline-none focus:border-blue-500 font-mono text-sm">
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">查找关键字:</label>
+                <input type="text" id="input-key" value="7" class="border rounded px-2 py-1 w-20 focus:outline-none focus:border-blue-500 font-mono text-sm">
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">版本:</label>
+                <select id="version-select" class="border rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+                    <option value="regular">普通顺序查找</option>
+                    <option value="sentinel">哨兵版顺序查找</option>
+                </select>
+            </div>
+            <button onclick="initSearch()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm">初始化 / 重置</button>
+        </div>
+        <div class="flex gap-2">
+            <button id="btn-step" onclick="step()" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition flex items-center gap-1 text-sm disabled:opacity-50">
+                单步执行
+            </button>
+            <button id="btn-play" onclick="togglePlay()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center gap-1 text-sm disabled:opacity-50">
+                <span id="play-text">自动播放</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- 左：可视化区域 -->
+        <div class="flex-1 p-6 overflow-auto bg-gray-50 flex flex-col gap-6">
+            <!-- 哨兵说明（哨兵模式下显示） -->
+            <div id="sentinel-info" class="bg-purple-50 border border-purple-200 p-3 rounded-lg text-sm hidden">
+                <span class="font-bold text-purple-700">哨兵模式:</span>
+                将查找关键字 <span class="font-mono font-bold" id="sentinel-key-display"></span> 存入 ST[0]（哨兵位），从尾部 ST[n] 向前查找，省去每次判断下标越界的开销。
+            </div>
+
+            <!-- 数组可视化 -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-4">查找表 (ST)</h2>
+                <div class="overflow-x-auto">
+                    <div class="array-row justify-center" id="array-display"></div>
+                </div>
+                <div class="text-center mt-4">
+                    <span id="pointer-info" class="font-mono text-sm bg-gray-100 px-3 py-1 rounded-lg">等待初始化…</span>
+                </div>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-3">查找统计</h2>
+                <div class="grid grid-cols-4 gap-4 text-sm">
+                    <div class="bg-blue-50 p-3 rounded-lg text-center"><div class="text-gray-500">比较次数</div><div class="text-2xl font-bold text-blue-600 font-mono" id="stat-comparisons">0</div></div>
+                    <div class="bg-green-50 p-3 rounded-lg text-center"><div class="text-gray-500">查找成功 ASL</div><div class="text-2xl font-bold text-green-600 font-mono" id="stat-asl-success">--</div></div>
+                    <div class="bg-red-50 p-3 rounded-lg text-center"><div class="text-gray-500">查找失败 ASL</div><div class="text-2xl font-bold text-red-600 font-mono" id="stat-asl-fail">--</div></div>
+                    <div class="bg-orange-50 p-3 rounded-lg text-center"><div class="text-gray-500">表长 n</div><div class="text-2xl font-bold text-orange-600 font-mono" id="stat-n">0</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧日志 -->
+        <div class="w-80 bg-white border-l flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]">
+            <div class="p-4 border-b bg-gray-50 font-bold flex justify-between items-center">
+                <span>执行日志</span>
+                <span id="status-badge" class="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">未开始</span>
+            </div>
+            <div id="log-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 font-mono text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        let arr = [];          // 原始数据数组（1-based: arr[1..n]）
+        let key = null;
+        let idx = 0;           // 当前比较位置
+        let status = 0;        // 0=init, 1=running, 2=found, 3=notFound
+        let comparisons = 0;
+        let version = 'regular';
+        let isPlaying = false;
+        let playInterval = null;
+
+        function initSearch() {
+            stopAutoPlay();
+            const arrStr = document.getElementById('input-array').value.trim();
+            const keyStr = document.getElementById('input-key').value.trim();
+            version = document.getElementById('version-select').value;
+
+            if (!arrStr) return alert("请输入数组");
+            if (!keyStr) return alert("请输入查找关键字");
+
+            const raw = arrStr.split(',').map(s => s.trim()).filter(s => s !== '');
+            if (raw.length === 0) return alert("数组不能为空");
+
+            // 构建1-based数组
+            if (version === 'sentinel') {
+                // 哨兵: arr[0] = key, arr[1..n] = 数据
+                arr = [keyStr, ...raw];
+                key = keyStr;
+                idx = arr.length - 1; // 从尾部开始
+                document.getElementById('sentinel-info').classList.remove('hidden');
+                document.getElementById('sentinel-key-display').textContent = keyStr;
+            } else {
+                // 普通: arr[1..n] = 数据
+                arr = [null, ...raw];
+                key = keyStr;
+                idx = 1; // 从头部开始
+                document.getElementById('sentinel-info').classList.add('hidden');
+            }
+
+            comparisons = 0;
+            status = 1;
+            document.getElementById('stat-comparisons').textContent = '0';
+            document.getElementById('stat-n').textContent = raw.length;
+            document.getElementById('log-container').innerHTML = '';
+            addLog('系统', `初始化完成。版本: ${version === 'sentinel' ? '哨兵版' : '普通版'}，表长 n=${raw.length}，查找关键字: ${key}`);
+            updateStatusBadge('运行中', 'bg-blue-100 text-blue-700');
+            // 计算理论ASL
+            const n = raw.length;
+            document.getElementById('stat-asl-success').textContent = ((n + 1) / 2).toFixed(2);
+            document.getElementById('stat-asl-fail').textContent = version === 'sentinel' ? (n + 1).toString() : (n + 1).toString();
+            renderArray();
+            updatePointer();
+        }
+
+        function step() {
+            if (status !== 1) return;
+
+            if (version === 'regular') {
+                // 普通顺序查找: i 从 1 到 n
+                if (idx >= arr.length) {
+                    // 已经越界，查找失败
+                    status = 3;
+                    addLog('失败', `查找失败！i 已超过表长 (i=${idx} > n=${arr.length - 1})，未找到关键字 ${key}。`, 'text-red-600 font-bold');
+                    updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+                    stopAutoPlay();
+                    comparisons++;
+                    document.getElementById('stat-comparisons').textContent = comparisons;
+                    renderArray();
+                    return;
+                }
+                comparisons++;
+                document.getElementById('stat-comparisons').textContent = comparisons;
+                const box = document.getElementById(`box-${idx}`);
+                if (box) { box.classList.add('checking'); box.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+                addLog('比较', `ST[${idx}] = ${arr[idx]} 与 key(${key}) 比较 (第${comparisons}次比较)`, 'text-gray-700');
+
+                if (String(arr[idx]) === String(key)) {
+                    status = 2;
+                    setTimeout(() => {
+                        const b = document.getElementById(`box-${idx}`);
+                        if (b) { b.classList.remove('checking'); b.classList.add('found'); }
+                        addLog('成功', `查找成功！在位置 ST[${idx}] 找到关键字 ${key}，共比较 ${comparisons} 次。`, 'text-green-600 font-bold text-base');
+                        updateStatusBadge('查找成功', 'bg-green-100 text-green-700');
+                        stopAutoPlay();
+                    }, 400);
+                } else {
+                    setTimeout(() => {
+                        if (box) { box.classList.remove('checking'); box.classList.add('not-found'); }
+                    }, 400);
+                    idx++;
+                }
+                renderArray();
+                updatePointer();
+            } else {
+                // 哨兵版: i 从 n 递减到 0
+                comparisons++;
+                document.getElementById('stat-comparisons').textContent = comparisons;
+                const box = document.getElementById(`box-${idx}`);
+                if (box) { box.classList.add('checking'); box.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+                addLog('比较', `ST[${idx}] = ${arr[idx]} 与 key(${key}) 比较 (第${comparisons}次比较)`, 'text-gray-700');
+
+                if (String(arr[idx]) === String(key)) {
+                    if (idx === 0) {
+                        // 遇到哨兵，查找失败
+                        status = 3;
+                        setTimeout(() => {
+                            const b = document.getElementById('box-0');
+                            if (b) { b.classList.remove('checking'); b.classList.add('sentinel'); }
+                            addLog('失败', `i=0，命中哨兵位，查找失败！共比较 ${comparisons} 次。`, 'text-red-600 font-bold text-base');
+                            updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+                            stopAutoPlay();
+                        }, 400);
+                    } else {
+                        status = 2;
+                        setTimeout(() => {
+                            const b = document.getElementById(`box-${idx}`);
+                            if (b) { b.classList.remove('checking'); b.classList.add('found'); }
+                            addLog('成功', `查找成功！在位置 ST[${idx}] 找到关键字 ${key}，共比较 ${comparisons} 次。`, 'text-green-600 font-bold text-base');
+                            updateStatusBadge('查找成功', 'bg-green-100 text-green-700');
+                            stopAutoPlay();
+                        }, 400);
+                    }
+                } else {
+                    setTimeout(() => {
+                        if (box) { box.classList.remove('checking'); box.classList.add('not-found'); }
+                    }, 400);
+                    idx--;
+                }
+                renderArray();
+                updatePointer();
+            }
+        }
+
+        function renderArray() {
+            const container = document.getElementById('array-display');
+            container.innerHTML = '';
+
+            // 哨兵位特殊渲染
+            if (version === 'sentinel') {
+                const sentinelDiv = document.createElement('div');
+                sentinelDiv.id = 'box-0';
+                sentinelDiv.className = 'array-box sentinel';
+                sentinelDiv.style.width = '62px';
+                sentinelDiv.innerHTML = `<span class="text-purple-600">${arr[0]}</span>`;
+                const idxLabel = document.createElement('div');
+                idxLabel.className = 'absolute -bottom-6 text-[10px] text-purple-400 font-mono';
+                idxLabel.innerText = 'ST[0] 哨兵';
+                idxLabel.style.whiteSpace = 'nowrap';
+                sentinelDiv.appendChild(idxLabel);
+                container.appendChild(sentinelDiv);
+                // 分隔线
+                const divider = document.createElement('div');
+                divider.className = 'flex items-center mx-1';
+                divider.innerHTML = '<span class="text-gray-300 font-bold text-lg">|</span>';
+                container.appendChild(divider);
+            }
+
+            // 渲染 arr[1..n]
+            const start = 1;
+            const end = arr.length;
+            for (let k = start; k < end; k++) {
+                const div = document.createElement('div');
+                div.id = `box-${k}`;
+                div.className = 'array-box';
+                div.innerHTML = `<span>${arr[k]}</span>`;
+                const idxLabel = document.createElement('div');
+                idxLabel.className = 'absolute -bottom-6 text-[10px] text-gray-400 font-mono';
+                idxLabel.textContent = `ST[${k}]`;
+                div.appendChild(idxLabel);
+
+                if (status === 1 && k === idx) div.classList.add('checking');
+                else if (status === 2 && k === idx) div.classList.add('found');
+                else if (status === 3) div.classList.add('not-found');
+
+                container.appendChild(div);
+            }
+        }
+
+        function updatePointer() {
+            const info = document.getElementById('pointer-info');
+            if (status === 1) {
+                info.innerHTML = `当前比较位置: <span class="font-bold text-blue-600">ST[${idx}]</span>，比较次数: <span class="font-bold text-orange-600">${comparisons}</span>`;
+            } else if (status === 2) {
+                info.innerHTML = `查找成功! 位置: <span class="font-bold text-green-600">ST[${idx}]</span>，比较次数: <span class="font-bold text-orange-600">${comparisons}</span>`;
+            } else if (status === 3) {
+                info.innerHTML = `查找失败! 共比较 <span class="font-bold text-red-600">${comparisons}</span> 次`;
+            } else {
+                info.innerHTML = '等待初始化…';
+            }
+        }
+
+        function addLog(type, message, colorClass = 'text-gray-800') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `p-3 bg-white rounded border border-gray-100 shadow-sm ${colorClass} leading-relaxed animate-fade-in`;
+            entry.innerHTML = `<span class="inline-block px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-500 mb-1 border">${type}</span><br>${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatusBadge(text, classes) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = text;
+            badge.className = `px-2 py-1 rounded text-xs font-bold ${classes}`;
+        }
+
+        function togglePlay() {
+            if (isPlaying) { stopAutoPlay(); return; }
+            if (status !== 1) initSearch();
+            isPlaying = true;
+            document.getElementById('play-text').textContent = '暂停播放';
+            document.getElementById('btn-step').disabled = true;
+            playInterval = setInterval(() => {
+                if (status === 1) step();
+                else stopAutoPlay();
+            }, 1000);
+        }
+
+        function stopAutoPlay() {
+            isPlaying = false;
+            document.getElementById('play-text').textContent = '自动播放';
+            document.getElementById('btn-step').disabled = false;
+            if (playInterval) clearInterval(playInterval);
+        }
+
+        window.onload = initSearch;
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/sequential-search.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

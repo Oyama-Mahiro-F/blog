@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="图,408">
+    <meta name="keywords" content="408,图">
     <meta name="description" content="拓扑排序：由某个集合上的一个偏序得到该集合上的一个全序的操作。即有向图的拓扑排序——构造 AOV 网中顶点的一个拓扑线性序列，使得该线性序列满足两点：  保持原来有向图中顶点之间的优先关系 对原图中没有优先关系的顶点之间，也建立一种（人为的）优先关系  基本概念   概念 说明    偏序 集合中仅有部分元素之间可以比较先后   全序 集合中任意两个元素之间都可以比较先后（拓扑排序后的线性序列）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="拓扑排序算法">
@@ -28,12 +28,14 @@
 <meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
 <meta property="og:description" content="拓扑排序：由某个集合上的一个偏序得到该集合上的一个全序的操作。即有向图的拓扑排序——构造 AOV 网中顶点的一个拓扑线性序列，使得该线性序列满足两点：  保持原来有向图中顶点之间的优先关系 对原图中没有优先关系的顶点之间，也建立一种（人为的）优先关系  基本概念   概念 说明    偏序 集合中仅有部分元素之间可以比较先后   全序 集合中任意两个元素之间都可以比较先后（拓扑排序后的线性序列）">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png">
 <meta property="article:published_time" content="2026-08-09T03:20:00.000Z">
-<meta property="article:modified_time" content="2026-08-09T11:09:25.646Z">
+<meta property="article:modified_time" content="2026-08-11T14:54:44.640Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="图">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png">
     
     <link rel="shortcut icon" href="/blog/img/avatar.jpg">
     <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
@@ -249,7 +251,15 @@
 </tr>
 </tbody></table>
 <p><strong>AOV 网不能有环</strong>：若存在环，则某项活动能否进行是以自身的完成作为前提条件，逻辑上不可能。检查方法——拓扑排序，<strong>若所有顶点都在拓扑有序序列中，则无环</strong>（否则存在环，拓扑排序失败）。</p>
-<h2 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h2><p>① 在 AOV 网中选择一个<strong>没有前驱</strong>的顶点（入度为 0）并<strong>输出</strong>；</p>
+<h2 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png" alt="拓扑排序过程示意" title="">
+                </div>
+                <div class="image-caption">拓扑排序过程示意</div>
+            </figure>
+
+<p>① 在 AOV 网中选择一个<strong>没有前驱</strong>的顶点（入度为 0）并<strong>输出</strong>；</p>
 <p>② 在 AOV 网中<strong>删除</strong>该顶点以及从该顶点出发的所有有向弧（即邻接点入度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span>）；</p>
 <p>③ <strong>重复</strong> ①②，直到：</p>
 <ul>
@@ -328,7 +338,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-09T11:09:25.646Z" itemprop="dateUpdated">2026-08-09 19:09:25</time>
+    最后更新时间：<time datetime="2026-08-11T14:54:44.640Z" itemprop="dateUpdated">2026-08-11 22:54:44</time>
 </span><br>
 
 

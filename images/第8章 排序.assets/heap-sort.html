@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="堆排序演示     @keyframes fadeInUp {     from { opacity: 0; transform: translateY(8px); }     to { opacity: 1; transform: translateY(0); }   }   @keyframes pulseNode {     0%, 100% { transform: transl">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="堆排序演示     @keyframes fadeInUp {     from { opacity: 0; transform: translateY(8px); }     to { opacity: 1; transform: translateY(0); }   }   @keyframes pulseNode {     0%, 100% { transform: transl">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-18T14:30:08.994Z">
+<meta property="article:modified_time" content="2026-07-18T14:30:08.992Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>堆排序演示</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseNode {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.18); }
+  }
+  @keyframes swapFlash {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.8); }
+    100% { filter: brightness(1); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes highlightBorder {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(239,68,68,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(239,68,68,0.2); }
+  }
+  @keyframes siftDownGlow {
+    0% { box-shadow: 0 0 8px rgba(168,85,247,0.6); }
+    50% { box-shadow: 0 0 20px rgba(168,85,247,0.9); }
+    100% { box-shadow: 0 0 8px rgba(168,85,247,0.6); }
+  }
+  .tree-node {
+    position: absolute;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    transform: translate(-50%, -50%);
+    transition: left 0.4s ease, top 0.4s ease, background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    cursor: default;
+    z-index: 10;
+    user-select: none;
+  }
+  .tree-node.pulse {
+    animation: pulseNode 0.6s ease-in-out infinite;
+  }
+  .tree-node.swap-flash {
+    animation: swapFlash 0.4s ease-in-out;
+  }
+  .tree-node.sift-glow {
+    animation: siftDownGlow 0.7s ease-in-out infinite;
+  }
+  .node-default { background: #6366f1; border: 2px solid #4f46e5; color: #fff; }
+  .node-sorted { background: #22c55e; border: 2px solid #16a34a; color: #fff; }
+  .node-root-adjust { background: #ef4444; border: 2px solid #dc2626; color: #fff; }
+  .node-compare-child { background: #f97316; border: 2px solid #ea580c; color: #fff; }
+  .node-current-pos { background: #eab308; border: 2px solid #ca8a04; color: #1c1917; }
+  .node-move-target { background: #a855f7; border: 2px solid #9333ea; color: #fff; }
+  .node-place-target { background: #14b8a6; border: 2px solid #0d9488; color: #fff; }
+  .node-swap-a { background: #f43f5e; border: 2px solid #e11d48; color: #fff; }
+  .tree-line { transition: stroke 0.3s; }
+  .array-cell {
+    width: 46px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    font-size: 14px; font-weight: 600;
+    transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+    user-select: none;
+  }
+  .log-entry {
+    animation: fadeInUp 0.25s ease-out;
+    padding: 4px 10px;
+    border-left: 3px solid #6366f1;
+    margin-bottom: 4px;
+    font-size: 13px;
+    background: #f8fafc;
+    border-radius: 0 4px 4px 0;
+  }
+  .log-entry.important {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+  }
+  .log-entry.swap-log {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+  }
+  #logContainer::-webkit-scrollbar { width: 4px; }
+  #logContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+  .phase-badge {
+    display: inline-block; padding: 2px 10px; border-radius: 9999px;
+    font-size: 12px; font-weight: 600;
+  }
+  .phase-build { background: #dbeafe; color: #1d4ed8; }
+  .phase-sort { background: #fef3c7; color: #b45309; }
+  .phase-done { background: #d1fae5; color: #065f46; }
+  .phase-idle { background: #f1f5f9; color: #475569; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button { transition: all 0.2s; }
+  button:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  button:not(:disabled):active { transform: translateY(0); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+<!-- ===== TOP CONTROL BAR ===== -->
+<div class="bg-white shadow-md border-b border-slate-200 px-6 py-4 flex flex-wrap items-center gap-3">
+  <h1 class="text-xl font-bold text-slate-800 mr-2 whitespace-nowrap">堆排序演示</h1>
+  <input id="dataInput" type="text" value="49,38,65,97,76,13,27,49"
+    class="flex-1 min-w-[260px] max-w-lg px-3 py-2 border border-slate-300 rounded-lg text-sm
+           focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+    placeholder="输入逗号分隔的数字" />
+  <button id="btnReset" onclick="resetAll()"
+    class="px-4 py-2 bg-indigo-500 text-white text-sm font-semibold rounded-lg hover:bg-indigo-600">
+    初始化 / 重置</button>
+  <button id="btnStep" onclick="stepOnce()"
+    class="px-4 py-2 bg-emerald-500 text-white text-sm font-semibold rounded-lg hover:bg-emerald-600">
+    单步执行</button>
+  <button id="btnAuto" onclick="toggleAuto()"
+    class="px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600">自动播放</button>
+  <span id="speedLabel" class="text-xs text-slate-400">900ms/步</span>
+</div>
+
+<!-- ===== MAIN AREA ===== -->
+<div class="flex flex-col lg:flex-row gap-0" style="min-height: calc(100vh - 80px);">
+
+  <!-- LEFT: VISUALIZATION -->
+  <div class="flex-1 flex flex-col bg-white border-r border-slate-200 overflow-auto p-4">
+
+    <!-- Phase info bar -->
+    <div class="flex flex-wrap items-center gap-3 mb-3 px-2">
+      <span class="text-sm font-semibold text-slate-600">当前阶段:</span>
+      <span id="phaseBadge" class="phase-badge phase-idle">空闲</span>
+      <span id="heapAdjustParams" class="text-sm text-slate-500 ml-2"></span>
+      <span class="flex-1"></span>
+      <span class="text-sm text-slate-600">已排序元素:</span>
+      <span id="sortedInfo" class="text-sm font-mono font-bold text-green-600">-</span>
+    </div>
+
+    <!-- Tree visualization -->
+    <div class="flex justify-center mb-2">
+      <div class="text-sm font-semibold text-slate-500 mb-1">-- 完全二叉树 (堆) --</div>
+    </div>
+    <div id="treeContainer" class="relative mx-auto border border-dashed border-slate-200 rounded-xl bg-slate-50/50"
+      style="width: 750px; min-height: 320px;">
+      <svg id="treeSvg" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;"></svg>
+      <div id="treeNodes" class="absolute inset-0" style="z-index: 10;"></div>
+    </div>
+
+    <!-- Legend -->
+    <div class="flex flex-wrap justify-center gap-4 mt-3 mb-2 text-xs text-slate-500">
+      <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-indigo-500"></span> 普通节点</span>
+      <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-red-500"></span> 调整根</span>
+      <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-orange-500"></span> 比较孩子</span>
+      <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-amber-400"></span> 当前位置</span>
+      <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-green-500"></span> 已排序</span>
+    </div>
+
+    <!-- Array visualization -->
+    <div class="flex justify-center mt-4">
+      <div class="text-sm font-semibold text-slate-500 mb-1">-- 数组视图 (1-based) --</div>
+    </div>
+    <div class="flex justify-center">
+      <div id="arrayContainer" class="flex flex-wrap items-end gap-1.5 justify-center p-3 bg-slate-50 rounded-xl border border-slate-200 min-h-[70px]">
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: LOG SIDEBAR -->
+  <div class="w-80 flex-shrink-0 bg-white flex flex-col border-l border-slate-200" style="max-height: calc(100vh - 80px);">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-2">
+      <span class="font-semibold text-slate-700">执行日志</span>
+      <span id="logCount" class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">0</span>
+    </div>
+    <div id="logContainer" class="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
+      <div class="text-xs text-slate-400 italic text-center py-6">点击"单步执行"或"自动播放"开始</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA & STATE ====================
+let data = [];          // internal 0-based, data[i] corresponds to R[i+1] in 408
+let n = 0;
+let phase = 'IDLE';     // IDLE | BUILD_HEAP_ADJUSTING | BUILD_HEAP_NEXT | SORTING_SWAP | SORTING_ADJUST | DONE
+let sortedIndices = new Set();  // 1-based indices that are sorted
+let logs = [];
+let autoTimer = null;
+let autoRunning = false;
+
+// Build-heap state
+let buildI = 0;         // current non-leaf node index (n/2 down to 1)
+
+// Sort state
+let sortPass = 1;       // current sort pass (1 to n-1)
+
+// HeapAdjust state
+let adjRoot = 0;        // original root of current HeapAdjust (1-based)
+let adjK = 0;           // current "hole" position
+let adjChild = 0;       // current child being examined
+let adjLen = 0;         // heap size for current HeapAdjust
+let adjSaved = null;    // saved value (A[0] in 408)
+let adjStep = '';       // init | find_child | compare | move | place
+
+// Highlight tracking
+let highlightRoot = 0;      // index highlighted as root (red)
+let highlightChild = 0;     // index highlighted as child (orange)
+let highlightK = 0;         // index highlighted as current position (amber)
+let highlightSwap = [];     // indices being swapped
+
+// ==================== INITIALIZATION ====================
+function parseInput() {
+  const raw = document.getElementById('dataInput').value.trim();
+  if (!raw) return [49, 38, 65, 97, 76, 13, 27, 49];
+  const parts = raw.split(/[,，\s]+/).filter(s => s.length > 0);
+  const nums = parts.map(s => parseInt(s, 10)).filter(v => !isNaN(v));
+  return nums.length > 0 ? nums : [49, 38, 65, 97, 76, 13, 27, 49];
+}
+
+function resetState(arr) {
+  data = [...arr];
+  n = data.length;
+  phase = 'IDLE';
+  sortedIndices = new Set();
+  logs = [];
+  buildI = Math.floor(n / 2);
+  sortPass = 1;
+  adjRoot = 0;
+  adjK = 0;
+  adjChild = 0;
+  adjLen = n;
+  adjSaved = null;
+  adjStep = '';
+  highlightRoot = 0;
+  highlightChild = 0;
+  highlightK = 0;
+  highlightSwap = [];
+  stopAuto();
+  updateUI();
+  renderAll();
+  addLog('系统', '已初始化，共 ' + n + ' 个元素。点击"单步执行"或"自动播放"开始。');
+}
+
+function resetAll() {
+  const arr = parseInput();
+  resetState(arr);
+  document.getElementById('dataInput').value = arr.join(',');
+}
+
+// ==================== LOGGING ====================
+function addLog(type, msg) {
+  const entry = { type, msg, time: new Date() };
+  logs.push(entry);
+  const container = document.getElementById('logContainer');
+  // Remove placeholder if exists
+  const placeholder = container.querySelector('.italic');
+  if (placeholder) placeholder.remove();
+
+  const div = document.createElement('div');
+  let cls = 'log-entry';
+  if (type === 'important' || type === 'adjust') cls += ' important';
+  if (type === 'swap') cls += ' swap-log';
+  div.className = cls;
+  const prefix = type === 'swap' ? '[交换] ' : type === 'adjust' ? '[调整] ' : type === 'phase' ? '[阶段] ' : type === 'done' ? '[完成] ' : '[信息] ';
+  div.textContent = prefix + msg;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+
+  document.getElementById('logCount').textContent = logs.length;
+}
+
+// ==================== RENDERING ====================
+function getNodeLevel(idx) {
+  // idx is 1-based, returns 0-based level
+  return Math.floor(Math.log2(idx));
+}
+
+function computePositions() {
+  // Returns array of {x, y} for each 1-based index, or null
+  if (n === 0) return [];
+  const positions = new Array(n + 1);
+  const containerW = 750;
+  const marginX = 45;
+  const usableW = containerW - 2 * marginX;
+  const marginTop = 25;
+  const levelH = 78;
+
+  // Assign leaf positions left to right
+  const firstLeaf = Math.floor(n / 2) + 1;
+  const leafCount = n - firstLeaf + 1;
+  const leafSpacing = usableW / (leafCount + 1);
+  let leafIdx = 0;
+  for (let i = firstLeaf; i <= n; i++) {
+    leafIdx++;
+    const level = getNodeLevel(i);
+    positions[i] = {
+      x: marginX + leafSpacing * leafIdx,
+      y: marginTop + level * levelH
+    };
+  }
+
+  // Internal nodes: center over children
+  for (let i = firstLeaf - 1; i >= 1; i--) {
+    const level = getNodeLevel(i);
+    const leftChild = 2 * i;
+    const rightChild = 2 * i + 1;
+    if (rightChild <= n) {
+      positions[i] = {
+        x: (positions[leftChild].x + positions[rightChild].x) / 2,
+        y: marginTop + level * levelH
+      };
+    } else if (leftChild <= n) {
+      positions[i] = {
+        x: positions[leftChild].x,
+        y: marginTop + level * levelH
+      };
+    } else {
+      // Leaf that is also internal? shouldn't happen in complete tree
+      positions[i] = {
+        x: marginX + usableW / 2,
+        y: marginTop + level * levelH
+      };
+    }
+  }
+  return positions;
+}
+
+function computeNodeClass(idx) {
+  // idx is 1-based
+  if (sortedIndices.has(idx)) return 'tree-node node-sorted';
+  if (highlightSwap.includes(idx)) return 'tree-node node-swap-a swap-flash';
+  if (idx === highlightRoot) return 'tree-node node-root-adjust pulse';
+  if (idx === highlightChild) return 'tree-node node-compare-child pulse';
+  if (idx === highlightK && (phase === 'SORTING_ADJUST' || phase === 'BUILD_HEAP_ADJUSTING')) {
+    if (adjStep === 'move') return 'tree-node node-move-target sift-glow';
+    if (adjStep === 'place') return 'tree-node node-place-target';
+    if (adjStep === 'compare' || adjStep === 'find_child') return 'tree-node node-current-pos';
+  }
+  return 'tree-node node-default';
+}
+
+function renderTree() {
+  const positions = computePositions();
+  const container = document.getElementById('treeContainer');
+  const nodesDiv = document.getElementById('treeNodes');
+  const svg = document.getElementById('treeSvg');
+  const circleR = 22;
+
+  // Compute number of levels for container height
+  const numLevels = n > 0 ? Math.floor(Math.log2(n)) + 1 : 1;
+  const treeHeight = 25 + (numLevels - 1) * 78 + 44 + 20;
+  container.style.height = Math.max(treeHeight, 200) + 'px';
+
+  // Clear
+  nodesDiv.innerHTML = '';
+  svg.innerHTML = '';
+
+  if (n === 0) return;
+
+  // Draw SVG lines first (behind nodes)
+  for (let i = 1; i <= n; i++) {
+    const leftChild = 2 * i;
+    const rightChild = 2 * i + 1;
+    const px = positions[i].x;
+    const py = positions[i].y;
+
+    [leftChild, rightChild].forEach(ci => {
+      if (ci <= n) {
+        const cx = positions[ci].x;
+        const cy = positions[ci].y;
+        // Line from bottom of parent to top of child
+        const x1 = px, y1 = py + circleR;
+        const x2 = cx, y2 = cy - circleR;
+        // Check if this edge connects sorted node
+        let strokeColor = '#94a3b8';
+        if (sortedIndices.has(i) || sortedIndices.has(ci)) {
+          strokeColor = '#86efac';
+        }
+        if (i === highlightRoot || i === highlightK || ci === highlightChild || ci === highlightK) {
+          strokeColor = '#f97316';
+        }
+        if (highlightSwap.includes(i) || highlightSwap.includes(ci)) {
+          strokeColor = '#f43f5e';
+        }
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', strokeColor);
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('class', 'tree-line');
+        if (sortedIndices.has(ci)) {
+          line.setAttribute('stroke-dasharray', '5,3');
+        }
+        svg.appendChild(line);
+      }
+    });
+  }
+
+  // Draw nodes
+  for (let i = 1; i <= n; i++) {
+    const pos = positions[i];
+    if (!pos) continue;
+    const node = document.createElement('div');
+    node.className = computeNodeClass(i);
+    node.style.left = pos.x + 'px';
+    node.style.top = pos.y + 'px';
+    node.textContent = data[i - 1];
+    node.title = 'R[' + i + '] = ' + data[i - 1];
+    nodesDiv.appendChild(node);
+  }
+}
+
+function renderArray() {
+  const container = document.getElementById('arrayContainer');
+  container.innerHTML = '';
+
+  for (let i = 0; i < n; i++) {
+    const idx1 = i + 1;
+    const cell = document.createElement('div');
+    cell.className = 'array-cell';
+    cell.textContent = data[i];
+
+    if (sortedIndices.has(idx1)) {
+      cell.className += ' bg-green-500 text-white border-2 border-green-600';
+    } else if (highlightSwap.includes(idx1)) {
+      cell.className += ' bg-rose-400 text-white border-2 border-rose-600 swap-flash';
+    } else if (idx1 === highlightRoot) {
+      cell.className += ' bg-red-500 text-white border-2 border-red-600 pulse';
+    } else if (idx1 === highlightChild) {
+      cell.className += ' bg-orange-500 text-white border-2 border-orange-600 pulse';
+    } else if (idx1 === highlightK) {
+      if (adjStep === 'move') cell.className += ' bg-purple-400 text-white border-2 border-purple-600 sift-glow';
+      else if (adjStep === 'place') cell.className += ' bg-teal-400 text-white border-2 border-teal-600';
+      else cell.className += ' bg-amber-300 text-amber-900 border-2 border-amber-500';
+    } else {
+      cell.className += ' bg-indigo-100 text-indigo-800 border-2 border-indigo-200';
+    }
+
+    // Index label below
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex flex-col items-center gap-0.5';
+    wrapper.appendChild(cell);
+    const lbl = document.createElement('span');
+    lbl.className = 'text-xs text-slate-400 font-mono';
+    lbl.textContent = 'R[' + idx1 + ']';
+    wrapper.appendChild(lbl);
+    container.appendChild(wrapper);
+  }
+}
+
+function updateUI() {
+  // Phase badge
+  const badge = document.getElementById('phaseBadge');
+  let phaseText = '空闲', phaseCls = 'phase-idle';
+  if (phase === 'IDLE') { phaseText = '空闲'; phaseCls = 'phase-idle'; }
+  else if (phase === 'BUILD_HEAP_ADJUSTING' || phase === 'BUILD_HEAP_NEXT') { phaseText = '建堆'; phaseCls = 'phase-build'; }
+  else if (phase === 'SORTING_SWAP' || phase === 'SORTING_ADJUST') { phaseText = '排序'; phaseCls = 'phase-sort'; }
+  else if (phase === 'DONE') { phaseText = '完成'; phaseCls = 'phase-done'; }
+  badge.textContent = phaseText;
+  badge.className = 'phase-badge ' + phaseCls;
+
+  // HeapAdjust params
+  const paramsEl = document.getElementById('heapAdjustParams');
+  if ((phase === 'BUILD_HEAP_ADJUSTING' || phase === 'SORTING_ADJUST') && adjRoot > 0) {
+    paramsEl.textContent = 'HeapAdjust(A, ' + adjRoot + ', ' + adjLen + ')' +
+      (adjSaved !== null ? ' | 暂存=' + adjSaved : '') +
+      ' | k=' + adjK + ' | child=' + (adjChild <= adjLen ? adjChild : '-');
+  } else {
+    paramsEl.textContent = '';
+  }
+
+  // Sorted info
+  const sortedEl = document.getElementById('sortedInfo');
+  if (sortedIndices.size > 0) {
+    const sorted = Array.from(sortedIndices).sort((a, b) => a - b);
+    sortedEl.textContent = sorted.map(i => 'R[' + i + ']=' + data[i - 1]).join(', ');
+  } else {
+    sortedEl.textContent = '-';
+  }
+
+  // Button states
+  const btnStep = document.getElementById('btnStep');
+  const btnAuto = document.getElementById('btnAuto');
+  btnStep.disabled = (phase === 'DONE');
+  btnAuto.disabled = (phase === 'DONE');
+  if (autoRunning) {
+    btnAuto.textContent = '停止播放';
+  } else {
+    btnAuto.textContent = '自动播放';
+  }
+}
+
+function renderAll() {
+  renderTree();
+  renderArray();
+  updateUI();
+}
+
+// ==================== STATE MACHINE ====================
+function clearHighlights() {
+  highlightRoot = 0;
+  highlightChild = 0;
+  highlightK = 0;
+  highlightSwap = [];
+}
+
+function stepOnce() {
+  if (phase === 'DONE') return;
+
+  if (phase === 'IDLE') {
+    // Start build-heap phase
+    phase = 'BUILD_HEAP_NEXT';
+    buildI = Math.floor(n / 2);
+    clearHighlights();
+    addLog('phase', '开始建堆阶段，从最后一个非叶节点 R[' + buildI + '] 开始调整');
+    renderAll();
+    // Immediately process the first BUILD_HEAP_NEXT
+    processBuildHeapNext();
+    return;
+  }
+
+  if (phase === 'BUILD_HEAP_NEXT') {
+    processBuildHeapNext();
+    return;
+  }
+
+  if (phase === 'BUILD_HEAP_ADJUSTING') {
+    processHeapAdjustStep();
+    return;
+  }
+
+  if (phase === 'SORTING_SWAP') {
+    processSortSwap();
+    return;
+  }
+
+  if (phase === 'SORTING_ADJUST') {
+    processHeapAdjustStep();
+    return;
+  }
+}
+
+function processBuildHeapNext() {
+  if (buildI < 1) {
+    // Build heap complete, start sorting
+    phase = 'SORTING_SWAP';
+    sortPass = 1;
+    adjLen = n;
+    clearHighlights();
+    addLog('phase', '建堆完成！当前堆顶 R[1]=' + data[0] + '。开始排序阶段。');
+    renderAll();
+    return;
+  }
+
+  // Start HeapAdjust on buildI — initialize only, the first visible step ('init')
+  // will be processed on the next step() call by processHeapAdjustStep
+  phase = 'BUILD_HEAP_ADJUSTING';
+  adjRoot = buildI;
+  adjK = buildI;
+  adjLen = n;
+  adjChild = 2 * buildI;
+  adjSaved = data[buildI - 1];
+  adjStep = 'init';
+  clearHighlights();
+  highlightRoot = buildI;
+  addLog('adjust', 'HeapAdjust(A, ' + buildI + ', ' + n + '): 暂存 R[' + buildI + ']=' + adjSaved);
+  renderAll();
+}
+
+function processHeapAdjustStep() {
+  // ---- init: show the root being adjusted, nothing else ----
+  if (adjStep === 'init') {
+    adjStep = 'find_child';
+    clearHighlights();
+    highlightK = adjK;
+    // If child initially out of bounds, jump straight to place
+    if (adjChild > adjLen) {
+      highlightChild = 0;
+      addLog('adjust', 'R[' + adjK + '] 无孩子节点');
+    }
+    renderAll();
+    return;
+  }
+
+  // ---- find_child: select the larger child (or note there isn't one) ----
+  if (adjStep === 'find_child') {
+    if (adjChild > adjLen || adjChild === 0) {
+      adjStep = 'place';
+      clearHighlights();
+      highlightK = adjK;
+      addLog('adjust', 'R[' + adjK + '] 无孩子可比较，将暂存值 ' + adjSaved + ' 放入此处');
+      renderAll();
+      return;
+    }
+
+    // Select larger child if two children exist
+    const rightChild = adjChild + 1;
+    if (rightChild <= adjLen && data[rightChild - 1] > data[adjChild - 1]) {
+      const leftVal = data[adjChild - 1];
+      const rightVal = data[rightChild - 1];
+      adjChild = rightChild;
+      addLog('adjust', '比较孩子: R[' + (adjChild - 1) + ']=' + leftVal + ' vs R[' + adjChild + ']=' + rightVal + ', 选较大者 R[' + adjChild + ']');
+    } else if (rightChild <= adjLen) {
+      addLog('adjust', '比较孩子: R[' + adjChild + ']=' + data[adjChild - 1] + ' >= R[' + rightChild + ']=' + data[rightChild - 1] + ', 选 R[' + adjChild + ']');
+    } else {
+      addLog('adjust', 'R[' + adjK + '] 只有一个孩子 R[' + adjChild + ']=' + data[adjChild - 1]);
+    }
+
+    adjStep = 'compare';
+    clearHighlights();
+    highlightK = adjK;
+    highlightChild = adjChild;
+    renderAll();
+    return;
+  }
+
+  // ---- compare: compare saved value with selected child ----
+  if (adjStep === 'compare') {
+    const childVal = data[adjChild - 1];
+    if (adjSaved >= childVal) {
+      // Root value >= child, stop sifting
+      adjStep = 'place';
+      clearHighlights();
+      highlightK = adjK;
+      addLog('adjust', '比较: 暂存值 ' + adjSaved + ' >= R[' + adjChild + ']=' + childVal + ', 无需继续下滤');
+      renderAll();
+      return;
+    }
+    // Need to move child up
+    adjStep = 'move';
+    clearHighlights();
+    highlightK = adjK;
+    highlightChild = adjChild;
+    addLog('adjust', '比较: 暂存值 ' + adjSaved + ' < R[' + adjChild + ']=' + childVal + ', 需要下滤');
+    renderAll();
+    return;
+  }
+
+  // ---- move: move the larger child value up into the "hole" ----
+  if (adjStep === 'move') {
+    const oldK = adjK;
+    const oldChild = adjChild;
+    const childVal = data[oldChild - 1];
+    data[oldK - 1] = childVal;
+
+    // Advance the "hole" down to the child position
+    adjK = oldChild;
+    adjChild = 2 * adjK;  // new child at next level
+
+    adjStep = 'find_child';
+    clearHighlights();
+    highlightK = adjK;
+
+    // Show info about the new position and its children
+    if (adjChild <= adjLen) {
+      highlightChild = adjChild;
+      addLog('adjust', '下滤: R[' + oldChild + ']=' + childVal + ' 上移至 R[' + oldK + '], 现在考察新位置 R[' + adjK + ']');
+    } else {
+      highlightChild = 0;
+      addLog('adjust', '下滤: R[' + oldChild + ']=' + childVal + ' 上移至 R[' + oldK + '], R[' + adjK + '] 已是叶子节点');
+    }
+    renderAll();
+    return;
+  }
+
+  // ---- place: put the saved value at its final position ----
+  if (adjStep === 'place') {
+    data[adjK - 1] = adjSaved;
+    clearHighlights();
+    highlightK = adjK;
+    addLog('adjust', '将暂存值 ' + adjSaved + ' 放入 R[' + adjK + '], HeapAdjust 完成');
+
+    // Transition to next state
+    if (phase === 'BUILD_HEAP_ADJUSTING') {
+      phase = 'BUILD_HEAP_NEXT';
+      buildI--;
+      adjRoot = 0; adjK = 0; adjChild = 0; adjSaved = null; adjStep = '';
+      highlightK = 0;
+      renderAll();
+      if (buildI >= 1) {
+        addLog('info', '准备调整下一个子树: R[' + buildI + ']');
+      }
+    } else if (phase === 'SORTING_ADJUST') {
+      sortPass++;
+      adjRoot = 0; adjK = 0; adjChild = 0; adjSaved = null; adjStep = '';
+      highlightK = 0;
+      if (sortPass >= n) {
+        sortedIndices.add(1);
+        phase = 'DONE';
+        clearHighlights();
+        addLog('done', '排序完成！数组已升序排列。');
+      } else {
+        phase = 'SORTING_SWAP';
+        addLog('info', 'HeapAdjust 完成，准备第 ' + sortPass + ' 趟交换');
+      }
+      renderAll();
+    }
+    return;
+  }
+}
+
+function processSortSwap() {
+  if (sortPass >= n) {
+    phase = 'DONE';
+    clearHighlights();
+    addLog('done', '排序完成！');
+    renderAll();
+    return;
+  }
+
+  const lastIdx = n - sortPass + 1;  // 1-based index of last element in current heap
+  const rootVal = data[0];
+  const lastVal = data[lastIdx - 1];
+
+  // Perform swap
+  data[0] = lastVal;
+  data[lastIdx - 1] = rootVal;
+
+  highlightSwap = [1, lastIdx];
+  addLog('swap', '第 ' + sortPass + ' 趟: 交换 R[1]=' + rootVal + ' 与 R[' + lastIdx + ']=' + lastVal);
+  renderAll();
+
+  // Mark lastIdx as sorted
+  sortedIndices.add(lastIdx);
+  highlightSwap = [];
+  addLog('info', 'R[' + lastIdx + ']=' + rootVal + ' 已排序 (绿色)');
+
+  if (sortPass >= n - 1) {
+    // Only root left
+    sortedIndices.add(1);
+    phase = 'DONE';
+    clearHighlights();
+    addLog('done', '排序完成！数组已升序排列。');
+    renderAll();
+    return;
+  }
+
+  // Transition to adjust — initialize only, the first visible step ('init')
+  // will be processed on the next step() call by processHeapAdjustStep
+  phase = 'SORTING_ADJUST';
+  adjRoot = 1;
+  adjK = 1;
+  adjLen = n - sortPass;
+  adjChild = 2;  // 2 * 1
+  adjSaved = data[0];
+  adjStep = 'init';
+  clearHighlights();
+  highlightRoot = 1;
+  addLog('adjust', 'HeapAdjust(A, 1, ' + adjLen + '): 暂存 R[1]=' + adjSaved);
+  renderAll();
+}
+
+// ==================== AUTO PLAY ====================
+function toggleAuto() {
+  if (autoRunning) {
+    stopAuto();
+  } else {
+    startAuto();
+  }
+}
+
+function startAuto() {
+  if (autoRunning) return;
+  if (phase === 'DONE') return;
+  autoRunning = true;
+  document.getElementById('btnAuto').textContent = '停止播放';
+  autoStep();
+}
+
+function stopAuto() {
+  autoRunning = false;
+  if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+  document.getElementById('btnAuto').textContent = '自动播放';
+  renderAll();
+}
+
+function autoStep() {
+  if (!autoRunning) return;
+  if (phase === 'DONE') { stopAuto(); return; }
+  stepOnce();
+  autoTimer = setTimeout(autoStep, 900);
+}
+
+// ==================== INIT ====================
+window.addEventListener('DOMContentLoaded', () => {
+  resetAll();
+});
+
+// Allow keyboard shortcut: Space for step
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    stepOnce();
+  } else if (e.code === 'KeyA' && e.target === document.body) {
+    e.preventDefault();
+    toggleAuto();
+  } else if (e.code === 'KeyR' && e.target === document.body) {
+    e.preventDefault();
+    resetAll();
+  }
+});
+</script>
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC8%E7%AB%A0%20%E6%8E%92%E5%BA%8F.assets/heap-sort.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

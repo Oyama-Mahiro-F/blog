@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+    <meta name="description" content="散列表&#x2F;哈希表演示 (408标准)                   .hash-cell {             width: 100%; min-height: 64px; border: 2px solid #e5e7eb;             border-radius: 0.5rem; display: flex; flex-direction">
+<meta property="og:type" content="website">
+<meta property="og:title" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="散列表&#x2F;哈希表演示 (408标准)                   .hash-cell {             width: 100%; min-height: 64px; border: 2px solid #e5e7eb;             border-radius: 0.5rem; display: flex; flex-direction">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-18T14:25:05.689Z">
+<meta property="article:modified_time" content="2026-07-18T14:25:05.687Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis"></div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header page-header">
+
+    <div class="container fade-scale">
+        <h1 class="title"></h1>
+        <h5 class="subtitle">
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    <article class="page-article fade" itemprop="blogPage">
+        <div class="post-content page-content" id="page-content" itemprop="pageContent">
+            <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>散列表/哈希表演示 (408标准)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hash-cell {
+            width: 100%; min-height: 64px; border: 2px solid #e5e7eb;
+            border-radius: 0.5rem; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; background: white;
+            transition: all 0.35s ease; position: relative; padding: 4px;
+        }
+        .hash-cell.probing-cell { border-color: #f59e0b; background: #fffbeb; box-shadow: 0 0 0 4px rgba(245,158,11,0.2); }
+        .hash-cell.filled-cell { border-color: #22c55e; background: #f0fdf4; }
+        .hash-cell.collision-cell { border-color: #ef4444; background: #fef2f2; box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+        .hash-cell.current-cell { border-color: #3b82f6; background: #eff6ff; box-shadow: 0 0 0 5px rgba(59,130,246,0.25); transform: scale(1.03); }
+        .chain-list { list-style: none; padding: 0; margin: 0; }
+        .chain-list li {
+            padding: 2px 10px; margin: 2px 0; border-radius: 4px; background: #f1f5f9;
+            border: 1px solid #e2e8f0; font-size: 0.8rem; font-weight: bold; text-align: center;
+        }
+        .chain-list li.highlight-chain { background: #fef3c7; border-color: #f59e0b; }
+        .tab-btn { padding: 6px 16px; border-radius: 0.375rem 0.375rem 0 0; font-size: 0.85rem; font-weight: 600; border: 1px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: white; border-color: #e5e7eb; border-bottom-color: white; color: #3b82f6; }
+        .tab-btn.inactive { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col font-sans">
+
+    <!-- 顶部控制栏 -->
+    <div class="bg-white shadow-sm border-b p-4 flex flex-wrap gap-4 items-center justify-between z-10">
+        <div class="flex gap-4 items-center flex-wrap">
+            <h1 class="text-xl font-bold text-blue-600 mr-2">散列表 / 哈希表演示</h1>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">表长:</label>
+                <input type="number" id="input-size" value="13" min="5" max="30" class="border rounded px-2 py-1 w-16 focus:outline-none focus:border-blue-500 text-sm">
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">散列函数:</label>
+                <select id="input-hash-func" class="border rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500">
+                    <option value="mod">H(key) = key % m</option>
+                    <option value="digit">H(key) = key 各位数字之和 % m</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">冲突解决:</label>
+                <div class="flex" id="tab-buttons">
+                    <button class="tab-btn active" onclick="switchMethod('linear')">线性探测</button>
+                    <button class="tab-btn inactive" onclick="switchMethod('quadratic')">二次探测</button>
+                    <button class="tab-btn inactive" onclick="switchMethod('chaining')">拉链法</button>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-1">
+                <label class="text-sm font-medium">关键字:</label>
+                <input type="number" id="input-key" value="" placeholder="数字" class="border rounded px-2 py-1 w-20 focus:outline-none focus:border-blue-500 text-sm">
+                <button onclick="doInsert()" class="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-sm">插入</button>
+                <button onclick="doSearch()" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm">查找</button>
+            </div>
+            <button onclick="resetHash()" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition text-sm">重置</button>
+        </div>
+    </div>
+
+    <div class="flex-1 flex overflow-hidden">
+        <div class="flex-1 p-6 overflow-auto bg-gray-50 flex flex-col gap-4">
+            <!-- 散列表可视化 -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-3">散列表 <span class="text-sm font-normal text-gray-500" id="method-label">(线性探测法)</span></h2>
+                <div class="grid gap-2" id="hash-grid" style="grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));"></div>
+            </div>
+
+            <!-- 统计 -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-3">散列表分析</h2>
+                <div class="grid grid-cols-5 gap-3 text-sm">
+                    <div class="bg-blue-50 p-3 rounded-lg text-center"><div class="text-gray-500">装填因子 α</div><div class="text-2xl font-bold text-blue-600 font-mono" id="stat-alpha">0.00</div></div>
+                    <div class="bg-green-50 p-3 rounded-lg text-center"><div class="text-gray-500">成功 ASL</div><div class="text-2xl font-bold text-green-600 font-mono" id="stat-asl-success">--</div></div>
+                    <div class="bg-red-50 p-3 rounded-lg text-center"><div class="text-gray-500">失败 ASL</div><div class="text-2xl font-bold text-red-600 font-mono" id="stat-asl-fail">--</div></div>
+                    <div class="bg-purple-50 p-3 rounded-lg text-center"><div class="text-gray-500">元素数</div><div class="text-2xl font-bold text-purple-600 font-mono" id="stat-count">0</div></div>
+                    <div class="bg-orange-50 p-3 rounded-lg text-center"><div class="text-gray-500">冲突次数</div><div class="text-2xl font-bold text-orange-600 font-mono" id="stat-collisions">0</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧日志 -->
+        <div class="w-80 bg-white border-l flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]">
+            <div class="p-4 border-b bg-gray-50 font-bold flex justify-between items-center">
+                <span>执行日志</span>
+                <span id="status-badge" class="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">就绪</span>
+            </div>
+            <div id="log-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 font-mono text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        let tableSize = 13;
+        let hashMethod = 'linear'; // 'linear', 'quadratic', 'chaining'
+        let hashFuncType = 'mod';
+        // hashTable: 线性/二次探测时为数组，拉链法时为数组的数组
+        let hashTable = [];
+        // 每个位置的探测次数（用于ASL计算）
+        let probeCount = [];
+        // 拉链法链表
+        let chainTable = [];
+        let collisionCount = 0;
+        let currentProbing = -1; // 当前正在探测的位置
+        let currentKey = null;
+
+        function resetHash() {
+            tableSize = parseInt(document.getElementById('input-size').value) || 13;
+            hashFuncType = document.getElementById('input-hash-func').value;
+            hashTable = new Array(tableSize).fill(null);
+            chainTable = new Array(tableSize).fill(null).map(() => []);
+            probeCount = new Array(tableSize).fill(0);
+            collisionCount = 0;
+            currentProbing = -1; currentKey = null;
+            document.getElementById('log-container').innerHTML = '';
+            updateStats();
+            renderHashTable();
+            addLog('系统', `散列表初始化。表长 m=${tableSize}，方法: ${getMethodName()}，散列函数: ${getHashFuncName()}。`);
+            updateStatusBadge('就绪', 'bg-gray-200 text-gray-700');
+        }
+
+        function getMethodName() {
+            return { linear: '线性探测法', quadratic: '二次探测法', chaining: '拉链法' }[hashMethod];
+        }
+
+        function getHashFuncName() {
+            return { mod: 'H(key)=key%m', digit: 'H(key)=各位数之和%m' }[hashFuncType];
+        }
+
+        function hashFunc(key) {
+            const num = Number(key);
+            if (hashFuncType === 'mod') {
+                return ((num % tableSize) + tableSize) % tableSize;
+            } else {
+                // 各位数字之和
+                const sum = String(Math.abs(num)).split('').reduce((a, b) => a + Number(b), 0);
+                return sum % tableSize;
+            }
+        }
+
+        function switchMethod(method) {
+            hashMethod = method;
+            document.getElementById('method-label').textContent = `(${getMethodName()})`;
+            // 更新tab样式
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'inactive');
+                btn.classList.add('inactive');
+            });
+            const btns = document.querySelectorAll('#tab-buttons .tab-btn');
+            const idx = { linear: 0, quadratic: 1, chaining: 2 }[method];
+            if (btns[idx]) { btns[idx].classList.remove('inactive'); btns[idx].classList.add('active'); }
+            resetHash();
+        }
+
+        function doInsert() {
+            const val = document.getElementById('input-key').value;
+            if (!val && val !== 0) return alert('请输入关键字');
+            const key = Number(val);
+            if (isNaN(key)) return alert('请输入有效数字');
+
+            currentKey = key; currentProbing = -1;
+
+            if (hashMethod === 'chaining') {
+                insertChaining(key);
+            } else {
+                insertProbing(key);
+            }
+            document.getElementById('input-key').value = '';
+            updateStats();
+            renderHashTable();
+            setTimeout(() => { currentProbing = -1; currentKey = null; renderHashTable(); }, 3000);
+        }
+
+        function insertProbing(key) {
+            let h = hashFunc(key);
+            let pos = h;
+            let step = 0;
+            const maxSteps = tableSize;
+
+            addLog('插入', `尝试插入关键字 ${key}，H(${key}) = ${h}。`, 'text-purple-600');
+
+            for (let i = 0; i < maxSteps; i++) {
+                currentProbing = pos;
+                renderHashTable();
+
+                if (hashTable[pos] === null || hashTable[pos] === undefined) {
+                    hashTable[pos] = key;
+                    probeCount[pos] = step + 1;
+                    addLog('成功', `位置 ${pos} 为空，将 ${key} 存入。探测 ${step + 1} 次，无冲突。` + (step > 0 ? ` (发生 ${step} 次冲突)` : ''), 'text-green-600 font-bold');
+                    updateStatusBadge('已插入 ' + key, 'bg-purple-100 text-purple-700');
+                    currentProbing = pos;
+                    return;
+                }
+
+                // 冲突
+                collisionCount++;
+                addLog('冲突', `位置 ${pos} 已被 ${hashTable[pos]} 占用。冲突！探测第 ${i + 1} 次。`, 'text-red-500');
+
+                if (hashMethod === 'linear') {
+                    pos = (h + i + 1) % tableSize;
+                    step = i + 1;
+                } else {
+                    // 二次探测: pos = (h + i²) % m，i = 1,2,3,...
+                    const offset = (i + 1) * (i + 1);
+                    pos = (h + offset) % tableSize;
+                    step = i + 1;
+                }
+            }
+            addLog('失败', `散列表已满！无法插入 ${key}。探测 ${maxSteps} 次均冲突。`, 'text-red-600 font-bold text-base');
+            updateStatusBadge('插入失败', 'bg-red-100 text-red-700');
+        }
+
+        function insertChaining(key) {
+            let h = hashFunc(key);
+            chainTable[h].push(key);
+            const chainLen = chainTable[h].length;
+            currentProbing = h;
+            addLog('插入', `插入 ${key}，H(${key}) = ${h}，添加到链表位置 ${h} 的末尾 (链表长 ${chainLen})。`, 'text-purple-600');
+            updateStatusBadge('已插入 ' + key, 'bg-purple-100 text-purple-700');
+            if (chainLen > 1) {
+                collisionCount++;
+                addLog('冲突', `位置 ${h} 已有 ${chainLen - 1} 个元素，追加到链表末尾。`, 'text-orange-500');
+            }
+        }
+
+        function doSearch() {
+            const val = document.getElementById('input-key').value;
+            if (!val && val !== 0) return alert('请输入查找关键字');
+            const key = Number(val);
+            if (isNaN(key)) return alert('请输入有效数字');
+            currentKey = key;
+
+            if (hashMethod === 'chaining') {
+                searchChaining(key);
+            } else {
+                searchProbing(key);
+            }
+            updateStats();
+            renderHashTable();
+            setTimeout(() => { currentProbing = -1; currentKey = null; renderHashTable(); }, 3000);
+        }
+
+        function searchProbing(key) {
+            let h = hashFunc(key);
+            let pos = h;
+            const maxSteps = tableSize;
+            addLog('查找', `查找关键字 ${key}，H(${key}) = ${h}。`, 'text-blue-600');
+
+            for (let i = 0; i < maxSteps; i++) {
+                currentProbing = pos;
+                renderHashTable();
+
+                if (hashTable[pos] === null || hashTable[pos] === undefined) {
+                    addLog('失败', `位置 ${pos} 为空，${key} 不在表中。查找失败，共探测 ${i + 1} 次。`, 'text-red-600 font-bold');
+                    updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+                    return;
+                }
+                if (hashTable[pos] === key) {
+                    addLog('成功', `在位置 ${pos} 找到 ${key}！共探测 ${i + 1} 次。`, 'text-green-600 font-bold');
+                    updateStatusBadge('查找成功', 'bg-green-100 text-green-700');
+                    return;
+                }
+                addLog('探测', `位置 ${pos} 存储的是 ${hashTable[pos]} != ${key}，继续探测。`, 'text-gray-600');
+
+                if (hashMethod === 'linear') {
+                    pos = (h + i + 1) % tableSize;
+                } else {
+                    pos = (h + (i + 1) * (i + 1)) % tableSize;
+                }
+            }
+            addLog('失败', `查找 ${key} 失败，遍历完整个表。`, 'text-red-600 font-bold');
+            updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+        }
+
+        function searchChaining(key) {
+            let h = hashFunc(key);
+            currentProbing = h;
+            const chain = chainTable[h];
+            addLog('查找', `查找 ${key}，H(${key}) = ${h}，在链表 ${h} 中顺序查找。`, 'text-blue-600');
+            const idx = chain.indexOf(key);
+            if (idx >= 0) {
+                addLog('成功', `在链表 ${h} 的第 ${idx + 1} 位找到 ${key}！比较 ${idx + 1} 次。`, 'text-green-600 font-bold');
+                updateStatusBadge('查找成功', 'bg-green-100 text-green-700');
+            } else {
+                addLog('失败', `链表 ${h} 中未找到 ${key}。比较 ${chain.length} 次。`, 'text-red-600 font-bold');
+                updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+            }
+        }
+
+        function updateStats() {
+            let filled = 0;
+            if (hashMethod === 'chaining') {
+                filled = chainTable.reduce((sum, arr) => sum + arr.length, 0);
+            } else {
+                filled = hashTable.filter(v => v !== null && v !== undefined).length;
+            }
+            const alpha = (filled / tableSize).toFixed(2);
+            document.getElementById('stat-alpha').textContent = alpha;
+            document.getElementById('stat-count').textContent = filled;
+            document.getElementById('stat-collisions').textContent = collisionCount;
+
+            // ASL计算
+            let aslSuccess = 0, aslFail = 0;
+            if (hashMethod === 'chaining') {
+                // 拉链法ASL
+                const totalElements = filled;
+                let totalSearchLen = 0;
+                chainTable.forEach(arr => {
+                    for (let i = 0; i < arr.length; i++) totalSearchLen += (i + 1);
+                });
+                aslSuccess = totalElements > 0 ? (totalSearchLen / totalElements).toFixed(2) : '0.00';
+                // 失败ASL = alpha + 1 (大概)
+                aslFail = (Number(alpha) + 1.0).toFixed(2);
+            } else {
+                // 开放定址法
+                const totalElements = filled;
+                let totalProbes = 0;
+                let totalFailProbes = 0;
+                hashTable.forEach((v, idx) => {
+                    if (v !== null && v !== undefined) {
+                        // 重新计算探测次数
+                        let h0 = hashFunc(v);
+                        let probes = 1;
+                        if (hashMethod === 'linear') {
+                            let p = h0;
+                            while (p !== idx) {
+                                p = (p + 1) % tableSize;
+                                probes++;
+                                if (probes > tableSize) break;
+                            }
+                        } else {
+                            let step = 1;
+                            let p = h0;
+                            while (p !== idx) {
+                                p = (h0 + step * step) % tableSize;
+                                step++;
+                                probes++;
+                                if (step > tableSize) break;
+                            }
+                        }
+                        totalProbes += probes;
+                    } else {
+                        // 空位置
+                        let probes = 1;
+                        if (hashMethod === 'linear') {
+                            let p = idx;
+                            while (p >= 0 && hashTable[p] === null && (p > 0 ? hashTable[p - 1] !== null : false) === false) {
+                                if (p === 0) break;
+                                if (hashTable[p - 1] !== null && hashTable[p - 1] !== undefined) break;
+                                p--;
+                            }
+                        }
+                    }
+                });
+                // 简化ASL
+                if (totalElements > 0) {
+                    let sumProbes = 0;
+                    hashTable.forEach((v, idx) => {
+                        if (v !== null && v !== undefined) {
+                            let h0 = hashFunc(v);
+                            let probes = 1;
+                            if (hashMethod === 'linear') {
+                                let p = h0;
+                                while (p !== idx) { p = (p + 1) % tableSize; probes++; if (probes > tableSize) break; }
+                            } else {
+                                let st = 1; let p = h0;
+                                while (p !== idx) { p = (h0 + st * st) % tableSize; st++; probes++; if (st > tableSize) break; }
+                            }
+                            sumProbes += probes;
+                        }
+                    });
+                    aslSuccess = (sumProbes / totalElements).toFixed(2);
+                } else {
+                    aslSuccess = '0.00';
+                }
+                // 简化失败ASL
+                let failSum = 0;
+                for (let i = 0; i < tableSize; i++) {
+                    let probes = 1;
+                    let pos = i;
+                    if (hashMethod === 'linear') {
+                        while (hashTable[pos] !== null && hashTable[pos] !== undefined && probes <= tableSize) {
+                            pos = (pos + 1) % tableSize;
+                            probes++;
+                        }
+                    } else {
+                        probes = Math.min(tableSize, Math.ceil(Math.sqrt(tableSize)));
+                    }
+                    failSum += Math.min(probes, tableSize);
+                }
+                aslFail = (failSum / tableSize).toFixed(2);
+            }
+            document.getElementById('stat-asl-success').textContent = aslSuccess;
+            document.getElementById('stat-asl-fail').textContent = aslFail;
+        }
+
+        function renderHashTable() {
+            const grid = document.getElementById('hash-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < tableSize; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'hash-cell';
+                cell.id = `cell-${i}`;
+
+                const idxLabel = document.createElement('div');
+                idxLabel.className = 'text-[10px] text-gray-400 font-mono';
+                idxLabel.textContent = '[' + i + ']';
+                cell.appendChild(idxLabel);
+
+                if (hashMethod === 'chaining') {
+                    const chain = chainTable[i];
+                    if (chain.length > 0) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'chain-list';
+                        chain.forEach((key, ci) => {
+                            const li = document.createElement('li');
+                            li.textContent = key;
+                            if (currentProbing === i && currentKey !== null && key === currentKey) li.classList.add('highlight-chain');
+                            ul.appendChild(li);
+                        });
+                        cell.appendChild(ul);
+                    }
+                    if (chain.length > 1 && currentProbing === i) cell.classList.add('collision-cell');
+                } else {
+                    // 开放定址
+                    if (hashTable[i] !== null && hashTable[i] !== undefined) {
+                        const valDiv = document.createElement('div');
+                        valDiv.className = 'font-bold text-sm';
+                        valDiv.textContent = hashTable[i];
+                        cell.appendChild(valDiv);
+                        cell.classList.add('filled-cell');
+                    }
+                }
+
+                // 高亮
+                if (currentProbing === i) cell.classList.add('probing-cell');
+                if (hashMethod !== 'chaining' && currentProbing === i) cell.classList.add('current-cell');
+
+                grid.appendChild(cell);
+            }
+        }
+
+        function addLog(type, message, colorClass = 'text-gray-800') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `p-3 bg-white rounded border border-gray-100 shadow-sm ${colorClass} leading-relaxed animate-fade-in`;
+            entry.innerHTML = `<span class="inline-block px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-500 mb-1 border">${type}</span><br>${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatusBadge(text, classes) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = text; badge.className = `px-2 py-1 rounded text-xs font-bold ${classes}`;
+        }
+
+        // 加载预设
+        window.onload = function () {
+            resetHash();
+            // 预设一些插入值
+            setTimeout(() => {
+                addLog('提示', '可以插入关键字演示散列表操作。尝试: 26,36,41,24,15,68（它们会产生冲突展示线性探测/二次探测/拉链法）');
+            }, 300);
+        };
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</body>
+</html>
+
+        </div>
+
+        
+        <div class="card page-about-me flex-row">
+            <a href="/" class="avatar waves-effect waves-circle waves-light"><img src="/blog/img/avatar.jpg"></a>
+            <div class="content flex-col">
+                <p><strong>义务教育漏网之鱼</strong></p>
+                <p><em></em></p>
+                <p>用户页面中作者相关的描述性文字，如不需要设为 false</p>
+            </div>
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+        
+
+        
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </article>
+    
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&title=义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&title=义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/hash-table.html" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
