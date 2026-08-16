@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>折半查找算法演示 (408标准)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .array-box {
+            width: 50px; height: 50px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: bold;
+            border-radius: 0.5rem; border: 2px solid #d1d5db;
+            background-color: white; transition: all 0.35s ease; position: relative;
+        }
+        .array-box.low-highlight { border-color: #3b82f6; background-color: #eff6ff; }
+        .array-box.mid-highlight { border-color: #f59e0b; background-color: #fef3c7; box-shadow: 0 0 0 5px rgba(245,158,11,0.3); transform: scale(1.12); }
+        .array-box.found-box { border-color: #22c55e; background-color: #f0fdf4; box-shadow: 0 0 0 5px rgba(34,197,94,0.3); }
+        .array-box.dimmed { opacity: 0.35; }
+        .array-box.eliminated { opacity: 0.15; border-style: dashed; }
+        .tree-node {
+            width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: bold; border: 2px solid #cbd5e1;
+            background: white; position: absolute; transition: all 0.4s ease;
+        }
+        .tree-node.highlight { border-color: #f59e0b; background: #fef3c7; box-shadow: 0 0 0 4px rgba(245,158,11,0.3); }
+        .tree-node.path-node { border-color: #3b82f6; background: #eff6ff; }
+        .tree-container { position: relative; min-height: 400px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col font-sans">
+
+    <!-- 顶部控制栏 -->
+    <div class="bg-white shadow-sm border-b p-4 flex flex-wrap gap-4 items-center justify-between z-10">
+        <div class="flex gap-4 items-center flex-wrap">
+            <h1 class="text-xl font-bold text-blue-600 mr-2">折半查找算法演示</h1>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">有序数组:</label>
+                <input type="text" id="input-array" value="5,13,19,21,37,56,64,75,80,88,92" class="border rounded px-2 py-1 w-72 focus:outline-none focus:border-blue-500 font-mono text-sm">
+            </div>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium">关键字:</label>
+                <input type="text" id="input-key" value="21" class="border rounded px-2 py-1 w-20 focus:outline-none focus:border-blue-500 font-mono text-sm">
+            </div>
+            <button onclick="initSearch()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm">初始化 / 重置</button>
+        </div>
+        <div class="flex gap-2">
+            <button id="btn-step" onclick="step()" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition flex items-center gap-1 text-sm disabled:opacity-50">单步执行</button>
+            <button id="btn-play" onclick="togglePlay()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center gap-1 text-sm disabled:opacity-50"><span id="play-text">自动播放</span></button>
+        </div>
+    </div>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- 左：可视化区域 -->
+        <div class="flex-1 p-6 overflow-auto bg-gray-50 flex flex-col gap-6">
+            <!-- 数组可视化 -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-4">有序查找表 (ST)</h2>
+                <div class="overflow-x-auto">
+                    <div class="flex gap-1.5 justify-center flex-wrap" id="array-display"></div>
+                </div>
+                <div class="flex justify-center gap-6 mt-4">
+                    <span class="font-mono text-sm bg-blue-50 px-3 py-1 rounded-lg"><span class="font-bold text-blue-600">low</span>: <span id="ptr-low">-</span></span>
+                    <span class="font-mono text-sm bg-yellow-50 px-3 py-1 rounded-lg"><span class="font-bold text-yellow-600">mid</span>: <span id="ptr-mid">-</span></span>
+                    <span class="font-mono text-sm bg-blue-50 px-3 py-1 rounded-lg"><span class="font-bold text-blue-600">high</span>: <span id="ptr-high">-</span></span>
+                </div>
+            </div>
+
+            <!-- 判定树 -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-3">折半查找判定树 (二叉判定树)</h2>
+                <div class="tree-container" id="tree-display"></div>
+            </div>
+
+            <!-- 统计 -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-3">查找统计</h2>
+                <div class="grid grid-cols-4 gap-4 text-sm">
+                    <div class="bg-blue-50 p-3 rounded-lg text-center"><div class="text-gray-500">比较次数</div><div class="text-2xl font-bold text-blue-600 font-mono" id="stat-comparisons">0</div></div>
+                    <div class="bg-green-50 p-3 rounded-lg text-center"><div class="text-gray-500">成功 ASL</div><div class="text-2xl font-bold text-green-600 font-mono" id="stat-asl-success">--</div></div>
+                    <div class="bg-red-50 p-3 rounded-lg text-center"><div class="text-gray-500">失败 ASL</div><div class="text-2xl font-bold text-red-600 font-mono" id="stat-asl-fail">--</div></div>
+                    <div class="bg-orange-50 p-3 rounded-lg text-center"><div class="text-gray-500">log₂(n+1)向上取整</div><div class="text-2xl font-bold text-orange-600 font-mono" id="stat-max">--</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧日志 -->
+        <div class="w-80 bg-white border-l flex flex-col shadow-[-4px_0_15px_rgba(0,0,0,0.03)]">
+            <div class="p-4 border-b bg-gray-50 font-bold flex justify-between items-center">
+                <span>执行日志</span>
+                <span id="status-badge" class="px-2 py-1 rounded text-xs bg-gray-200 text-gray-700">未开始</span>
+            </div>
+            <div id="log-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 font-mono text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        let arr = [];       // 1-based
+        let key = null;
+        let low = 1, high = 0, mid = 0;
+        let comparisons = 0;
+        let status = 0;     // 0=init, 1=running, 2=found, 3=notFound
+        let isPlaying = false;
+        let playInterval = null;
+
+        function initSearch() {
+            stopAutoPlay();
+            const arrStr = document.getElementById('input-array').value.trim();
+            const keyStr = document.getElementById('input-key').value.trim();
+            if (!arrStr || !keyStr) return alert("请输入有序数组和关键字");
+
+            const raw = arrStr.split(',').map(s => s.trim()).filter(s => s !== '').map(Number);
+            if (raw.length === 0) return alert("数组不能为空");
+            // 验证是否已排序
+            for (let k = 1; k < raw.length; k++) {
+                if (raw[k] < raw[k-1]) return alert("数组必须为有序！(从小到大)");
+            }
+
+            arr = [null, ...raw];
+            key = keyStr;
+            low = 1;
+            high = arr.length - 1;
+            mid = Math.floor((low + high) / 2);
+            comparisons = 0;
+            status = 1;
+
+            document.getElementById('log-container').innerHTML = '';
+            document.getElementById('stat-comparisons').textContent = '0';
+            const n = raw.length;
+            addLog('系统', `初始化完成。有序表长 n=${n}，查找关键字: ${key}。初始范围: low=1, high=${high}, mid=${mid}`);
+            updateStatusBadge('运行中', 'bg-blue-100 text-blue-700');
+            // 理论值
+            document.getElementById('stat-asl-success').textContent = '≈ log₂(n+1)-1';
+            document.getElementById('stat-asl-fail').textContent = '≈ log₂(n+1)';
+            document.getElementById('stat-max').textContent = Math.ceil(Math.log2(n + 1)).toString();
+            renderArray();
+            renderTree();
+            updatePointers();
+        }
+
+        function step() {
+            if (status !== 1) return;
+
+            if (low > high) {
+                status = 3;
+                addLog('失败', `low(${low}) > high(${high})，查找区间为空。查找失败！共比较 ${comparisons} 次。`, 'text-red-600 font-bold text-base');
+                updateStatusBadge('查找失败', 'bg-red-100 text-red-700');
+                stopAutoPlay();
+                renderArray();
+                renderTree();
+                return;
+            }
+
+            comparisons++;
+            document.getElementById('stat-comparisons').textContent = comparisons;
+            mid = Math.floor((low + high) / 2);
+
+            const strVal = String(arr[mid]);
+            addLog('比较', `low=${low}, high=${high}, mid=${mid}。ST[${mid}] = ${arr[mid]} 与 key(${key}) 比较 (第${comparisons}次)`, 'text-gray-700');
+
+            if (strVal === String(key)) {
+                status = 2;
+                setTimeout(() => {
+                    addLog('成功', `等值条件满足！在位置 ST[${mid}] 找到关键字 ${key}。共比较 ${comparisons} 次。`, 'text-green-600 font-bold text-base');
+                    updateStatusBadge('查找成功', 'bg-green-100 text-green-700');
+                    stopAutoPlay();
+                    renderArray();
+                    renderTree();
+                }, 500);
+                return;
+            } else if (Number(arr[mid]) < Number(key)) {
+                addLog('缩范围', `ST[${mid}](${arr[mid]}) < key(${key})，low = mid + 1 = ${mid + 1}`, 'text-blue-600');
+                low = mid + 1;
+            } else {
+                addLog('缩范围', `ST[${mid}](${arr[mid]}) > key(${key})，high = mid - 1 = ${mid - 1}`, 'text-blue-600');
+                high = mid - 1;
+            }
+
+            renderArray();
+            renderTree();
+            updatePointers();
+        }
+
+        function renderArray() {
+            const container = document.getElementById('array-display');
+            container.innerHTML = '';
+            for (let k = 1; k < arr.length; k++) {
+                const div = document.createElement('div');
+                div.id = `box-${k}`;
+                div.className = 'array-box';
+                div.textContent = arr[k];
+                const label = document.createElement('div');
+                label.className = 'absolute -bottom-5 text-[10px] text-gray-400 font-mono';
+                label.textContent = k;
+                div.appendChild(label);
+
+                if (status === 2 && k === mid) {
+                    div.classList.add('found-box');
+                } else if (status === 1) {
+                    if (k === mid) div.classList.add('mid-highlight');
+                    else if (k >= low && k <= high) div.classList.add('low-highlight');
+                    else div.classList.add('dimmed');
+                }
+                if (status === 3) div.classList.add('dimmed');
+
+                container.appendChild(div);
+            }
+        }
+
+        function updatePointers() {
+            document.getElementById('ptr-low').textContent = (status === 1) ? low : (status === 2 ? low : '-');
+            document.getElementById('ptr-mid').textContent = (status === 1) ? mid : (status === 2 ? mid : '-');
+            document.getElementById('ptr-high').textContent = (status === 1) ? high : (status === 2 ? high : '-');
+        }
+
+        // ---- 判定树绘制 (递归) ----
+        function renderTree() {
+            const container = document.getElementById('tree-display');
+            container.innerHTML = '';
+            const n = arr.length - 1;
+            if (n === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">无数据</p>'; return; }
+
+            // 构建判定树结构
+            const treeRootIndex = buildDecisionTree(1, n);
+
+            // CSS绝对定位绘制
+            const width = container.clientWidth || 700;
+            const nodeSize = 46;
+
+            function draw(node, depth, leftBound, rightBound) {
+                if (!node) return;
+                const x = (leftBound + rightBound) / 2;
+                const y = depth * 80 + 30;
+                const div = document.createElement('div');
+                div.className = 'tree-node';
+                div.style.left = (x - nodeSize / 2) + 'px';
+                div.style.top = y + 'px';
+                // 显示的是值，不是下标
+                const displayVal = arr[node.index];
+                div.innerHTML = `<span class="text-xs">${node.index}</span><br><span class="text-[0.65rem] text-gray-500">${displayVal}</span>`;
+
+                if (node.index === mid && (status === 1 || status === 2)) div.classList.add('highlight');
+                else if (status === 1 || status === 2) {
+                    // 检查是否在搜索路径上
+                    if (isOnSearchPath(node.index)) div.classList.add('path-node');
+                }
+                container.appendChild(div);
+
+                if (node.left) {
+                    const childX = (leftBound + x) / 2;
+                    drawLine(x, y + nodeSize / 2, childX, (depth + 1) * 80 + 30 + nodeSize / 2);
+                    draw(node.left, depth + 1, leftBound, x);
+                }
+                if (node.right) {
+                    const childX = (x + rightBound) / 2;
+                    drawLine(x + nodeSize / 2, y + nodeSize / 2, childX + nodeSize / 2, (depth + 1) * 80 + 30 + nodeSize / 2);
+                    draw(node.right, depth + 1, x, rightBound);
+                }
+            }
+            draw(treeRootIndex, 0, 0, width);
+            container.style.height = (getDepth(treeRootIndex) * 80 + 100) + 'px';
+        }
+
+        function buildDecisionTree(l, r) {
+            if (l > r) return null;
+            const m = Math.floor((l + r) / 2);
+            return {
+                index: m,
+                left: buildDecisionTree(l, m - 1),
+                right: buildDecisionTree(m + 1, r)
+            };
+        }
+
+        function getDepth(node) {
+            if (!node) return 0;
+            return 1 + Math.max(getDepth(node.left), getDepth(node.right));
+        }
+
+        function isOnSearchPath(idx) {
+            let lo = 1, hi = arr.length - 1;
+            while (lo <= hi) {
+                const mi = Math.floor((lo + hi) / 2);
+                if (mi === idx) return true;
+                if (Number(arr[mi]) < Number(key)) lo = mi + 1;
+                else hi = mi - 1;
+                if (lo > hi) return false;
+            }
+            return false;
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            const container = document.getElementById('tree-display');
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'absolute';
+            svg.style.left = '0';
+            svg.style.top = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.pointerEvents = 'none';
+            svg.style.zIndex = '0';
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#cbd5e1');
+            line.setAttribute('stroke-width', '1.5');
+            svg.appendChild(line);
+            container.appendChild(svg);
+        }
+
+        function addLog(type, message, colorClass = 'text-gray-800') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `p-3 bg-white rounded border border-gray-100 shadow-sm ${colorClass} leading-relaxed animate-fade-in`;
+            entry.innerHTML = `<span class="inline-block px-1.5 py-0.5 bg-gray-100 rounded text-xs text-gray-500 mb-1 border">${type}</span><br>${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatusBadge(text, classes) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = text; badge.className = `px-2 py-1 rounded text-xs font-bold ${classes}`;
+        }
+
+        function togglePlay() {
+            if (isPlaying) { stopAutoPlay(); return; }
+            if (status !== 1) initSearch();
+            isPlaying = true;
+            document.getElementById('play-text').textContent = '暂停播放';
+            document.getElementById('btn-step').disabled = true;
+            playInterval = setInterval(() => {
+                if (status === 1) step(); else stopAutoPlay();
+            }, 1200);
+        }
+
+        function stopAutoPlay() {
+            isPlaying = false;
+            document.getElementById('play-text').textContent = '自动播放';
+            document.getElementById('btn-step').disabled = false;
+            if (playInterval) clearInterval(playInterval);
+        }
+
+        window.onload = initSearch;
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</body>
+</html>

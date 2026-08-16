@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prim 算法 (最小生成树) 演示</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['"Microsoft YaHei"', '"PingFang SC"', 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+  .node { transition: all 0.4s ease; }
+  .node.selected { transform: scale(1.15); }
+  .edge-line { transition: all 0.4s ease; }
+  .log-entry { animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .array-cell { transition: all 0.3s ease; }
+  .pulse-dot { animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body class="bg-gray-900 min-h-screen text-white">
+
+<!-- Top Control Bar -->
+<div class="fixed top-0 left-0 right-0 z-50 bg-gray-800 border-b border-gray-700 shadow-lg">
+  <div class="flex items-center justify-between px-5 py-3 max-w-full">
+    <div class="flex items-center gap-4">
+      <span class="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">Prim 算法 (最小生成树)</span>
+      <span class="text-sm text-gray-400 hidden sm:inline">贪心策略 · 从顶点出发逐步扩展</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="stepBack()" id="btnBack" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-md text-sm font-medium transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>上一步</button>
+      <button onclick="stepForward()" id="btnStep" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 rounded-md text-sm font-medium transition">单步执行</button>
+      <button onclick="autoPlay()" id="btnPlay" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-md text-sm font-medium transition">自动播放</button>
+      <button onclick="reset()" id="btnReset" class="px-4 py-1.5 bg-gray-600 hover:bg-gray-500 rounded-md text-sm font-medium transition">重置</button>
+      <span id="speedLabel" class="text-xs text-gray-400 ml-1">速度: 1.0s</span>
+      <input type="range" min="0.3" max="2.5" step="0.1" value="1.0" oninput="updateSpeed(this.value)" class="w-20 h-1 accent-green-500">
+    </div>
+  </div>
+  <!-- Step Indicator -->
+  <div class="px-5 py-1.5 bg-gray-850 border-t border-gray-700 flex items-center gap-3">
+    <span class="text-sm text-gray-400">当前步骤:</span>
+    <span id="stepDesc" class="text-sm text-green-400 font-medium">初始化 — 从顶点 0 开始构造最小生成树</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="flex pt-28 pb-0 h-screen">
+
+  <!-- Left: Graph Visualization -->
+  <div class="flex-1 relative p-6 overflow-hidden" style="min-width: 500px;">
+    <div class="relative w-full h-full flex items-center justify-center" style="min-height: 500px;">
+      <svg id="edgeLayer" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;"></svg>
+      <div id="nodeLayer" class="relative z-10" style="width: 520px; height: 420px;">
+        <!-- Nodes will be placed by JS -->
+      </div>
+    </div>
+    <!-- Legend -->
+    <div class="absolute bottom-4 left-6 flex gap-5 text-xs">
+      <div class="flex items-center gap-1.5"><div class="w-4 h-0.5 bg-green-500"></div><span class="text-gray-300">MST中边</span></div>
+      <div class="flex items-center gap-1.5"><div class="w-4 h-0.5 bg-red-500 border-red-500" style="border-width:2px;"></div><span class="text-gray-300">当前选中边</span></div>
+      <div class="flex items-center gap-1.5"><div class="w-4 h-0.5 bg-blue-400 border-dashed" style="border:1px dashed #60a5fa;"></div><span class="text-gray-300">候选边</span></div>
+      <div class="flex items-center gap-1.5"><div class="w-4 h-0.5 bg-gray-600"></div><span class="text-gray-300">未考虑边</span></div>
+    </div>
+  </div>
+
+  <!-- Right: Info Panel -->
+  <div class="w-80 flex flex-col border-l border-gray-700 bg-gray-850 overflow-hidden" style="min-width: 300px;">
+    <!-- Status -->
+    <div class="p-4 border-b border-gray-700">
+      <h3 class="text-sm font-bold text-gray-300 mb-3">MST 构造状态</h3>
+      <div class="text-xs text-gray-400 mb-2">
+        MST 边数: <span id="mstEdgeCount" class="text-green-400 font-mono">0</span> / <span class="font-mono">5</span>
+      </div>
+      <div class="text-xs text-gray-400 mb-2">
+        MST 总权重: <span id="mstTotalWeight" class="text-yellow-400 font-mono">0</span>
+      </div>
+      <!-- lowcost array -->
+      <div class="mt-3">
+        <span class="text-xs text-gray-500 block mb-1 font-mono">lowcost[]</span>
+        <div class="flex gap-1 flex-wrap" id="lowcostDisplay"></div>
+      </div>
+      <!-- adjvex array -->
+      <div class="mt-3">
+        <span class="text-xs text-gray-500 block mb-1 font-mono">adjvex[]</span>
+        <div class="flex gap-1 flex-wrap" id="adjvexDisplay"></div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <h3 class="text-sm font-bold text-gray-300 px-4 py-2 border-b border-gray-700">执行日志</h3>
+      <div id="logPanel" class="flex-1 overflow-y-auto p-3 space-y-1.5 text-xs font-mono"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+// 6 vertices, ~10 weighted edges (same graph for all MST demos)
+// Positions in the 520x420 nodeLayer
+const nodePositions = [
+  { x: 60,  y: 120 }, // 0 - top left
+  { x: 220, y: 60  }, // 1 - top center
+  { x: 400, y: 120 }, // 2 - top right
+  { x: 400, y: 300 }, // 3 - bottom right
+  { x: 220, y: 360 }, // 4 - bottom center
+  { x: 60,  y: 300 }, // 5 - bottom left
+];
+
+// Adjacency matrix: INF = no edge
+const INF = Infinity;
+const graph = [
+  [INF,   6,   1,   5, INF, INF],  // 0
+  [  6, INF,   5, INF,   3, INF],  // 1
+  [  1,   5, INF,   5,   6,   4],  // 2
+  [  5, INF,   5, INF, INF,   2],  // 3
+  [INF,   3,   6, INF, INF,   6],  // 4
+  [INF, INF,   4,   2,   6, INF],  // 5
+];
+
+const n = 6; // vertex count
+
+// Pre-compute edge list for SVG rendering
+const allEdges = [];
+for (let i = 0; i < n; i++) {
+  for (let j = i + 1; j < n; j++) {
+    if (graph[i][j] !== INF) {
+      allEdges.push({ from: i, to: j, weight: graph[i][j] });
+    }
+  }
+}
+
+// ==================== STATE ====================
+let inMST = new Array(n).fill(false);      // vertices already in MST
+let lowcost = new Array(n).fill(INF);      // min edge weight to MST
+let adjvex = new Array(n).fill(-1);        // which MST vertex gives that min weight
+let mstEdges = [];                          // edges in MST [{from, to, weight}]
+let steps = [];                             // all steps for replay
+let currentStep = -1;
+let autoTimer = null;
+let playSpeed = 1000;
+
+// ==================== INIT ====================
+function initSteps() {
+  steps = [];
+
+  // Step 0: initialize with vertex 0
+  inMST = new Array(n).fill(false);
+  lowcost = new Array(n).fill(INF);
+  adjvex = new Array(n).fill(-1);
+  mstEdges = [];
+
+  inMST[0] = true;
+  for (let j = 0; j < n; j++) {
+    if (graph[0][j] !== INF && j !== 0) {
+      lowcost[j] = graph[0][j];
+      adjvex[j] = 0;
+    }
+  }
+
+  steps.push({
+    type: 'init',
+    description: '初始化: 将顶点 0 加入 MST，更新 lowcost[] 和 adjvex[]',
+    inMST: [...inMST],
+    lowcost: [...lowcost],
+    adjvex: [...adjvex],
+    mstEdges: [...mstEdges],
+    highlightVertex: 0,
+    highlightEdge: null,
+    candidateEdges: []
+  });
+
+  // For n-1 iterations, add one vertex each time
+  for (let iter = 0; iter < n - 1; iter++) {
+    // Find min lowcost among vertices not in MST
+    let minCost = INF;
+    let k = -1;
+    for (let j = 0; j < n; j++) {
+      if (!inMST[j] && lowcost[j] < minCost) {
+        minCost = lowcost[j];
+        k = j;
+      }
+    }
+
+    if (k === -1) break; // graph disconnected
+
+    // Step: found minimum edge
+    // Collect current candidate edges for display
+    let candidates = [];
+    for (let j = 0; j < n; j++) {
+      if (!inMST[j] && lowcost[j] !== INF) {
+        candidates.push({ from: adjvex[j], to: j, weight: lowcost[j] });
+      }
+    }
+
+    let selectedEdge = { from: adjvex[k], to: k, weight: minCost };
+
+    steps.push({
+      type: 'select',
+      description: `从候选边中选择最小边: (${adjvex[k]}, ${k}) 权重 ${minCost}`,
+      inMST: [...inMST],
+      lowcost: [...lowcost],
+      adjvex: [...adjvex],
+      mstEdges: [...mstEdges],
+      highlightVertex: k,
+      highlightEdge: selectedEdge,
+      candidateEdges: [...candidates],
+      selectedEdge: selectedEdge
+    });
+
+    // Add vertex k to MST
+    inMST[k] = true;
+    mstEdges.push(selectedEdge);
+    lowcost[k] = 0; // mark as in MST
+
+    // Update lowcost and adjvex for vertices adjacent to k
+    let updatedVertices = [];
+    for (let j = 0; j < n; j++) {
+      if (!inMST[j] && graph[k][j] !== INF && graph[k][j] < lowcost[j]) {
+        updatedVertices.push({ vertex: j, oldCost: lowcost[j], newCost: graph[k][j], oldAdj: adjvex[j], newAdj: k });
+        lowcost[j] = graph[k][j];
+        adjvex[j] = k;
+      }
+    }
+
+    steps.push({
+      type: 'update',
+      description: `将顶点 ${k} 加入 MST` + (updatedVertices.length > 0 ? `，更新相关顶点的 lowcost[]` : ''),
+      inMST: [...inMST],
+      lowcost: [...lowcost],
+      adjvex: [...adjvex],
+      mstEdges: [...mstEdges],
+      highlightVertex: k,
+      highlightEdge: null,
+      candidateEdges: [],
+      updatedVertices: updatedVertices
+    });
+  }
+
+  // Final complete step
+  steps.push({
+    type: 'complete',
+    description: `最小生成树构造完成! 总权重: ${mstEdges.reduce((s, e) => s + e.weight, 0)}`,
+    inMST: [...inMST],
+    lowcost: [...lowcost],
+    adjvex: [...adjvex],
+    mstEdges: [...mstEdges],
+    highlightVertex: -1,
+    highlightEdge: null,
+    candidateEdges: []
+  });
+
+  // Clean up: mark INF lowcost entries for vertices that will never connect (disconnected components)
+  // In this graph all vertices connect, so fine
+}
+
+// ==================== RENDER ====================
+function render() {
+  if (currentStep < 0 || currentStep >= steps.length) return;
+  const step = steps[currentStep];
+
+  renderNodes(step);
+  renderEdges(step);
+  renderArrays(step);
+  renderStatus(step);
+  updateButtons();
+}
+
+function renderNodes(step) {
+  const layer = document.getElementById('nodeLayer');
+  layer.innerHTML = '';
+
+  for (let v = 0; v < n; v++) {
+    const pos = nodePositions[v];
+    let bgClass = 'bg-gray-700 border-gray-600';
+    let textClass = 'text-gray-300';
+
+    if (step.inMST[v]) {
+      bgClass = step.type === 'complete' ? 'bg-green-600 border-green-400' : 'bg-green-600 border-green-400 shadow-lg shadow-green-500/30';
+      textClass = 'text-white';
+    } else if (v === step.highlightVertex) {
+      bgClass = 'bg-yellow-500 border-yellow-300 shadow-lg shadow-yellow-500/30';
+      textClass = 'text-white font-bold';
+    }
+
+    // Check if this is a candidate vertex
+    if (!step.inMST[v] && step.candidateEdges.some(e => e.to === v)) {
+      bgClass = 'bg-blue-700 border-blue-400';
+      textClass = 'text-blue-200';
+    }
+
+    const div = document.createElement('div');
+    div.className = `node absolute w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold border-2 cursor-default ${bgClass} ${textClass}`;
+    div.style.left = pos.x + 'px';
+    div.style.top = pos.y + 'px';
+    div.style.transform = 'translate(-50%, -50%)';
+    div.textContent = v;
+
+    // pulse on current highlight
+    if (v === step.highlightVertex && step.type === 'select' && !step.inMST[v]) {
+      div.classList.add('pulse-dot');
+    }
+
+    layer.appendChild(div);
+  }
+}
+
+function renderEdges(step) {
+  const svg = document.getElementById('edgeLayer');
+  const w = svg.parentElement.clientWidth;
+  const h = svg.parentElement.clientHeight;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+  // Compute the center of nodeLayer relative to svg
+  const layerW = 520, layerH = 420;
+  const offsetX = (w - layerW) / 2;
+  const offsetY = (h - layerH) / 2;
+
+  let html = '';
+
+  // Edge set in MST (by sorted pair)
+  const mstEdgeSet = new Set();
+  for (const e of step.mstEdges) {
+    mstEdgeSet.add(`${Math.min(e.from, e.to)}-${Math.max(e.from, e.to)}`);
+  }
+
+  // Selected edge
+  let selKey = null;
+  if (step.selectedEdge) {
+    selKey = `${Math.min(step.selectedEdge.from, step.selectedEdge.to)}-${Math.max(step.selectedEdge.from, step.selectedEdge.to)}`;
+  }
+
+  // Candidate edge set
+  const candEdgeSet = new Set();
+  for (const e of step.candidateEdges) {
+    candEdgeSet.add(`${Math.min(e.from, e.to)}-${Math.max(e.from, e.to)}`);
+  }
+
+  for (const e of allEdges) {
+    const key = `${Math.min(e.from, e.to)}-${Math.max(e.from, e.to)}`;
+    const x1 = offsetX + nodePositions[e.from].x;
+    const y1 = offsetY + nodePositions[e.from].y;
+    const x2 = offsetX + nodePositions[e.to].x;
+    const y2 = offsetY + nodePositions[e.to].y;
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+
+    let strokeColor = '#4b5563'; // gray-600
+    let strokeWidth = 1.5;
+    let strokeDash = '';
+    let labelColor = '#6b7280';
+
+    if (mstEdgeSet.has(key)) {
+      strokeColor = '#22c55e'; // green-500
+      strokeWidth = 3;
+      labelColor = '#22c55e';
+    } else if (selKey === key && step.type === 'select') {
+      strokeColor = '#ef4444'; // red-500
+      strokeWidth = 3.5;
+      labelColor = '#ef4444';
+    } else if (candEdgeSet.has(key)) {
+      strokeColor = '#60a5fa'; // blue-400
+      strokeWidth = 2;
+      strokeDash = '8,4';
+      labelColor = '#60a5fa';
+    }
+
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+      stroke="${strokeColor}" stroke-width="${strokeWidth}"
+      stroke-dasharray="${strokeDash}" stroke-linecap="round"/>`;
+
+    // Weight label on a small background
+    html += `<rect x="${mx - 12}" y="${my - 10}" width="24" height="18" rx="4" fill="#1f2937" opacity="0.9"/>`;
+    html += `<text x="${mx}" y="${my + 4}" text-anchor="middle" fill="${labelColor}" font-size="11" font-weight="bold">${e.weight}</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+function renderArrays(step) {
+  // lowcost
+  const lcDiv = document.getElementById('lowcostDisplay');
+  lcDiv.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const val = step.lowcost[i];
+    const displayVal = val === INF ? '∞' : (val === 0 ? '0' : val);
+    let cellClass = 'bg-gray-700 text-gray-400 border border-gray-600';
+    if (step.inMST[i]) {
+      cellClass = 'bg-green-800 text-green-300 border border-green-600';
+    } else if (val === 0 && !step.inMST[i]) {
+      // shouldn't happen, but just in case
+      cellClass = 'bg-yellow-800 text-yellow-300 border border-yellow-600';
+    } else if (val !== INF) {
+      cellClass = 'bg-blue-900 text-blue-300 border border-blue-700';
+    }
+
+    // highlight the selected vertex's entry
+    if (i === step.highlightVertex && step.type === 'select') {
+      cellClass = 'bg-yellow-600 text-white border border-yellow-400 font-bold';
+    }
+
+    lcDiv.innerHTML += `<div class="array-cell w-10 h-7 flex items-center justify-center text-xs rounded ${cellClass}">${displayVal}</div>`;
+  }
+
+  // adjvex
+  const avDiv = document.getElementById('adjvexDisplay');
+  avDiv.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const val = step.adjvex[i];
+    const displayVal = val === -1 ? '-' : val;
+    let cellClass = 'bg-gray-700 text-gray-400 border border-gray-600';
+    if (step.inMST[i]) {
+      cellClass = 'bg-green-800 text-green-300 border border-green-600';
+    } else if (val !== -1) {
+      cellClass = 'bg-indigo-900 text-indigo-300 border border-indigo-700';
+    }
+
+    avDiv.innerHTML += `<div class="array-cell w-10 h-7 flex items-center justify-center text-xs rounded ${cellClass}">${displayVal}</div>`;
+  }
+
+  // Row labels
+  document.getElementById('mstEdgeCount').textContent = step.mstEdges.length;
+  const totalW = step.mstEdges.reduce((s, e) => s + e.weight, 0);
+  document.getElementById('mstTotalWeight').textContent = totalW;
+
+  document.getElementById('stepDesc').textContent = step.description;
+}
+
+function renderStatus(step) {
+  // The stepDesc is already updated in renderArrays
+}
+
+function updateButtons() {
+  document.getElementById('btnBack').disabled = currentStep <= 0;
+  document.getElementById('btnStep').disabled = currentStep >= steps.length - 1;
+  document.getElementById('btnPlay').disabled = currentStep >= steps.length - 1;
+}
+
+// ==================== LOG ====================
+function addLog(msg, type) {
+  const panel = document.getElementById('logPanel');
+  let colorClass = 'text-gray-400';
+  if (type === 'select') colorClass = 'text-red-400';
+  else if (type === 'update') colorClass = 'text-green-400';
+  else if (type === 'init') colorClass = 'text-blue-400';
+  else if (type === 'complete') colorClass = 'text-yellow-400';
+
+  const div = document.createElement('div');
+  div.className = `log-entry ${colorClass}`;
+  div.textContent = msg;
+  panel.appendChild(div);
+  panel.scrollTop = panel.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logPanel').innerHTML = '';
+}
+
+// ==================== CONTROLS ====================
+function stepForward() {
+  if (currentStep >= steps.length - 1) return;
+
+  currentStep++;
+  const step = steps[currentStep];
+
+  // Map step type to log type
+  let logType = step.type;
+  if (step.type === 'select') logType = 'select';
+  else if (step.type === 'update') logType = 'update';
+  else if (step.type === 'complete') logType = 'complete';
+  else logType = 'init';
+
+  addLog(`[步骤 ${currentStep}] ${step.description}`, logType);
+  render();
+
+  if (currentStep >= steps.length - 1) {
+    stopAuto();
+  }
+}
+
+function stepBack() {
+  if (currentStep <= 0) return;
+
+  currentStep--;
+  // Remove last log entry
+  const panel = document.getElementById('logPanel');
+  if (panel.lastChild) panel.removeChild(panel.lastChild);
+
+  render();
+}
+
+function autoPlay() {
+  if (autoTimer) {
+    stopAuto();
+    document.getElementById('btnPlay').textContent = '自动播放';
+    document.getElementById('btnPlay').classList.remove('bg-red-600', 'hover:bg-red-500');
+    document.getElementById('btnPlay').classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+    return;
+  }
+
+  document.getElementById('btnPlay').textContent = '暂停';
+  document.getElementById('btnPlay').classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+  document.getElementById('btnPlay').classList.add('bg-red-600', 'hover:bg-red-500');
+
+  function tick() {
+    if (currentStep >= steps.length - 1) {
+      stopAuto();
+      return;
+    }
+    stepForward();
+    if (currentStep < steps.length - 1) {
+      autoTimer = setTimeout(tick, playSpeed);
+    } else {
+      stopAuto();
+    }
+  }
+
+  autoTimer = setTimeout(tick, playSpeed);
+}
+
+function stopAuto() {
+  if (autoTimer) {
+    clearTimeout(autoTimer);
+    autoTimer = null;
+  }
+  document.getElementById('btnPlay').textContent = '自动播放';
+  document.getElementById('btnPlay').classList.remove('bg-red-600', 'hover:bg-red-500');
+  document.getElementById('btnPlay').classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+}
+
+function reset() {
+  stopAuto();
+  currentStep = -1;
+  clearLog();
+  initSteps();
+  currentStep = 1; // skip init, start at first real step
+  stepBack(); // go to init
+  // Actually just go to step 0
+  currentStep = 0;
+  addLog(`[初始化] ${steps[0].description}`, 'init');
+  render();
+}
+
+function updateSpeed(val) {
+  playSpeed = parseFloat(val) * 1000;
+  document.getElementById('speedLabel').textContent = '速度: ' + parseFloat(val).toFixed(1) + 's';
+}
+
+// ==================== STARTUP ====================
+function init() {
+  initSteps();
+  currentStep = 0;
+  addLog(`[初始化] ${steps[0].description}`, 'init');
+  render();
+}
+
+// Handle window resize for SVG
+window.addEventListener('resize', () => {
+  if (currentStep >= 0 && currentStep < steps.length) {
+    renderEdges(steps[currentStep]);
+  }
+});
+
+init();
+</script>
+
+</body>
+</html>

@@ -27,6 +27,8 @@ Dijkstra（迪杰斯特拉）提出了一个**按路径长度递增次序产生�
 
 > **限制**：Dijkstra **不允许负权边**——若存在负权，已确定的 $dist$ 可能被进一步缩小，贪心失效。
 
+![Dijkstra 负权边失效示例](/blog/images/第6章 图.assets/image-20260703174225050.png)
+
 ## 核心公式
 
 下一条最短路径的终点 $V_j$ 必定是不在 $S$ 中且 $dist$ 值最小的顶点：
@@ -44,6 +46,8 @@ w_{si} & i \neq s\ \text{且}\ \langle V_s, V_i \rangle \in E \\[4pt]
 **松弛（修改）**：对 $V - S$ 中的每个顶点 $V_k$：若 $dist[j] + w_{jk} < dist[k]$，则 $dist[k] = dist[j] + w_{jk}$。
 
 ## 算法实现
+
+![Dijkstra 最短路径实例](/blog/images/第6章 图.assets/dijkstra.png)
 
 ```c++
 BOOLEAN final[MAX_VEX];                      // 标记顶点是否已确定最短路径

@@ -79,6 +79,8 @@ void PrintPath(int j, int k) {
 
 ## 实例：依次加入中转点
 
+![Floyd 算法实例](/blog/images/第6章 图.assets/Gemini_Generated_Image_kpktzmkpktzmkpkt.png)
+
 | 轮次 | 允许中转点 | 更新结果 |
 |:---|:---|:---|
 | Step 1 (k=0) | $V_0$ | $A[2][1]$：$\infty$ → 7（借道 $V_0$），Path[2][1]=0 |
@@ -102,6 +104,8 @@ void PrintPath(int j, int k) {
 | **Bellman-Ford** | ✅ | 对所有边松弛 $n-1$ 轮，允许已被更新的顶点再次被修正 |
 
 **负权回路**：回路边权之和为负数时，每绕一圈路径长度减少——最短路径**不存在**（可无限缩短）。
+
+![负权回路示例](/blog/images/第6章 图.assets/image-20260703174409035.png)
 
 | 问题 | 结论 |
 |:---|:---|

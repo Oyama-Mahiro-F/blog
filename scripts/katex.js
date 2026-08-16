@@ -1,69 +1,79 @@
 // Server-side math rendering via KaTeX
-// Two-pass approach: extract math before markdown, render after HTML
+// Two-pass approach:
+//   1. before_post_render: extract $...$ / $$...$$ from the RAW markdown into
+//      placeholders, so the markdown renderer cannot mangle TeX syntax
+//      (e.g. "\\" -> hard line break, "_" / "*" -> emphasis, "|" in tables).
+//   2. after_post_render: render the stored TeX with KaTeX and substitute it
+//      back into the final HTML.
 const katex = require('katex');
-const he = require('he'); // HTML entity decoder
 
-function renderMath(html) {
-  // Protect code blocks
-  const blocks = [];
-  let out = html.replace(/<pre[^>]*>[\s\S]*?<\/pre>/gi, (m) => {
-    blocks.push(m);
-    return `\x00KA_BLOCK_${blocks.length - 1}\x00`;
-  });
-  out = out.replace(/<code[^>]*>[\s\S]*?<\/code>/gi, (m) => {
-    blocks.push(m);
-    return `\x00KA_BLOCK_${blocks.length - 1}\x00`;
-  });
+const STORE_KEY = '_katexMathStore';
+const MATH_RE = /xxKATEXMATH(\d+)xx/g;
 
-  // Decode HTML entities in $...$ math before passing to KaTeX
-  function decodeMath(s) {
-    return he.decode(s);
-  }
+// --- pass 1: markdown stage -------------------------------------------------
+function extractMath(md) {
+  const store = [];
+  const pushMath = (tex, display) => {
+    store.push({ tex: tex.trim(), display });
+    return `xxKATEXMATH${store.length - 1}xx`;
+  };
 
-  // ① Extract all paired math expressions ($$...$$ and $...$) into placeholders
-  const mathExprs = [];
-  out = out.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
-    mathExprs.push({ math: decodeMath(math.trim()), display: true });
-    return `\x00KA_MATH_${mathExprs.length - 1}\x00`;
-  });
-  out = out.replace(/\$([^\$\n]+?)\$/g, (_, math) => {
-    mathExprs.push({ math: decodeMath(math.trim()), display: false });
-    return `\x00KA_MATH_${mathExprs.length - 1}\x00`;
-  });
+  // Protect fenced code blocks and inline code first: their content is not math.
+  const codes = [];
+  const pushCode = (m) => {
+    codes.push(m);
+    return `xxKATEXCODE${codes.length - 1}xx`;
+  };
+  let out = md.replace(/```[\s\S]*?```/g, pushCode);
+  out = out.replace(/`[^`\n]*`/g, pushCode);
 
-  // ② Escape stray dollar signs (e.g. produced by truncated excerpts) so they
-  //    never end up inside math mode
-  out = out.replace(/\$/g, '&#36;');
+  // Extract math: display ($$...$$, may span lines) before inline ($...$).
+  out = out.replace(/(?<!\\)\$\$([\s\S]+?)(?<!\\)\$\$/g, (_, tex) => pushMath(tex, true));
+  out = out.replace(/(?<!\\)\$(?!\s)([^\$\n]*?\S)(?<!\\)\$/g, (_, tex) => pushMath(tex, false));
 
-  // ③ Render each extracted math expression back into place
-  for (let i = 0; i < mathExprs.length; i++) {
-    const { math, display } = mathExprs[i];
-    let html;
-    try {
-      html = katex.renderToString(math, { displayMode: display, throwOnError: false, strict: false });
-      // Drop the MathML half of KaTeX output: it visibly doubles every formula
-      // when katex.min.css is missing, and its text (incl. the TeX annotation)
-      // leaks into strip_html() excerpts, meta description and search index.
-      html = html.replace(/<span class="katex-mathml">[\s\S]*?<\/span>(?=<span class="katex-html")/, '');
-    } catch (e) {
-      html = `<span class="katex-error" style="color:#cc0000">$${math}$</span>`;
-    }
-    out = out.replace(`\x00KA_MATH_${i}\x00`, html);
-  }
+  // Restore code so it renders normally; math stays as placeholders.
+  out = out.replace(/xxKATEXCODE(\d+)xx/g, (_, i) => codes[parseInt(i)]);
 
-  // Restore protected blocks
-  return out.replace(/\x00KA_BLOCK_(\d+)\x00/g, (_, i) => blocks[parseInt(i)]);
+  return { md: out, store };
 }
 
-// Only process post/page content (never the full-page HTML), otherwise the
-// regex would also rewrite $...$ inside <head> meta attributes (description,
-// og:description) and break the page markup with quote-truncated attributes.
-hexo.extend.filter.register('after_post_render', function(data) {
-  if (data.content && data.content.includes('$')) {
-    data.content = renderMath(data.content);
+// --- pass 2: html stage -----------------------------------------------------
+function renderOne(store, i) {
+  const item = store[parseInt(i)];
+  if (!item) return '';
+  const { tex, display } = item;
+  let html;
+  try {
+    html = katex.renderToString(tex, { displayMode: display, throwOnError: false, strict: false });
+    // Drop the MathML half of KaTeX output: it visibly doubles every formula
+    // when katex.min.css is missing, and its text (incl. the TeX annotation)
+    // leaks into strip_html() excerpts, meta description and search index.
+    html = html.replace(/<span class="katex-mathml">[\s\S]*?<\/span>(?=<span class="katex-html")/, '');
+  } catch (e) {
+    html = `<span class="katex-error" style="color:#cc0000">$${tex}$</span>`;
   }
-  if (data.excerpt && data.excerpt.includes('$')) {
-    data.excerpt = renderMath(data.excerpt);
-  }
+  return html;
+}
+
+function renderInto(html, store) {
+  // Unwrap the <p> around a standalone placeholder (display math blocks).
+  return html
+    .replace(/<p>\s*xxKATEXMATH(\d+)xx\s*<\/p>/g, (_, i) => renderOne(store, i))
+    .replace(MATH_RE, (_, i) => renderOne(store, i));
+}
+
+hexo.extend.filter.register('before_post_render', function (data) {
+  if (!data.content || !data.content.includes('$')) return data;
+  const { md, store } = extractMath(data.content);
+  data.content = md;
+  data[STORE_KEY] = store;
+  return data;
+});
+
+hexo.extend.filter.register('after_post_render', function (data) {
+  const store = data[STORE_KEY];
+  if (!store || !store.length) return data;
+  if (data.content) data.content = renderInto(data.content, store);
+  if (data.excerpt) data.excerpt = renderInto(data.excerpt, store);
   return data;
 });

@@ -141,7 +141,7 @@ j=6:  T[6]=B, next[6]=2, T[2]=B
 | 考点 | 记忆 |
 |:---|:---|
 | KMP 思想 | **i 永不回溯**，失配时 j 跳到 next[j]，利用模式串自身结构；匹配时间 **$O(n+m)$** |
-| next 定义 | $next[j]=\max\{k\mid 1<k<j$ 且 $T[1..k-1]=T[j-k+1..j-1]\}$；$next[1]=0$，其余无公共前后缀为 1 |
+| next 定义 | $next[j]=\begin{cases}0 & \text{当 } j=1\\ \max\{k\mid 1<k<j \text{ 且 } T[1..k-1]=T[j-k+1..j-1]\} & \text{当此集合非空}\\ 1 & \text{其他}\end{cases}$；$next[1]=0$，其余无公共前后缀为 1 |
 | next 实例 | "ABCDABD"：next = **0 1 1 1 1 2 3** |
 | nextval 改进 | 若 $T[i]=T[next[i]]$，则 $nextval[i]=nextval[next[i]]$——**跳过必然再次失配**的回溯 |
 | nextval 实例 | "ABCDABD"：nextval = **0 1 1 1 0 1 3** |

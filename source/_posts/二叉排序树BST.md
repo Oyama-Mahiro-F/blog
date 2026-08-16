@@ -132,6 +132,10 @@ BSTNode *Create_BST() {
 | ② | **只有一个孩子** | 用孩子替代该结点 |
 | ③ | **有两个孩子** | 用**中序前驱**（左子树最大）或**中序后继**（右子树最小）替换，转而删除前驱/后继 |
 
+![BST 删除三种情况](/blog/images/第7章 查找.assets/image-20260705173911003.png)
+
+![BST 删除三种情况示例](/blog/images/第7章 查找.assets/image-20260705173938676.png)
+
 ```c++
 void BST_Delete(BSTNode *&T, KeyType key) {
     if (T == NULL) {

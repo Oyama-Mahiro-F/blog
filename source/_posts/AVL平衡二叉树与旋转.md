@@ -48,6 +48,8 @@ typedef struct BSTNode {
 
 > **旋转法则**：被挤掉的节点，直接挂到降级节点的空缺位置上。
 
+![AVL 四种旋转图解](/blog/images/第7章 查找.assets/1a4e065af5d8655cf23bbb45657b3be5.webp)
+
 **LL 旋转图解（右单旋）**：
 
 ```
