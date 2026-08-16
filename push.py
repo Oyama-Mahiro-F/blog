@@ -5,10 +5,23 @@
 """
 import os, subprocess, sys
 
+# 强制 UTF-8 输出（配合 push.bat 的 chcp 65001），避免 GBK 乱码 / 特殊字符编码错误
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO_URL_SSH = 'git@github.com:Oyama-Mahiro-F/blog.git'
 REPO_URL_HTTPS = 'https://github.com/Oyama-Mahiro-F/blog.git'
 SITE_URL = 'https://oyama-mahiro-f.github.io/blog/'
+
+
+def wait_exit():
+    """等待回车退出；非交互环境（如管道/自动化）则直接返回"""
+    try:
+        wait_exit()
+    except (EOFError, KeyboardInterrupt):
+        pass
 
 
 def run(cmd, cwd=ROOT, check=True):
@@ -134,7 +147,7 @@ def main():
     check_git_user()
     if not check_git_remote():
         print()
-        input('修复后按回车重试，或直接关闭窗口退出...')
+        wait_exit()
         return
     print()
 
@@ -143,7 +156,7 @@ def main():
     ok, _ = run('git add -A', check=False)
     if not ok:
         print('  [失败] git add 出错')
-        input('按回车退出...')
+        wait_exit()
         return
 
     # 检查是否有内容可提交
@@ -154,7 +167,7 @@ def main():
         ok, _ = run('git commit -m "更新博客"')
         if not ok:
             print('  [失败] git commit 出错')
-            input('按回车退出...')
+            wait_exit()
             return
         print('  完成。')
     print()
@@ -167,7 +180,7 @@ def main():
         print('    1. 网络问题 - 浏览器访问 github.com 试试')
         print('    2. 首次推送需授权 - 弹出的 GitHub 登录窗口点 "Sign in with browser"')
         print('    3. 远程有冲突 - 先 git pull 再重试')
-        input('按回车退出...')
+        wait_exit()
         return
     print('  完成。')
     print()
@@ -177,7 +190,7 @@ def main():
     ok, out = run('npx hexo clean')
     if not ok:
         print('  [失败] hexo clean 出错')
-        input('按回车退出...')
+        wait_exit()
         return
     print('  完成。')
     print()
@@ -187,7 +200,7 @@ def main():
     ok, out = run('npx hexo generate')
     if not ok:
         print('  [失败] hexo generate 出错')
-        input('按回车退出...')
+        wait_exit()
         return
     print('  完成。')
     print()
@@ -199,7 +212,7 @@ def main():
         print('  [部署失败] 常见原因:')
         print('    1. 网络问题 - 浏览器访问 github.com 试试')
         print('    2. 首次部署需授权 - 弹出的 GitHub 登录窗口点 "Sign in with browser"')
-        input('按回车退出...')
+        wait_exit()
         return
     print('  完成。')
     print()
@@ -228,4 +241,4 @@ if __name__ == '__main__':
         print('\n已取消。')
     except Exception as e:
         print(f'\n[异常] {e}')
-    input('按回车退出...')
+    wait_exit()
