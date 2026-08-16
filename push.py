@@ -19,7 +19,7 @@ SITE_URL = 'https://oyama-mahiro-f.github.io/blog/'
 def wait_exit():
     """等待回车退出；非交互环境（如管道/自动化）则直接返回"""
     try:
-        wait_exit()
+        input('按回车退出...')
     except (EOFError, KeyboardInterrupt):
         pass
 
