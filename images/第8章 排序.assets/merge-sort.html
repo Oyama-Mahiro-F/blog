@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
 <meta property="og:description" content="归并排序演示 - Merge Sort   &#x2F;* &#x3D;&#x3D;&#x3D;&#x3D;&#x3D; Custom CSS Animations &#x3D;&#x3D;&#x3D;&#x3D;&#x3D; *&#x2F; @keyframes pulse-highlight {     0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6); }     50% { transform: s">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-07-18T14:25:35.915Z">
+<meta property="article:published_time" content="2026-08-20T23:27:25.985Z">
 <meta property="article:modified_time" content="2026-07-18T14:25:35.913Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="考研,408,计算机组成原理,数据结构,操作系统,计算机网络">
@@ -855,7 +855,7 @@
             const cls = elementClassForStep(step, i);
             const isPointer = (step.k !== null && i === step.k && step.isMerging);
             html += `<div class="relative flex flex-col items-center">
-                <div class="array-box <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">s</span></span><span class="mord">&quot;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span></span></span></span>{step.R[i]}</div>`;
+                <div class="array-box {cls}&quot;&gt;{step.R[i]}</div>`;
             if (isPointer) {
                 html += `<div style="margin-top:2px;font-size:11px;font-weight:700;color:#7c3aed;" class="anim-pointer">k</div>`;
             }
@@ -899,7 +899,7 @@
             const showIPtr = (step.i !== null && i === step.i && i <= (step.mergeMid ?? 0));
             const showJPtr = (step.j !== null && i === step.j && i > (step.mergeMid ?? 0));
             html += `<div class="relative flex flex-col items-center">
-                <div class="array-box <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">s</span></span><span class="mord">&quot;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span></span></span></span>{step.B[i]}</div>`;
+                <div class="array-box {cls}&quot;&gt;{step.B[i]}</div>`;
             if (showIPtr) {
                 html += `<div style="margin-top:2px;font-size:11px;font-weight:700;color:#dc2626;" class="anim-pointer">i</div>`;
             }
