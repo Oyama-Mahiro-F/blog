@@ -55,11 +55,43 @@ function renderOne(store, i) {
   return html;
 }
 
+// HTML-escape text that is placed inside an attribute value, so a math source
+// like `a = 2` or `x < y` cannot break attribute quoting.
+function escapeAttr(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Attribute-safe fallback for a math expression. Used anywhere KaTeX HTML is
+// not allowed: heading id/href/title attributes baked from the placeholder
+// text by the markdown renderer.
+function plainMath(store, i) {
+  const item = store[parseInt(i)];
+  return item ? escapeAttr(item.tex) : '';
+}
+
 function renderInto(html, store) {
-  // Unwrap the <p> around a standalone placeholder (display math blocks).
-  return html
-    .replace(/<p>\s*xxKATEXMATH(\d+)xx\s*<\/p>/g, (_, i) => renderOne(store, i))
-    .replace(MATH_RE, (_, i) => renderOne(store, i));
+  // 1) Unwrap the <p> around a standalone placeholder (display math blocks).
+  html = html.replace(/<p>(\s*)xxKATEXMATH(\d+)xx(\s*)<\/p>/g, (_, s1, i, s2) => s1 + renderOne(store, i) + s2);
+
+  // 2) Substitute the remaining placeholders ONLY in text nodes (anything not
+  //    inside a <...> tag). The old global regex also rewrote the placeholders
+  //    that the markdown heading feature had baked into its id/href/title
+  //    attributes, injecting raw KaTeX HTML (which contains quotes) into the
+  //    attributes and corrupting the surrounding markup: phantom
+  //    `class="headerlink"`, broken TOC entries.
+  html = html.replace(/(<[^>]*>)|xxKATEXMATH(\d+)xx/g, (m, tag, i) => (
+    tag !== undefined ? m : renderOne(store, i)
+  ));
+
+  // 3) Whatever is left now lives inside attribute values (heading ids, TOC
+  //    anchors, headerlink titles). Swap them for the readable TeX source,
+  //    HTML-escaped, so the heading id and its href stay valid and consistent.
+  html = html.replace(MATH_RE, (_, i) => plainMath(store, i));
+  return html;
 }
 
 hexo.extend.filter.register('before_post_render', function (data) {
