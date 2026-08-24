@@ -3973,7 +3973,8 @@ pre .javascript .function {
 .post-content table td,
 .post-content table th {
   border: 1px solid #dedede;
-  padding: 0 10px;
+  padding: 8px 10px;
+  vertical-align: middle;
 }
 .post-content figure table {
   border: none;

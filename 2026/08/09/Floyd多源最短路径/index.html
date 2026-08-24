@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="408,图">
+    <meta name="keywords" content="图,408">
     <meta name="description" content="求每一对顶点之间的最短路径。允许负权，不允许负环。  核心递推式：dist[i][j]&#x3D;min(dist[i][j], dist[i][k]+dist[k][j])  基本思想Floyd 算法采用动态规划思想：依次尝试将每个顶点作为中转点，若从 Vi​ 先到 Vk​ 再到 Vj​ 比当前已知的 dist[i][j] 更短，则更新。  初始：dist[i][j]&#x3D;wij​（直接边的权值，无边则为 ∞">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Floyd 多源最短路径算法">

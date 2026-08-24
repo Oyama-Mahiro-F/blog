@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="408,图">
+    <meta name="keywords" content="图,408">
     <meta name="description" content="最小生成树（MST）：在带权连通无向图中，所有生成树中边权之和最小的那棵。恰有 n−1 条边。 算法思想（加边法） 类比：将图中所有边按权值从小到大排序，依次”试探”每条边——能加就加，不能加（会成环）就跳过 辅助结构：并查集（Union-Find）——维护顶点所属的连通分量，快速判断两个顶点是否已在同一集合 核心策略（贪心）：每次从剩余的边中选权值最小且不会形成回路的边加入 MST  核心步骤：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kruskal 最小生成树算法">
