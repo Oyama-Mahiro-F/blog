@@ -166,6 +166,64 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
+            <article id="post-深度优先搜索DFS"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:50:00" datetime="2026-08-09T02:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2DFS/">深度优先搜索 DFS（图的遍历）</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        算法思想
+类比：树的先序遍历——访问顶点后，立即沿第一条边深入，走不通再退回
+辅助结构：栈（递归隐式使用系统栈）——后访问的顶点先被回溯
+搜索方式：从起始顶点出发，沿邻接点链”一条路走到黑”；当无未访问邻接点时回溯到上一个顶点，继续探索其他分支
+
+核心步骤：
+
+访问当前顶点，标记已访问
+找其第一个未访问邻接点，递归深入
+若无未访问邻接点（死胡同），回溯到上一层
+重复直至所有可达顶点均已访问
+...
+    
+
+        <a href="/blog/2026/08/09/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2DFS/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
             <article id="post-图的存储-邻接表"
   class="article-card article-type-post" itemprop="blogPost">
 
@@ -642,57 +700,6 @@ n 个带权叶子构成的 WPL 最小的二叉树
     <div class="post-footer">
         
 	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-链式队列的实现"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 10:00:00" datetime="2026-08-09T02:00:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/">链式队列的实现</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        链式队列（Linked Queue）用链表实现队列，front 指向队头、rear 指向队尾。链式队列不会满、不需要循环——天然没有假溢出问题。
-
-核心设计原则：入队在 rear 端（尾插法）、出队在 front 端（头删法），均为 O(1)。队头必须设在链表头部（否则出队找前驱退化为 O(n)）。
-
-结构定义1234567891011// 队列的结点typedef struct QNode...
-    
-
-        <a href="/blog/2026/08/09/%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%98%9F%E5%88%97/" rel="tag">队列</a></li></ul>
 
     </div>
     

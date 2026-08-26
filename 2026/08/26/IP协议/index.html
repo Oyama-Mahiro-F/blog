@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>IP协议 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,网络,网络层,IP">
+    <meta name="description" content="IP 协议（Internet Protocol，网际协议）是网络层最核心的无连接协议，负责把 IP 数据报从源主机尽力而为地传送到目的主机。它屏蔽底层物理网络的差异，实现异构网络互联。408 对 IP 的考查集中在：IP 地址、IP 数据报格式、子网划分、CIDR、NAT 与 IPv6。 一、IP 地址概述**IP 地址（IPv4）长度 32 位（4 字节），由网络号（Net ID）+ 主机号（H">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IP协议">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="IP 协议（Internet Protocol，网际协议）是网络层最核心的无连接协议，负责把 IP 数据报从源主机尽力而为地传送到目的主机。它屏蔽底层物理网络的差异，实现异构网络互联。408 对 IP 的考查集中在：IP 地址、IP 数据报格式、子网划分、CIDR、NAT 与 IPv6。 一、IP 地址概述**IP 地址（IPv4）长度 32 位（4 字节），由网络号（Net ID）+ 主机号（H">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/ip-%E5%88%86%E7%B1%BB%E5%9C%B0%E5%9D%80.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/ip-%E6%95%B0%E6%8D%AE%E6%8A%A5%E9%A6%96%E9%83%A8.png">
+<meta property="article:published_time" content="2026-08-26T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-26T08:37:55.867Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="IP">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="网络层">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/ip-%E5%88%86%E7%B1%BB%E5%9C%B0%E5%9D%80.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">IP协议</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">IP协议</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-26T01:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-26
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%80%E3%80%81IP-%E5%9C%B0%E5%9D%80%E6%A6%82%E8%BF%B0"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、IP 地址概述</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#IP-%E5%9C%B0%E5%9D%80-vs-MAC-%E5%9C%B0%E5%9D%80%EF%BC%88%E9%87%8D%E7%82%B9%E5%AF%B9%E6%AF%94%EF%BC%89"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">IP 地址 vs MAC 地址（重点对比）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%8C%E3%80%81%E5%88%86%E7%B1%BB-IP-%E5%9C%B0%E5%9D%80%EF%BC%88A-B-C-D-E%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、分类 IP 地址（A&#x2F;B&#x2F;C&#x2F;D&#x2F;E）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%89%B9%E6%AE%8A%E5%9C%B0%E5%9D%80"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">特殊地址</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%89%E3%80%81IP-%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%A0%BC%E5%BC%8F%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">3.</span> <span class="post-toc-text">三、IP 数据报格式（重点）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MTU-%E4%B8%8E%E5%88%86%E7%89%87"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">MTU 与分片</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9B%9B%E3%80%81%E5%AD%90%E7%BD%91%E5%88%92%E5%88%86%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">4.</span> <span class="post-toc-text">四、子网划分（重点）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%94%E3%80%81CIDR%EF%BC%88%E6%97%A0%E5%88%86%E7%B1%BB%E5%9F%9F%E9%97%B4%E8%B7%AF%E7%94%B1%EF%BC%89"><span class="post-toc-number">5.</span> <span class="post-toc-text">五、CIDR（无分类域间路由）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%AD%E3%80%81%E7%A7%81%E6%9C%89-IP-%E5%9C%B0%E5%9D%80%E4%B8%8E-NAT"><span class="post-toc-number">6.</span> <span class="post-toc-text">六、私有 IP 地址与 NAT</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%83%E3%80%81IPv6"><span class="post-toc-number">7.</span> <span class="post-toc-text">七、IPv6</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%B3%E8%81%94%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="post-toc-number">8.</span> <span class="post-toc-text">关联知识点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">9.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-IP协议"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">IP协议</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-26 09:00:00" datetime="2026-08-26T01:00:00.000Z"  itemprop="datePublished">2026-08-26</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>IP 协议（Internet Protocol，网际协议）<strong>是网络层最核心的无连接协议，负责把 IP 数据报从源主机</strong>尽力而为地</strong>传送到目的主机。它屏蔽底层物理网络的差异，实现异构网络互联。408 对 IP 的考查集中在：<strong>IP 地址、IP 数据报格式、子网划分、CIDR、NAT 与 IPv6</strong>。</p>
+<h2 id="一、IP-地址概述"><a href="#一、IP-地址概述" class="headerlink" title="一、IP 地址概述"></a>一、IP 地址概述</h2><p>**IP 地址（IPv4）<strong>长度 <strong>32 位（4 字节）</strong>，由</strong>网络号（Net ID）+ 主机号（Host ID）**两部分组成，标识一台主机（或一个网络接口）在互联网中的位置。</p>
+<p>采用**点分十进制（Dotted Decimal）**记法：把 32 位分成 4 组，每组 8 位转十进制，用点隔开。</p>
+<blockquote>
+<p>例：<code>11000000 10101000 00000001 00000001</code> → <strong>192.168.1.1</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">地址长度</td>
+<td align="left"><strong>32 位</strong>，4 个字节</td>
+</tr>
+<tr>
+<td align="left">记法</td>
+<td align="left"><strong>点分十进制</strong>（4 组 0~255）</td>
+</tr>
+<tr>
+<td align="left">结构</td>
+<td align="left">网络号 + 主机号</td>
+</tr>
+<tr>
+<td align="left">分配原则</td>
+<td align="left">网络号标识<strong>所在网络</strong>（全球唯一），主机号标识<strong>网络内主机</strong></td>
+</tr>
+</tbody></table>
+<h3 id="IP-地址-vs-MAC-地址（重点对比）"><a href="#IP-地址-vs-MAC-地址（重点对比）" class="headerlink" title="IP 地址 vs MAC 地址（重点对比）"></a>IP 地址 vs MAC 地址（重点对比）</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">IP 地址</th>
+<th align="left">MAC 地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">所在层次</td>
+<td align="left"><strong>网络层</strong></td>
+<td align="left"><strong>数据链路层</strong></td>
+</tr>
+<tr>
+<td align="left">地址结构</td>
+<td align="left">32 位（IPv4），网络号 + 主机号</td>
+<td align="left">48 位（6 字节）</td>
+</tr>
+<tr>
+<td align="left">分配方式</td>
+<td align="left">由 ICANN&#x2F;ISP 分配，可改动</td>
+<td align="left">由厂家出厂固化</td>
+</tr>
+<tr>
+<td align="left">唯一性</td>
+<td align="left"><strong>全局唯一</strong></td>
+<td align="left">全球唯一（IEEE 分配）</td>
+</tr>
+<tr>
+<td align="left">是否反映位置</td>
+<td align="left"><strong>反映主机所在网络位置</strong></td>
+<td align="left">不反映位置（只是网卡标识）</td>
+</tr>
+<tr>
+<td align="left">转发依据</td>
+<td align="left">路由器<strong>按 IP 地址</strong>转发分组</td>
+<td align="left">交换机<strong>按 MAC 地址</strong>转发帧</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>IP 地址反映主机的网络位置（分层寻址），MAC 地址只是网卡物理标识</strong>。分组在互联网上用 IP 地址寻址，进入局域网后经 ARP 换成 MAC 地址交付。</p>
+</blockquote>
+<h2 id="二、分类-IP-地址（A-B-C-D-E）"><a href="#二、分类-IP-地址（A-B-C-D-E）" class="headerlink" title="二、分类 IP 地址（A&#x2F;B&#x2F;C&#x2F;D&#x2F;E）"></a>二、分类 IP 地址（A&#x2F;B&#x2F;C&#x2F;D&#x2F;E）</h2><p>传统 IP 地址按<strong>前几位固定标志位</strong>分为 A、B、C、D、E 五类：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第4章 网络层.assets/ip-分类地址.png" alt="IP 分类地址" title="">
+                </div>
+                <div class="image-caption">IP 分类地址</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">最高位</th>
+<th align="left">第一字节</th>
+<th align="left">网络号</th>
+<th align="left">主机号</th>
+<th align="left">默认掩码</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>A 类</strong></td>
+<td align="left">0</td>
+<td align="left"><strong>1 ~ 126</strong></td>
+<td align="left">8 位</td>
+<td align="left">24 位</td>
+<td align="left"><strong>255.0.0.0</strong>（&#x2F;8）</td>
+<td align="left">大型网络</td>
+</tr>
+<tr>
+<td align="left"><strong>B 类</strong></td>
+<td align="left">10</td>
+<td align="left"><strong>128 ~ 191</strong></td>
+<td align="left">16 位</td>
+<td align="left">16 位</td>
+<td align="left"><strong>255.255.0.0</strong>（&#x2F;16）</td>
+<td align="left">中型网络</td>
+</tr>
+<tr>
+<td align="left"><strong>C 类</strong></td>
+<td align="left">110</td>
+<td align="left"><strong>192 ~ 223</strong></td>
+<td align="left">24 位</td>
+<td align="left">8 位</td>
+<td align="left"><strong>255.255.255.0</strong>（&#x2F;24）</td>
+<td align="left">小型网络（局域网）</td>
+</tr>
+<tr>
+<td align="left"><strong>D 类</strong></td>
+<td align="left">1110</td>
+<td align="left">224 ~ 239</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>组播（多播）</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>E 类</strong></td>
+<td align="left">11110</td>
+<td align="left">240 ~ 255</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>保留</strong>（实验用）</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>可用网络数</strong>：A 类 126 个、B 类 16382 个、C 类约 209 万个</li>
+<li><strong>每网络可用主机数</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9247em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">主机号位数</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>（A 类约 1670 万、B 类 65534、<strong>C 类 254</strong>）</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：A 类范围是 <strong>1~126</strong>，不是 0~127——<strong>0.x.x.x 保留</strong>（表示本网络），<strong>127.0.0.1 是环回测试地址（Loopback，本机回环）</strong>，不属于任何网络。</p>
+</blockquote>
+<h3 id="特殊地址"><a href="#特殊地址" class="headerlink" title="特殊地址"></a>特殊地址</h3><table>
+<thead>
+<tr>
+<th align="left">网络号</th>
+<th align="left">主机号</th>
+<th align="left">作源地址</th>
+<th align="left">作目的地址</th>
+<th align="left">含义</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">可以</td>
+<td align="left"><strong>不可</strong></td>
+<td align="left">本网络上的<strong>本主机</strong></td>
+<td align="left">0.0.0.0</td>
+</tr>
+<tr>
+<td align="left">0</td>
+<td align="left">host-id</td>
+<td align="left">可以</td>
+<td align="left"><strong>不可</strong></td>
+<td align="left">本网络上的主机 host-id</td>
+<td align="left">—</td>
+</tr>
+<tr>
+<td align="left">全 1</td>
+<td align="left">全 1</td>
+<td align="left"><strong>不可</strong></td>
+<td align="left">可以</td>
+<td align="left"><strong>有限广播</strong>（各路由不转发）</td>
+<td align="left">255.255.255.255</td>
+</tr>
+<tr>
+<td align="left">net-id</td>
+<td align="left">全 1</td>
+<td align="left"><strong>不可</strong></td>
+<td align="left">可以</td>
+<td align="left"><strong>直接广播</strong></td>
+<td align="left">192.168.1.255</td>
+</tr>
+<tr>
+<td align="left">net-id</td>
+<td align="left">全 0</td>
+<td align="left">—</td>
+<td align="left">仅代表本网络</td>
+<td align="left"><strong>网络地址</strong></td>
+<td align="left">192.168.1.0</td>
+</tr>
+<tr>
+<td align="left"><strong>127</strong></td>
+<td align="left">非全 0&#x2F;全 1</td>
+<td align="left">可以</td>
+<td align="left">可以</td>
+<td align="left"><strong>环回测试</strong></td>
+<td align="left">127.0.0.1</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：网络号全 0（0.x.x.x）<strong>只能作源地址</strong>；广播地址（主机号全 1）<strong>只能作目的地址</strong>；127 环回地址源、目的都可用，但 127 的主机号<strong>不能取全 0 或全 1</strong>。0.0.0.0 还常作<strong>默认路由</strong>（0.0.0.0&#x2F;0）。</p>
+</blockquote>
+<h2 id="三、IP-数据报格式（重点）"><a href="#三、IP-数据报格式（重点）" class="headerlink" title="三、IP 数据报格式（重点）"></a>三、IP 数据报格式（重点）</h2><p>IP 数据报 &#x3D; <strong>首部</strong> + <strong>数据</strong>。首部固定部分 <strong>20B</strong>（还可有可变选项，最多 40B）：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第4章 网络层.assets/ip-数据报首部.png" alt="IP 数据报首部" title="">
+                </div>
+                <div class="image-caption">IP 数据报首部</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">长度</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>版本</strong></td>
+<td align="left">4 位</td>
+<td align="left">IPv4 取 4</td>
+</tr>
+<tr>
+<td align="left"><strong>首部长度（IHL）</strong></td>
+<td align="left">4 位</td>
+<td align="left">以 <strong>4B</strong> 为单位，最小 5（20B）、最大 15（60B）</td>
+</tr>
+<tr>
+<td align="left"><strong>总长度</strong></td>
+<td align="left">16 位</td>
+<td align="left">首部 + 数据，以 <strong>1B</strong> 为单位，最大 65535B</td>
+</tr>
+<tr>
+<td align="left"><strong>标识</strong></td>
+<td align="left">16 位</td>
+<td align="left">分片标记：<strong>同一数据报的分片标识相同</strong>，用于重组</td>
+</tr>
+<tr>
+<td align="left"><strong>标志</strong></td>
+<td align="left">3 位</td>
+<td align="left"><strong>DF&#x3D;1 禁止分片；MF&#x3D;1 后面还有分片</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>片偏移</strong></td>
+<td align="left">13 位</td>
+<td align="left">分片相对位置，以 <strong>8B</strong> 为单位</td>
+</tr>
+<tr>
+<td align="left"><strong>生存时间（TTL）</strong></td>
+<td align="left">8 位</td>
+<td align="left">每过一个路由器<strong>减 1</strong>，减到 0 丢弃（防环路）</td>
+</tr>
+<tr>
+<td align="left"><strong>协议</strong></td>
+<td align="left">8 位</td>
+<td align="left">上层：<strong>1&#x3D;ICMP、2&#x3D;IGMP、6&#x3D;TCP、17&#x3D;UDP、89&#x3D;OSPF</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>首部校验和</strong></td>
+<td align="left">16 位</td>
+<td align="left"><strong>只校验首部</strong>，每跳重新计算</td>
+</tr>
+<tr>
+<td align="left"><strong>源 IP 地址</strong></td>
+<td align="left">32 位</td>
+<td align="left">发送方 IP</td>
+</tr>
+<tr>
+<td align="left"><strong>目的 IP 地址</strong></td>
+<td align="left">32 位</td>
+<td align="left">接收方 IP</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：三个”单位”易混淆——<strong>首部长度以 4B 为单位、总长度以 1B 为单位、片偏移以 8B 为单位</strong>。<br><strong>易错点</strong>：首部校验和<strong>只校验首部不校验数据</strong>，且 TTL 每跳减 1，校验和必须<strong>每跳重新计算</strong>。</p>
+</blockquote>
+<h3 id="MTU-与分片"><a href="#MTU-与分片" class="headerlink" title="MTU 与分片"></a>MTU 与分片</h3><p><strong>MTU（最大传输单元）</strong> &#x3D; 链路层帧<strong>数据部分的最大长度</strong>，即 IP 数据报能通过该链路的长度上限（以太网典型 <strong>1500B</strong>）。IP 数据报总长度<strong>超过 MTU 时必须分片</strong>；若 <strong>DF&#x3D;1 禁止分片</strong>则直接<strong>丢弃</strong>并回送 ICMP 差错报文。</p>
+<p><strong>IP 数据报分片例题</strong>：主机 A 向 B 发送一个 <strong>4000B</strong> 的 IP 数据报（含 20B 首部），某链路 <strong>MTU&#x3D;1500B</strong>，求各分片情况。</p>
+<ul>
+<li>每片都带 20B 首部，每片最多带数据 &#x3D; 1500 − 20 &#x3D; <strong>1480B</strong></li>
+<li>数据部分 &#x3D; 4000 − 20 &#x3D; <strong>3980B</strong>；分片数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord">3980/1480</span><span class="mclose">⌉</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> 片</li>
+<li><strong>片偏移</strong> &#x3D; 该片数据起始字节数 ÷ 8</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">分片</th>
+<th align="left">数据长度</th>
+<th align="left">总长度</th>
+<th align="left">数据起始</th>
+<th align="left">片偏移</th>
+<th align="left">MF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">片 1</td>
+<td align="left"><strong>1480B</strong></td>
+<td align="left"><strong>1500B</strong></td>
+<td align="left">0</td>
+<td align="left"><strong>0</strong></td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">片 2</td>
+<td align="left"><strong>1480B</strong></td>
+<td align="left"><strong>1500B</strong></td>
+<td align="left">1480</td>
+<td align="left"><strong>185</strong></td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">片 3</td>
+<td align="left"><strong>1020B</strong></td>
+<td align="left"><strong>1040B</strong></td>
+<td align="left">2960</td>
+<td align="left"><strong>370</strong></td>
+<td align="left">0</td>
+</tr>
+</tbody></table>
+<p><strong>校验</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3980</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1480</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1480</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1020</span></span></span></span>；除最后一片外每片数据都是 <strong>8 的倍数</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1480</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">185</span></span></span></span>）✓</p>
+<blockquote>
+<p><strong>考点</strong>：片偏移单位是 8B，因此<strong>除最后一片外每片数据长度必须是 8 的倍数</strong>；<strong>总长度含 20B 首部</strong>；分片由路由器或源主机完成，<strong>重组只发生在目的主机</strong>。</p>
+</blockquote>
+<h2 id="四、子网划分（重点）"><a href="#四、子网划分（重点）" class="headerlink" title="四、子网划分（重点）"></a>四、子网划分（重点）</h2><p><strong>子网划分（Subnetting）</strong>：向主机号借出若干位作<strong>子网号</strong>，把一个网络分成多个子网，缓解 IP 地址浪费。</p>
+<p><strong>子网掩码</strong>：32 位，<strong>网络号 + 子网号对应位置 1、主机号对应位置 0</strong>。掩码与 IP 地址<strong>按位与</strong>即得所在<strong>子网网络地址</strong>。</p>
+<ul>
+<li>划分子网数：借 n 位 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个子网</li>
+<li>每子网可用主机数：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>（m 为剩余主机号位数；减网络地址和广播地址）</li>
+</ul>
+<p><strong>子网划分例题</strong>：C 类网络 <strong>192.168.1.0</strong> 划分 <strong>4 个子网</strong>。</p>
+<ul>
+<li>需 n &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 位子网号；掩码 &#x3D; 255.255.255.<strong>11000000</strong> &#x3D; <strong>255.255.255.192</strong>（&#x2F;26）</li>
+<li>剩余主机号 6 位，每子网可用主机数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">62</span></span></span></span>；子网步长 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">子网</th>
+<th align="left">子网号</th>
+<th align="left">网络地址</th>
+<th align="left">可用主机范围</th>
+<th align="left">广播地址</th>
+<th align="left">可用主机数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">子网 1</td>
+<td align="left">00</td>
+<td align="left">192.168.1.<strong>0</strong>&#x2F;26</td>
+<td align="left">192.168.1.1 ~ .62</td>
+<td align="left">192.168.1.63</td>
+<td align="left">62</td>
+</tr>
+<tr>
+<td align="left">子网 2</td>
+<td align="left">01</td>
+<td align="left">192.168.1.<strong>64</strong>&#x2F;26</td>
+<td align="left">192.168.1.65 ~ .126</td>
+<td align="left">192.168.1.127</td>
+<td align="left">62</td>
+</tr>
+<tr>
+<td align="left">子网 3</td>
+<td align="left">10</td>
+<td align="left">192.168.1.<strong>128</strong>&#x2F;26</td>
+<td align="left">192.168.1.129 ~ .190</td>
+<td align="left">192.168.1.191</td>
+<td align="left">62</td>
+</tr>
+<tr>
+<td align="left">子网 4</td>
+<td align="left">11</td>
+<td align="left">192.168.1.<strong>192</strong>&#x2F;26</td>
+<td align="left">192.168.1.193 ~ .254</td>
+<td align="left">192.168.1.255</td>
+<td align="left">62</td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：掩码 255.255.255.192 与 192.168.1.65（01000001）相与 &#x3D; 01000000 &#x3D; <strong>64</strong> → 属于子网 2 ✓</p>
+<p><strong>同一&#x2F;跨子网判断</strong>：用<strong>本子网掩码</strong>与<strong>目的 IP</strong> 相与，等于<strong>本子网网络地址</strong> → <strong>同一子网，直接交付</strong>；否则交给<strong>默认网关（路由器）</strong>，路由表逐条匹配、<strong>最长前缀优先</strong>、全不匹配走<strong>默认路由 0.0.0.0&#x2F;0</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：子网划分后每子网同样<strong>减 2</strong>——4 个子网共可用 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">62</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">248</span></span></span></span> 台机器（原 254 台少 6 台）。掩码必须是<strong>连续 1</strong>；子网号全 0&#x2F;全 1 早期禁用，CIDR 后允许。</p>
+</blockquote>
+<h2 id="五、CIDR（无分类域间路由）"><a href="#五、CIDR（无分类域间路由）" class="headerlink" title="五、CIDR（无分类域间路由）"></a>五、CIDR（无分类域间路由）</h2><p><strong>CIDR</strong> 取消传统的 A&#x2F;B&#x2F;C 类划分，用”<strong>IP 地址 &#x2F; 网络前缀长度</strong>“表示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.1.0/26   ← 前 26 位是网络前缀，后 6 位是主机号</span><br></pre></td></tr></table></figure>
+
+<p><strong>路由聚合例题</strong>：把相邻地址块 <strong>192.168.1.0&#x2F;25</strong> 与 <strong>192.168.1.128&#x2F;25</strong> 聚合为一条路由。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">192.168.1.0/25   = 11000000 10101000 00000001 0 0000000</span><br><span class="line">192.168.1.128/25 = 11000000 10101000 00000001 1 0000000</span><br><span class="line">                   共同前缀 24 位 ↑（第 25 位分别为 0 和 1）</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论</strong>：聚合为 <strong>192.168.1.0&#x2F;24</strong>（覆盖 0~255 共 256 个地址，恰为两块的并集）。</p>
+<blockquote>
+<p><strong>考点</strong>：路由聚合取各地址块<strong>最长公共前缀</strong>；聚合块必须<strong>连续</strong>（&#x2F;25 + &#x2F;25 → &#x2F;24；&#x2F;24 与 &#x2F;25 不能简单合成）。聚合可减少路由表条目，但可能引入<strong>路由黑洞</strong>。</p>
+</blockquote>
+<p><strong>最长前缀匹配</strong>：目的 IP 匹配多条路由时，选**前缀最长（最具体）**的一条。例：目的 <strong>192.168.1.132</strong>，路由表有 192.168.1.0&#x2F;24 与 192.168.1.128&#x2F;25——两者都匹配，但 &#x2F;25 前缀更长，<strong>优先选择 192.168.1.128&#x2F;25</strong>。默认路由 0.0.0.0&#x2F;0（前缀 0）匹配一切，只在更具体路由都不匹配时兜底。</p>
+<h2 id="六、私有-IP-地址与-NAT"><a href="#六、私有-IP-地址与-NAT" class="headerlink" title="六、私有 IP 地址与 NAT"></a>六、私有 IP 地址与 NAT</h2><p><strong>私有 IP 地址</strong>（RFC 1918）：只在局域网内部使用，互联网路由器不转发：</p>
+<table>
+<thead>
+<tr>
+<th align="left">私有地址块</th>
+<th align="left">范围</th>
+<th align="left">规模</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>10.0.0.0&#x2F;8</strong></td>
+<td align="left">10.0.0.0 ~ 10.255.255.255</td>
+<td align="left">大型内网</td>
+</tr>
+<tr>
+<td align="left"><strong>172.16.0.0&#x2F;12</strong></td>
+<td align="left">172.16.0.0 ~ 172.31.255.255</td>
+<td align="left">中型内网</td>
+</tr>
+<tr>
+<td align="left"><strong>192.168.0.0&#x2F;16</strong></td>
+<td align="left">192.168.0.0 ~ 192.168.255.255</td>
+<td align="left">小型内网</td>
+</tr>
+</tbody></table>
+<p><strong>NAT（网络地址转换）</strong>：把内网<strong>私有 IP</strong> 转换为公网 IP，使多个内网主机共用一个（或少量）公网 IP 访问互联网。NAT 路由器维护 <strong>NAT 转换表</strong>（内网 IP:端口 ↔ 公网 IP:端口），常与<strong>端口多路复用（NAPT）</strong> 结合——用不同端口区分不同内网主机的连接。</p>
+<blockquote>
+<p><strong>考点</strong>：NAT 使内网主机访问外网时<strong>源 IP 被替换为公网 IP</strong>；外网主动访问内网主机困难（需端口映射&#x2F;内网穿透）——<strong>NAT 也起到隔离、保护内网主机的作用</strong>。</p>
+</blockquote>
+<h2 id="七、IPv6"><a href="#七、IPv6" class="headerlink" title="七、IPv6"></a>七、IPv6</h2><p><strong>IPv6</strong> 地址长度 <strong>128 位</strong>，采用<strong>冒号十六进制记法</strong>：8 组 4 位十六进制数，用冒号隔开。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2001:0DB8:0000:0000:0000:FF00:0042:8329</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">压缩规则</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">每组<strong>前导 0 省略</strong></td>
+<td align="left">0DB8 → DB8、0000 → 0</td>
+</tr>
+<tr>
+<td align="left"><strong>连续的 0 组用 :: 压缩</strong>（只能用一次）</td>
+<td align="left">2001:0DB8:0:0:0:FF00:42:8329 → 2001:DB8::FF00:42:8329</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意</strong>：<code>::</code> 若用两次会产生<strong>二义性</strong>（无法判断压缩了多少组），故<strong>只能用一次</strong>。</p>
+</blockquote>
+<p><strong>IPv4 vs IPv6 对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">IPv4</th>
+<th align="left">IPv6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">地址长度</td>
+<td align="left"><strong>32 位</strong>（约 43 亿个）</td>
+<td align="left"><strong>128 位</strong>（约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">38</span></span></span></span></span></span></span></span></span></span></span></span> 个）</td>
+</tr>
+<tr>
+<td align="left">记法</td>
+<td align="left">点分十进制</td>
+<td align="left"><strong>冒号十六进制</strong>（:: 压缩）</td>
+</tr>
+<tr>
+<td align="left">首部</td>
+<td align="left">有选项字段，变长</td>
+<td align="left"><strong>固定 40B</strong>，无校验和字段</td>
+</tr>
+<tr>
+<td align="left">安全性</td>
+<td align="left">靠外部机制（IPSec 可选）</td>
+<td align="left"><strong>IPSec 内置于 IPv6</strong></td>
+</tr>
+<tr>
+<td align="left">自动配置</td>
+<td align="left">需 DHCP</td>
+<td align="left"><strong>无状态自动配置</strong></td>
+</tr>
+<tr>
+<td align="left">广播</td>
+<td align="left">支持广播</td>
+<td align="left"><strong>取消广播</strong>（用组播&#x2F;任意播）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：IPv6 三大改进——<strong>地址空间 128 位、首部精简（去校验和）、安全性好（IPSec 内嵌）</strong>；并<strong>取消广播地址</strong>，避免广播风暴。</p>
+</blockquote>
+<h2 id="关联知识点"><a href="#关联知识点" class="headerlink" title="关联知识点"></a>关联知识点</h2><p>IP 协议常与下面几个网络层协议一起考查：</p>
+<table>
+<thead>
+<tr>
+<th align="left">协议</th>
+<th align="left">作用</th>
+<th align="left">协议类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>ARP</strong></td>
+<td align="left"><strong>IP → MAC</strong> 地址解析（请求广播、响应单播）</td>
+<td align="left">—</td>
+</tr>
+<tr>
+<td align="left"><strong>ICMP</strong></td>
+<td align="left">差错报告 + 询问（<strong>ping</strong> 用回送请求&#x2F;应答，协议字段 1）</td>
+<td align="left">差错报文不再产生差错报文</td>
+</tr>
+<tr>
+<td align="left"><strong>IGMP</strong></td>
+<td align="left">IP 组播管理（协议字段 2，D 类 224~239）</td>
+<td align="left">组播</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>ping 用 ICMP 回送请求&#x2F;应答报文</strong>（不是 TCP 也不是 UDP）；ARP 请求是广播、响应是单播；ICMP 只<strong>报告</strong>差错、不<strong>改正</strong>差错（纠错由高层完成）。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">IPv4 地址</td>
+<td align="left"><strong>32 位</strong>，网络号 + 主机号，点分十进制</td>
+</tr>
+<tr>
+<td align="left">分类地址</td>
+<td align="left">A：1<del>126（&#x2F;8）；B：128</del>191（&#x2F;16）；C：192~223（&#x2F;24）；D：组播；E：保留</td>
+</tr>
+<tr>
+<td align="left">每网络主机数</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9247em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">主机号</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>（C 类 254）</td>
+</tr>
+<tr>
+<td align="left">特殊地址</td>
+<td align="left">0.x.x.x 只作源地址；广播只作目的地址；127.0.0.1 环回</td>
+</tr>
+<tr>
+<td align="left">IP 数据报</td>
+<td align="left">固定首部 <strong>20B</strong>；首部长度 4B 单位、总长度 1B 单位、片偏移 <strong>8B</strong> 单位</td>
+</tr>
+<tr>
+<td align="left">分片</td>
+<td align="left">除最后一片外每片数据为 <strong>8 的倍数</strong>；总长度含 20B 首部；重组只在目的主机</td>
+</tr>
+<tr>
+<td align="left">TTL</td>
+<td align="left">每跳减 1，减到 0 丢弃；首部校验和只校验首部、每跳重算</td>
+</tr>
+<tr>
+<td align="left">子网划分</td>
+<td align="left">借 n 位子网号 → 2ⁿ 子网；每子网主机 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>；掩码连续 1</td>
+</tr>
+<tr>
+<td align="left">CIDR</td>
+<td align="left">IP&#x2F;前缀；路由聚合取最长公共前缀；<strong>最长前缀匹配</strong>优先</td>
+</tr>
+<tr>
+<td align="left">私有地址</td>
+<td align="left">10.0.0.0&#x2F;8、172.16.0.0&#x2F;12、192.168.0.0&#x2F;16</td>
+</tr>
+<tr>
+<td align="left">NAT</td>
+<td align="left">私有 IP ↔ 公网 IP；常与 NAPT 端口复用结合</td>
+</tr>
+<tr>
+<td align="left">IPv6</td>
+<td align="left"><strong>128 位</strong>；冒号十六进制，:: 只能用一次；去校验和、内置 IPSec、取消广播</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-26T08:37:55.867Z" itemprop="dateUpdated">2026-08-26 16:37:55</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/IP/" rel="tag">IP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C%E5%B1%82/" rel="tag">网络层</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&title=《IP协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&title=《IP协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IP协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/25/%E9%80%89%E6%8B%A9%E9%87%8D%E4%BC%A0%E5%8D%8F%E8%AE%AE/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">选择重传协议（SR）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&title=《IP协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&title=《IP协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IP协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -166,6 +166,54 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
+            <article id="post-分块查找算法"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 11:40:00" datetime="2026-08-09T03:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">分块查找算法</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        将数据分块，块间有序但块内无序。建立索引表记录每块的最大关键字和起始地址。查找分两步：① 在索引表中折半（或顺序）确定所在块 → ② 在块内顺序查找。
+结构示意123456789101112index table:           data table (3 blocks, 3 elems each):┌────┬──────┐          ┌───┬───┬───┬───┬───...
+    
+
+        <a href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
             <article id="post-折半查找算法"
   class="article-card article-type-post" itemprop="blogPost">
 
@@ -635,64 +683,6 @@ BFS ...
     
 
         <a href="/blog/2026/08/09/%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2BFS/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-深度优先搜索DFS"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 10:50:00" datetime="2026-08-09T02:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2DFS/">深度优先搜索 DFS（图的遍历）</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        算法思想
-类比：树的先序遍历——访问顶点后，立即沿第一条边深入，走不通再退回
-辅助结构：栈（递归隐式使用系统栈）——后访问的顶点先被回溯
-搜索方式：从起始顶点出发，沿邻接点链”一条路走到黑”；当无未访问邻接点时回溯到上一个顶点，继续探索其他分支
-
-核心步骤：
-
-访问当前顶点，标记已访问
-找其第一个未访问邻接点，递归深入
-若无未访问邻接点（死胡同），回溯到上一层
-重复直至所有可达顶点均已访问
-...
-    
-
-        <a href="/blog/2026/08/09/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2DFS/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
