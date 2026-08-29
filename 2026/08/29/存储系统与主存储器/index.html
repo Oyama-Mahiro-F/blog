@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>存储系统与主存储器 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理,存储器">
+    <meta name="description" content="存储系统是计算机组成原理的核心章节之一。理想存储器要容量大、速度快、价格低，但三者不可兼得，于是催生了层次化存储结构；不同介质、不同存取方式的存储器又形成了分类辨析考点。408 对本章的考查集中在：存储器分类、层次结构、SRAM 与 DRAM、ROM 与 Flash、主存与 CPU 的连接（容量扩展）、双端口与多模块存储器。 存储器的分类按存储介质分类   类型 存储介质 特点 典型代表    半">
+<meta property="og:type" content="article">
+<meta property="og:title" content="存储系统与主存储器">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="存储系统是计算机组成原理的核心章节之一。理想存储器要容量大、速度快、价格低，但三者不可兼得，于是催生了层次化存储结构；不同介质、不同存取方式的存储器又形成了分类辨析考点。408 对本章的考查集中在：存储器分类、层次结构、SRAM 与 DRAM、ROM 与 Flash、主存与 CPU 的连接（容量扩展）、双端口与多模块存储器。 存储器的分类按存储介质分类   类型 存储介质 特点 典型代表    半">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cpu-mainmem-connection.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/bit-expansion.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/multi-bank-interleave.png">
+<meta property="article:published_time" content="2026-08-29T12:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:02:00.341Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="存储器">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cpu-mainmem-connection.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">存储系统与主存储器</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">存储系统与主存储器</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T12:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%88%86%E7%B1%BB"><span class="post-toc-number">1.</span> <span class="post-toc-text">存储器的分类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%AD%98%E5%82%A8%E4%BB%8B%E8%B4%A8%E5%88%86%E7%B1%BB"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">按存储介质分类</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%AD%98%E5%8F%96%E6%96%B9%E5%BC%8F%E5%88%86%E7%B1%BB%EF%BC%88%E9%87%8D%E7%82%B9%E8%BE%A8%E6%9E%90%EF%BC%89"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">按存取方式分类（重点辨析）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%86%85%E5%AE%B9%E5%8F%AF%E5%8F%98%E6%80%A7%E4%B8%8E%E4%BF%A1%E6%81%AF%E5%8F%AF%E4%BF%9D%E5%AD%98%E6%80%A7%E5%88%86%E7%B1%BB"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">按内容可变性与信息可保存性分类</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%B1%82%E6%AC%A1%E5%8C%96%E7%BB%93%E6%9E%84"><span class="post-toc-number">2.</span> <span class="post-toc-text">存储器的层次化结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%A4%E7%BA%A7%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1%E8%A7%A3%E5%86%B3%E7%9A%84%E4%B8%A4%E4%B8%AA%E7%9F%9B%E7%9B%BE"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">两级存储层次解决的两个矛盾</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8D%8A%E5%AF%BC%E4%BD%93%E9%9A%8F%E6%9C%BA%E5%AD%98%E5%8F%96%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">3.</span> <span class="post-toc-text">半导体随机存取存储器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SRAM%EF%BC%88%E9%9D%99%E6%80%81%E9%9A%8F%E6%9C%BA%E5%AD%98%E5%8F%96%E5%AD%98%E5%82%A8%E5%99%A8%EF%BC%89"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">SRAM（静态随机存取存储器）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DRAM%EF%BC%88%E5%8A%A8%E6%80%81%E9%9A%8F%E6%9C%BA%E5%AD%98%E5%8F%96%E5%AD%98%E5%82%A8%E5%99%A8%EF%BC%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">DRAM（动态随机存取存储器）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DRAM-%E7%9A%84%E5%9C%B0%E5%9D%80%E5%88%86%E6%97%B6%E5%A4%8D%E7%94%A8"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">DRAM 的地址分时复用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DRAM-%E7%9A%84%E4%B8%89%E7%A7%8D%E5%88%B7%E6%96%B0%E6%96%B9%E5%BC%8F"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">DRAM 的三种刷新方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SRAM-%E4%B8%8E-DRAM-%E7%9A%84%E5%AF%B9%E6%AF%94%EF%BC%88%E5%BF%85%E5%A4%87%EF%BC%89"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">SRAM 与 DRAM 的对比（必备）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8F%AA%E8%AF%BB%E5%AD%98%E5%82%A8%E5%99%A8%EF%BC%88ROM%EF%BC%89"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">只读存储器（ROM）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Flash-%E9%97%AA%E5%AD%98"><span class="post-toc-number">3.7.</span> <span class="post-toc-text">Flash 闪存</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8%E4%B8%8E-CPU-%E7%9A%84%E8%BF%9E%E6%8E%A5"><span class="post-toc-number">4.</span> <span class="post-toc-text">主存储器与 CPU 的连接</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BD%8D%E6%89%A9%E5%B1%95%EF%BC%88%E5%8A%A0%E5%A4%A7%E5%AD%97%E9%95%BF%EF%BC%89"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">位扩展（加大字长）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%97%E6%89%A9%E5%B1%95%EF%BC%88%E5%8A%A0%E5%A4%A7%E5%AD%97%E6%95%B0%EF%BC%89"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">字扩展（加大字数）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%97%E4%BD%8D%E5%90%8C%E6%97%B6%E6%89%A9%E5%B1%95"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">字位同时扩展</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E6%89%A9%E5%B1%95%E4%BE%8B%E9%A2%98%EF%BC%88%E6%A0%B8%E5%BF%83%EF%BC%89"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">存储器扩展例题（核心）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8F%8C%E7%AB%AF%E5%8F%A3%E5%AD%98%E5%82%A8%E5%99%A8%E4%B8%8E%E5%A4%9A%E6%A8%A1%E5%9D%97%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.</span> <span class="post-toc-text">双端口存储器与多模块存储器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8F%8C%E7%AB%AF%E5%8F%A3%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">双端口存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E4%BD%93%E5%B9%B6%E8%A1%8C%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">多体并行存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%AB%98%E4%BD%8D%E4%BA%A4%E5%8F%89%E7%BC%96%E5%9D%80%EF%BC%88%E9%A1%BA%E5%BA%8F%E7%BC%96%E5%9D%80%EF%BC%89"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">高位交叉编址（顺序编址）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BD%8E%E4%BD%8D%E4%BA%A4%E5%8F%89%E7%BC%96%E5%9D%80%EF%BC%88%E4%BA%A4%E5%8F%89%E7%BC%96%E5%9D%80%EF%BC%89"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">低位交叉编址（交叉编址）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BD%8E%E4%BD%8D%E4%BA%A4%E5%8F%89%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%BE%8B%E9%A2%98%EF%BC%88%E5%BF%85%E8%80%83%EF%BC%89"><span class="post-toc-number">5.5.</span> <span class="post-toc-text">低位交叉流水线例题（必考）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-存储系统与主存储器"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">存储系统与主存储器</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 20:30:00" datetime="2026-08-29T12:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>存储系统</strong>是计算机组成原理的核心章节之一。理想存储器要<strong>容量大、速度快、价格低</strong>，但三者不可兼得，于是催生了<strong>层次化存储结构</strong>；不同介质、不同存取方式的存储器又形成了<strong>分类辨析</strong>考点。408 对本章的考查集中在：<strong>存储器分类、层次结构、SRAM 与 DRAM、ROM 与 Flash、主存与 CPU 的连接（容量扩展）、双端口与多模块存储器</strong>。</p>
+<h2 id="存储器的分类"><a href="#存储器的分类" class="headerlink" title="存储器的分类"></a>存储器的分类</h2><h3 id="按存储介质分类"><a href="#按存储介质分类" class="headerlink" title="按存储介质分类"></a>按存储介质分类</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">存储介质</th>
+<th align="left">特点</th>
+<th align="left">典型代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>半导体存储器</strong></td>
+<td align="left">半导体电路（触发器&#x2F;电容）</td>
+<td align="left">体积小、速度快、功耗低</td>
+<td align="left">主存（DRAM）、Cache（SRAM）</td>
+</tr>
+<tr>
+<td align="left"><strong>磁表面存储器</strong></td>
+<td align="left">磁性材料涂层</td>
+<td align="left">非易失、容量大、速度慢</td>
+<td align="left">硬盘（HDD）、磁带</td>
+</tr>
+<tr>
+<td align="left"><strong>光存储器</strong></td>
+<td align="left">光学介质</td>
+<td align="left">非易失、可移动</td>
+<td align="left">CD、DVD、光盘</td>
+</tr>
+</tbody></table>
+<h3 id="按存取方式分类（重点辨析）"><a href="#按存取方式分类（重点辨析）" class="headerlink" title="按存取方式分类（重点辨析）"></a>按存取方式分类（重点辨析）</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">存取原理</th>
+<th align="left">存取时间与位置的关系</th>
+<th align="left">典型代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>随机存取（RAM）</strong></td>
+<td align="left">按地址直接访问任意单元</td>
+<td align="left"><strong>与物理位置无关</strong>，每个单元存取时间相同</td>
+<td align="left">SRAM、DRAM、主存、Cache</td>
+</tr>
+<tr>
+<td align="left"><strong>顺序存取（SAM）</strong></td>
+<td align="left">从头按顺序查找</td>
+<td align="left"><strong>与位置有关</strong>，越靠后越慢</td>
+<td align="left"><strong>磁带</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>直接存取（DAM）</strong></td>
+<td align="left">先<strong>直接定位</strong>到一个区域，再在区域内<strong>顺序搜索</strong></td>
+<td align="left">介于两者之间（先寻道、再等待旋转）</td>
+<td align="left"><strong>磁盘</strong>、光盘</td>
+</tr>
+<tr>
+<td align="left"><strong>相联存取（CAM）</strong></td>
+<td align="left">按<strong>内容</strong>并行比较检索，而非按地址</td>
+<td align="left">与位置无关，速度极快</td>
+<td align="left">Cache 的行标记、TLB</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>磁盘是直接存取，不是随机存取</strong>——必须先移动磁臂定位磁道（直接定位），再等待目标扇区旋转到磁头下方（顺序搜索）；磁带才是顺序存取。<br><strong>易错点</strong>：<strong>ROM 也是随机存取方式</strong>（按地址访问、存取时间与位置无关），”只读”说的是<strong>内容可变性</strong>，不要把 ROM 归为顺序存取。</p>
+</blockquote>
+<h3 id="按内容可变性与信息可保存性分类"><a href="#按内容可变性与信息可保存性分类" class="headerlink" title="按内容可变性与信息可保存性分类"></a>按内容可变性与信息可保存性分类</h3><table>
+<thead>
+<tr>
+<th align="left">分类维度</th>
+<th align="left">类别</th>
+<th align="left">含义</th>
+<th align="left">典型代表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>内容可变性</strong></td>
+<td align="left">读写存储器</td>
+<td align="left">正常工作时可读<strong>可写</strong></td>
+<td align="left">RAM</td>
+</tr>
+<tr>
+<td align="left"><strong>内容可变性</strong></td>
+<td align="left">只读存储器</td>
+<td align="left">正常工作时<strong>只能读</strong>，断电不丢</td>
+<td align="left">ROM（BIOS、固件）</td>
+</tr>
+<tr>
+<td align="left"><strong>信息可保存性</strong></td>
+<td align="left">易失性存储器</td>
+<td align="left"><strong>断电后信息丢失</strong></td>
+<td align="left">SRAM、DRAM（主存）</td>
+</tr>
+<tr>
+<td align="left"><strong>信息可保存性</strong></td>
+<td align="left">非易失性存储器</td>
+<td align="left">断电后信息<strong>长期保存</strong></td>
+<td align="left">ROM、Flash、磁盘、磁带</td>
+</tr>
+</tbody></table>
+<p><strong>存储器分类维度速查</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">分类依据</th>
+<th align="left">类别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">按存储介质</td>
+<td align="left">半导体 &#x2F; 磁表面 &#x2F; 光存储器</td>
+</tr>
+<tr>
+<td align="left">按存取方式</td>
+<td align="left">随机存取 &#x2F; 顺序存取 &#x2F; 直接存取 &#x2F; 相联存取</td>
+</tr>
+<tr>
+<td align="left">按内容可变性</td>
+<td align="left">读写（RAM）&#x2F; 只读（ROM）</td>
+</tr>
+<tr>
+<td align="left">按信息可保存性</td>
+<td align="left">易失性 &#x2F; 非易失性</td>
+</tr>
+<tr>
+<td align="left">按在计算机中的作用</td>
+<td align="left">高速缓存（Cache）&#x2F; 主存 &#x2F; 辅存</td>
+</tr>
+</tbody></table>
+<h2 id="存储器的层次化结构"><a href="#存储器的层次化结构" class="headerlink" title="存储器的层次化结构"></a>存储器的层次化结构</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">speed faster / capacity smaller / price higher</span><br><span class="line">            +----------------+</span><br><span class="line">            |   register     |</span><br><span class="line">            +----------------+</span><br><span class="line">            |  Cache (SRAM)  |</span><br><span class="line">            +----------------+</span><br><span class="line">            |  main mem DRAM |</span><br><span class="line">            +----------------+</span><br><span class="line">            | disk / SSD     |</span><br><span class="line">            +----------------+</span><br><span class="line">            | tape / archive |</span><br><span class="line">            +----------------+</span><br><span class="line">speed slower / capacity larger / price lower</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">层次</th>
+<th align="left">存储器</th>
+<th align="left">速度（数量级）</th>
+<th align="left">容量（数量级）</th>
+<th align="left">位价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">L0</td>
+<td align="left">寄存器</td>
+<td align="left">与 CPU 同级（亚 ns）</td>
+<td align="left">几十&#126;几百 B</td>
+<td align="left">最高</td>
+</tr>
+<tr>
+<td align="left">L1</td>
+<td align="left"><strong>Cache（SRAM）</strong></td>
+<td align="left"><strong>1&#126;10 ns</strong></td>
+<td align="left">几十 KB&#126;几 MB</td>
+<td align="left">很高</td>
+</tr>
+<tr>
+<td align="left">L2</td>
+<td align="left"><strong>主存（DRAM）</strong></td>
+<td align="left"><strong>50&#126;100 ns</strong></td>
+<td align="left">几 GB&#126;几十 GB</td>
+<td align="left">中</td>
+</tr>
+<tr>
+<td align="left">L3</td>
+<td align="left"><strong>辅存（磁盘&#x2F;SSD）</strong></td>
+<td align="left"><strong>ms 级</strong>（HDD）</td>
+<td align="left">几百 GB&#126;几 TB</td>
+<td align="left">低</td>
+</tr>
+</tbody></table>
+<h3 id="两级存储层次解决的两个矛盾"><a href="#两级存储层次解决的两个矛盾" class="headerlink" title="两级存储层次解决的两个矛盾"></a>两级存储层次解决的两个矛盾</h3><table>
+<thead>
+<tr>
+<th align="left">存储层次</th>
+<th align="left">解决的矛盾</th>
+<th align="left">速度差</th>
+<th align="left">管理者</th>
+<th align="left">数据交换单位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Cache — 主存</strong></td>
+<td align="left">CPU 与主存的<strong>速度</strong>矛盾</td>
+<td align="left">约 10 倍</td>
+<td align="left"><strong>硬件</strong>自动完成，对所有程序员透明</td>
+<td align="left">块</td>
+</tr>
+<tr>
+<td align="left"><strong>主存 — 辅存</strong></td>
+<td align="left">存储系统的<strong>容量</strong>矛盾</td>
+<td align="left">约 10 万倍</td>
+<td align="left"><strong>操作系统 + 硬件</strong>（发展出虚拟存储器）</td>
+<td align="left">页</td>
+</tr>
+</tbody></table>
+<ul>
+<li>层次结构能够成立的依据是程序访问的<strong>局部性原理</strong>：<strong>时间局部性</strong>（刚访问过的项不久后再次被访问）与<strong>空间局部性</strong>（被访问项附近的项紧接着被访问）——高频数据自然集中在上层。</li>
+<li>整个体系呈<strong>金字塔</strong>：越往上<strong>越快、越小、越贵</strong>；目标是用低成本获得接近上层速度、接近下层容量的<strong>整体性能</strong>。</li>
+<li>主存的主要技术指标：<strong>存取周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> &gt; 存取时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></strong>（存取后有恢复&#x2F;预充电）；<strong>主存带宽 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span> 为存储字长），即<strong>每秒可访问的位数</strong>。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>Cache-主存层次解决速度，主存-辅存层次解决容量</strong>；两者的理论基础都是局部性原理。Cache 与虚拟存储器的细节另文展开。</p>
+</blockquote>
+<h2 id="半导体随机存取存储器"><a href="#半导体随机存取存储器" class="headerlink" title="半导体随机存取存储器"></a>半导体随机存取存储器</h2><h3 id="SRAM（静态随机存取存储器）"><a href="#SRAM（静态随机存取存储器）" class="headerlink" title="SRAM（静态随机存取存储器）"></a>SRAM（静态随机存取存储器）</h3><p><strong>SRAM 的存储元是一个双稳态</strong>触发器**（6 管 MOS 电路）**，只要不断电，0&#x2F;1 状态就稳定保持，因此叫”静态”。</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存储元</td>
+<td align="left"><strong>6 管（6T）触发器</strong>（锁存器）</td>
+</tr>
+<tr>
+<td align="left">刷新</td>
+<td align="left"><strong>不需要</strong>刷新</td>
+</tr>
+<tr>
+<td align="left">读出</td>
+<td align="left"><strong>非破坏性读出</strong>（触发器状态不变，无需重写）</td>
+</tr>
+<tr>
+<td align="left">地址送入</td>
+<td align="left">地址<strong>一次送入</strong>（行、列地址不分先后）</td>
+</tr>
+<tr>
+<td align="left">速度</td>
+<td align="left"><strong>快</strong>（ns 级）</td>
+</tr>
+<tr>
+<td align="left">集成度&#x2F;功耗&#x2F;位价</td>
+<td align="left">集成度<strong>低</strong>、功耗<strong>大</strong>、位价<strong>高</strong></td>
+</tr>
+<tr>
+<td align="left">用途</td>
+<td align="left"><strong>Cache</strong></td>
+</tr>
+</tbody></table>
+<p>SRAM 芯片引脚分三组：<strong>地址线</strong>（位数决定存储单元数，如 10 根 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">⇒</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1</span><span class="mord text"><span class="mord">K</span></span></span></span></span> 个单元）、<strong>数据线</strong>（位数决定存储字长）、<strong>控制线</strong>（<strong>片选 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span>、读写控制 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></strong>）。</p>
+<h3 id="DRAM（动态随机存取存储器）"><a href="#DRAM（动态随机存取存储器）" class="headerlink" title="DRAM（动态随机存取存储器）"></a>DRAM（动态随机存取存储器）</h3><p><strong>DRAM 靠电容存储电荷记忆信息</strong>，存储元为 <strong>1 个 MOS 管 + 1 个电容（1T1C）</strong>：有电荷为 1、无电荷为 0。</p>
+<ul>
+<li><strong>破坏性读出</strong>：读出时电容电荷流向位线而流失，读后必须紧跟**再生（重写）**恢复原值。</li>
+<li><strong>必须定时刷新</strong>：电容会漏电，电荷一般只能维持 <strong>2 ms</strong>，必须在最大刷新间隔内对<strong>所有行</strong>刷一遍。</li>
+<li><strong>刷新按行进行</strong>：刷新本质是”只读不输出的假读”——每次选中<strong>一整行</strong>，行上所有单元经读出放大器同时读出并写回，<strong>不需要列地址</strong>；刷新一行耗时 ≈ 一个存取周期。</li>
+<li><strong>刷新与再生不同</strong>：<strong>再生</strong>是被动的、随机的，只在<strong>破坏性读出后</strong>针对被读单元重写；<strong>刷新</strong>是主动的、定时的，不管单元是否被访问，到点就对整行补充电荷。</li>
+</ul>
+<h3 id="DRAM-的地址分时复用"><a href="#DRAM-的地址分时复用" class="headerlink" title="DRAM 的地址分时复用"></a>DRAM 的地址分时复用</h3><p>DRAM 芯片把地址<strong>分两次送入</strong>：先送<strong>行地址</strong>（<strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 行地址选通</strong>下降沿锁存），再送<strong>列地址</strong>（<strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 列地址选通</strong>下降沿锁存），行、列地址<strong>共用同一组地址引脚</strong>，使芯片引脚数<strong>几乎减半</strong>（1K 个单元只需 5 根地址线而非 10 根）。</p>
+<h3 id="DRAM-的三种刷新方式"><a href="#DRAM-的三种刷新方式" class="headerlink" title="DRAM 的三种刷新方式"></a>DRAM 的三种刷新方式</h3><table>
+<thead>
+<tr>
+<th align="left">刷新方式</th>
+<th align="left">做法</th>
+<th align="left">死区</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>集中刷新</strong></td>
+<td align="left">在一段时间内集中、连续逐行刷完全部行</td>
+<td align="left"><strong>有</strong>（死区 &#x3D; 行数 × 存取周期），期间 CPU 不能访存</td>
+<td align="left">控制简单，死区时间长</td>
+</tr>
+<tr>
+<td align="left"><strong>分散刷新</strong></td>
+<td align="left">把刷新插入到<strong>每个存取周期之后</strong>（读写一次 + 刷新一行）</td>
+<td align="left"><strong>无</strong></td>
+<td align="left">存取周期被拉长为”读写 + 刷新”，<strong>系统速度减半</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>异步刷新</strong></td>
+<td align="left">在最大刷新间隔内<strong>每隔 刷新间隔÷行数 刷一行</strong></td>
+<td align="left">极小（每次仅刷一行，阻塞一个存取周期）</td>
+<td align="left">折中方案，<strong>现代 DRAM 主流</strong></td>
+</tr>
+</tbody></table>
+<p><strong>DRAM 刷新例题</strong>：某 DRAM 芯片存储阵列共 <strong>128 行</strong>，电容电荷最大保持时间（须刷完一遍的间隔）为 <strong>1 ms</strong>，存取周期 <strong>0.5 μs</strong>，分析三种刷新方式。</p>
+<ul>
+<li><strong>集中刷新</strong>：死区 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>；死时间率 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1000</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">64</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">100%</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">6.4%</span></span></span></span>（1 ms 内 CPU 有 64 μs 完全不能访存）。</li>
+<li><strong>分散刷新</strong>：每个存取周期变为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>（读写一个周期 + 刷新一行一个周期），无死区，但访存速度<strong>降低一半</strong>。</li>
+<li><strong>异步刷新</strong>：每隔 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">128</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mord mathnormal">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">7.8</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span> 刷新一行；<strong>验算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">7.8</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span> 行 ✓，每行都在 1 ms 内被刷新到，死区仅 0.5 μs。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：刷新的单位是<strong>行</strong>（不需要列地址）；三种方式中<strong>分散刷新无死区但周期最长、集中刷新死区最长、异步刷新死区极小</strong>。<br><strong>易错点</strong>：刷新对 CPU 是<strong>透明的</strong>（由存储器控制电路完成，不是操作系统的事）；刷新期间仍占用存储器，集中刷新才有明显”死区”。</p>
+</blockquote>
+<h3 id="SRAM-与-DRAM-的对比（必备）"><a href="#SRAM-与-DRAM-的对比（必备）" class="headerlink" title="SRAM 与 DRAM 的对比（必备）"></a>SRAM 与 DRAM 的对比（必备）</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">SRAM</th>
+<th align="left">DRAM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存储元</td>
+<td align="left"><strong>6T 触发器</strong>（锁存器）</td>
+<td align="left"><strong>1T1C 电容</strong>（存电荷）</td>
+</tr>
+<tr>
+<td align="left">刷新</td>
+<td align="left"><strong>不需要</strong></td>
+<td align="left"><strong>必须</strong>（2 ms 内按行刷完）</td>
+</tr>
+<tr>
+<td align="left">破坏性读出</td>
+<td align="left"><strong>否</strong></td>
+<td align="left"><strong>是</strong>（读后需再生重写）</td>
+</tr>
+<tr>
+<td align="left">地址送入</td>
+<td align="left">一次送入</td>
+<td align="left"><strong>分时复用</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 行、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 列两次送）</td>
+</tr>
+<tr>
+<td align="left">运行速度</td>
+<td align="left"><strong>快</strong></td>
+<td align="left">较慢</td>
+</tr>
+<tr>
+<td align="left">集成度</td>
+<td align="left">低</td>
+<td align="left"><strong>高</strong></td>
+</tr>
+<tr>
+<td align="left">功耗</td>
+<td align="left">大</td>
+<td align="left">小</td>
+</tr>
+<tr>
+<td align="left">位价（成本）</td>
+<td align="left"><strong>高</strong></td>
+<td align="left"><strong>低</strong></td>
+</tr>
+<tr>
+<td align="left">主要用途</td>
+<td align="left"><strong>Cache</strong></td>
+<td align="left"><strong>主存</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：记住三条主线——<strong>结构（触发器 vs 电容）决定是否刷新、是否破坏性读出；引脚（是否分时复用）；用途（Cache vs 主存）</strong>。</p>
+</blockquote>
+<h3 id="只读存储器（ROM）"><a href="#只读存储器（ROM）" class="headerlink" title="只读存储器（ROM）"></a>只读存储器（ROM）</h3><p>ROM 正常工作时<strong>只能读出</strong>，结构简单、<strong>非易失</strong>，常存放 BIOS、固件等固定程序。按擦写能力演进：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">全称</th>
+<th align="left">写入（编程）方式</th>
+<th align="left">擦除方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>MROM</strong></td>
+<td align="left">掩膜式 ROM</td>
+<td align="left"><strong>出厂时掩膜工艺固化</strong></td>
+<td align="left"><strong>不可改写</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>PROM</strong></td>
+<td align="left">一次性可编程 ROM</td>
+<td align="left">用户<strong>一次性</strong>编程（烧断熔丝）</td>
+<td align="left"><strong>不可擦除</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>EPROM</strong></td>
+<td align="left">可擦除可编程 ROM</td>
+<td align="left">用户可多次编程</td>
+<td align="left"><strong>紫外线</strong>照射擦除（整片擦除，需取出开窗照射）</td>
+</tr>
+<tr>
+<td align="left"><strong>EEPROM</strong></td>
+<td align="left">电可擦除可编程 ROM</td>
+<td align="left">用户可多次编程</td>
+<td align="left"><strong>电擦除</strong>，可按字节在线擦写</td>
+</tr>
+<tr>
+<td align="left"><strong>Flash</strong></td>
+<td align="left">闪存</td>
+<td align="left">电写入</td>
+<td align="left">电擦除，<strong>按块擦除</strong>（EEPROM 的改进型）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：演进主线 <strong>MROM → PROM（一次） → EPROM（紫外线擦） → EEPROM（电擦） → Flash（按块擦）</strong>，擦除越来越方便、粒度越来越大。<br><strong>易错点</strong>：PROM 烧断熔丝是<strong>物理破坏</strong>，不可恢复；EPROM 擦除须<strong>整片</strong>进行，且要从设备上取下。</p>
+</blockquote>
+<h3 id="Flash-闪存"><a href="#Flash-闪存" class="headerlink" title="Flash 闪存"></a>Flash 闪存</h3><p><strong>Flash 是 EEPROM 的改进型</strong>，按<strong>块（Block）<strong>擦除、按</strong>页&#x2F;字节</strong>读写，密度高、成本低，兼具 RAM 的电可改写与 ROM 的非易失性。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">读取方式</th>
+<th align="left">特点</th>
+<th align="left">典型应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>NOR Flash</strong></td>
+<td align="left">支持<strong>随机按字节读取</strong>，可<strong>就地执行（XIP）</strong></td>
+<td align="left">读快写慢、容量小</td>
+<td align="left">BIOS&#x2F;UEFI 固件、嵌入式代码</td>
+</tr>
+<tr>
+<td align="left"><strong>NAND Flash</strong></td>
+<td align="left"><strong>按页读写、按块擦除</strong></td>
+<td align="left">密度高、成本低、容量大</td>
+<td align="left">U 盘、存储卡、<strong>SSD</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li>**SSD（固态硬盘）**一句话：SSD &#x3D; <strong>NAND Flash 阵列 + 主控芯片</strong>的存储设备，<strong>写前必须先擦除</strong>（先整块擦、再按页写），靠磨损均衡延长寿命——细节属辅存章节。</li>
+<li>Flash 写入以<strong>电荷打入浮栅</strong>方式保存信息，因此擦写次数有限（有寿命）。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>NOR 可 XIP（CPU 直接取指执行）、NAND 高密度做大容量</strong>；Flash 断电不丢信息，既非 RAM 也非严格意义的 ROM。</p>
+</blockquote>
+<h2 id="主存储器与-CPU-的连接"><a href="#主存储器与-CPU-的连接" class="headerlink" title="主存储器与 CPU 的连接"></a>主存储器与 CPU 的连接</h2><p>主存通过<strong>地址总线、数据总线、控制总线</strong>与 CPU 相连：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/cpu-mainmem-connection.png" alt="主存与 CPU 的连接" title="">
+                </div>
+                <div class="image-caption">主存与 CPU 的连接</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">总线</th>
+<th align="left">方向</th>
+<th align="left">作用</th>
+<th align="left">位数由谁决定</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>地址总线</strong></td>
+<td align="left">CPU → 主存（<strong>单向</strong>）</td>
+<td align="left">传送访存地址</td>
+<td align="left"><strong>MAR 位数</strong> → 决定<strong>最大寻址范围</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>数据总线</strong></td>
+<td align="left">CPU ↔ 主存（<strong>双向</strong>）</td>
+<td align="left">传送读出&#x2F;写入数据</td>
+<td align="left"><strong>MDR 位数</strong> → 决定<strong>存储字长</strong>（一次传送位数）</td>
+</tr>
+<tr>
+<td align="left"><strong>控制总线</strong></td>
+<td align="left">CPU → 主存</td>
+<td align="left">传送读&#x2F;写命令等控制信号</td>
+<td align="left">读、写、片选线</td>
+</tr>
+</tbody></table>
+<p>芯片级连接要点：芯片的<strong>地址线</strong>接总线低位地址选片内单元，<strong>数据线</strong>接数据总线，<strong>片选 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></strong> 决定本芯片是否工作，<strong>读写 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></strong> 控制读&#x2F;写方向。单芯片容量不够时需要<strong>容量扩展</strong>。</p>
+<h3 id="位扩展（加大字长）"><a href="#位扩展（加大字长）" class="headerlink" title="位扩展（加大字长）"></a>位扩展（加大字长）</h3><p><strong>位扩展</strong>：芯片<strong>字数够、位数不够</strong>时，多片<strong>并联</strong>拼位数——<strong>地址线、片选、读写全部并联</strong>（各片同时被选中、同时工作），<strong>只有数据线分开</strong>各接总线的一段。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/bit-expansion.png" alt="位扩展连接" title="">
+                </div>
+                <div class="image-caption">位扩展连接</div>
+            </figure>
+
+<blockquote>
+<p>图：两片 1K×4 位芯片位扩展为 1K×8 位——地址 A0&#126;A9、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 并联，数据 D0&#126;D3 与 D4&#126;D7 分别接总线。</p>
+</blockquote>
+<h3 id="字扩展（加大字数）"><a href="#字扩展（加大字数）" class="headerlink" title="字扩展（加大字数）"></a>字扩展（加大字数）</h3><p><strong>字扩展</strong>：芯片<strong>位数够、字数不够</strong>时，多组芯片<strong>串联</strong>扩容量——<strong>低位地址线、数据线、读写线全部并联</strong>，<strong>高位地址经译码器产生片选</strong>，任一时刻<strong>只有一片（组）被选中</strong>输出，其余芯片处于高阻态。</p>
+<table>
+<thead>
+<tr>
+<th align="left">片选方案</th>
+<th align="left">做法</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>线选法</strong></td>
+<td align="left">每根高位地址线<strong>直接</strong>接一组芯片的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></td>
+<td align="left">简单、无需译码器，但地址空间<strong>不连续</strong>、浪费</td>
+</tr>
+<tr>
+<td align="left"><strong>译码片选法</strong></td>
+<td align="left">高位地址接<strong>译码器</strong>（如 2:4、3:8），输出接各组 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span></td>
+<td align="left">n 条地址线译出 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个片选，地址<strong>连续唯一</strong>，<strong>常用</strong></td>
+</tr>
+</tbody></table>
+<h3 id="字位同时扩展"><a href="#字位同时扩展" class="headerlink" title="字位同时扩展"></a>字位同时扩展</h3><p><strong>字位同时扩展</strong>：字数、位数都不够时，<strong>先位扩展拼出所需位宽，再字扩展拼出所需容量</strong>。</p>
+<p><strong>芯片数通用公式</strong>：设目标存储器为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> 位，芯片为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 位，则所需芯片数</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1297em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">L</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p>其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 是<strong>每组片数</strong>（位扩展），<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">L</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 是<strong>组数</strong>（字扩展）。<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> 时退化为纯字扩展，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span> 时退化为纯位扩展。</p>
+<h3 id="存储器扩展例题（核心）"><a href="#存储器扩展例题（核心）" class="headerlink" title="存储器扩展例题（核心）"></a>存储器扩展例题（核心）</h3><p><strong>题目</strong>：用 <strong>1K×4 位</strong>的 SRAM 芯片组成 <strong>4K×8 位</strong>存储器，求所需芯片数、每组片数、组数、地址线&#x2F;数据线数量，并说明 2:4 译码器的片选连接。</p>
+<p><strong>逐项求解</strong>：</p>
+<ul>
+<li><strong>所需芯片数</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1297em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> 片。</li>
+<li><strong>位扩展</strong>：每组片数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 片——两片并联拼出 8 位字长，芯片 1 数据线 <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 4: D_0&amp;̲#126;D_3" style="color:#cc0000">D_0&amp;#126;D_3</span> 接总线 <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 4: D_0&amp;̲#126;D_3" style="color:#cc0000">D_0&amp;#126;D_3</span>，芯片 2 接 <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 4: D_4&amp;̲#126;D_7" style="color:#cc0000">D_4&amp;#126;D_7</span>。</li>
+<li><strong>字扩展</strong>：组数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> 组。</li>
+<li><strong>地址线</strong>：目标 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span> 个单元 → 系统<strong>地址线 12 根</strong> <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 7: A_{11}&amp;̲#126;A_0" style="color:#cc0000">A_{11}&amp;#126;A_0</span>；每片 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> → <strong>片内地址 10 根</strong> <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 4: A_9&amp;̲#126;A_0" style="color:#cc0000">A_9&amp;#126;A_0</span>（各组并联）。</li>
+<li><strong>数据线</strong>：存储字长 8 位 → <strong>数据总线 8 根</strong> <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 4: D_7&amp;̲#126;D_0" style="color:#cc0000">D_7&amp;#126;D_0</span>。</li>
+<li><strong>片选</strong>：高位地址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">11</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>（2 位）接 <strong>2:4 译码器</strong>输入，4 个输出 <span class="katex-error" title="ParseError: KaTeX parse error: Expected &#x27;EOF&#x27;, got &#x27;&amp;&#x27; at position 15: \overline{Y_0}&amp;̲#126;\overline{…" style="color:#cc0000">\overline{Y_0}&amp;#126;\overline{Y_3}</span>（低电平有效）分别接第 0&#126;3 组的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span>。</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">                 +--------------+</span><br><span class="line">A11 A10 -------&gt; |  2:4 decoder |</span><br><span class="line">                 |  in:  A11A10 |</span><br><span class="line">                 |  Y0  Y1  Y2  Y3   (active low)</span><br><span class="line">                 +--|---|---|---+</span><br><span class="line">                    |   |   |   +--- CS of group 3</span><br><span class="line">                    |   |   +------- CS of group 2</span><br><span class="line">                    |   +----------- CS of group 1</span><br><span class="line">                    +--------------- CS of group 0</span><br><span class="line"></span><br><span class="line">group 0 (addr 0000H - 03FFH):</span><br><span class="line">+---------------+   +---------------+</span><br><span class="line">| chip 1  1Kx4  |   | chip 2  1Kx4  |</span><br><span class="line">| A0-A9         |   | A0-A9         |    A9..A0  &lt;- common low addr bus</span><br><span class="line">| D0-D3         |   | D4-D7         |    each chip connects its own data bits</span><br><span class="line">| CS | WE       |   | CS | WE       |    CS and WE wired in parallel</span><br><span class="line">+---------------+   +---------------+</span><br><span class="line"></span><br><span class="line">group 1..3: same wiring, only CS differs (Y1 / Y2 / Y3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>地址分配</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">组号</th>
+<th align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">11</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></th>
+<th align="left">片选</th>
+<th align="left">地址范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">组 0</td>
+<td align="left">00</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0333em;vertical-align:-0.15em;"></span><span class="mord katex-overline"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></td>
+<td align="left">0000H&#126;03FFH</td>
+</tr>
+<tr>
+<td align="left">组 1</td>
+<td align="left">01</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0333em;vertical-align:-0.15em;"></span><span class="mord katex-overline"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></td>
+<td align="left">0400H&#126;07FFH</td>
+</tr>
+<tr>
+<td align="left">组 2</td>
+<td align="left">10</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0333em;vertical-align:-0.15em;"></span><span class="mord katex-overline"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></td>
+<td align="left">0800H&#126;0BFFH</td>
+</tr>
+<tr>
+<td align="left">组 3</td>
+<td align="left">11</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0333em;vertical-align:-0.15em;"></span><span class="mord katex-overline"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></td>
+<td align="left">0C00H&#126;0FFFH</td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：总容量 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">片</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">位</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">32</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 位 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> 位 ✓；地址空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 个单元，每组占 1K ✓；任一地址只有一组 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0333em;vertical-align:-0.15em;"></span><span class="mord katex-overline"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span> 有效，仅该组 2 片工作 ✓。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>位扩展”并联地址、拆分数据”，字扩展”并联数据、译码选片”</strong>；芯片数公式 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">L</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。<br><strong>易错点</strong>：系统地址线数由<strong>目标容量</strong>决定（12 根），不是芯片地址线数（10 根）；译码器输入接的是<strong>高位地址</strong> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">11</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">A</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>；若改用线选法，2 根高位线只能区分 2 组（00&#x2F;11 或 10&#x2F;01 组合受限），4 组必须用 2:4 译码。</p>
+</blockquote>
+<h2 id="双端口存储器与多模块存储器"><a href="#双端口存储器与多模块存储器" class="headerlink" title="双端口存储器与多模块存储器"></a>双端口存储器与多模块存储器</h2><p>为提高主存速度，除缩短存取周期外，还可<strong>并行</strong>：同一存储器提供多个访问端口，或拆成多个存储体交叉工作。</p>
+<h3 id="双端口存储器"><a href="#双端口存储器" class="headerlink" title="双端口存储器"></a>双端口存储器</h3><p>双端口存储器是<strong>同一个存储体配两套独立的端口</strong>（各自的地址线、数据线、控制线），两个端口可<strong>同时</strong>访问<strong>不同</strong>存储单元，实现并行访问（典型应用：CPU 与 DMA、双 CPU 共享内存）。</p>
+<ul>
+<li>两端口访问<strong>不同单元</strong>：并行工作，互不影响。</li>
+<li>两端口访问<strong>同一单元</strong>且<strong>同时写</strong>（或一读一写）：发生<strong>访问冲突</strong>，由片内<strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8833em;"></span><span class="mord katex-overline"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8833em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span></span></span><span style="top:-3.8033em;"><span class="pstrut" style="height:3em;"></span><span class="overline-line" style="border-bottom-width:0.04em;"></span></span></span></span></span></span></span></span></span> 忙标志逻辑仲裁</strong>——被判为”忙”的一方延迟访问，写冲突时写入值以仲裁结果为准。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：双口 RAM 解决的是”<strong>速度</strong>“（并行访问同一存储体），冲突靠 <strong>BUSY 标志仲裁</strong>，这不是两个独立存储器。</p>
+</blockquote>
+<h3 id="多体并行存储器"><a href="#多体并行存储器" class="headerlink" title="多体并行存储器"></a>多体并行存储器</h3><p>把主存拆成 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 个独立的<strong>存储体（bank）</strong>，各体有自己的地址寄存器与读写电路，按”体号放在地址的哪一端”分为两种编址方式。</p>
+<h3 id="高位交叉编址（顺序编址）"><a href="#高位交叉编址（顺序编址）" class="headerlink" title="高位交叉编址（顺序编址）"></a>高位交叉编址（顺序编址）</h3><ul>
+<li><strong>体号在高地址位</strong>、体内地址在低位，地址在<strong>同一存储体内连续</strong>增长：先编满 M0，再编 M1，以此类推。</li>
+<li><strong>优点</strong>：便于<strong>扩大容量</strong>——需要扩容时<strong>加一个存储体</strong>即可（体号位扩展）；各体可独立服务<strong>不同任务</strong>（如一个体执行程序、一个体进行 DMA）。</li>
+<li><strong>缺点</strong>：程序<strong>顺序访问</strong>时地址连续、都落在同一体内，<strong>不能流水并行</strong>，对带宽无帮助——连续读 4 个字耗时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>。</li>
+</ul>
+<h3 id="低位交叉编址（交叉编址）"><a href="#低位交叉编址（交叉编址）" class="headerlink" title="低位交叉编址（交叉编址）"></a>低位交叉编址（交叉编址）</h3><ul>
+<li><strong>体号在低地址位</strong>、体内地址在高位：<strong>连续地址依次分布在不同存储体中</strong>（模 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 交叉），如 4 体交叉时 0000H 在 M0、0001H 在 M1、0002H 在 M2、0003H 在 M3、0004H 又回 M0。</li>
+<li><strong>原理</strong>：对第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 体启动一次存取后，不必等它结束（只需等<strong>总线传送周期</strong> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>），就可启动第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7429em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 体——各体<strong>流水线式</strong>轮流工作，宏观上<strong>每个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 交出一个字</strong>，<strong>大幅提高主存带宽</strong>。</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/multi-bank-interleave.png" alt="多体并行存储器" title="">
+                </div>
+                <div class="image-caption">多体并行存储器</div>
+            </figure>
+
+<ul>
+<li>设存取周期为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>、总线传送周期为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>，交叉体数为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>，取 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">m</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。<strong>流水线不间断的条件是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></strong>——体数太少时，下一轮启动会撞上前一体尚未结束的存取周期，流水线出现断流。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>高位交叉”体号在高位、利于扩容、不利提速”；低位交叉”体号在低位、连续地址跨体、流水提带宽”</strong>；交叉存储器又称<strong>模 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 编址存储器</strong>。</p>
+</blockquote>
+<h3 id="低位交叉流水线例题（必考）"><a href="#低位交叉流水线例题（必考）" class="headerlink" title="低位交叉流水线例题（必考）"></a>低位交叉流水线例题（必考）</h3><p><strong>题目</strong>：某机主存采用 <strong>4 体低位交叉</strong>编址，存取周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span>，总线传送周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">m</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">50</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span>，每个字 32 位。求：连续读取 4 个字、连续读取 12 个字的耗时；若 12 个字都在<strong>同一存储体</strong>中，耗时又是多少？</p>
+<p><strong>求解</strong>：</p>
+<ul>
+<li><strong>校验条件</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">50</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 成立 ✓，流水线可不间断。</li>
+<li><strong>连续读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> 个字</strong>：首字经一个完整存取周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> 读出，之后每隔 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 交出一个字：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">350</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span></span>
+<ul>
+<li><strong>连续读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span> 个字</strong>（跨 4 体流水）：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">11</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">50</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">750</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span></span>
+<ul>
+<li><strong>退化情形</strong>：12 个字都在同一存储体 → 同一体存取周期未结束前<strong>不能再次启动</strong>，必须逐个等 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">12</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">200</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span></span>
+<ul>
+<li><strong>对比高位交叉</strong>：连续 4 字落在同一体内，耗时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">800</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span></span>，是低位交叉 350 ns 的约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.3</span></span></span></span> 倍。</li>
+<li><strong>带宽对比</strong>：读 4 字共 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span> 位，低位交叉 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">350</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">128</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">bi</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.7</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">bi</span><span class="mord mathnormal">t</span><span class="mord">/</span><span class="mord mathnormal">s</span></span></span></span>；顺序访问 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">800</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">s</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">128</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">bi</span><span class="mord mathnormal">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">bi</span><span class="mord mathnormal">t</span><span class="mord">/</span><span class="mord mathnormal">s</span></span></span></span>，<strong>带宽提高约 2.3 倍</strong>；连续字数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 越大越接近理想值 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 倍。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>连续读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个字（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 体低位交叉）<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>；同一存储体退化 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></strong>；流水线条件 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。<br><strong>易错点</strong>：首字仍需完整 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>，不能按 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> 直接乘；求”访问程序&#x2F;数组”类题目先看<strong>地址是否连续且跨体</strong>，若访问不连续或集中在同一体，流水线优势消失。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">分类维度</td>
+<td align="left">按介质（半导体&#x2F;磁&#x2F;光）、按存取方式、按内容可变性（读写&#x2F;只读）、按可保存性（易失&#x2F;非易失）</td>
+</tr>
+<tr>
+<td align="left">随机 vs 顺序 vs 直接</td>
+<td align="left">随机&#x3D;与位置无关（主存，<strong>ROM 也算随机存取</strong>）；顺序&#x3D;磁带；直接&#x3D;先定位道再顺序搜索（<strong>磁盘</strong>）；相联&#x3D;按内容（Cache 标记）</td>
+</tr>
+<tr>
+<td align="left">层次结构</td>
+<td align="left"><strong>Cache-主存解决速度，主存-辅存解决容量</strong>；依据&#x3D;<strong>局部性原理</strong>；越往上越<strong>快、小、贵</strong></td>
+</tr>
+<tr>
+<td align="left">SRAM vs DRAM</td>
+<td align="left"><strong>触发器 vs 电容</strong>；<strong>免刷新 vs 必刷新</strong>；<strong>非破坏 vs 破坏性读出</strong>；快&#x2F;贵&#x2F;Cache vs 慢&#x2F;便宜&#x2F;主存</td>
+</tr>
+<tr>
+<td align="left">DRAM 刷新</td>
+<td align="left"><strong>按行刷新</strong>（不需列地址）；电容约 2 ms 漏完；刷新一行 ≈ 一个存取周期</td>
+</tr>
+<tr>
+<td align="left">三种刷新方式</td>
+<td align="left"><strong>集中</strong>有死区（行数×存取周期）；<strong>分散</strong>无死区但周期加倍；<strong>异步</strong>折中（2 ms÷行数 刷一行），现代主流</td>
+</tr>
+<tr>
+<td align="left">DRAM 地址复用</td>
+<td align="left"><strong>RAS 锁行、CAS 锁列</strong>，行列地址分两次送，引脚减半</td>
+</tr>
+<tr>
+<td align="left">ROM 家族</td>
+<td align="left">MROM（掩膜）→PROM（熔丝一次）→EPROM（<strong>紫外线</strong>擦）→EEPROM（<strong>电擦</strong>）→Flash（<strong>按块擦</strong>）</td>
+</tr>
+<tr>
+<td align="left">Flash</td>
+<td align="left"><strong>NOR 可 XIP、随机按字节读</strong>；<strong>NAND 按页读写按块擦、密度高</strong>；SSD&#x3D;NAND 阵列+主控，写前先擦除</td>
+</tr>
+<tr>
+<td align="left">CPU-主存三总线</td>
+<td align="left">地址线单向（MAR 定<strong>寻址范围</strong>）、数据线双向（MDR 定<strong>字长</strong>）、控制线传读写命令</td>
+</tr>
+<tr>
+<td align="left">容量扩展</td>
+<td align="left"><strong>位扩展</strong>并联地址拆分数据；<strong>字扩展</strong>并联数据、高位译码选片；<strong>先位后字</strong>；线选法地址不连续，<strong>译码片选法</strong>（n 条线选 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 组）常用</td>
+</tr>
+<tr>
+<td align="left">芯片数公式</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">L</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>（组数×每组片数）；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">/</span><span class="mord mathnormal">L</span></span></span></span> 字扩展、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span></span></span></span> 位扩展</td>
+</tr>
+<tr>
+<td align="left">主存带宽</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，即<strong>每秒访问位数</strong>；存取周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span></span></span></span> 存取时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">双端口存储器</td>
+<td align="left">两套端口独立并行；访问同一单元冲突由 <strong>BUSY 标志仲裁</strong></td>
+</tr>
+<tr>
+<td align="left">高位 vs 低位交叉</td>
+<td align="left">高位&#x3D;体号在高位、<strong>顺序编址利扩容</strong>；低位&#x3D;体号在低位、<strong>连续地址跨体、流水提带宽</strong></td>
+</tr>
+<tr>
+<td align="left">低位交叉流水线</td>
+<td align="left">连续读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 字 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/</span><span class="mord mathnormal">m</span></span></span></span>；同一体退化 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>；条件 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span></strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:02:00.341Z" itemprop="dateUpdated">2026-08-29 16:02:00</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%AD%98%E5%82%A8%E5%99%A8/" rel="tag">存储器</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&title=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&title=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Cache与虚拟存储器</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E6%B5%AE%E7%82%B9%E6%95%B0%E4%B8%8EIEEE754/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">浮点数与IEEE754</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&title=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&title=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《存储系统与主存储器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

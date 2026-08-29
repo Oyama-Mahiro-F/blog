@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>IO系统：中断与DMA | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理">
+    <meta name="description" content="输入输出（I&#x2F;O）系统是计算机主机与外界进行信息交换的桥梁，由 I&#x2F;O 设备（外设）、I&#x2F;O 接口、I&#x2F;O 总线与 I&#x2F;O 软件共同构成。它的核心矛盾是：CPU 快、外设慢，且外设种类繁多、信号形式各异，因此必须解决数据缓冲、信号转换、设备选择与控制方式等问题。408 对本章的考查集中在：外设参数与磁盘计算、I&#x2F;O 端口编址、程序查询 &amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO系统：中断与DMA">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="输入输出（I&#x2F;O）系统是计算机主机与外界进行信息交换的桥梁，由 I&#x2F;O 设备（外设）、I&#x2F;O 接口、I&#x2F;O 总线与 I&#x2F;O 软件共同构成。它的核心矛盾是：CPU 快、外设慢，且外设种类繁多、信号形式各异，因此必须解决数据缓冲、信号转换、设备选择与控制方式等问题。408 对本章的考查集中在：外设参数与磁盘计算、I&#x2F;O 端口编址、程序查询 &amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC7%E7%AB%A0%20%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%B3%BB%E7%BB%9F.assets/io-interface-structure.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC7%E7%AB%A0%20%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%B3%BB%E7%BB%9F.assets/dma-controller-process.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC7%E7%AB%A0%20%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%B3%BB%E7%BB%9F.assets/dma-memory-access-modes.png">
+<meta property="article:published_time" content="2026-08-29T15:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:32:57.422Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC7%E7%AB%A0%20%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%B3%BB%E7%BB%9F.assets/io-interface-structure.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">IO系统：中断与DMA</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">IO系统：中断与DMA</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T15:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#I-O-%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%BB%84%E6%88%90%E4%B8%8E%E6%8E%A7%E5%88%B6%E6%96%B9%E5%BC%8F"><span class="post-toc-number">1.</span> <span class="post-toc-text">I&#x2F;O 系统的组成与控制方式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%96%E9%83%A8%E8%AE%BE%E5%A4%87"><span class="post-toc-number">2.</span> <span class="post-toc-text">外部设备</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%EF%BC%9A%E9%94%AE%E7%9B%98%E4%B8%8E%E9%BC%A0%E6%A0%87"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">输入设备：键盘与鼠标</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BE%93%E5%87%BA%E8%AE%BE%E5%A4%87%EF%BC%9A%E6%98%BE%E7%A4%BA%E5%99%A8%E4%B8%8E%E6%89%93%E5%8D%B0%E6%9C%BA"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">输出设备：显示器与打印机</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%96%E5%AD%98%E5%82%A8%E5%99%A8%EF%BC%9A%E7%A1%AC%E7%9B%98%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">外存储器：硬盘存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97-RAID"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">磁盘阵列 RAID</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#I-O-%E6%8E%A5%E5%8F%A3%EF%BC%88I-O-%E6%8E%A7%E5%88%B6%E5%99%A8%EF%BC%89"><span class="post-toc-number">3.</span> <span class="post-toc-text">I&#x2F;O 接口（I&#x2F;O 控制器）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#I-O-%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%8A%9F%E8%83%BD%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">I&#x2F;O 接口的功能与基本结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#I-O-%E7%AB%AF%E5%8F%A3%E5%8F%8A%E5%85%B6%E7%BC%96%E5%9D%80"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">I&#x2F;O 端口及其编址</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%9F%A5%E8%AF%A2%E6%96%B9%E5%BC%8F"><span class="post-toc-number">4.</span> <span class="post-toc-text">程序查询方式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%A8%8B%E5%BA%8F%E4%B8%AD%E6%96%AD%E6%96%B9%E5%BC%8F"><span class="post-toc-number">5.</span> <span class="post-toc-text">程序中断方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%AD%E6%96%AD%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">中断的基本概念</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%AD%E6%96%AD%E9%9A%90%E6%8C%87%E4%BB%A4%EF%BC%9A%E7%A1%AC%E4%BB%B6%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E7%9A%84%E4%B8%89%E4%BB%B6%E4%BA%8B"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">中断隐指令：硬件自动完成的三件事</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B%EF%BC%9A%E4%B8%AD%E6%96%AD%E6%9C%8D%E5%8A%A1%E7%A8%8B%E5%BA%8F%E6%B5%81%E7%A8%8B"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">中断处理过程：中断服务程序流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8D%95%E9%87%8D%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%A4%9A%E9%87%8D%E4%B8%AD%E6%96%AD"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">单重中断与多重中断</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%AD%E6%96%AD%E5%B1%8F%E8%94%BD%E5%AD%97%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7%E8%AE%BE%E7%BD%AE"><span class="post-toc-number">5.5.</span> <span class="post-toc-text">中断屏蔽字与优先级设置</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#DMA-%E6%96%B9%E5%BC%8F"><span class="post-toc-number">6.</span> <span class="post-toc-text">DMA 方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DMA-%E6%96%B9%E5%BC%8F%E7%9A%84%E7%89%B9%E7%82%B9"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">DMA 方式的特点</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DMA-%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E7%BB%84%E6%88%90"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">DMA 控制器的组成</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DMA-%E4%BC%A0%E9%80%81%E8%BF%87%E7%A8%8B%EF%BC%9A%E4%B8%89%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">DMA 传送过程：三个阶段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DMA-%E4%B8%8E-CPU-%E7%9A%84%E4%B8%89%E7%A7%8D%E8%AE%BF%E5%AD%98%E6%96%B9%E5%BC%8F"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">DMA 与 CPU 的三种访存方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DMA-%E4%B8%8E%E4%B8%AD%E6%96%AD%E6%96%B9%E5%BC%8F%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="post-toc-number">6.5.</span> <span class="post-toc-text">DMA 与中断方式的对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%89%E7%A7%8D-I-O-%E6%96%B9%E5%BC%8F%E7%BB%BC%E5%90%88%E5%AF%B9%E6%AF%94"><span class="post-toc-number">7.</span> <span class="post-toc-text">三种 I&#x2F;O 方式综合对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">8.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-IO系统：中断与DMA"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">IO系统：中断与DMA</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 23:30:00" datetime="2026-08-29T15:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>输入输出（I&#x2F;O）系统</strong>是计算机主机与外界进行信息交换的桥梁，由 <strong>I&#x2F;O 设备（外设）、I&#x2F;O 接口、I&#x2F;O 总线与 I&#x2F;O 软件</strong>共同构成。它的核心矛盾是：<strong>CPU 快、外设慢</strong>，且外设种类繁多、信号形式各异，因此必须解决<strong>数据缓冲、信号转换、设备选择与控制方式</strong>等问题。408 对本章的考查集中在：<strong>外设参数与磁盘计算、I&#x2F;O 端口编址、程序查询 &#x2F; 程序中断 &#x2F; DMA 三种 I&#x2F;O 方式</strong>——尤其是<strong>中断屏蔽字与多重中断、DMA 控制器组成与传送过程、中断与 DMA 的对比</strong>。</p>
+<h2 id="I-O-系统的组成与控制方式"><a href="#I-O-系统的组成与控制方式" class="headerlink" title="I&#x2F;O 系统的组成与控制方式"></a>I&#x2F;O 系统的组成与控制方式</h2><p><strong>I&#x2F;O 系统</strong>由四部分组成，软硬件协同完成一次输入输出：</p>
+<table>
+<thead>
+<tr>
+<th align="left">组成部分</th>
+<th align="left">说明</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>I&#x2F;O 设备（外设）</strong></td>
+<td align="left">输入 &#x2F; 输出 &#x2F; 外存储设备</td>
+<td align="left">键盘、显示器、磁盘</td>
+</tr>
+<tr>
+<td align="left"><strong>I&#x2F;O 接口</strong></td>
+<td align="left">主机与外设之间的交接电路，内含可访问的寄存器</td>
+<td align="left">串口控制器、磁盘控制器</td>
+</tr>
+<tr>
+<td align="left"><strong>I&#x2F;O 总线</strong></td>
+<td align="left">连接 CPU、主存与各 I&#x2F;O 接口的传输线路</td>
+<td align="left">PCIe、USB、SATA</td>
+</tr>
+<tr>
+<td align="left"><strong>I&#x2F;O 软件</strong></td>
+<td align="left">驱动程序、中断服务程序等</td>
+<td align="left">设备驱动、BIOS 例程</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>注意</strong>：<strong>I&#x2F;O 接口</strong>是整块接口电路，<strong>I&#x2F;O 端口</strong>只是接口内部<strong>可被 CPU 访问的寄存器</strong>（数据 &#x2F; 状态 &#x2F; 控制端口），每个端口有一个地址。接口功能（缓冲、译码、中断控制等）与端口编址详见下文” I&#x2F;O 接口”一节；<strong>I&#x2F;O 软件、驱动与中断处理程序的分层管理</strong>属于操作系统的 I&#x2F;O 子系统，考纲只要求一句” I&#x2F;O 接口与端口”的概念，详细机制与 OS 课程呼应。</p>
+</blockquote>
+<p><strong>I&#x2F;O 控制方式</strong>的演进主线是：<strong>CPU 介入越来越少，CPU 与外设并行程度越来越高</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">CPU 介入程度</th>
+<th align="left">数据传送单位</th>
+<th align="center">速度</th>
+<th align="left">适用设备</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>程序查询方式</strong></td>
+<td align="left"><strong>全程参与</strong>（循环查询忙等）</td>
+<td align="left">字 &#x2F; 字节</td>
+<td align="center">慢</td>
+<td align="left">低速简单设备</td>
+</tr>
+<tr>
+<td align="left"><strong>程序中断方式</strong></td>
+<td align="left">每传送一个数据响应一次中断</td>
+<td align="left">字 &#x2F; 字节</td>
+<td align="center">中</td>
+<td align="left">键盘、鼠标</td>
+</tr>
+<tr>
+<td align="left"><strong>DMA 方式</strong></td>
+<td align="left">仅预处理、后处理介入</td>
+<td align="left"><strong>数据块</strong></td>
+<td align="center">快</td>
+<td align="left">磁盘、网卡</td>
+</tr>
+<tr>
+<td align="left"><strong>通道 &#x2F; I&#x2F;O 处理机</strong></td>
+<td align="left">几乎不介入</td>
+<td align="left">块 &#x2F; 文件</td>
+<td align="center">最快</td>
+<td align="left">大型机（408 仅要求概念）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：四种方式的演进趋势——<strong>查询 → 中断 → DMA → 通道</strong>，CPU 介入逐级减少；408 重点考<strong>中断与 DMA 的细节</strong>。</p>
+</blockquote>
+<h2 id="外部设备"><a href="#外部设备" class="headerlink" title="外部设备"></a>外部设备</h2><h3 id="输入设备：键盘与鼠标"><a href="#输入设备：键盘与鼠标" class="headerlink" title="输入设备：键盘与鼠标"></a>输入设备：键盘与鼠标</h3><table>
+<thead>
+<tr>
+<th align="left">设备</th>
+<th align="left">功能</th>
+<th align="left">工作原理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>键盘</strong></td>
+<td align="left">字符 &#x2F; 命令输入</td>
+<td align="left">按键 → 扫描电路得<strong>扫描码</strong> → 转换为 ASCII 码 → <strong>以中断方式通知 CPU</strong> 取走</td>
+</tr>
+<tr>
+<td align="left"><strong>鼠标</strong></td>
+<td align="left">位置 &#x2F; 点击输入</td>
+<td align="left">光电传感器检测位移 → 输出<strong>坐标增量</strong>与按键事件，同样经接口上报</td>
+</tr>
+</tbody></table>
+<p>键盘、鼠标都是<strong>低速设备</strong>，天然适合用<strong>程序中断方式</strong>与 CPU 交换数据。</p>
+<h3 id="输出设备：显示器与打印机"><a href="#输出设备：显示器与打印机" class="headerlink" title="输出设备：显示器与打印机"></a>输出设备：显示器与打印机</h3><p><strong>显示器主要参数</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>屏幕大小</strong></td>
+<td align="left">以对角线长度度量，常见 12&#126;29 英寸</td>
+</tr>
+<tr>
+<td align="left"><strong>分辨率</strong></td>
+<td align="left">屏幕能显示的<strong>像素个数</strong>，用”水平 × 垂直”表示（如 1024×768），分辨率越高图像越细</td>
+</tr>
+<tr>
+<td align="left"><strong>灰度级</strong></td>
+<td align="left">黑白显示器中像素的亮暗等级；彩色显示器中表现为<strong>颜色种类数</strong>，灰度级越多层次越逼真</td>
+</tr>
+<tr>
+<td align="left"><strong>刷新频率</strong></td>
+<td align="left">单位时间内整屏刷新的次数，<strong>大于 30 Hz 人眼才不感到闪烁</strong>，常见 60&#126;120 Hz</td>
+</tr>
+</tbody></table>
+<p>**显示存储器（VRAM，刷新存储器）**用于存放一帧图像以供反复刷新，其容量由分辨率与灰度级共同决定：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">显存</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">分辨率</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">灰度级</span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">B</span></span></span></span></span></span>
+<p><strong>显存容量例题</strong>：分辨率 <strong>1024×768</strong>、灰度级 <strong>256 色</strong>，求所需显存容量与刷新带宽。</p>
+<ul>
+<li>每个像素位数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">256</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> 位 &#x3D; <strong>1 B</strong></li>
+<li>显存容量 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">768</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> 位 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">291</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">456</span></span></span></span> 位 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">786</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">432</span></span></span></span> B &#x3D; <strong>768 KB</strong>（即 0.75 MB）</li>
+<li>若刷新频率为 60 Hz，刷新带宽 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">768</span><span class="mord text"><span class="mord"> KB</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">60/</span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">45</span><span class="mord text"><span class="mord"> MB/s</span></span></span></span></span>——显存要按帧频被反复读出</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：显存存的是<strong>一帧</strong>画面，”灰度级 256”意味着<strong>每像素 8 位</strong>而不是 256 位；分辨率与灰度级<strong>任何一个增大都会使显存加大</strong>。</p>
+</blockquote>
+<p><strong>打印机</strong>三种典型机型的对比：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">成像方式</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>针式打印机</strong></td>
+<td align="left">打印针击打色带（<strong>击打式</strong>）</td>
+<td align="left">噪声大、速度慢，但可<strong>复写多联票据</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>喷墨打印机</strong></td>
+<td align="left">喷头喷射微小墨滴（非击打式）</td>
+<td align="left">可彩色打印，耗材为墨水</td>
+</tr>
+<tr>
+<td align="left"><strong>激光打印机</strong></td>
+<td align="left">静电成像 + 碳粉转印定影（非击打式）</td>
+<td align="left">速度快、质量高、噪声低，办公主流</td>
+</tr>
+</tbody></table>
+<h3 id="外存储器：硬盘存储器"><a href="#外存储器：硬盘存储器" class="headerlink" title="外存储器：硬盘存储器"></a>外存储器：硬盘存储器</h3><p><strong>磁记录原理</strong>：硬盘属于<strong>磁表面存储器</strong>，利用磁性材料的<strong>两种不同磁化方向</strong>表示 0 和 1。写入时，写线圈中通以不同方向的电流，通过磁头把盘片表面的磁层<strong>磁化</strong>成相应方向；读出时，磁化单元随盘片旋转掠过磁头，磁通变化在 read 线圈中<strong>感应出电动势</strong>，还原出 0&#x2F;1。记录方式（归零制、不归零制、调相制、调频制、改进调频制 MFM 等）影响自同步能力与密度，408 只需了解。</p>
+<p><strong>磁盘的组成与关键术语</strong>：硬盘由<strong>磁盘驱动器</strong>（磁头组件 + 盘片组件）、<strong>磁盘控制器</strong>（IDE、SCSI、SATA 等接口标准）和<strong>盘片</strong>组成。一块硬盘含若干<strong>记录面</strong>，每个面划分若干<strong>磁道</strong>，每条磁道划分若干<strong>扇区</strong>——<strong>扇区（块）是磁盘读写的最小单位</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">术语</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>磁头数 &#x3D; 记录面数</strong></td>
+<td align="left">每个记录面一个磁头</td>
+</tr>
+<tr>
+<td align="left"><strong>柱面</strong></td>
+<td align="left">所有记录面上<strong>相同编号的磁道</strong>的集合（磁头不动、盘旋转即可同柱面连续存取）</td>
+</tr>
+<tr>
+<td align="left"><strong>扇区数</strong></td>
+<td align="left">每条磁道划分的扇区个数</td>
+</tr>
+</tbody></table>
+<p><strong>磁盘性能指标</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>道密度</strong></td>
+<td align="left">沿<strong>半径方向</strong>单位长度上的磁道数（道&#x2F;mm）</td>
+</tr>
+<tr>
+<td align="left"><strong>位密度</strong></td>
+<td align="left">沿磁道方向单位长度上记录的二进制位数；<strong>各道容量相同，最内圈磁道周长最短，故内圈位密度最大</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>转速</strong></td>
+<td align="left">盘片每分钟转数（r&#x2F;min），决定旋转延迟</td>
+</tr>
+<tr>
+<td align="left"><strong>数据传输率</strong></td>
+<td align="left">单位时间内读出 &#x2F; 写入的数据量 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 为每道字节数，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 为每秒转数）</td>
+</tr>
+<tr>
+<td align="left"><strong>平均存取时间</strong></td>
+<td align="left">&#x3D; <strong>寻道时间</strong>（磁头移到目标磁道）+ <strong>平均旋转延迟</strong>（转到目标扇区，取<strong>半圈时间</strong>）+ <strong>传输时间</strong>（读 &#x2F; 写数据）(+ 控制器开销)</td>
+</tr>
+</tbody></table>
+<p><strong>磁盘性能例题 1（数据传输率）</strong>：转速 <strong>7200 r&#x2F;min</strong>，每磁道 <strong>160 扇区</strong>，每扇区 <strong>512 B</strong>，求数据传输率。</p>
+<ul>
+<li>转速 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">7200/60</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">120</span></span></span></span> r&#x2F;s；每道容量 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">160</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">512</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">B</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">80</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">KB</span></span></span></span></span></li>
+<li>数据传输率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">120</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">80</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">KB/s</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathbf">9600</span><span class="mspace"> </span><span class="mord mathbf">KB/s</span></span></span></span></span>（≈ 9.375 MB&#x2F;s）</li>
+</ul>
+<p><strong>磁盘性能例题 2（平均存取时间）</strong>：转速 <strong>10000 r&#x2F;min</strong>，平均寻道时间 <strong>6 ms</strong>，传输率 <strong>20 MB&#x2F;s</strong>，控制器延迟 <strong>0.2 ms</strong>，读一个 <strong>4 KB</strong> 块的平均时间。</p>
+<ul>
+<li>平均旋转延迟 &#x3D; 转半圈 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">60/10000</span><span class="mclose">)</span><span class="mord">/2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> ms</li>
+<li>传输时间 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">KB</span></span><span class="mord">/20</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">MB/s</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.2</span></span></span></span> ms</li>
+<li>平均存取时间 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">9.4</span><span class="mspace"> </span><span class="mord mathbf">ms</span></span></span></span></span></li>
+</ul>
+<p><strong>格式化容量例题</strong>：某盘组 <strong>6 个记录面</strong>，每面 <strong>1000 磁道</strong>，每道 <strong>160 扇区</strong>，每扇区 <strong>512 B</strong>。</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">格式化容量</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">160</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">512</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">B</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">491</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">520</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">B</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord"><span class="mord mathbf">468.75</span><span class="mspace"> </span><span class="mord mathbf">MB</span></span></span></span></span></span>
+<blockquote>
+<p><strong>易错点</strong>：<strong>格式化容量</strong>（按扇区数计算，用户可用）<strong>小于非格式化容量</strong>（按磁化单元总数计算）；磁道容量相同 → <strong>位密度内圈最大、外圈最小</strong>。</p>
+</blockquote>
+<p><strong>磁盘地址</strong>由四字段构成，访问时按字段逐级定位：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">磁盘地址</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">驱动器号</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">柱面（磁道）号</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">盘面号</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">扇区号</span></span></span></span></span></span>
+<p><strong>磁盘工作过程</strong>：<strong>寻址</strong>（译码驱动器号 → 磁头移动到目标<strong>柱面</strong>（寻道）→ 选中<strong>盘面</strong> → 旋转等待目标<strong>扇区</strong>到达磁头下）→ <strong>读写操作</strong>（写：数据经磁头磁化盘面；读：磁头感应磁化状态还原数据）。可见一次访盘的大头开销是<strong>寻道与旋转等待</strong>，因此磁盘按<strong>块</strong>成批存取，也正因如此适合用 <strong>DMA 方式</strong>传送。</p>
+<h3 id="磁盘阵列-RAID"><a href="#磁盘阵列-RAID" class="headerlink" title="磁盘阵列 RAID"></a>磁盘阵列 RAID</h3><p><strong>RAID（独立 &#x2F; 廉价冗余磁盘阵列）<strong>把多个物理盘组织成一个逻辑盘，数据</strong>交叉并行存储</strong>，同时用冗余信息提高可靠性。408 重点掌握四级：</p>
+<table>
+<thead>
+<tr>
+<th align="left">级别</th>
+<th align="left">名称</th>
+<th align="left">冗余方式</th>
+<th align="center">容量利用率</th>
+<th align="left">容错能力</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>RAID 0</strong></td>
+<td align="left">条带阵列</td>
+<td align="left"><strong>无冗余</strong>，数据按条带分布在各盘</td>
+<td align="center"><strong>100%（最高）</strong></td>
+<td align="left"><strong>无</strong>，坏一块全失效</td>
+</tr>
+<tr>
+<td align="left"><strong>RAID 1</strong></td>
+<td align="left">镜像阵列</td>
+<td align="left">数据<strong>完全镜像</strong>到另一盘</td>
+<td align="center"><strong>50%</strong></td>
+<td align="left">可坏一块，读快</td>
+</tr>
+<tr>
+<td align="left"><strong>RAID 4</strong></td>
+<td align="left">块交叉奇偶校验</td>
+<td align="left">数据按块交叉 + <strong>专用奇偶校验盘</strong></td>
+<td align="center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span></td>
+<td align="left">可坏一块；校验盘成瓶颈</td>
+</tr>
+<tr>
+<td align="left"><strong>RAID 5</strong></td>
+<td align="left">分布式奇偶校验</td>
+<td align="left">奇偶信息<strong>分散在所有盘</strong>，无专用校验盘</td>
+<td align="center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span></td>
+<td align="left">可坏一块，兼顾性能</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：RAID 0<strong>速度最快但无容错</strong>；RAID 1<strong>利用率 50% 但可靠性最高</strong>；RAID 5 把校验<strong>分散</strong>存放，解决了 RAID 4 专用校验盘的写瓶颈——三者是”容量利用率 ↔ 可靠性”的权衡。N 块盘的 RAID 5 等效容量为 <strong>N−1 块盘</strong>。</p>
+</blockquote>
+<h2 id="I-O-接口（I-O-控制器）"><a href="#I-O-接口（I-O-控制器）" class="headerlink" title="I&#x2F;O 接口（I&#x2F;O 控制器）"></a>I&#x2F;O 接口（I&#x2F;O 控制器）</h2><h3 id="I-O-接口的功能与基本结构"><a href="#I-O-接口的功能与基本结构" class="headerlink" title="I&#x2F;O 接口的功能与基本结构"></a>I&#x2F;O 接口的功能与基本结构</h3><p>I&#x2F;O 接口（I&#x2F;O 控制器）处于<strong>系统总线与外设之间</strong>，功能包括：<strong>数据缓冲</strong>（匹配速度差）、<strong>信号与格式转换</strong>（电平、串并转换）、<strong>地址译码与设备选择</strong>、<strong>命令译码</strong>、<strong>记录并提供设备状态</strong>、<strong>差错检测</strong>、以及<strong>中断控制</strong>（需要时向 CPU 发中断请求）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第7章 输入输出系统.assets/io-interface-structure.png" alt="I/O 接口的基本结构" title="">
+                </div>
+                <div class="image-caption">I/O 接口的基本结构</div>
+            </figure>
+
+<p>接口内部的核心是<strong>三类可编程寄存器（端口）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">端口（寄存器）</th>
+<th align="left">作用</th>
+<th align="left">传送方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>数据缓冲寄存器 DBR</strong></td>
+<td align="left">暂存 CPU 与外设间交换的数据</td>
+<td align="left">双向（输入 &#x2F; 输出）</td>
+</tr>
+<tr>
+<td align="left"><strong>状态寄存器</strong></td>
+<td align="left">记录设备状态：忙（Busy）、就绪（Ready）、错误（Error）</td>
+<td align="left">CPU <strong>只读</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>控制寄存器</strong></td>
+<td align="left">存放 CPU 发出的命令（启动、读 &#x2F; 写、方式选择）</td>
+<td align="left">CPU <strong>只写</strong></td>
+</tr>
+</tbody></table>
+<p>此外还有<strong>地址译码器</strong>（识别端口地址选中本接口）与<strong>控制逻辑</strong>。<strong>状态、控制寄存器在传送方向上正好相反，占用不同端口地址</strong>。</p>
+<h3 id="I-O-端口及其编址"><a href="#I-O-端口及其编址" class="headerlink" title="I&#x2F;O 端口及其编址"></a>I&#x2F;O 端口及其编址</h3><p><strong>I&#x2F;O 端口</strong>就是接口中上述可被 CPU 访问的寄存器，要给每个端口编一个地址，编址方式有两种：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left"><strong>统一编址</strong>（存储器映射 I&#x2F;O）</th>
+<th align="left"><strong>独立编址</strong>（端口映射 I&#x2F;O）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">地址空间</td>
+<td align="left">端口与主存单元<strong>共用一个地址空间</strong></td>
+<td align="left">端口有<strong>独立的 I&#x2F;O 地址空间</strong></td>
+</tr>
+<tr>
+<td align="left">访问指令</td>
+<td align="left">直接用<strong>访存指令</strong>（LOAD&#x2F;STORE&#x2F;MOV）</td>
+<td align="left">需<strong>专用 I&#x2F;O 指令</strong>（IN &#x2F; OUT）</td>
+</tr>
+<tr>
+<td align="left">是否占内存空间</td>
+<td align="left"><strong>占用</strong>主存地址空间，使内存可用空间减少</td>
+<td align="left"><strong>不占</strong>内存空间</td>
+</tr>
+<tr>
+<td align="left">译码与速度</td>
+<td align="left">地址位数长，<strong>译码电路复杂、速度较慢</strong></td>
+<td align="left">端口地址短，译码快</td>
+</tr>
+<tr>
+<td align="left">区分 I&#x2F;O 与访存</td>
+<td align="left">靠<strong>地址范围</strong>区分，无需专门控制信号</td>
+<td align="left">靠<strong>专门的控制线</strong>（如 M&#x2F;IO 信号）区分</td>
+</tr>
+<tr>
+<td align="left">优点</td>
+<td align="left">指令丰富、寻址方式多，无需专用 I&#x2F;O 指令</td>
+<td align="left">I&#x2F;O 指令短、一目了然，不挤占内存</td>
+</tr>
+<tr>
+<td align="left">代表体系</td>
+<td align="left">ARM、MIPS</td>
+<td align="left">x86</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：统一编址下<strong>对端口的操作就是对存储单元的操作</strong>，无需专用 I&#x2F;O 指令，但<strong>占内存空间、译码复杂</strong>；独立编址<strong>必须用 IN&#x2F;OUT 专用指令</strong>，且需<strong>控制线</strong>指明当前地址属于内存还是 I&#x2F;O——“是否需要专用指令、是否占内存空间”是选择题最常见判断点。</p>
+</blockquote>
+<h2 id="程序查询方式"><a href="#程序查询方式" class="headerlink" title="程序查询方式"></a>程序查询方式</h2><p><strong>程序查询方式</strong>完全由 CPU 执行程序控制传送：CPU 先向接口发出启动命令，然后<strong>循环读取状态寄存器</strong>，检测到”就绪”标志后才与数据端口交换一个数据；未就绪则继续查询——<strong>CPU 与外设完全串行工作</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">流程</th>
+<th align="left">操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">①</td>
+<td align="left">CPU 执行启动指令，启动外设</td>
+</tr>
+<tr>
+<td align="left">②</td>
+<td align="left">循环读<strong>状态端口</strong>，判断 Busy &#x2F; Ready（<strong>忙等</strong>）</td>
+</tr>
+<tr>
+<td align="left">③</td>
+<td align="left">就绪后读 &#x2F; 写<strong>数据端口</strong>，传送一个字</td>
+</tr>
+<tr>
+<td align="left">④</td>
+<td align="left">判断是否全部传完，未完转 ②</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：查询方式中 CPU <strong>绝大部分时间浪费在”查询忙等”上</strong>，设备越多 CPU 负担越重；它优点只有<strong>接口硬件简单</strong>。数据通路单位是<strong>字 &#x2F; 字节</strong>，且传送过程<strong>不允许被打断</strong>（查询-传送紧密耦合）。</p>
+</blockquote>
+<h2 id="程序中断方式"><a href="#程序中断方式" class="headerlink" title="程序中断方式"></a>程序中断方式</h2><h3 id="中断的基本概念"><a href="#中断的基本概念" class="headerlink" title="中断的基本概念"></a>中断的基本概念</h3><p><strong>中断</strong>指 CPU 暂停现行程序，转去处理<strong>随机出现的紧急事件</strong>，处理完后返回断点继续执行。按来源分：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">来源</th>
+<th align="left">示例</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>内中断（异常）</strong></td>
+<td align="left">CPU <strong>内部</strong>、与指令相关</td>
+<td align="left">除 0、溢出、非法操作码、缺页、陷入指令</td>
+<td align="left">通常不可屏蔽</td>
+</tr>
+<tr>
+<td align="left"><strong>外中断</strong></td>
+<td align="left">CPU <strong>外部</strong>设备 &#x2F; 事件</td>
+<td align="left"><strong>I&#x2F;O 设备请求（INTR）</strong>、时钟、掉电</td>
+<td align="left">分可屏蔽与不可屏蔽（NMI）</td>
+</tr>
+</tbody></table>
+<p>本节只讨论<strong>外中断驱动的 I&#x2F;O</strong>：外设准备就绪后，通过接口中的<strong>中断请求触发器向 CPU 发出中断请求信号 INTR</strong>，CPU 在适当时机响应。</p>
+<p><strong>中断响应过程</strong>的三个条件：</p>
+<ol>
+<li>中断源<strong>有请求</strong>（INTR 触发器置 1，且未被屏蔽字屏蔽）；</li>
+<li>CPU <strong>允许中断</strong>（处于开中断状态，EINT &#x2F; IF&#x3D;1；不可屏蔽中断 NMI 不受此限制）；</li>
+<li><strong>一条指令执行完毕</strong>之后（CPU 只在指令周期结束时检查中断请求）。</li>
+</ol>
+<h3 id="中断隐指令：硬件自动完成的三件事"><a href="#中断隐指令：硬件自动完成的三件事" class="headerlink" title="中断隐指令：硬件自动完成的三件事"></a>中断隐指令：硬件自动完成的三件事</h3><p>CPU 响应中断后、转去服务程序之前，由<strong>中断隐指令</strong>（不是真实指令，<strong>完全由硬件自动完成</strong>）做三件事：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">① <strong>关中断</strong></td>
+<td align="left">置 EINT&#x3D;0，防止响应过程被新中断打断</td>
+</tr>
+<tr>
+<td align="left">② <strong>保存断点</strong></td>
+<td align="left">把 PC（及程序状态字等）压栈或存入指定单元，供返回使用</td>
+</tr>
+<tr>
+<td align="left">③ <strong>引出中断服务程序</strong></td>
+<td align="left">取出中断服务程序的入口地址——<strong>硬件向量法</strong>（由排队器输出产生向量地址，查中断向量表得入口，速度快）或<strong>软件查询法</strong>（逐个查询中断源，慢）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：”保存断点”和”关中断”属于<strong>中断隐指令（硬件完成）</strong>；而”保护现场（通用寄存器）”是<strong>中断服务程序里的指令（软件完成）</strong>——两者经常放在一起做辨析。</p>
+</blockquote>
+<h3 id="中断处理过程：中断服务程序流程"><a href="#中断处理过程：中断服务程序流程" class="headerlink" title="中断处理过程：中断服务程序流程"></a>中断处理过程：中断服务程序流程</h3><p>响应之后，<strong>中断服务程序</strong>按固定流程执行：</p>
+<ol>
+<li><strong>保护现场</strong>：保存通用寄存器等内容（压栈）；</li>
+<li>（多重中断：<strong>设置中断屏蔽字</strong>，然后<strong>开中断</strong>）</li>
+<li><strong>设备服务</strong>：与接口交换数据（输入 &#x2F; 输出一个字）；</li>
+<li><strong>恢复现场</strong>：恢复被保护的内容；</li>
+<li><strong>开中断并中断返回</strong>（IRET），回到断点继续执行。</li>
+</ol>
+<p>其中数据传送期间接口与 CPU 的配合：外设<strong>准备数据（并行）</strong> → 就绪后<strong>发 INTR</strong> → CPU 执行服务程序<strong>取走数据</strong> → 返回主程序继续执行——<strong>CPU 与外设并行工作</strong>，这正是中断方式优于查询方式的根源。</p>
+<h3 id="单重中断与多重中断"><a href="#单重中断与多重中断" class="headerlink" title="单重中断与多重中断"></a>单重中断与多重中断</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left"><strong>单重中断</strong></th>
+<th align="left"><strong>多重中断（中断嵌套）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">定义</td>
+<td align="left">服务程序执行期间<strong>不再响应</strong>新的中断请求</td>
+<td align="left"><strong>暂停</strong>现行服务程序，转去处理**更紧急（优先级更高）**的新请求</td>
+</tr>
+<tr>
+<td align="left">开中断时机</td>
+<td align="left">服务程序<strong>末尾</strong>才开中断（全程关中断）</td>
+<td align="left">保护现场、设置屏蔽字后<strong>提前开中断</strong></td>
+</tr>
+<tr>
+<td align="left">嵌套</td>
+<td align="left">不允许</td>
+<td align="left">允许”高级打断低级”</td>
+</tr>
+<tr>
+<td align="left">屏蔽字</td>
+<td align="left">屏蔽一切其他可屏蔽请求</td>
+<td align="left">按优先级屏蔽，留给更高级的通路</td>
+</tr>
+</tbody></table>
+<p><strong>实现多重中断的两个必备条件</strong>：① 服务程序中<strong>提前设置开中断指令</strong>；② <strong>优先级高的中断源有权打断优先级低的中断源</strong>。</p>
+<h3 id="中断屏蔽字与优先级设置"><a href="#中断屏蔽字与优先级设置" class="headerlink" title="中断屏蔽字与优先级设置"></a>中断屏蔽字与优先级设置</h3><p><strong>优先级有两套，务必区分</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">决定者</th>
+<th align="center">可否动态改变</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>响应优先级</strong></td>
+<td align="left"><strong>硬件排队电路</strong>（排队器）</td>
+<td align="center"><strong>不可改变</strong></td>
+<td align="left">多个请求<strong>同时到达</strong>时，先<strong>响应</strong>谁</td>
+</tr>
+<tr>
+<td align="left"><strong>处理优先级</strong></td>
+<td align="left"><strong>中断屏蔽字</strong>（各服务程序中设置）</td>
+<td align="center"><strong>可动态修改</strong></td>
+<td align="left">决定执行某服务程序时<strong>谁能打断谁</strong>（嵌套次序）</td>
+</tr>
+</tbody></table>
+<p>每个中断源对应一个<strong>屏蔽触发器</strong>，全体组成<strong>屏蔽字寄存器</strong>：<strong>某位为 1 表示屏蔽对应中断源，为 0 表示开放</strong>。<strong>构造规则：屏蔽字中，对本中断源自身以及处理优先级不高于自己的中断源置 1（屏蔽），对处理优先级高于自己的置 0（开放）</strong>——这样只留出”更高者可打断我”的通路。</p>
+<p><strong>中断屏蔽字例题（核心）</strong>：某机 4 个中断源 A、B、C、D，<strong>硬件排队（响应）优先级 A&gt;B&gt;C&gt;D</strong>；现要求把<strong>处理优先级改为 D&gt;A&gt;C&gt;B</strong>，写出各源的屏蔽字（每位按 A、B、C、D 顺序），并推演中断嵌套。</p>
+<ul>
+<li><strong>D</strong>（处理第 1，最高）：屏蔽自己 + 所有更低者 A、B、C → <strong>1 1 1 1</strong></li>
+<li><strong>A</strong>（处理第 2）：屏蔽 A、B、C，开放 D → <strong>1 1 1 0</strong></li>
+<li><strong>C</strong>（处理第 3）：屏蔽 C、B，开放 D、A → <strong>0 1 1 0</strong></li>
+<li><strong>B</strong>（处理第 4，最低）：只屏蔽 B，开放 D、A、C → <strong>0 1 0 0</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">中断源</th>
+<th align="center">处理次序</th>
+<th align="center">屏蔽字（A B C D）</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>D</strong></td>
+<td align="center">1（最高）</td>
+<td align="center"><strong>1 1 1 1</strong></td>
+<td align="left">全 1，谁都打不断 D</td>
+</tr>
+<tr>
+<td align="left"><strong>A</strong></td>
+<td align="center">2</td>
+<td align="center"><strong>1 1 1 0</strong></td>
+<td align="left">仅 D 位为 0（允许 D 打断 A）</td>
+</tr>
+<tr>
+<td align="left"><strong>C</strong></td>
+<td align="center">3</td>
+<td align="center"><strong>0 1 1 0</strong></td>
+<td align="left">D、A 位为 0（允许 D、A 打断 C）</td>
+</tr>
+<tr>
+<td align="left"><strong>B</strong></td>
+<td align="center">4（最低）</td>
+<td align="center"><strong>0 1 0 0</strong></td>
+<td align="left">D、A、C 位为 0（都可打断 B）</td>
+</tr>
+</tbody></table>
+<p><strong>嵌套情形推演 1</strong>：CPU 正执行 <strong>B</strong> 的服务程序（屏蔽字 0100），此时 <strong>C 的请求到来</strong>——C 位为 0（开放），且 C 处理优先级高 → <strong>C 打断 B</strong>；C 执行中 <strong>D 又到来</strong>——D 位为 0 → <strong>D 打断 C</strong>。完整嵌套序列：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">主程序 → B → C → D →（D 返回）C →（C 返回）B →（B 返回）主程序</span><br></pre></td></tr></table></figure>
+
+<p><strong>嵌套情形推演 2</strong>：CPU 正执行 <strong>D</strong> 的服务程序（屏蔽字 1111），<strong>B 的请求到来</strong>——B 被屏蔽，只能<strong>挂起等待</strong>；D 执行完毕返回后，若挂起的请求有多个（如 A、B、C 同时在等），则按<strong>硬件响应优先级 A&gt;B&gt;C&gt;D</strong> 依次逐个响应（A、C、B）。</p>
+<blockquote>
+<p><strong>考点</strong>：屏蔽字例题的固定套路——<strong>先写处理次序，再按”屏蔽自己及更低、开放更高”逐行填 1&#x2F;0</strong>；判断嵌套时只看<strong>现行程序的屏蔽字中该请求对应位是 0 还是 1</strong>。别忘了同一时刻多个挂起请求按<strong>响应优先级</strong>排队。<br><strong>易错点</strong>：修改屏蔽字改变的只是<strong>处理优先级</strong>，<strong>响应优先级由硬件排队固定，不会因屏蔽字而变</strong>。</p>
+</blockquote>
+<h2 id="DMA-方式"><a href="#DMA-方式" class="headerlink" title="DMA 方式"></a>DMA 方式</h2><h3 id="DMA-方式的特点"><a href="#DMA-方式的特点" class="headerlink" title="DMA 方式的特点"></a>DMA 方式的特点</h3><p><strong>DMA（Direct Memory Access，直接存储器访问）<strong>在</strong>主存与外设之间开辟直接数据通路</strong>，成块数据的传送<strong>完全由硬件（DMA 控制器）控制</strong>，传送期间<strong>不需要 CPU 执行程序来搬运数据</strong>。特点归纳：</p>
+<ul>
+<li>主存既可被 CPU 访问，也可被外设（经 DMAC）访问，主存中需开辟<strong>数据缓冲区</strong>；</li>
+<li>主存地址修改、传送计数等全由<strong>硬件</strong>直接实现；</li>
+<li><strong>CPU 与外设高度并行</strong>，传送速度快，适合磁盘等<strong>高速批量设备</strong>；</li>
+<li>在 DMA 方式中<strong>中断的作用</strong>仅为：<strong>数据传送结束（或出错）时通知 CPU</strong>——不像中断方式每个数据都中断一次。</li>
+</ul>
+<h3 id="DMA-控制器的组成"><a href="#DMA-控制器的组成" class="headerlink" title="DMA 控制器的组成"></a>DMA 控制器的组成</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第7章 输入输出系统.assets/dma-controller-process.png" alt="DMA 控制器的组成与传送过程" title="">
+                </div>
+                <div class="image-caption">DMA 控制器的组成与传送过程</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">部件</th>
+<th align="left">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>主存地址计数器（MAR）</strong></td>
+<td align="left">存放交换数据在主存中的首地址，由 CPU 预置；<strong>每传一个数据自动 +1</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>传输长度计数器（WC）</strong></td>
+<td align="left">存放要传送的字数（补码形式由 CPU 预置），<strong>每传一个自动 −1，减到 0 表示本块传送结束</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>数据缓冲寄存器（BR）</strong></td>
+<td align="left">暂存设备与主存间传送的数据</td>
+</tr>
+<tr>
+<td align="left"><strong>命令 &#x2F; 状态寄存器（CR）</strong></td>
+<td align="left">接收 CPU 发来的 I&#x2F;O 命令（读 &#x2F; 写方向、启动）并存放 DMAC、设备的状态</td>
+</tr>
+<tr>
+<td align="left"><strong>DMA 请求触发器</strong></td>
+<td align="left">设备准备好一个数据后置位，向 DMAC 提出 DMA 请求</td>
+</tr>
+<tr>
+<td align="left"><strong>中断机构（中断逻辑）</strong></td>
+<td align="left"><strong>一块数据传送完毕（WC&#x3D;0）时向 CPU 发出中断请求</strong>，请求做后处理</td>
+</tr>
+</tbody></table>
+<h3 id="DMA-传送过程：三个阶段"><a href="#DMA-传送过程：三个阶段" class="headerlink" title="DMA 传送过程：三个阶段"></a>DMA 传送过程：三个阶段</h3><table>
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">由谁控制</th>
+<th align="left">操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>① 预处理（初始化）</strong></td>
+<td align="left"><strong>CPU 执行指令</strong></td>
+<td align="left">向 DMAC 写入主存起始地址、传送字数、传送方向（读 &#x2F; 写），启动设备；随后 CPU 继续执行原程序</td>
+</tr>
+<tr>
+<td align="left"><strong>② 数据传送</strong></td>
+<td align="left"><strong>DMAC 硬件控制</strong></td>
+<td align="left">设备每准备好一个数据就向 DMAC 发 DMA 请求 → DMAC 向 CPU 申请<strong>总线使用权</strong>（HOLD&#x2F;HLDA 握手）→ 接管总线，完成”设备 ↔ 主存”一个数据的传送；循环直至 WC&#x3D;0</td>
+</tr>
+<tr>
+<td align="left"><strong>③ 后处理</strong></td>
+<td align="left"><strong>CPU 响应中断</strong></td>
+<td align="left">DMAC 发中断 → CPU 执行中断服务程序：校验数据、决定是否继续传送、释放缓冲区等</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：DMA 传送<strong>以块为单位</strong>，但<strong>每次挪用总线只传一个字（字节）</strong>，传完即还总线；<strong>“预处理和后处理要 CPU 参与，中间传送不用”</strong>——这正是与中断方式的本质区别。DMA 结束时的中断叫**”DMA 结束中断”**，一句话常考：<strong>DMA 方式仍需要中断机构，但中断只在整块数据传送结束时发生一次</strong>。</p>
+</blockquote>
+<h3 id="DMA-与-CPU-的三种访存方式"><a href="#DMA-与-CPU-的三种访存方式" class="headerlink" title="DMA 与 CPU 的三种访存方式"></a>DMA 与 CPU 的三种访存方式</h3><p>DMA 与 CPU 都要访存，可能冲突，常用三种方式协调：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第7章 输入输出系统.assets/dma-memory-access-modes.png" alt="DMA 与 CPU 的三种访存方式" title="">
+                </div>
+                <div class="image-caption">DMA 与 CPU 的三种访存方式</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">原理</th>
+<th align="left">优缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>停止 CPU 访存</strong></td>
+<td align="left">DMA 传送期间 CPU <strong>完全停止</strong>访存，整块让出总线</td>
+<td align="left">控制最简单，但 CPU 利用率低（成组传送）</td>
+</tr>
+<tr>
+<td align="left"><strong>周期挪用（周期窃取）</strong></td>
+<td align="left">DMA 趁 CPU <strong>不访存的周期</strong>“偷”一个存储周期传一个数据</td>
+<td align="left"><strong>折中最常用</strong>；既有并行度又不至于长时间霸占总线</td>
+</tr>
+<tr>
+<td align="left"><strong>DMA 与 CPU 交替访问</strong></td>
+<td align="left">把一个（存储）周期<strong>一分为二</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 专供 DMA、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 专供 CPU</td>
+<td align="left">CPU、DMA <strong>分时访存互不等待</strong>，无需总线申请归还，但硬件逻辑复杂</td>
+</tr>
+</tbody></table>
+<p><strong>周期挪用时 DMA 请求与 CPU 访存的三种冲突情形</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">情形</th>
+<th align="left">处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">CPU <strong>此刻不访存</strong></td>
+<td align="left">不冲突，DMA 直接挪用该周期</td>
+</tr>
+<tr>
+<td align="left">CPU <strong>正在访存</strong></td>
+<td align="left">DMA 等<strong>该存取周期结束后</strong>再挪用（不中断 CPU 的访存）</td>
+</tr>
+<tr>
+<td align="left">CPU 与 DMA <strong>同时请求访存</strong></td>
+<td align="left"><strong>I&#x2F;O（DMA）优先</strong>，CPU 暂让总线（否则数据会丢失）</td>
+</tr>
+</tbody></table>
+<h3 id="DMA-与中断方式的对比"><a href="#DMA-与中断方式的对比" class="headerlink" title="DMA 与中断方式的对比"></a>DMA 与中断方式的对比</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left"><strong>程序中断方式</strong></th>
+<th align="left"><strong>DMA 方式</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>数据传送单位</strong></td>
+<td align="left">字 &#x2F; 字节</td>
+<td align="left"><strong>数据块</strong>（成批）</td>
+</tr>
+<tr>
+<td align="left"><strong>数据通路</strong></td>
+<td align="left">外设 → 接口 → <strong>CPU 寄存器</strong> → 主存（CPU 执行程序搬运）</td>
+<td align="left">外设 ↔ 主存<strong>直接传送</strong>，不经 CPU</td>
+</tr>
+<tr>
+<td align="left"><strong>CPU 是否执行程序传送</strong></td>
+<td align="left"><strong>是</strong>，每传一个数据执行一次中断服务程序</td>
+<td align="left"><strong>否</strong>，传送由 DMAC 硬件完成</td>
+</tr>
+<tr>
+<td align="left"><strong>CPU 介入程度</strong></td>
+<td align="left">每个数据一次（响应 + 服务 + 返回）</td>
+<td align="left">仅<strong>预处理、后处理</strong>介入</td>
+</tr>
+<tr>
+<td align="left"><strong>响应时机</strong></td>
+<td align="left"><strong>每条指令执行周期结束后</strong>才可响应</td>
+<td align="left"><strong>每个（存储&#x2F;机器）周期结束后</strong>即可响应总线请求</td>
+</tr>
+<tr>
+<td align="left"><strong>现场保护</strong></td>
+<td align="left">中断要<strong>保护 &#x2F; 恢复现场</strong>（程序切换）</td>
+<td align="left">DMA 不执行程序，<strong>不占用 CPU 寄存器等资源</strong>，无需保护现场</td>
+</tr>
+<tr>
+<td align="left"><strong>请求优先级</strong></td>
+<td align="left">低</td>
+<td align="left"><strong>DMA 请求高于中断请求</strong>（数据实时性更强，晚了会丢失）</td>
+</tr>
+<tr>
+<td align="left"><strong>硬件开销</strong></td>
+<td align="left">中断控制器、向量表</td>
+<td align="left">专用 DMAC（硬件复杂）</td>
+</tr>
+<tr>
+<td align="left"><strong>适用设备</strong></td>
+<td align="left"><strong>中低速</strong>设备（键盘、鼠标）</td>
+<td align="left"><strong>高速块设备</strong>（磁盘、网卡）</td>
+</tr>
+</tbody></table>
+<p><strong>DMA 每秒中断次数例题</strong>：主机经 DMA 从磁盘读 <strong>1 MB</strong> 文件，DMA 每次传送一块 <strong>4 KB</strong> 后向 CPU 发一次中断；若改用程序中断方式按<strong>每字节中断一次</strong>，比较两者的 CPU 介入次数。</p>
+<ul>
+<li>DMA 方式：中断次数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">B</span></span><span class="mord">/</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">B</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">256</span></span></span></span></span> 次</li>
+<li>中断方式：中断次数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">048</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">576</span></span></span></span></span> 次</li>
+<li>相差 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4096</span></span></span></span> 倍——<strong>DMA 把”每个字节打断 CPU 一次”降为”每块打断一次”</strong>，这就是高速块设备必须用 DMA 的原因。</li>
+</ul>
+<h2 id="三种-I-O-方式综合对比"><a href="#三种-I-O-方式综合对比" class="headerlink" title="三种 I&#x2F;O 方式综合对比"></a>三种 I&#x2F;O 方式综合对比</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left"><strong>程序查询</strong></th>
+<th align="left"><strong>程序中断</strong></th>
+<th align="left"><strong>DMA</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">CPU 参与程度</td>
+<td align="left"><strong>全程忙等</strong>（100% 参与）</td>
+<td align="left">每个数据响应一次中断</td>
+<td align="left">仅<strong>预处理 &#x2F; 后处理</strong></td>
+</tr>
+<tr>
+<td align="left">数据传送单位</td>
+<td align="left">字 &#x2F; 字节</td>
+<td align="left">字 &#x2F; 字节</td>
+<td align="left"><strong>块</strong></td>
+</tr>
+<tr>
+<td align="left">数据通路</td>
+<td align="left">接口 ↔ CPU 寄存器</td>
+<td align="left">接口 ↔ CPU 寄存器</td>
+<td align="left"><strong>设备 ↔ 主存直达</strong></td>
+</tr>
+<tr>
+<td align="left">是否打断现行程序</td>
+<td align="left">不打断（但 CPU 也干不了别的，忙等）</td>
+<td align="left"><strong>打断</strong>，需保护 &#x2F; 恢复现场</td>
+<td align="left">打断，但仅启动与结束各一次，<strong>不保护现场</strong></td>
+</tr>
+<tr>
+<td align="left">CPU 与外设</td>
+<td align="left"><strong>串行</strong>工作</td>
+<td align="left"><strong>并行</strong>工作</td>
+<td align="left"><strong>高度并行</strong></td>
+</tr>
+<tr>
+<td align="left">响应时机</td>
+<td align="left">—（CPU 主动查询）</td>
+<td align="left">指令执行周期结束</td>
+<td align="left">存取周期结束即可</td>
+</tr>
+<tr>
+<td align="left">传送控制方式</td>
+<td align="left">程序</td>
+<td align="left">程序（中断服务程序）</td>
+<td align="left"><strong>硬件（DMAC）</strong></td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">低速、任务单一的系统</td>
+<td align="left">中低速设备（键盘、鼠标）</td>
+<td align="left">高速块设备（磁盘、网卡）</td>
+</tr>
+</tbody></table>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">I&#x2F;O 控制方式演进</td>
+<td align="left"><strong>查询 → 中断 → DMA → 通道</strong>，CPU 介入逐级减少</td>
+</tr>
+<tr>
+<td align="left">显存容量</td>
+<td align="left">分辨率 × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span></span></span></span>灰度级 &#x2F; 8 B；1024×768、256 色 &#x3D; <strong>768 KB</strong>；刷新 <strong>&gt;30 Hz</strong> 不闪烁</td>
+</tr>
+<tr>
+<td align="left">磁盘最小读写单位</td>
+<td align="left"><strong>扇区（块）</strong>；磁盘地址 &#x3D; 驱动器号+柱面号+盘面号+扇区号</td>
+</tr>
+<tr>
+<td align="left">平均存取时间</td>
+<td align="left"><strong>寻道 + 平均旋转延迟（半圈）+ 传输时间</strong>；旋转延迟 &#x3D; (60&#x2F;转速)&#x2F;2</td>
+</tr>
+<tr>
+<td align="left">数据传输率</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> &#x3D; 每道字节数 × 每秒转数；内圈磁道<strong>位密度最大</strong></td>
+</tr>
+<tr>
+<td align="left">RAID</td>
+<td align="left"><strong>0 条带无冗余（100% 无容错）、1 镜像（50%）、4 专用校验盘、5 分布式校验（少一块容量）</strong></td>
+</tr>
+<tr>
+<td align="left">统一 vs 独立编址</td>
+<td align="left">统一：访存指令、占内存空间、译码复杂；独立：IN&#x2F;OUT 专用指令、不占内存、需控制线区分</td>
+</tr>
+<tr>
+<td align="left">中断隐指令</td>
+<td align="left"><strong>关中断、保存断点、引出服务程序入口</strong>——硬件自动；保护现场才是软件；响应需<strong>开中断 + 一条指令执行完</strong></td>
+</tr>
+<tr>
+<td align="left">响应 vs 处理优先级</td>
+<td align="left">响应：硬件排队<strong>不可改</strong>；处理：<strong>屏蔽字可动态改</strong></td>
+</tr>
+<tr>
+<td align="left">屏蔽字规则</td>
+<td align="left"><strong>1 屏蔽 0 开放</strong>；屏蔽<strong>自己及处理优先级更低</strong>的，开放更高的</td>
+</tr>
+<tr>
+<td align="left">多重中断条件</td>
+<td align="left">服务程序<strong>提前开中断</strong> + 高优先级可打断低优先级</td>
+</tr>
+<tr>
+<td align="left">DMAC 组成</td>
+<td align="left">主存地址计数器（自动 +1）、传输长度计数器（−1 至 0 结束）、CR、BR、<strong>中断机构</strong></td>
+</tr>
+<tr>
+<td align="left">DMA 三阶段</td>
+<td align="left"><strong>预处理（CPU 置参）→ 数据传送（DMAC 接管总线）→ 后处理（中断通知 CPU）</strong></td>
+</tr>
+<tr>
+<td align="left">DMA 三种访存方式</td>
+<td align="left">停止 CPU &#x2F; <strong>周期挪用（最常用）</strong> &#x2F; 交替访问；同时请求时 <strong>CPU 让给 DMA</strong></td>
+</tr>
+<tr>
+<td align="left">中断 vs DMA</td>
+<td align="left">字节 vs <strong>块</strong>；程序 vs 硬件；<strong>指令周期末 vs 存取周期末</strong>；DMA 请求优先级更高</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:32:57.422Z" itemprop="dateUpdated">2026-08-29 16:32:57</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&title=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&title=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/30/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%9F%BA%E7%A1%80/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据结构与算法基础</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E6%80%BB%E7%BA%BF%E7%B3%BB%E7%BB%9F/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">总线系统</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&title=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&title=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IO系统：中断与DMA》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/IO%E7%B3%BB%E7%BB%9F%EF%BC%9A%E4%B8%AD%E6%96%AD%E4%B8%8EDMA/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

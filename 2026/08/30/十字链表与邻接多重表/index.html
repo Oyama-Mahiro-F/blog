@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>十字链表与邻接多重表 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,图,数据结构">
+    <meta name="description" content="邻接矩阵与邻接表（含逆邻接表）是图最常用的两种存储结构，但各有短板：邻接矩阵空间 O(n2)，稀疏图太浪费；邻接表虽省空间，却有向图难找入边（要另建逆邻接表）、无向图每条边要存两份。为此考纲引入两种专用链式存储：十字链表（Orthogonal List）把邻接表与逆邻接表合二为一，专用于有向图；邻接多重表（Adjacency Multilist）让每条边只存一个结点，专用于无向图。两者空间复杂度均">
+<meta property="og:type" content="article">
+<meta property="og:title" content="十字链表与邻接多重表">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="邻接矩阵与邻接表（含逆邻接表）是图最常用的两种存储结构，但各有短板：邻接矩阵空间 O(n2)，稀疏图太浪费；邻接表虽省空间，却有向图难找入边（要另建逆邻接表）、无向图每条边要存两份。为此考纲引入两种专用链式存储：十字链表（Orthogonal List）把邻接表与逆邻接表合二为一，专用于有向图；邻接多重表（Adjacency Multilist）让每条边只存一个结点，专用于无向图。两者空间复杂度均">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/1062579-20171110191910653-695287627.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/image-20260702182320406.png">
+<meta property="article:published_time" content="2026-08-30T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:53:04.842Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="图">
+<meta property="article:tag" content="数据结构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/1062579-20171110191910653-695287627.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">十字链表与邻接多重表</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">十字链表与邻接多重表</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-30T01:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-30
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%EF%BC%88%E6%9C%89%E5%90%91%E5%9B%BE%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">十字链表（有向图）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%BB%93%E6%9E%84"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">结点结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%BB%BA%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E5%B9%B6%E6%89%BE%E5%85%A5%E8%BE%B9-%E5%87%BA%E8%BE%B9"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">完整示例：建十字链表并找入边&#x2F;出边</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8%EF%BC%88%E6%97%A0%E5%90%91%E5%9B%BE%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">邻接多重表（无向图）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%BB%93%E6%9E%84-1"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">结点结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89-1"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%8C%E6%95%B4%E7%A4%BA%E4%BE%8B%EF%BC%9A%E5%BB%BA%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">完整示例：建邻接多重表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%A0%E8%BE%B9%E5%AF%B9%E6%AF%94%E6%BC%94%E7%A4%BA%EF%BC%9A%E5%8F%AA%E6%94%B9%E4%B8%80%E5%A4%84-vs-%E6%94%B9%E4%B8%A4%E5%A4%84"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">删边对比演示：只改一处 vs 改两处</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%94%E7%A7%8D%E5%9B%BE%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E6%80%BB%E5%AF%B9%E6%AF%94"><span class="post-toc-number">3.</span> <span class="post-toc-text">五种图存储结构总对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">4.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-十字链表与邻接多重表"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">十字链表与邻接多重表</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-30 09:30:00" datetime="2026-08-30T01:30:00.000Z"  itemprop="datePublished">2026-08-30</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>邻接矩阵与邻接表（含逆邻接表）是图最常用的两种存储结构，但各有短板：<strong>邻接矩阵空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，稀疏图太浪费</strong>；<strong>邻接表虽省空间，却有向图难找入边（要另建逆邻接表）、无向图每条边要存两份</strong>。为此考纲引入两种专用链式存储：<strong>十字链表（Orthogonal List）<strong>把邻接表与逆邻接表</strong>合二为一</strong>，专用于<strong>有向图</strong>；<strong>邻接多重表（Adjacency Multilist）<strong>让每条边</strong>只存一个结点</strong>，专用于<strong>无向图</strong>。两者空间复杂度均为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>，是 408 选择题的高频出题点。</p>
+<h2 id="十字链表（有向图）"><a href="#十字链表（有向图）" class="headerlink" title="十字链表（有向图）"></a>十字链表（有向图）</h2><p>十字链表在邻接表的基础上，再为每个顶点补一条<strong>入弧链表</strong>：每条弧只占<strong>一个结点</strong>，同时挂在<strong>弧尾的出弧链</strong>和<strong>弧头的入弧链</strong>上——相当于把邻接表（沿 <code>firstout</code> 找出边）和逆邻接表（沿 <code>firstin</code> 找入边）合并存储，出度、入度都能高效求得。</p>
+<h3 id="结点结构"><a href="#结点结构" class="headerlink" title="结点结构"></a>结点结构</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">     顶点结点 (VexNode)                   弧结点 (ArcBox)</span><br><span class="line">┌──────┬─────────┬──────────┐   ┌─────────┬─────────┬───────┬───────┬──────┐</span><br><span class="line">│ data │ firstin │ firstout │   │ tailvex │ headvex │ hlink │ tlink │ info │</span><br><span class="line">└──────┴─────────┴──────────┘   └─────────┴─────────┴───────┴───────┴──────┘</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>firstin</code></td>
+<td align="left">顶点的<strong>第一条入弧</strong>（入弧链入口，相当于逆邻接表的表头指针）</td>
+</tr>
+<tr>
+<td align="left"><code>firstout</code></td>
+<td align="left">顶点的<strong>第一条出弧</strong>（出弧链入口，相当于邻接表的表头指针）</td>
+</tr>
+<tr>
+<td align="left"><code>tailvex</code></td>
+<td align="left">弧尾顶点下标（弧从谁发出）</td>
+</tr>
+<tr>
+<td align="left"><code>headvex</code></td>
+<td align="left">弧头顶点下标（弧指向谁）</td>
+</tr>
+<tr>
+<td align="left"><code>hlink</code></td>
+<td align="left">指向下一条<strong>弧头相同</strong>的弧（同在该弧头的入弧链上）</td>
+</tr>
+<tr>
+<td align="left"><code>tlink</code></td>
+<td align="left">指向下一条<strong>弧尾相同</strong>的弧（同在该弧尾的出弧链上）</td>
+</tr>
+<tr>
+<td align="left"><code>info</code></td>
+<td align="left">弧的权值等信息</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>hlink 记 head（弧头）→ 入弧链；tlink 记 tail（弧尾）→ 出弧链</strong>。顺 <code>tlink</code> 数出边求出度、顺 <code>hlink</code> 数入边求入度，<strong>不必再建逆邻接表</strong>。</p>
+</blockquote>
+<h3 id="结构定义"><a href="#结构定义" class="headerlink" title="结构定义"></a>结构定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">ArcBox</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> tailvex, headvex;              <span class="comment">// 弧尾、弧头顶点的下标</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ArcBox</span> *<span class="title">hlink</span>, *<span class="title">tlink</span>;</span>      <span class="comment">// hlink 入弧链、tlink 出弧链</span></span><br><span class="line">    InfoType info;                     <span class="comment">// 弧的权值等信息</span></span><br><span class="line">&#125; ArcBox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    VexType data;</span><br><span class="line">    ArcBox *firstin, *firstout;        <span class="comment">// 第一条入弧、第一条出弧</span></span><br><span class="line">&#125; VexNode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    VexNode xlist[MAX_VEX];            <span class="comment">// 顶点数组</span></span><br><span class="line">    <span class="type">int</span> vexnum, arcnum;                <span class="comment">// 顶点数、弧数</span></span><br><span class="line">&#125; OLGraph;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整示例：建十字链表并找入边-出边"><a href="#完整示例：建十字链表并找入边-出边" class="headerlink" title="完整示例：建十字链表并找入边&#x2F;出边"></a>完整示例：建十字链表并找入边&#x2F;出边</h3><p>有向图：顶点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>；弧集 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>，共 4 条弧，对应 4 个弧结点 A0、A1、A2、A3。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">弧结点（每条弧只存一份；hlink 连同弧头，tlink 连同弧尾）</span><br><span class="line">┌────┬─────────┬─────────┬──────────┬──────────┐</span><br><span class="line">│ 弧 │ tailvex │ headvex │ hlink    │ tlink    │</span><br><span class="line">├────┼─────────┼─────────┼──────────┼──────────┤</span><br><span class="line">│ A0 │   0     │   1     │ → A3     │ → A1     │   &lt;v0,v1&gt;</span><br><span class="line">│ A1 │   0     │   2     │ → ∧      │ → ∧      │   &lt;v0,v2&gt;</span><br><span class="line">│ A2 │   1     │   3     │ → ∧      │ → ∧      │   &lt;v1,v3&gt;</span><br><span class="line">│ A3 │   2     │   1     │ → ∧      │ → ∧      │   &lt;v2,v1&gt;</span><br><span class="line">└────┴─────────┴─────────┴──────────┴──────────┘</span><br><span class="line"></span><br><span class="line">顶点结点（firstin 串入弧链，firstout 串出弧链）</span><br><span class="line">┌────┬───────────┬────────────┐</span><br><span class="line">│顶点│ firstin   │ firstout   │</span><br><span class="line">├────┼───────────┼────────────┤</span><br><span class="line">│ v0 │    ∧      │ → A0       │</span><br><span class="line">│ v1 │ → A0      │ → A2       │</span><br><span class="line">│ v2 │ → A1      │ → A3       │</span><br><span class="line">│ v3 │ → A2      │    ∧       │</span><br><span class="line">└────┴───────────┴────────────┘</span><br><span class="line"></span><br><span class="line">出弧链（顺 tlink）：v0 ─firstout→ A0&lt;v0,v1&gt; ─tlink→ A1&lt;v0,v2&gt; ─tlink→ ∧</span><br><span class="line">入弧链（顺 hlink）：v1 ─firstin→ A0&lt;v0,v1&gt; ─hlink→ A3&lt;v2,v1&gt; ─hlink→ ∧</span><br></pre></td></tr></table></figure>
+
+<p><strong>找所有出边（求出度）</strong>：从 <code>v0.firstout</code> 出发 → A0（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>）→ 顺 <code>tlink</code> → A1（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>）→ <code>tlink = ∧</code> 结束，共 2 条，出度为 2。</p>
+<p><strong>找所有入边（求入度）</strong>：从 <code>v1.firstin</code> 出发 → A0（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>）→ 顺 <code>hlink</code> → A3（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>）→ <code>hlink = ∧</code> 结束，共 2 条，入度为 2。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/1062579-20171110191910653-695287627.png" alt="有向图的十字链表示例" title="">
+                </div>
+                <div class="image-caption">有向图的十字链表示例</div>
+            </figure>
+
+<blockquote>
+<p><strong>易错点</strong>：十字链表<strong>只适用于有向图</strong>——无向图的边没有方向，”入弧链&#x2F;出弧链”无从谈起；无向图的对应结构是邻接多重表。</p>
+</blockquote>
+<h2 id="邻接多重表（无向图）"><a href="#邻接多重表（无向图）" class="headerlink" title="邻接多重表（无向图）"></a>邻接多重表（无向图）</h2><p>邻接表存无向图时，每条边 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span></span></span></span> 在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> 两个顶点的边表里<strong>各存一个结点</strong>（共 2 份），带来两个麻烦：<strong>删除一条边要改两条单链表</strong>；<strong>给边做标记（如图遍历中标记边已访问）要同步两处</strong>。邻接多重表的对策：<strong>每条边只建一个边结点</strong>，让它同时挂在所依附的两个顶点的边链表中。</p>
+<h3 id="结点结构-1"><a href="#结点结构-1" class="headerlink" title="结点结构"></a>结点结构</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">    顶点结点 (VexBox)                        边结点 (EBox)</span><br><span class="line">┌──────┬───────────┐      ┌──────┬──────┬───────┬──────┬───────┬──────┐</span><br><span class="line">│ data │ firstedge │      │ mark │ ivex │ ilink │ jvex │ jlink │ info │</span><br><span class="line">└──────┴───────────┘      └──────┴──────┴───────┴──────┴───────┴──────┘</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>firstedge</code></td>
+<td align="left">指向<strong>第一条依附于该顶点</strong>的边</td>
+</tr>
+<tr>
+<td align="left"><code>mark</code></td>
+<td align="left">标志域，标记该边是否被访问过</td>
+</tr>
+<tr>
+<td align="left"><code>ivex</code> &#x2F; <code>jvex</code></td>
+<td align="left">该边依附的<strong>两个顶点</strong>的下标</td>
+</tr>
+<tr>
+<td align="left"><code>ilink</code></td>
+<td align="left">指向下一条<strong>依附于 ivex</strong> 的边（ivex 侧的边链）</td>
+</tr>
+<tr>
+<td align="left"><code>jlink</code></td>
+<td align="left">指向下一条<strong>依附于 jvex</strong> 的边（jvex 侧的边链）</td>
+</tr>
+<tr>
+<td align="left"><code>info</code></td>
+<td align="left">边的权值等信息</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：一条边 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span></span></span></span> <strong>只有一个结点</strong>，却同时出现在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span> 的边链（沿 <code>ilink</code> 走）和 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> 的边链（沿 <code>jlink</code> 走）中——<strong>一份存储、两条链路</strong>。</p>
+</blockquote>
+<h3 id="结构定义-1"><a href="#结构定义-1" class="headerlink" title="结构定义"></a>结构定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">EBox</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> mark;                          <span class="comment">// 访问标记</span></span><br><span class="line">    <span class="type">int</span> ivex, jvex;                    <span class="comment">// 边依附的两个顶点下标</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">EBox</span> *<span class="title">ilink</span>, *<span class="title">jlink</span>;</span>        <span class="comment">// ivex 侧、jvex 侧的下一条依附边</span></span><br><span class="line">    InfoType info;                     <span class="comment">// 边的权值等信息</span></span><br><span class="line">&#125; EBox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    VexType data;</span><br><span class="line">    EBox *firstedge;                   <span class="comment">// 第一条依附于该顶点的边</span></span><br><span class="line">&#125; VexBox;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    VexBox adjmulist[MAX_VEX];         <span class="comment">// 顶点数组</span></span><br><span class="line">    <span class="type">int</span> vexnum, edgenum;               <span class="comment">// 顶点数、边数</span></span><br><span class="line">&#125; AMLGraph;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整示例：建邻接多重表"><a href="#完整示例：建邻接多重表" class="headerlink" title="完整示例：建邻接多重表"></a>完整示例：建邻接多重表</h3><p>无向图：顶点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>；边集 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，共 4 条边，每条只存 1 个边结点 e0、e1、e2、e3（约定小下标作 ivex）。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">边结点</span><br><span class="line">┌────┬──────┬───────┬──────┬───────┬──────────┐</span><br><span class="line">│ 边 │ ivex │ ilink │ jvex │ jlink │ 依附顶点 │</span><br><span class="line">├────┼──────┼───────┼──────┼───────┼──────────┤</span><br><span class="line">│ e0 │  0   │ → e1  │  1   │ → e2  │ (v0,v1)  │</span><br><span class="line">│ e1 │  0   │ → ∧   │  2   │ → e2  │ (v0,v2)  │</span><br><span class="line">│ e2 │  1   │ → ∧   │  2   │ → e3  │ (v1,v2)  │</span><br><span class="line">│ e3 │  2   │ → ∧   │  3   │ → ∧   │ (v2,v3)  │</span><br><span class="line">└────┴──────┴───────┴──────┴───────┴──────────┘</span><br><span class="line"></span><br><span class="line">顶点表：v0.firstedge→e0   v1.firstedge→e0   v2.firstedge→e1   v3.firstedge→e3</span><br><span class="line"></span><br><span class="line">v0 的边链：e0(v0,v1) ─ilink→ e1(v0,v2) ─ilink→ ∧</span><br><span class="line">v1 的边链：e0(v0,v1) ─jlink→ e2(v1,v2) ─ilink→ ∧</span><br><span class="line">v2 的边链：e1(v0,v2) ─jlink→ e2(v1,v2) ─jlink→ e3(v2,v3) ─ilink→ ∧</span><br><span class="line">（从某条边走向下一条时，走 ilink 还是 jlink 取决于该顶点在 ivex 还是 jvex 侧）</span><br></pre></td></tr></table></figure>
+
+<h3 id="删边对比演示：只改一处-vs-改两处"><a href="#删边对比演示：只改一处-vs-改两处" class="headerlink" title="删边对比演示：只改一处 vs 改两处"></a>删边对比演示：只改一处 vs 改两处</h3><p>删除边 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.2222em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，即边结点 e2：</p>
+<ul>
+<li><strong>邻接多重表</strong>：e2 只是<strong>一个</strong>结点。把 v1 边链上的前驱 e0 的 <code>jlink</code> 改为 <code>e2.ilink</code>（∧），把 v2 边链上的前驱 e1 的 <code>jlink</code> 改为 <code>e2.jlink</code>（e3），再释放 e2。两个链域的值都从 e2 自身出发即可取得，<strong>释放的边结点只有 1 个</strong>。</li>
+<li><strong>邻接表</strong>：同一条边被复制成<strong>两个</strong>结点，分别在 v1、v2 的边表里；必须<strong>在两条单链表中各找前驱、各删一个结点</strong>，释放 2 个结点。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">邻接表（无向图）</th>
+<th align="left">邻接多重表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">删除一条边</td>
+<td align="left">在两个顶点的边表<strong>各删一个结点</strong>（改 2 处）</td>
+<td align="left">只删 <strong>1 个</strong>边结点（改其两个前驱的链域）</td>
+</tr>
+<tr>
+<td align="left">标记边已访问</td>
+<td align="left">同一条边的两个结点要<strong>同步标记</strong>（或另设辅助数组）</td>
+<td align="left">改该边结点自己的 <code>mark</code>，<strong>一处即可</strong></td>
+</tr>
+<tr>
+<td align="left">边结点个数</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal">e</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span></span></span></span>（省约一半）</td>
+</tr>
+<tr>
+<td align="left">空间复杂度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：邻接多重表专为<strong>无向图中边操作频繁</strong>（删边、标记边）的场景设计；若只做”找邻接点、图遍历”，普通邻接表同样够用。</p>
+</blockquote>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/image-20260702182320406.png" alt="无向图的邻接多重表示例" title="">
+                </div>
+                <div class="image-caption">无向图的邻接多重表示例</div>
+            </figure>
+
+<h2 id="五种图存储结构总对比"><a href="#五种图存储结构总对比" class="headerlink" title="五种图存储结构总对比"></a>五种图存储结构总对比</h2><p>结合前两篇的邻接矩阵、邻接表（含逆邻接表），五种结构对比如下（收官大表）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">存储结构</th>
+<th align="left">适用图</th>
+<th align="left">空间复杂度</th>
+<th align="left">找邻接点&#x2F;出边</th>
+<th align="left">找入边（入度）</th>
+<th align="left">判边是否方便</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">邻接矩阵</td>
+<td align="left">有向&#x2F;无向，<strong>稠密图</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">遍历该行，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">遍历该列，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 最方便</strong></td>
+<td align="left">简单直观，稀疏图浪费</td>
+</tr>
+<tr>
+<td align="left">邻接表</td>
+<td align="left">有向&#x2F;无向，<strong>稀疏图</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>（无向 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>）</td>
+<td align="left">顺边链，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">de<span style="margin-right:0.0139em;">g</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">需<strong>另建逆邻接表</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">de<span style="margin-right:0.0139em;">g</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">无向图每边存 2 份</td>
+</tr>
+<tr>
+<td align="left">逆邻接表</td>
+<td align="left">有向图</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">不便（存的全是入边）</td>
+<td align="left">顺入边链，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord text"><span class="mord">in</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord text"><span class="mord">in</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">与邻接表二选一，难两全</td>
+</tr>
+<tr>
+<td align="left"><strong>十字链表</strong></td>
+<td align="left"><strong>有向图</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">顺 <code>tlink</code>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord text"><span class="mord">out</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">顺 <code>hlink</code>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord text"><span class="mord">in</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord text"><span class="mord">out</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">邻接表 + 逆邻接表<strong>合体</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>邻接多重表</strong></td>
+<td align="left"><strong>无向图</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">顺边链，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">de<span style="margin-right:0.0139em;">g</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">—（边链长度即度）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">de<span style="margin-right:0.0139em;">g</span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">每边 <strong>1</strong> 个结点，边操作高效</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：按操作场景选结构——“<strong>既方便找出边又方便找入边</strong>“选<strong>十字链表</strong>；”<strong>对边删除&#x2F;标记操作多</strong>“选<strong>邻接多重表</strong>；”<strong>判断两顶点间是否有边</strong>“选<strong>邻接矩阵</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>）；”<strong>稀疏图省空间 + 方便遍历邻接点</strong>“选<strong>邻接表</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">十字链表适用</td>
+<td align="left"><strong>有向图</strong>专用；邻接表 + 逆邻接表<strong>合二为一</strong></td>
+</tr>
+<tr>
+<td align="left">十字链表顶点结点</td>
+<td align="left">data + <strong>firstin</strong>（入弧链入口）+ <strong>firstout</strong>（出弧链入口）</td>
+</tr>
+<tr>
+<td align="left">弧结点信息域</td>
+<td align="left">tailvex（弧尾）+ headvex（弧头）+ <strong>hlink</strong>（同弧头的下一条弧）+ <strong>tlink</strong>（同弧尾的下一条弧）</td>
+</tr>
+<tr>
+<td align="left">记忆口诀</td>
+<td align="left"><strong>h &#x3D; head 弧头 → 入弧链求入度；t &#x3D; tail 弧尾 → 出弧链求出度</strong></td>
+</tr>
+<tr>
+<td align="left">邻接多重表适用</td>
+<td align="left"><strong>无向图</strong>专用；每条边<strong>只存 1 个结点</strong></td>
+</tr>
+<tr>
+<td align="left">边结点信息域</td>
+<td align="left">mark（访问标记）+ ivex&#x2F;jvex（两端下标）+ <strong>ilink</strong>（下一条依附 ivex）+ jlink（下一条依附 jvex）+ info</td>
+</tr>
+<tr>
+<td align="left">核心优点</td>
+<td align="left">删边、标记边<strong>只动 1 个结点</strong>；邻接表同一条边存 2 份、要改 2 处</td>
+</tr>
+<tr>
+<td align="left">空间复杂度</td>
+<td align="left">十字链表、邻接多重表均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>；无向图邻接表 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>；邻接矩阵 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">不可混用</td>
+<td align="left">十字链表不能存无向图，邻接多重表不能存有向图</td>
+</tr>
+<tr>
+<td align="left">结构选择</td>
+<td align="left">判边快→邻接矩阵；省空间→邻接表；出入边都要→十字链表；边操作多→邻接多重表</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:53:04.842Z" itemprop="dateUpdated">2026-08-29 16:53:04</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&title=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&title=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/30/%E6%95%B0%E7%BB%84%E4%B8%8E%E7%89%B9%E6%AE%8A%E7%9F%A9%E9%98%B5%E5%8E%8B%E7%BC%A9/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数组与特殊矩阵压缩</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&title=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&title=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《十字链表与邻接多重表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>IPv6协议 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="网络,408,网络层,IPv6">
+    <meta name="description" content="IPv4 的 32 位地址早已捉襟见肘，IPv6（IP version 6）用 128 位地址从根本上解决地址枯竭问题，并对首部、分片、安全、配置等机制做了系统性改造。地址长度、冒号十六进制记法等基础对比见《IP协议》一文，本文聚焦 408 考纲要求深化掌握的部分：基本首部 40B 的 8 个字段、地址表示规则与地址类型（单播&#x2F;组播&#x2F;任播）、与 IPv4 首部的逐字段对比、双协">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IPv6协议">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="IPv4 的 32 位地址早已捉襟见肘，IPv6（IP version 6）用 128 位地址从根本上解决地址枯竭问题，并对首部、分片、安全、配置等机制做了系统性改造。地址长度、冒号十六进制记法等基础对比见《IP协议》一文，本文聚焦 408 考纲要求深化掌握的部分：基本首部 40B 的 8 个字段、地址表示规则与地址类型（单播&#x2F;组播&#x2F;任播）、与 IPv4 首部的逐字段对比、双协">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-29T02:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:54:24.961Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="IPv6">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="网络层">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">IPv6协议</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">IPv6协议</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T02:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IPv6-%E7%9A%84%E4%B8%BB%E8%A6%81%E7%89%B9%E7%82%B9"><span class="post-toc-number">1.</span> <span class="post-toc-text">IPv6 的主要特点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IPv6-%E5%9F%BA%E6%9C%AC%E9%A6%96%E9%83%A8%EF%BC%8840-%E5%AD%97%E8%8A%82%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">IPv6 基本首部（40 字节）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%89%A9%E5%B1%95%E9%A6%96%E9%83%A8%EF%BC%88%E2%80%9D%E9%80%89%E9%A1%B9%E2%80%9D%E7%9A%84%E5%BD%92%E5%AE%BF%EF%BC%89"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">扩展首部（”选项”的归宿）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IPv6-%E5%9C%B0%E5%9D%80%E8%A1%A8%E7%A4%BA"><span class="post-toc-number">3.</span> <span class="post-toc-text">IPv6 地址表示</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IPv6-%E5%9C%B0%E5%9D%80%E7%B1%BB%E5%9E%8B"><span class="post-toc-number">4.</span> <span class="post-toc-text">IPv6 地址类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IPv6-%E4%B8%8E-IPv4-%E9%A6%96%E9%83%A8%E5%AF%B9%E6%AF%94%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">5.</span> <span class="post-toc-text">IPv6 与 IPv4 首部对比（重点）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BB%8E-IPv4-%E5%90%91-IPv6-%E8%BF%87%E6%B8%A1"><span class="post-toc-number">6.</span> <span class="post-toc-text">从 IPv4 向 IPv6 过渡</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-IPv6协议"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">IPv6协议</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 10:30:00" datetime="2026-08-29T02:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>IPv4 的 32 位地址早已捉襟见肘，<strong>IPv6（IP version 6）<strong>用 <strong>128 位地址</strong>从根本上解决地址枯竭问题，并对首部、分片、安全、配置等机制做了系统性改造。地址长度、冒号十六进制记法等</strong>基础对比见《IP协议》一文</strong>，本文聚焦 408 考纲要求深化掌握的部分：<strong>基本首部 40B 的 8 个字段、地址表示规则与地址类型（单播&#x2F;组播&#x2F;任播）、与 IPv4 首部的逐字段对比、双协议栈与隧道等过渡技术</strong>。</p>
+<h2 id="IPv6-的主要特点"><a href="#IPv6-的主要特点" class="headerlink" title="IPv6 的主要特点"></a>IPv6 的主要特点</h2><p>IPv6 仍支持<strong>无连接的尽最大努力交付</strong>，但对 IPv4 的弊病逐一做了修正，主要有 8 条：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特点</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>地址空间 128 位</strong></td>
+<td align="left">地址数约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">38</span></span></span></span></span></span></span></span></span></span></span></span> 个，彻底解决地址枯竭，地址层次结构更丰富</td>
+</tr>
+<tr>
+<td align="left"><strong>基本首部固定 40B</strong></td>
+<td align="left">字段从 IPv4 固定首部的 12 个精简为 <strong>8 个</strong>（”选项”移入扩展首部），路由器处理更快</td>
+</tr>
+<tr>
+<td align="left"><strong>取消首部校验和</strong></td>
+<td align="left">链路层与传输层均有校验，路由器<strong>每跳不再重算校验和</strong>，转发效率显著提高</td>
+</tr>
+<tr>
+<td align="left"><strong>只在源节点分片</strong></td>
+<td align="left"><strong>路由器不分片</strong>：路径 MTU 过小时回送 ICMPv6”分组过大”报文，由源端调整；分片信息放<strong>分片扩展首部</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>按 8B 对齐</strong></td>
+<td align="left">基本首部与扩展首部的长度都是 <strong>8 字节的整数倍</strong>，便于硬件快速处理</td>
+</tr>
+<tr>
+<td align="left"><strong>选项 → 扩展首部</strong></td>
+<td align="left">基本首部不再有可变”选项”字段，功能移入<strong>扩展首部</strong>；中间路由器通常只处理基本首部</td>
+</tr>
+<tr>
+<td align="left"><strong>支持 QoS（流标签）</strong></td>
+<td align="left">流量类型 + <strong>20 位流标签</strong>，可对同一条”流”的分组预留资源</td>
+</tr>
+<tr>
+<td align="left"><strong>即插即用 + 安全</strong></td>
+<td align="left"><strong>无状态地址自动配置</strong>（不依赖 DHCP 即可入网）；<strong>IPSec</strong> 内置于协议体系</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：IPv6 与 IPv4 最大的不同是<strong>地址 128 位 + 首部固定 40B</strong>；”取消校验和、源节点分片、扩展首部”三条是简答题常客。<br><strong>易错点</strong>：IPv6 <strong>没有广播</strong>（用组播&#x2F;任播替代）；”只在源节点分片”不等于”不能分片”——分片能力仍在，只是<strong>收敛到源端</strong>。</p>
+</blockquote>
+<h2 id="IPv6-基本首部（40-字节）"><a href="#IPv6-基本首部（40-字节）" class="headerlink" title="IPv6 基本首部（40 字节）"></a>IPv6 基本首部（40 字节）</h2><p>IPv6 数据报由<strong>基本首部（固定 40B）+ 扩展首部（0 个或多个）+ 数据</strong>组成。基本首部的 8 个字段如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">长度</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>版本</strong></td>
+<td align="left">4 位</td>
+<td align="left">取值 6</td>
+</tr>
+<tr>
+<td align="left"><strong>流量类型</strong></td>
+<td align="left">8 位</td>
+<td align="left">标记分组的服务类别&#x2F;优先级（对应 IPv4 的服务类型&#x2F;区分服务字段）</td>
+</tr>
+<tr>
+<td align="left"><strong>流标签</strong></td>
+<td align="left">20 位</td>
+<td align="left"><strong>IPv6 新增</strong>：标识一条”<strong>流</strong>“——同源同宿、有同类服务质量需求的一串分组，路由器可为其预留资源（QoS）</td>
+</tr>
+<tr>
+<td align="left"><strong>有效载荷长度</strong></td>
+<td align="left">16 位</td>
+<td align="left"><strong>扩展首部 + 数据</strong>的总长度，<strong>不含基本首部</strong>，单位 1B</td>
+</tr>
+<tr>
+<td align="left"><strong>下一个首部</strong></td>
+<td align="left">8 位</td>
+<td align="left">基本首部后面是什么：<strong>扩展首部的类型</strong>，或上层协议（TCP&#x2F;UDP&#x2F;ICMPv6），承担 IPv4”协议”字段的角色</td>
+</tr>
+<tr>
+<td align="left"><strong>跳数限制</strong></td>
+<td align="left">8 位</td>
+<td align="left">相当于 IPv4 的 TTL：每过一个路由器<strong>减 1</strong>，减到 0 丢弃</td>
+</tr>
+<tr>
+<td align="left"><strong>源地址</strong></td>
+<td align="left">128 位</td>
+<td align="left">发送方 IPv6 地址</td>
+</tr>
+<tr>
+<td align="left"><strong>目的地址</strong></td>
+<td align="left">128 位</td>
+<td align="left">接收方 IPv6 地址</td>
+</tr>
+</tbody></table>
+<p><strong>长度验算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">320</span></span></span></span> 位 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">40</span></span></span></span> 字节 ✓</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>有效载荷长度不含基本首部</strong>（IPv4 的”总长度”含首部）；各扩展首部通过”<strong>下一个首部</strong>“字段<strong>链式连接</strong>，形成”首部链”。<br><strong>易错点</strong>：跳数限制减到 0 时由<strong>当前路由器丢弃</strong>并回送 ICMPv6 报文；流标签是 IPv6 <strong>新增</strong>字段，IPv4 没有对应物。</p>
+</blockquote>
+<h3 id="扩展首部（”选项”的归宿）"><a href="#扩展首部（”选项”的归宿）" class="headerlink" title="扩展首部（”选项”的归宿）"></a>扩展首部（”选项”的归宿）</h3><p>IPv4 的可变”选项”字段被拆成若干<strong>扩展首部</strong>，插在基本首部与数据之间，靠”下一个首部”字段<strong>链式串联</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">基本首部 --&gt; 逐跳选项 --&gt; 路由首部 --&gt; 分片首部 --&gt; ... --&gt; TCP/UDP/ICMPv6</span><br><span class="line">  (下一个首部字段逐级指向下一个扩展首部, 最后指向上层协议)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">扩展首部</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>逐跳选项首部</strong></td>
+<td align="left">需要路径上<strong>每个路由器</strong>检查的选项（唯一要求逐跳处理的扩展首部）</td>
+</tr>
+<tr>
+<td align="left"><strong>路由首部</strong></td>
+<td align="left">类似 IPv4 的源路由：指定转发路径上必须经过的节点</td>
+</tr>
+<tr>
+<td align="left"><strong>分片首部</strong></td>
+<td align="left">源节点分片时使用：<strong>32 位标识</strong> + 片偏移（<strong>8B 为单位</strong>）+ M 位（还有后续分片？）</td>
+</tr>
+<tr>
+<td align="left">目的选项首部</td>
+<td align="left">只由<strong>目的节点</strong>检查的选项</td>
+</tr>
+<tr>
+<td align="left"><strong>认证首部（AH）</strong></td>
+<td align="left">数据来源认证 + 完整性校验（IPSec）</td>
+</tr>
+<tr>
+<td align="left"><strong>封装安全载荷（ESP）</strong></td>
+<td align="left">加密 + 认证（IPSec）</td>
+</tr>
+</tbody></table>
+<p>路由器转发时一般<strong>只处理基本首部</strong>（至多再处理逐跳选项首部），选项由通信两端处理——这是 IPv6 转发效率高于 IPv4 的又一原因。</p>
+<blockquote>
+<p><strong>考点</strong>：扩展首部长度都是 <strong>8B 的整数倍</strong>；除逐跳选项首部外，其余扩展首部<strong>只在目的（或指定）节点处理</strong>。<br><strong>易错点</strong>：IPv6 分片的标识（32 位）、片偏移、M 位都在<strong>分片首部</strong>中，基本首部里<strong>没有</strong>任何分片字段。</p>
+</blockquote>
+<h2 id="IPv6-地址表示"><a href="#IPv6-地址表示" class="headerlink" title="IPv6 地址表示"></a>IPv6 地址表示</h2><p>采用<strong>冒号十六进制记法</strong>：128 位分成 <strong>8 组</strong>，每组 16 位写成 <strong>4 个十六进制数字</strong>，组间用冒号隔开。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2001:0DB8:0000:0000:0000:FF00:0042:8329</span><br></pre></td></tr></table></figure>
+
+<p><strong>简化规则</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">规则</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">每组<strong>前导零可省略</strong></td>
+<td align="left">0DB8 → DB8；0042 → 42；0000 → 0</td>
+</tr>
+<tr>
+<td align="left"><strong>连续全 0 组用 :: 压缩，整个地址只能用一次</strong></td>
+<td align="left">2001:0DB8:0:0:0:FF00:42:8329 → 2001:DB8::FF00:42:8329</td>
+</tr>
+<tr>
+<td align="left"><strong>与 IPv4 混合表示</strong>（前 6 组冒号十六进制 + 后 32 位点分十进制）</td>
+<td align="left">::FFFF:192.168.1.1（IPv4 映射地址）</td>
+</tr>
+<tr>
+<td align="left"><strong>前缀记法</strong>表示网络（IPv6 没有子网掩码的概念）</td>
+<td align="left">2001:DB8::&#x2F;48 &#x3D; 前 48 位是网络前缀</td>
+</tr>
+</tbody></table>
+<p><strong>压缩例题</strong>：化简 <code>4BF5:0000:0000:0000:BA5F:039A:000A:2176</code>。</p>
+<ol>
+<li>去前导零：<code>4BF5:0:0:0:BA5F:39A:A:2176</code></li>
+<li>连续 3 个全 0 组压缩为 <code>::</code>：结果 <strong><code>4BF5::BA5F:39A:A:2176</code></strong></li>
+</ol>
+<blockquote>
+<p><strong>考点</strong>：<code>::</code> <strong>只能出现一次</strong>——出现两次就无法确定每段补几个 0（二义性）。<br><strong>易错点</strong>：地址中有多段连续 0 时应压缩<strong>最长的一段</strong>（等长取最左）；<code>4BF5::BA5F::2176</code> 这种<strong>两处压缩是非法写法</strong>；压缩只针对<strong>整组的 0</strong>，组内的非零数字不能省。</p>
+</blockquote>
+<p><strong>前缀例题</strong>：某机构分得前缀 <code>2001:DB8:AC10::/48</code>，机构内用 64 位作接口标识继续划分子网。</p>
+<ul>
+<li>子网号位数 &#x3D; 64 − 48 &#x3D; <strong>16 位</strong>，可划分子网 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">16</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">65536</span></span></span></span> 个；</li>
+<li>每个 &#x2F;64 子网可容纳约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">64</span></span></span></span></span></span></span></span></span></span></span></span> 个接口——IPv6 不设广播地址，<strong>没有 IPv4 那样”减 2”的约定</strong>。</li>
+</ul>
+<h2 id="IPv6-地址类型"><a href="#IPv6-地址类型" class="headerlink" title="IPv6 地址类型"></a>IPv6 地址类型</h2><p>IPv6 <strong>取消广播</strong>，地址只分三类：<strong>单播、组播、任播</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">标识对象</th>
+<th align="left">交付方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>单播 Unicast</strong></td>
+<td align="left">一个接口</td>
+<td align="left">逐跳路由，交付给<strong>唯一</strong>一个接口</td>
+</tr>
+<tr>
+<td align="left"><strong>组播 Multicast</strong></td>
+<td align="left">一组接口（前缀 <strong>FF00::&#x2F;8</strong>）</td>
+<td align="left">交付给<strong>组内所有</strong>成员</td>
+</tr>
+<tr>
+<td align="left"><strong>任播 Anycast</strong></td>
+<td align="left">一组接口（通常分属不同节点）</td>
+<td align="left">按<strong>路由协议的距离度量</strong>交付给其中”<strong>最近</strong>“的一个成员</td>
+</tr>
+</tbody></table>
+<p><strong>任播（Anycast，任意播&#x2F;泛播）</strong>：地址标识一组接口，分组只送给<strong>最近的一个</strong>成员。典型应用：多个 DNS 根服务器或 CDN 镜像共享一个任播地址，用户流量自动落到最近的副本。任播地址<strong>只能作目的地址</strong>，且<strong>只分配给路由器</strong>，不分配给主机。</p>
+<p><strong>常用地址前缀</strong>（必背）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">前缀</th>
+<th align="left">类型</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>::&#x2F;128</strong></td>
+<td align="left">未指定地址</td>
+<td align="left">全 0，主机<strong>尚未取得地址</strong>时作<strong>源地址</strong>（类似 IPv4 的 0.0.0.0）</td>
+</tr>
+<tr>
+<td align="left"><strong>::1&#x2F;128</strong></td>
+<td align="left"><strong>环回地址</strong></td>
+<td align="left">相当于 IPv4 的 127.0.0.1，发往本机</td>
+</tr>
+<tr>
+<td align="left"><strong>FF00::&#x2F;8</strong></td>
+<td align="left"><strong>组播地址</strong></td>
+<td align="left">前 8 位为 1111 1111</td>
+</tr>
+<tr>
+<td align="left"><strong>FE80::&#x2F;10</strong></td>
+<td align="left"><strong>链路本地单播</strong></td>
+<td align="left">仅同一链路内有效，自动配置的初始地址（类似 IPv4 的 169.254.0.0&#x2F;16）</td>
+</tr>
+<tr>
+<td align="left"><strong>2000::&#x2F;3</strong></td>
+<td align="left"><strong>全球单播地址</strong></td>
+<td align="left">目前实际分配的全球单播块（首 3 位 001，即 2xxx &#x2F; 3xxx 开头）</td>
+</tr>
+<tr>
+<td align="left">::FFFF:0:0&#x2F;96</td>
+<td align="left">IPv4 映射地址</td>
+<td align="left">与 IPv4 兼容&#x2F;过渡时使用</td>
+</tr>
+</tbody></table>
+<p><strong>全球单播地址的结构</strong>：<strong>全球路由前缀（48 位）+ 子网标识（16 位）+ 接口标识（64 位）</strong>。接口标识通常由网卡 <strong>MAC 地址按 EUI-64 规则生成</strong>（中间插入 FF:FE 并翻转 U&#x2F;L 位），这正是”<strong>无状态地址自动配置</strong>（即插即用）”的基础，其过程为：</p>
+<ol>
+<li>主机用网卡 MAC 按 EUI-64 生成<strong>接口标识</strong>，与本链路保留前缀拼出<strong>链路本地地址 FE80::&#x2F;64</strong>；</li>
+<li>做<strong>重复地址检测（DAD）</strong>：向试探地址发组播邻居请求，无应答方可使用；</li>
+<li>监听路由器周期性发送的<strong>路由器通告</strong>报文，从中取得 64 位<strong>网络前缀</strong>；</li>
+<li><strong>前缀 + 接口标识</strong>拼出全球单播地址——全程<strong>不需要 DHCP 服务器</strong>。</li>
+</ol>
+<blockquote>
+<p><strong>考点</strong>：<strong>链路本地 FE80::&#x2F;10、组播 FF00::&#x2F;8、全球单播 2000::&#x2F;3、环回 ::1、未指定 ::</strong>——给地址判类型的题每年都变着花样出。<br><strong>易错点</strong>：IPv6 <strong>没有广播地址</strong>；任播交付给<strong>最近一个</strong>成员而不是全体；组播地址同样<strong>只能作目的地址</strong>，不能作源地址。</p>
+</blockquote>
+<h2 id="IPv6-与-IPv4-首部对比（重点）"><a href="#IPv6-与-IPv4-首部对比（重点）" class="headerlink" title="IPv6 与 IPv4 首部对比（重点）"></a>IPv6 与 IPv4 首部对比（重点）</h2><p>把 IPv4 首部的字段逐个”对号入座”，分<strong>删除、更改、新增</strong>三类：</p>
+<table>
+<thead>
+<tr>
+<th align="left">IPv4 字段</th>
+<th align="left">IPv6 对应</th>
+<th align="left">处理方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">版本</td>
+<td align="left">版本</td>
+<td align="left">保留（取值 4 → 6）</td>
+</tr>
+<tr>
+<td align="left"><strong>首部长度 IHL</strong></td>
+<td align="left">—</td>
+<td align="left"><strong>删除</strong>：基本首部固定 40B，无需此字段</td>
+</tr>
+<tr>
+<td align="left">服务类型</td>
+<td align="left">流量类型</td>
+<td align="left"><strong>更名保留</strong>，配合流标签实现 QoS</td>
+</tr>
+<tr>
+<td align="left">总长度</td>
+<td align="left">有效载荷长度</td>
+<td align="left"><strong>更名</strong>，含义改为<strong>不含基本首部</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>标识 &#x2F; 标志 &#x2F; 片偏移</strong></td>
+<td align="left">分片扩展首部</td>
+<td align="left"><strong>移出基本首部</strong>：只有源节点分片时才用到</td>
+</tr>
+<tr>
+<td align="left">生存时间 TTL</td>
+<td align="left">跳数限制</td>
+<td align="left"><strong>更名</strong>（功能相同：每跳减 1，防环路）</td>
+</tr>
+<tr>
+<td align="left">协议</td>
+<td align="left">下一个首部</td>
+<td align="left"><strong>更名扩展</strong>：可指向扩展首部，也可指上层协议</td>
+</tr>
+<tr>
+<td align="left"><strong>首部校验和</strong></td>
+<td align="left">—</td>
+<td align="left"><strong>删除</strong>：免去路由器每跳重算</td>
+</tr>
+<tr>
+<td align="left">源地址 &#x2F; 目的地址</td>
+<td align="left">源地址 &#x2F; 目的地址</td>
+<td align="left">保留，扩为 <strong>128 位</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>选项</strong></td>
+<td align="left">扩展首部</td>
+<td align="left"><strong>移出基本首部</strong>，改造成链式扩展首部</td>
+</tr>
+<tr>
+<td align="left">—</td>
+<td align="left"><strong>流标签</strong></td>
+<td align="left"><strong>新增</strong>（20 位，支持 QoS）</td>
+</tr>
+</tbody></table>
+<p><strong>小结</strong>：删除 5 个字段（IHL、标识、标志、片偏移、首部校验和，外加”选项”移出）；更改 4 个（服务类型→流量类型、总长度→有效载荷长度、TTL→跳数限制、协议→下一个首部）；新增 1 个（流标签）。</p>
+<blockquote>
+<p><strong>考点</strong>：IPv6 基本首部 <strong>40B、8 个字段</strong>；分片字段没有消失，而是移入<strong>分片扩展首部</strong>且<strong>只由源节点使用</strong>。<br><strong>易错点</strong>：IPv6 首部里<strong>没有”总长度”</strong>——“有效载荷长度”不含基本首部，直接套用 IPv4 概念会算错；”跳数限制”与 TTL 功能相同，只是名字更贴切。</p>
+</blockquote>
+<h2 id="从-IPv4-向-IPv6-过渡"><a href="#从-IPv4-向-IPv6-过渡" class="headerlink" title="从 IPv4 向 IPv6 过渡"></a>从 IPv4 向 IPv6 过渡</h2><p>互联网规模太大，不可能指定某天全网统一升级，IPv4 与 IPv6 将<strong>长期共存</strong>，因此需要平滑过渡技术：</p>
+<table>
+<thead>
+<tr>
+<th align="left">技术</th>
+<th align="left">做法</th>
+<th align="left">适用场景与局限</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>双协议栈</strong></td>
+<td align="left">主机&#x2F;路由器<strong>同时安装 IPv4 和 IPv6 两套协议</strong>，按对端选用（DNS 需同时提供 A 与 AAAA 记录）</td>
+<td align="left">互通最直接、最彻底；但<strong>每个节点都要维护两套协议</strong>，开销大</td>
+</tr>
+<tr>
+<td align="left"><strong>隧道（Tunneling）</strong></td>
+<td align="left">把<strong>整个 IPv6 分组作为数据</strong>封装进 IPv4 数据报，穿过 IPv4 网络后由出口<strong>拆封</strong>还原</td>
+<td align="left">适合<strong>孤立的 IPv6 岛</strong>借助 IPv4 骨干网互联；沿途只需支持 IPv4</td>
+</tr>
+<tr>
+<td align="left"><strong>翻译（协议转换）</strong></td>
+<td align="left">转换网关改写首部字段，把 IPv6 数据报<strong>翻译</strong>成 IPv4（或反向），类似 NAT</td>
+<td align="left">适合<strong>纯 IPv4 老设备与纯 IPv6 主机</strong>直接通信；转换有损，无法体现 IPv6 扩展特性</td>
+</tr>
+</tbody></table>
+<p>双协议栈节点的工作方式示意：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">        双协议栈节点（同时运行两套协议）</span><br><span class="line">+-------------------------------------------+</span><br><span class="line">|   IPv6 协议栈        |     IPv4 协议栈     |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line">       |                        |</span><br><span class="line">  与 IPv6 对端通信           与 IPv4 对端通信</span><br><span class="line">  (用 IPv6 封装)             (用 IPv4 封装)</span><br></pre></td></tr></table></figure>
+
+<p>隧道原理示意：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> IPv6 岛 A                IPv4 骨干网（隧道）                IPv6 岛 B</span><br><span class="line">[IPv6 分组] --&gt; [入口路由器 A] == IPv4 数据报(载荷=IPv6分组) ==&gt; [出口路由器 B] --&gt; [IPv6 分组]</span><br><span class="line">                封装: 外层源/目的 = 隧道两端 IPv4 地址         拆封: 去掉外层 IPv4 首部</span><br><span class="line">                                                              还原出原 IPv6 分组继续转发</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：隧道中 IPv4 数据报的<strong>协议字段 &#x3D; 41</strong>，表示其数据部分是一个 IPv6 分组；双协议栈是<strong>最直接</strong>的过渡方式。<br><strong>易错点</strong>：隧道只要求<strong>隧道两端</strong>（入口&#x2F;出口路由器）是双协议栈，中间路径只需支持 IPv4；隧道<strong>不改变</strong>原 IPv6 分组的源&#x2F;目的地址（只是外面套了一层 IPv4 首部）。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">地址长度</td>
+<td align="left"><strong>128 位</strong>，冒号十六进制 8 组，地址数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">38</span></span></span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">压缩规则</td>
+<td align="left">前导零省略；<code>::</code> <strong>只能用一次</strong>、压最长连续 0 段；混合表示 ::FFFF:x.x.x.x</td>
+</tr>
+<tr>
+<td align="left">基本首部</td>
+<td align="left"><strong>固定 40B、8 个字段</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">320</span></span></span></span> 位</td>
+</tr>
+<tr>
+<td align="left">有效载荷长度</td>
+<td align="left">16 位，<strong>不含基本首部</strong>（区别于 IPv4”总长度”）</td>
+</tr>
+<tr>
+<td align="left">流标签</td>
+<td align="left">20 位，<strong>IPv6 新增</strong>，标识一条”流”以支持 QoS</td>
+</tr>
+<tr>
+<td align="left">分片</td>
+<td align="left"><strong>只允许源节点分片</strong>，信息在<strong>分片扩展首部</strong>；扩展首部 <strong>8B 对齐</strong></td>
+</tr>
+<tr>
+<td align="left">选项</td>
+<td align="left">IPv4”选项” → IPv6 <strong>扩展首部</strong>，由”下一个首部”字段链接</td>
+</tr>
+<tr>
+<td align="left">地址类型</td>
+<td align="left"><strong>单播 &#x2F; 组播 &#x2F; 任播</strong>，<strong>取消广播</strong></td>
+</tr>
+<tr>
+<td align="left">特殊前缀</td>
+<td align="left">环回 <strong>::1</strong>、未指定 <strong>::</strong>、链路本地 <strong>FE80::&#x2F;10</strong>、组播 <strong>FF00::&#x2F;8</strong>、全球单播 <strong>2000::&#x2F;3</strong></td>
+</tr>
+<tr>
+<td align="left">任播</td>
+<td align="left">交付给<strong>最近的一个</strong>成员；只能作目的地址、只分配给路由器</td>
+</tr>
+<tr>
+<td align="left">首部对比</td>
+<td align="left">删 IHL&#x2F;标识&#x2F;标志&#x2F;片偏移&#x2F;校验和；TTL→跳数限制、协议→下一个首部；<strong>新增流标签</strong></td>
+</tr>
+<tr>
+<td align="left">过渡技术</td>
+<td align="left"><strong>双协议栈</strong>（两套协议）、<strong>隧道</strong>（IPv4 协议字段 41）、<strong>翻译</strong>（类 NAT）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:54:24.961Z" itemprop="dateUpdated">2026-08-29 13:54:24</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/IPv6/" rel="tag">IPv6</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C%E5%B1%82/" rel="tag">网络层</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&title=《IPv6协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&title=《IPv6协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IPv6协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">路由算法与路由协议</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/IP%E7%BB%84%E6%92%AD%E4%B8%8E%E7%A7%BB%E5%8A%A8IP/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">IP组播与移动IP</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&title=《IPv6协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&title=《IPv6协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《IPv6协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

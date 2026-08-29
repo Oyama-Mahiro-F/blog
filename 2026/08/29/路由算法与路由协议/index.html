@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>路由算法与路由协议 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="网络,408,网络层,路由">
+    <meta name="description" content="网络层的两大任务中，分组转发是”查表、从哪个口送出去”的本地动作，而路由选择是”决定走哪条路”的全局决策——路由表怎么来，靠的就是路由算法与路由协议。路由算法是获得路由表中各表项所用的算法，是路由选择协议的核心：静态算法靠人工配置，动态算法（距离-向量、链路状态）让路由器自动适应网络变化；当网络规模大到一定程度，再按自治系统（AS） 划分层次，域内用 RIP&#x2F;OSPF，域间用 BGP。4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="路由算法与路由协议">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="网络层的两大任务中，分组转发是”查表、从哪个口送出去”的本地动作，而路由选择是”决定走哪条路”的全局决策——路由表怎么来，靠的就是路由算法与路由协议。路由算法是获得路由表中各表项所用的算法，是路由选择协议的核心：静态算法靠人工配置，动态算法（距离-向量、链路状态）让路由器自动适应网络变化；当网络规模大到一定程度，再按自治系统（AS） 划分层次，域内用 RIP&#x2F;OSPF，域间用 BGP。4">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/ospf-%E5%8C%BA%E5%9F%9F%E5%88%92%E5%88%86.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/bgp-%E5%8F%91%E8%A8%80%E4%BA%BA%E4%B8%8E%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9F.png">
+<meta property="article:published_time" content="2026-08-29T03:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:47:42.510Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="网络层">
+<meta property="article:tag" content="路由">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC4%E7%AB%A0%20%E7%BD%91%E7%BB%9C%E5%B1%82.assets/ospf-%E5%8C%BA%E5%9F%9F%E5%88%92%E5%88%86.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">路由算法与路由协议</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">路由算法与路由协议</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T03:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1%E4%B8%8E%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1"><span class="post-toc-number">1.</span> <span class="post-toc-text">静态路由与动态路由</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B7%9D%E7%A6%BB-%E5%90%91%E9%87%8F%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95"><span class="post-toc-number">2.</span> <span class="post-toc-text">距离-向量路由算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Bellman-Ford-%E6%80%9D%E6%83%B3"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">Bellman-Ford 思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#RIP-%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">RIP 路由协议</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#RIP-%E4%BE%8B%E9%A2%98%EF%BC%9A%E8%B7%9D%E7%A6%BB%E5%90%91%E9%87%8F%E6%9B%B4%E6%96%B0%E8%B7%AF%E7%94%B1%E8%A1%A8"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">RIP 例题：距离向量更新路由表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A5%BD%E6%B6%88%E6%81%AF%E4%BC%A0%E5%BE%97%E5%BF%AB%EF%BC%8C%E5%9D%8F%E6%B6%88%E6%81%AF%E4%BC%A0%E5%BE%97%E6%85%A2"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">好消息传得快，坏消息传得慢</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95"><span class="post-toc-number">3.</span> <span class="post-toc-text">链路状态路由算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B3%9B%E6%B4%AA-LSA-%E4%B8%8E%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">泛洪 LSA 与链路状态数据库</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Dijkstra-%E4%BE%8B%E9%A2%98%EF%BC%9A%E6%B1%82%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E6%A0%91"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">Dijkstra 例题：求最短路径树</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OSPF-%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">OSPF 路由协议</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%8C%BA%E5%9F%9F%E5%88%92%E5%88%86%EF%BC%88%E5%B1%82%E6%AC%A1%E5%8C%96%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%EF%BC%89"><span class="post-toc-number">3.3.1.</span> <span class="post-toc-text">区域划分（层次化链路状态）</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B1%82%E6%AC%A1%E8%B7%AF%E7%94%B1%E4%B8%8E%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9F"><span class="post-toc-number">4.</span> <span class="post-toc-text">层次路由与自治系统</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#BGP-%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE"><span class="post-toc-number">5.</span> <span class="post-toc-text">BGP 路由协议</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B7%9D%E7%A6%BB%E5%90%91%E9%87%8F-vs-%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%EF%BC%88%E6%A0%B8%E5%BF%83%E5%AF%B9%E6%AF%94%EF%BC%89"><span class="post-toc-number">6.</span> <span class="post-toc-text">距离向量 vs 链路状态（核心对比）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#RIP-vs-OSPF-vs-BGP%EF%BC%88%E5%8D%8F%E8%AE%AE%E4%B8%89%E5%B7%A8%E5%A4%B4%E5%AF%B9%E6%AF%94%EF%BC%89"><span class="post-toc-number">7.</span> <span class="post-toc-text">RIP vs OSPF vs BGP（协议三巨头对比）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">8.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-路由算法与路由协议"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">路由算法与路由协议</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 11:00:00" datetime="2026-08-29T03:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>网络层的两大任务中，<strong>分组转发</strong>是”查表、从哪个口送出去”的本地动作，而<strong>路由选择</strong>是”决定走哪条路”的全局决策——路由表怎么来，靠的就是<strong>路由算法</strong>与<strong>路由协议</strong>。<strong>路由算法</strong>是获得路由表中各表项所用的算法，是路由选择协议的核心：静态算法靠人工配置，动态算法（距离-向量、链路状态）让路由器自动适应网络变化；当网络规模大到一定程度，再按<strong>自治系统（AS）</strong> 划分层次，域内用 RIP&#x2F;OSPF，域间用 BGP。408 的考查集中在：<strong>静态与动态路由、距离-向量算法（RIP）、链路状态算法（OSPF）、层次路由与 BGP</strong>，其中”RIP vs OSPF vs BGP 三巨头对比”几乎是历年必考。</p>
+<h2 id="静态路由与动态路由"><a href="#静态路由与动态路由" class="headerlink" title="静态路由与动态路由"></a>静态路由与动态路由</h2><p>按路由算法能否随<strong>通信量或网络拓扑的变化自适应调整</strong>，路由选择分为两大类：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">静态路由选择</th>
+<th align="left">动态路由选择</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">别名</td>
+<td align="left"><strong>非自适应</strong>路由选择</td>
+<td align="left"><strong>自适应</strong>路由选择</td>
+</tr>
+<tr>
+<td align="left">路由来源</td>
+<td align="left">管理员<strong>人工配置</strong>每一条路由</td>
+<td align="left">路由协议（RIP&#x2F;OSPF&#x2F;BGP）<strong>自动交换、计算</strong></td>
+</tr>
+<tr>
+<td align="left">优点</td>
+<td align="left"><strong>简单、开销较小</strong>，结果可靠、可预测</td>
+<td align="left">能<strong>及时适应</strong>网络状态（拓扑&#x2F;故障&#x2F;负载）变化</td>
+</tr>
+<tr>
+<td align="left">缺点</td>
+<td align="left">拓扑变化后<strong>不能自动调整</strong>（链路故障需人工改表）</td>
+<td align="left"><strong>实现复杂、开销较大</strong>（交换报文占用带宽与 CPU）</td>
+</tr>
+<tr>
+<td align="left">适用</td>
+<td align="left">简单的小网络、末梢网络</td>
+<td align="left">较复杂的大网络</td>
+</tr>
+</tbody></table>
+<p>理想路由算法应具备 6 个特点，常以选择题形式考查：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特点</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">正确、完整</td>
+<td align="left">沿路由表指引，分组<strong>一定能到达</strong>目的</td>
+</tr>
+<tr>
+<td align="left">计算简单</td>
+<td align="left">不给网络增加<strong>太多额外开销</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>自适应性</strong></td>
+<td align="left">能自适应通信量与拓扑变化，<strong>均衡各链路负载</strong></td>
+</tr>
+<tr>
+<td align="left">稳定性</td>
+<td align="left">拓扑稳定时<strong>收敛</strong>于可接受的解，路由<strong>不振荡</strong></td>
+</tr>
+<tr>
+<td align="left">公平性</td>
+<td align="left">对所有用户<strong>平等</strong>，不为个别用户损害大家</td>
+</tr>
+<tr>
+<td align="left">最佳性</td>
+<td align="left">“最佳”是<strong>相对特定要求</strong>的合理选择（时延小或可靠性高）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>动态路由 &#x3D; 自适应路由</strong>；静态路由<strong>简单开销小但无法自适应</strong>，动态路由反之。<br><strong>易错点</strong>：”稳定性”即<strong>收敛性</strong>——后文 RIP”坏消息传得慢”与 OSPF”收敛快”都是收敛性的具体体现；”最佳”不等于”绝对最优”。</p>
+</blockquote>
+<h2 id="距离-向量路由算法"><a href="#距离-向量路由算法" class="headerlink" title="距离-向量路由算法"></a>距离-向量路由算法</h2><h3 id="Bellman-Ford-思想"><a href="#Bellman-Ford-思想" class="headerlink" title="Bellman-Ford 思想"></a>Bellman-Ford 思想</h3><p><strong>距离-向量（Distance Vector，DV）算法</strong>基于 <strong>Bellman-Ford</strong> 思想：到某目的网络的最短距离，等于”到某个邻居的距离 + 该邻居到目的网络的距离”中的最小值：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.45em;vertical-align:-0.7em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-2.4em;margin-left:0em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span><span class="mop">min</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7em;"><span></span></span></span></span></span><span class="mopen">{</span><span class="mord mathnormal">c</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)}</span></span></span></span></span>
+<p>其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span></span></span></span> 是本路由器 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 到邻居 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> 的代价，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 是邻居 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span> 到目的网络 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的距离。每个路由器维护一张”到各目的网络的<strong>距离表</strong>“，并<strong>定期与相邻路由器交换整张距离表</strong>——它只知道邻居报来的”二手信息”，从不知道全网拓扑，这是与链路状态算法的根本区别。</p>
+<h3 id="RIP-路由协议"><a href="#RIP-路由协议" class="headerlink" title="RIP 路由协议"></a>RIP 路由协议</h3><p><strong>RIP（Routing Information Protocol，路由信息协议）<strong>是内部网关协议（IGP），把 DV 思想中的”距离”具体化为</strong>跳数</strong>，最大优点是<strong>实现简单、开销较小</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">度量</td>
+<td align="left"><strong>跳数</strong>：直连网络 &#x3D; 1；非直连 &#x3D; <strong>经过的路由器数 + 1</strong>；<strong>最大 15，16 &#x3D; 不可达</strong></td>
+</tr>
+<tr>
+<td align="left">和谁交换</td>
+<td align="left"><strong>仅与相邻路由器</strong>交换</td>
+</tr>
+<tr>
+<td align="left">交换什么</td>
+<td align="left">自己的<strong>整张路由表</strong>（到本 AS 所有网络的距离 + 下一跳）</td>
+</tr>
+<tr>
+<td align="left">何时交换</td>
+<td align="left">每 <strong>30 秒</strong>定期交换；拓扑变化时<strong>及时</strong>通告；<strong>3 分钟</strong>收不到某邻居的更新 → 把该邻居记为<strong>不可达（距离 16）</strong></td>
+</tr>
+<tr>
+<td align="left">承载</td>
+<td align="left"><strong>UDP，端口 520</strong>（RIP 是<strong>应用层协议</strong>）</td>
+</tr>
+<tr>
+<td align="left">选路</td>
+<td align="left">只选跳数最少的<strong>一条</strong>路由，<strong>不支持等代价负载均衡</strong></td>
+</tr>
+<tr>
+<td align="left">适用</td>
+<td align="left"><strong>小型网络</strong>（15 跳封顶）</td>
+</tr>
+</tbody></table>
+<p>收到邻居 X 的 RIP 报文后，按<strong>距离向量算法</strong>更新路由表（四步）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">① 修改报文</td>
+<td align="left">报文中所有<strong>下一跳改为 X</strong>、所有<strong>距离 + 1</strong></td>
+</tr>
+<tr>
+<td align="left">② 逐项比较</td>
+<td align="left">目的网络<strong>表中没有</strong> → <strong>加入</strong>；<strong>下一跳相同</strong> → <strong>替换</strong>（即使距离增大）；<strong>距离更小</strong> → <strong>更新</strong>；否则<strong>什么也不做</strong></td>
+</tr>
+<tr>
+<td align="left">③ 超时</td>
+<td align="left"><strong>3 分钟</strong>未收到 X 的更新 → 到 X 的距离置 <strong>16</strong></td>
+</tr>
+<tr>
+<td align="left">④ 返回</td>
+<td align="left">处理下一个报文</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：RIP 三要点口诀——<strong>“和谁换：仅邻居；换什么：整张表；何时换：30 秒 + 变化即发”</strong>。<br><strong>易错点</strong>：RIP 是<strong>应用层</strong>协议（基于 UDP 520）；跳数 <strong>16 表示不可达</strong>（不是”还能到第 16 跳”）；RIP <strong>不支持多路由&#x2F;负载均衡</strong>——即使存在低时延但路由器更多的路径也弃用。</p>
+</blockquote>
+<h3 id="RIP-例题：距离向量更新路由表"><a href="#RIP-例题：距离向量更新路由表" class="headerlink" title="RIP 例题：距离向量更新路由表"></a>RIP 例题：距离向量更新路由表</h3><p><strong>题目</strong>：路由器 B 的原路由表如下（左），现收到相邻路由器 C 发来的距离向量：<strong>N2 &#x3D; 4，N3 &#x3D; 1（N3 是 C 的直连网络），N4 &#x3D; 9，N7 &#x3D; 5</strong>。按 RIP 规则更新 B 的路由表。</p>
+<table>
+<thead>
+<tr>
+<th align="left">目的网络</th>
+<th align="left">距离</th>
+<th align="left">下一跳</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">N1</td>
+<td align="left">1</td>
+<td align="left">直接交付</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">6</td>
+<td align="left">C</td>
+</tr>
+<tr>
+<td align="left">N3</td>
+<td align="left">8</td>
+<td align="left">A</td>
+</tr>
+<tr>
+<td align="left">N4</td>
+<td align="left">4</td>
+<td align="left">A</td>
+</tr>
+</tbody></table>
+<p><strong>第一步：修改 C 的报文</strong>——距离全部 <strong>+1</strong>、下一跳全部改为 <strong>C</strong>：</p>
+<ul>
+<li>N2：4 → <strong>5</strong>；N3：1 → <strong>2</strong>；N4：9 → <strong>10</strong>；N7：5 → <strong>6</strong></li>
+</ul>
+<p><strong>第二步：与原表逐项比较并更新</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">目的网络</th>
+<th align="left">来自 C</th>
+<th align="left">+1 后（下一跳 C）</th>
+<th align="left">B 原表（距离, 下一跳）</th>
+<th align="left">比较与规则</th>
+<th align="left">更新结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">N1</td>
+<td align="left">（未通告）</td>
+<td align="left">—</td>
+<td align="left">(1, 直接)</td>
+<td align="left">C 未通告，直连项不受影响</td>
+<td align="left">(1, 直接) 不变</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left">4</td>
+<td align="left">5</td>
+<td align="left">(6, C)</td>
+<td align="left"><strong>下一跳同为 C → 无条件替换</strong></td>
+<td align="left"><strong>(5, C)</strong> 更新</td>
+</tr>
+<tr>
+<td align="left">N3</td>
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">(8, A)</td>
+<td align="left">下一跳不同，<strong>2 &lt; 8 → 更新</strong></td>
+<td align="left"><strong>(2, C)</strong> 更新</td>
+</tr>
+<tr>
+<td align="left">N4</td>
+<td align="left">9</td>
+<td align="left">10</td>
+<td align="left">(4, A)</td>
+<td align="left">下一跳不同，10 &gt; 4 → <strong>保留原项</strong></td>
+<td align="left">(4, A) 不变</td>
+</tr>
+<tr>
+<td align="left">N7</td>
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">表中<strong>没有</strong></td>
+<td align="left"><strong>新目的网络 → 加入</strong></td>
+<td align="left"><strong>(6, C)</strong> 新增</td>
+</tr>
+</tbody></table>
+<p><strong>更新后的 B 路由表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">目的网络</th>
+<th align="left">距离</th>
+<th align="left">下一跳</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">N1</td>
+<td align="left">1</td>
+<td align="left">直接交付</td>
+</tr>
+<tr>
+<td align="left">N2</td>
+<td align="left"><strong>5</strong></td>
+<td align="left"><strong>C</strong></td>
+</tr>
+<tr>
+<td align="left">N3</td>
+<td align="left"><strong>2</strong></td>
+<td align="left"><strong>C</strong></td>
+</tr>
+<tr>
+<td align="left">N4</td>
+<td align="left">4</td>
+<td align="left">A</td>
+</tr>
+<tr>
+<td align="left">N7</td>
+<td align="left"><strong>6</strong></td>
+<td align="left"><strong>C</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：先”+1、改下一跳”再比较——<strong>表中没有 → 加入；同下一跳 → 无条件替换（哪怕距离变大）；不同下一跳 → 更小才更新；否则什么也不做</strong>。<br><strong>易错点</strong>：N7 是新表项，不能因为”距离 6 不算小”而拒绝加入；N4 收到的 10 比原 4 大且下一跳不同 → 什么也不做（别把 10 写进表）。</p>
+</blockquote>
+<h3 id="好消息传得快，坏消息传得慢"><a href="#好消息传得快，坏消息传得慢" class="headerlink" title="好消息传得快，坏消息传得慢"></a>好消息传得快，坏消息传得慢</h3><p>RIP 的根本隐患：<strong>好消息传得快，坏消息传得慢（无穷计数，Count-to-Infinity）</strong>。设 R1 直连网 1（距离 1），R2 经 R1 到网 1（距离 2）。网 1 故障后：</p>
+<table>
+<thead>
+<tr>
+<th align="left">轮次</th>
+<th align="left">R1 到网 1</th>
+<th align="left">R2 到网 1</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">故障前</td>
+<td align="left">1（直连）</td>
+<td align="left">2（经 R1）</td>
+<td align="left">正常收敛</td>
+</tr>
+<tr>
+<td align="left">故障瞬间</td>
+<td align="left">16</td>
+<td align="left">2</td>
+<td align="left">R1 置 16；但 R2 的<strong>旧更新（距离 2）先到</strong></td>
+</tr>
+<tr>
+<td align="left">第 1 轮交换</td>
+<td align="left">3</td>
+<td align="left">4</td>
+<td align="left">R1 误判”可经 R2”：2 + 1 &#x3D; 3；R2 收到 3 → 4</td>
+</tr>
+<tr>
+<td align="left">第 2 轮交换</td>
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">R1 收到 4 → 5；R2 收到 5 → 6</td>
+</tr>
+<tr>
+<td align="left">……</td>
+<td align="left">每轮 +2</td>
+<td align="left">每轮 +2</td>
+<td align="left">两者互相”抬价”</td>
+</tr>
+<tr>
+<td align="left">计数到 16</td>
+<td align="left">16</td>
+<td align="left">16</td>
+<td align="left">才真正确认不可达（每轮 30s，感知故障需数分钟）</td>
+</tr>
+</tbody></table>
+<p>缓解手段：<strong>水平分割</strong>——不从”学来这条路由的方向”再通告回去；<strong>毒性逆转</strong>——把从邻居学到的路由以距离 16 通告回去（熟悉概念即可）。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>16 &#x3D; 不可达</strong>正是给”无穷计数”设的上限；”坏消息传得慢” &#x3D; <strong>收敛慢</strong>，是 RIP 的根本缺点，也是 OSPF 诞生的直接动因。</p>
+</blockquote>
+<h2 id="链路状态路由算法"><a href="#链路状态路由算法" class="headerlink" title="链路状态路由算法"></a>链路状态路由算法</h2><h3 id="泛洪-LSA-与链路状态数据库"><a href="#泛洪-LSA-与链路状态数据库" class="headerlink" title="泛洪 LSA 与链路状态数据库"></a>泛洪 LSA 与链路状态数据库</h3><p><strong>链路状态（Link State，LS）算法</strong>与 DV 完全相反：每个路由器把<strong>与自己相邻的链路状态</strong>（和谁相邻 + 链路代价）封装成<strong>链路状态通告 LSA（Link State Advertisement）</strong>，用<strong>洪泛（Flooding）<strong>法发给</strong>全网（区域内所有路由器）</strong>；最终每台路由器都建立一张<strong>全网一致的链路状态数据库 LSDB</strong>——它就等于全网的拓扑图。之后每台路由器以<strong>自己为源点</strong>，用 <strong>Dijkstra 算法</strong>算出最短路径树，生成路由表。</p>
+<table>
+<thead>
+<tr>
+<th align="left">要点</th>
+<th align="left">链路状态（OSPF）</th>
+<th align="left">对照：距离向量（RIP）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">和谁交换</td>
+<td align="left"><strong>全网所有路由器</strong>（洪泛）</td>
+<td align="left">仅相邻路由器</td>
+</tr>
+<tr>
+<td align="left">交换什么</td>
+<td align="left"><strong>与相邻路由器的链路状态 LSA</strong>（只是部分信息）</td>
+<td align="left">自己的整张路由表</td>
+</tr>
+<tr>
+<td align="left">何时交换</td>
+<td align="left"><strong>只有链路状态变化时</strong>才洪泛（LSDB 另每 30 分钟刷新）</td>
+<td align="left">每 30 秒定期交换</td>
+</tr>
+</tbody></table>
+<h3 id="Dijkstra-例题：求最短路径树"><a href="#Dijkstra-例题：求最短路径树" class="headerlink" title="Dijkstra 例题：求最短路径树"></a>Dijkstra 例题：求最短路径树</h3><p>某网络拓扑以邻接表描述（无向、代价对称）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">节点</th>
+<th align="left">邻接（节点 : 代价）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">A</td>
+<td align="left">B : 2，C : 5</td>
+</tr>
+<tr>
+<td align="left">B</td>
+<td align="left">A : 2，C : 1，D : 6</td>
+</tr>
+<tr>
+<td align="left">C</td>
+<td align="left">A : 5，B : 1，D : 2，E : 7</td>
+</tr>
+<tr>
+<td align="left">D</td>
+<td align="left">B : 6，C : 2，E : 3，F : 6</td>
+</tr>
+<tr>
+<td align="left">E</td>
+<td align="left">C : 7，D : 3，F : 1</td>
+</tr>
+<tr>
+<td align="left">F</td>
+<td align="left">D : 6，E : 1</td>
+</tr>
+</tbody></table>
+<p>以 <strong>A 为源点</strong>执行 Dijkstra：每轮从<strong>未选入</strong>的节点中取 dist 最小者加入集合 S，并松弛其邻居。</p>
+<table>
+<thead>
+<tr>
+<th align="left">轮次</th>
+<th align="left">选入节点（dist）</th>
+<th align="left">B</th>
+<th align="left">C</th>
+<th align="left">D</th>
+<th align="left">E</th>
+<th align="left">F</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始</td>
+<td align="left">A (0)</td>
+<td align="left">2 经 A</td>
+<td align="left">5 经 A</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">B (2)</td>
+<td align="left">2 ✓</td>
+<td align="left"><strong>3</strong> 经 B</td>
+<td align="left">8 经 B</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">C (3)</td>
+<td align="left">—</td>
+<td align="left">3 ✓</td>
+<td align="left"><strong>5</strong> 经 C</td>
+<td align="left">10 经 C</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">D (5)</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">5 ✓</td>
+<td align="left"><strong>8</strong> 经 D</td>
+<td align="left">11 经 D</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">E (8)</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">8 ✓</td>
+<td align="left"><strong>9</strong> 经 E</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">F (9)</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">9 ✓</td>
+</tr>
+</tbody></table>
+<p><strong>最短路径树与验算</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">目的</th>
+<th align="left">最短距离</th>
+<th align="left">路径</th>
+<th align="left">验算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">B</td>
+<td align="left">2</td>
+<td align="left">A-B</td>
+<td align="left">2 ✓</td>
+</tr>
+<tr>
+<td align="left">C</td>
+<td align="left">3</td>
+<td align="left">A-B-C</td>
+<td align="left">2 + 1 &#x3D; 3 &lt; 5（直连 A-C &#x3D; 5 被更新）✓</td>
+</tr>
+<tr>
+<td align="left">D</td>
+<td align="left">5</td>
+<td align="left">A-B-C-D</td>
+<td align="left">2 + 1 + 2 &#x3D; 5 ✓</td>
+</tr>
+<tr>
+<td align="left">E</td>
+<td align="left">8</td>
+<td align="left">A-B-C-D-E</td>
+<td align="left">5 + 3 &#x3D; 8 &lt; 10（C-E &#x3D; 7 的旧值被更新）✓</td>
+</tr>
+<tr>
+<td align="left">F</td>
+<td align="left">9</td>
+<td align="left">A-B-C-D-E-F</td>
+<td align="left">8 + 1 &#x3D; 9 &lt; 11（D-F &#x3D; 6 的旧值被更新）✓</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：Dijkstra 每轮<strong>只确定一个</strong>当前 dist 最小的节点，一旦选入<strong>不再改变</strong>；链路状态算法中每个节点都要各自跑一遍 Dijkstra——计算量大是它的代价。<br><strong>易错点</strong>：dist 更新时要<strong>连同前驱（经谁而来）一起记录</strong>，最后沿前驱回溯才得到路径树；只有新 dist <strong>变小</strong>才更新。</p>
+</blockquote>
+<h3 id="OSPF-路由协议"><a href="#OSPF-路由协议" class="headerlink" title="OSPF 路由协议"></a>OSPF 路由协议</h3><p><strong>OSPF（Open Shortest Path First，开放最短路径优先）<strong>是内部网关协议，1989 年为</strong>克服 RIP 的缺点</strong>而开发：”开放” &#x3D; 协议<strong>公开发表</strong>、不受某一家厂商控制；”最短路径优先” &#x3D; 使用 <strong>Dijkstra 最短路径算法</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">核心流程</td>
+<td align="left"><strong>洪泛 LSA → 全网同步 LSDB → Dijkstra 算最短路径树 → 生成路由表</strong></td>
+</tr>
+<tr>
+<td align="left">度量</td>
+<td align="left"><strong>代价（Cost）</strong>：可配置、常与链路带宽相关；<strong>无跳数限制</strong></td>
+</tr>
+<tr>
+<td align="left">承载</td>
+<td align="left"><strong>直接封装在 IP 数据报中，协议号 89</strong>（不用 UDP&#x2F;TCP）</td>
+</tr>
+<tr>
+<td align="left">组播</td>
+<td align="left">通告发往组播地址 <strong>224.0.0.5</strong>（所有 OSPF 路由器）&#x2F; <strong>224.0.0.6</strong>（指定路由器 DR）</td>
+</tr>
+<tr>
+<td align="left">收敛</td>
+<td align="left"><strong>快</strong>：变化立即洪泛，响应时间 &lt; 100ms，<strong>没有”坏消息传得慢”问题</strong></td>
+</tr>
+<tr>
+<td align="left">其他特点</td>
+<td align="left"><strong>等代价多路径负载均衡</strong>（RIP 不支持）；分组带<strong>鉴别</strong>功能；支持 <strong>VLSM&#x2F;CIDR</strong>；LSDB 每 <strong>30 分钟</strong>刷新一次</td>
+</tr>
+</tbody></table>
+<p>OSPF 的<strong>五种分组类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">分组</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Hello</strong></td>
+<td align="left">发现并维持邻站可达性（每 <strong>10s</strong> 一次，<strong>40s</strong> 收不到判不可达）</td>
+</tr>
+<tr>
+<td align="left">数据库描述（DD）</td>
+<td align="left">向邻站给出自己 LSDB 的<strong>摘要</strong></td>
+</tr>
+<tr>
+<td align="left">链路状态请求（LSR）</td>
+<td align="left">请求某些链路状态项目的<strong>详细信息</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>链路状态更新（LSU）</strong></td>
+<td align="left">用洪泛法<strong>更新链路状态</strong>（最复杂、最核心）</td>
+</tr>
+<tr>
+<td align="left">链路状态确认（LSAck）</td>
+<td align="left">对 LSU 的<strong>确认</strong></td>
+</tr>
+</tbody></table>
+<h4 id="区域划分（层次化链路状态）"><a href="#区域划分（层次化链路状态）" class="headerlink" title="区域划分（层次化链路状态）"></a>区域划分（层次化链路状态）</h4><p>洪泛的通信量随网络规模膨胀，OSPF 进一步把一个 AS 划分为若干<strong>区域（Area）</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第4章 网络层.assets/ospf-区域划分.png" alt="OSPF 划分区域" title="">
+                </div>
+                <div class="image-caption">OSPF 划分区域</div>
+            </figure>
+
+<ul>
+<li>洪泛被<strong>限制在本区域内</strong>，区域内路由器<strong>只知道自己区域的拓扑</strong>，大大减少通信量</li>
+<li><strong>主干区域 0.0.0.0</strong>：位于上层，负责<strong>连通所有下层区域</strong></li>
+<li><strong>区域边界路由器（ABR）</strong>：连接主干区域与下层区域，<strong>概括并转发区域间路由</strong>（每个区域至少一个）</li>
+<li><strong>主干路由器</strong>：位于主干区域内的路由器（可以同时是 ABR）</li>
+<li><strong>AS 边界路由器（ASBR）</strong>：专门与本 AS <strong>之外</strong>的其他自治系统交换路由信息</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：OSPF 与 RIP 的本质区别——<strong>洪泛全网 vs 仅邻居</strong>、<strong>LSA（部分链路状态）vs 整张表</strong>、<strong>变化才发 vs 30s 定期</strong>；OSPF <strong>支持等代价负载均衡</strong>、收敛快、分区域、无跳数限制。<br><strong>易错点</strong>：OSPF 分组<strong>不封装成 TCP&#x2F;UDP 报文</strong>，直接作为 IP 数据报的数据部分（<strong>协议字段 &#x3D; 89</strong>）；”开放”指<strong>协议公开不受厂商控制</strong>，不是”开源”。</p>
+</blockquote>
+<h2 id="层次路由与自治系统"><a href="#层次路由与自治系统" class="headerlink" title="层次路由与自治系统"></a>层次路由与自治系统</h2><p>互联网规模巨大：任何一台路由器都不可能装下全网的路由表，各机构也需要<strong>独立管理、自主选路</strong>。于是把互联网划分成许多<strong>自治系统（AS，Autonomous System）</strong>：同一 AS 内部使用<strong>统一的路由策略与同一种内部路由协议</strong>，对外通过统一的出口呈现为一个整体。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">             BGP (EGP, TCP 179)</span><br><span class="line"> +------+  &lt;=====================&gt;  +------+</span><br><span class="line"> | AS 1 |                           | AS 2 |</span><br><span class="line"> +------+                           +------+</span><br><span class="line">   |    |                             |</span><br><span class="line">IGP: RIP / OSPF                  IGP: OSPF</span><br><span class="line">(inside AS 1)                    (inside AS 2)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">域内路由（IGP，内部网关协议）</th>
+<th align="left">域间路由（EGP，外部网关协议）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">作用范围</td>
+<td align="left"><strong>AS 内部</strong></td>
+<td align="left"><strong>AS 之间</strong>（互联网骨干层）</td>
+</tr>
+<tr>
+<td align="left">典型协议</td>
+<td align="left"><strong>RIP、OSPF</strong></td>
+<td align="left"><strong>BGP</strong></td>
+</tr>
+<tr>
+<td align="left">选路目标</td>
+<td align="left">找”<strong>最好</strong>“的路由（代价&#x2F;时延最优，讲效率）</td>
+<td align="left">策略允许下”<strong>可达</strong>“的路由（讲可控性）</td>
+</tr>
+<tr>
+<td align="left">关注因素</td>
+<td align="left">跳数、代价、时延</td>
+<td align="left">政治、安全、经济等<strong>策略</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：层次路由的两大动因——<strong>路由表规模太大 + 管理边界（各 AS 自治）</strong>；术语要能写全：Interior &#x2F; Exterior Gateway Protocol。<br><strong>易错点</strong>：”网关协议”是历史名称，实际就是<strong>路由协议</strong>；IGP&#x2F;EGP 是<strong>类别</strong>，RIP&#x2F;OSPF&#x2F;BGP 才是<strong>具体协议</strong>。</p>
+</blockquote>
+<h2 id="BGP-路由协议"><a href="#BGP-路由协议" class="headerlink" title="BGP 路由协议"></a>BGP 路由协议</h2><p><strong>BGP（Border Gateway Protocol，边界网关协议）<strong>是 AS 之间的</strong>外部网关协议（EGP）</strong>，基于<strong>路径向量（Path Vector）<strong>算法：通告的不是距离，而是”到达某目的网络</strong>依次经过哪些 AS</strong>“的<strong>路径序列</strong>（如”到 10.0.0.0&#x2F;8 途经 AS2-AS5”）——见路径中含有自己的 AS 号即可判定环路。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第4章 网络层.assets/bgp-发言人与自治系统.png" alt="BGP 发言人与自治系统" title="">
+                </div>
+                <div class="image-caption">BGP 发言人与自治系统</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">作用范围</td>
+<td align="left"><strong>AS 之间</strong>（域间路由，互联网骨干层）</td>
+</tr>
+<tr>
+<td align="left">算法</td>
+<td align="left"><strong>路径向量</strong>：携带完整 AS 序列，天然<strong>可检测环路</strong></td>
+</tr>
+<tr>
+<td align="left">交换对象</td>
+<td align="left"><strong>相邻的 BGP 发言人（BGP Speaker）</strong>——通常为 AS 边界上的 BGP 路由器</td>
+</tr>
+<tr>
+<td align="left">承载</td>
+<td align="left"><strong>TCP，端口 179</strong>（路由信息量大、跨 AS 必须可靠，可靠性交给 TCP）</td>
+</tr>
+<tr>
+<td align="left">选路</td>
+<td align="left"><strong>策略性选路</strong>：按政治、安全、经济策略选”好”的<strong>可达</strong>路径，<strong>不保证最短</strong></td>
+</tr>
+<tr>
+<td align="left">交换时机</td>
+<td align="left">建立连接时交换全表，之后<strong>变化时增量更新</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>eBGP（外部 BGP）</strong>：<strong>不同 AS</strong> 的发言人之间交换路由信息；<strong>iBGP（内部 BGP）</strong>：<strong>同一 AS 内部</strong>的 BGP 路由器之间传递 AS 间路由信息（报文格式相同，运行场景不同）</li>
+<li><strong>四种报文</strong>：<strong>OPEN</strong>（建立邻居关系）、<strong>UPDATE</strong>（通告新路由 &#x2F; 撤销旧路由）、<strong>KEEPALIVE</strong>（周期保活）、<strong>NOTIFICATION</strong>（报告差错并关闭连接）</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>BGP 找的不是最短路径，而是策略允许的可达路径</strong>（可达即可，”好”优先于”短”）；用 <strong>TCP 179</strong> 是因为 AS 间路由信息量大且必须可靠交付。<br><strong>易错点</strong>：三个承载要配对——<strong>RIP &#x3D; UDP 520，OSPF &#x3D; IP 协议号 89，BGP &#x3D; TCP 179</strong>；BGP 是<strong>路径向量</strong>协议，既非距离向量也非链路状态。</p>
+</blockquote>
+<h2 id="距离向量-vs-链路状态（核心对比）"><a href="#距离向量-vs-链路状态（核心对比）" class="headerlink" title="距离向量 vs 链路状态（核心对比）"></a>距离向量 vs 链路状态（核心对比）</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">距离向量（RIP）</th>
+<th align="left">链路状态（OSPF）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">算法基础</td>
+<td align="left"><strong>Bellman-Ford</strong>（邻居间迭代分布式计算）</td>
+<td align="left"><strong>Dijkstra</strong>（各节点拿着全图本地计算）</td>
+</tr>
+<tr>
+<td align="left">认知视角</td>
+<td align="left">只知道<strong>邻居报来的距离</strong>（二手信息）</td>
+<td align="left">掌握<strong>全网拓扑 LSDB</strong>（一手信息）</td>
+</tr>
+<tr>
+<td align="left">交换对象</td>
+<td align="left">仅<strong>相邻路由器</strong></td>
+<td align="left">**全网（区域内所有路由器）**洪泛</td>
+</tr>
+<tr>
+<td align="left">交换内容</td>
+<td align="left"><strong>整张距离表（路由表）</strong></td>
+<td align="left"><strong>LSA（本路由器相邻链路的状态）</strong></td>
+</tr>
+<tr>
+<td align="left">交换时机</td>
+<td align="left">每 <strong>30s</strong> 定期 + 变化时</td>
+<td align="left"><strong>链路状态变化时</strong>才洪泛</td>
+</tr>
+<tr>
+<td align="left">度量</td>
+<td align="left">跳数（≤ 15，16 不可达）</td>
+<td align="left">代价（可配置，无跳数限制）</td>
+</tr>
+<tr>
+<td align="left">收敛速度</td>
+<td align="left"><strong>慢</strong>（坏消息传得慢、无穷计数）</td>
+<td align="left"><strong>快</strong>（&lt; 100ms，无无穷计数问题）</td>
+</tr>
+<tr>
+<td align="left">主要代价</td>
+<td align="left">报文开销随规模线性增长、规模受限</td>
+<td align="left">每台都要跑 Dijkstra，计算与存储开销大</td>
+</tr>
+</tbody></table>
+<h2 id="RIP-vs-OSPF-vs-BGP（协议三巨头对比）"><a href="#RIP-vs-OSPF-vs-BGP（协议三巨头对比）" class="headerlink" title="RIP vs OSPF vs BGP（协议三巨头对比）"></a>RIP vs OSPF vs BGP（协议三巨头对比）</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">RIP</th>
+<th align="left">OSPF</th>
+<th align="left">BGP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">类别</td>
+<td align="left"><strong>IGP</strong>（域内）</td>
+<td align="left"><strong>IGP</strong>（域内）</td>
+<td align="left"><strong>EGP</strong>（域间）</td>
+</tr>
+<tr>
+<td align="left">算法</td>
+<td align="left"><strong>距离向量</strong></td>
+<td align="left"><strong>链路状态</strong></td>
+<td align="left"><strong>路径向量</strong></td>
+</tr>
+<tr>
+<td align="left">度量</td>
+<td align="left">跳数（<strong>≤ 15，16 不可达</strong>）</td>
+<td align="left"><strong>代价</strong>（无跳数限制）</td>
+<td align="left">策略 + <strong>AS 路径</strong></td>
+</tr>
+<tr>
+<td align="left">交换对象</td>
+<td align="left">仅<strong>相邻路由器</strong></td>
+<td align="left">区域内<strong>所有路由器</strong>（洪泛）</td>
+<td align="left">相邻 <strong>BGP 发言人</strong></td>
+</tr>
+<tr>
+<td align="left">交换内容</td>
+<td align="left"><strong>整张路由表</strong></td>
+<td align="left"><strong>链路状态通告 LSA</strong></td>
+<td align="left"><strong>可达路径（AS 序列）</strong></td>
+</tr>
+<tr>
+<td align="left">交换时机</td>
+<td align="left">每 <strong>30s</strong> 定期</td>
+<td align="left">链路<strong>变化时</strong>洪泛</td>
+<td align="left">变化时增量更新</td>
+</tr>
+<tr>
+<td align="left">承载</td>
+<td align="left"><strong>UDP 520</strong>（应用层协议）</td>
+<td align="left"><strong>直接用 IP（协议号 89）</strong></td>
+<td align="left"><strong>TCP 179</strong></td>
+</tr>
+<tr>
+<td align="left">适用规模</td>
+<td align="left"><strong>小型</strong>网络</td>
+<td align="left"><strong>大型</strong>网络（分区域）</td>
+<td align="left"><strong>互联网骨干（AS 间）</strong></td>
+</tr>
+<tr>
+<td align="left">收敛速度</td>
+<td align="left"><strong>慢</strong>（坏消息传得慢）</td>
+<td align="left"><strong>快</strong>（&lt; 100ms）</td>
+<td align="left">较慢（策略决策）</td>
+</tr>
+<tr>
+<td align="left">选路目标</td>
+<td align="left">跳数最少</td>
+<td align="left">最短路径（Dijkstra）</td>
+<td align="left"><strong>策略允许的可达路径</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：记忆口诀——<strong>“RIP 小、OSPF 大、BGP 管 AS；520 UDP、89 IP、179 TCP”</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">静态 vs 动态路由</td>
+<td align="left">静态：人工配置、简单开销小、<strong>不自适应</strong>；动态：自适应、复杂开销大</td>
+</tr>
+<tr>
+<td align="left">理想路由算法</td>
+<td align="left">正确完整、计算简单、<strong>自适应</strong>、稳定（收敛不振荡）、公平、最佳（相对特定要求）</td>
+</tr>
+<tr>
+<td align="left">距离向量核心</td>
+<td align="left">与邻居换<strong>整张距离表</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">min</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">{</span><span class="mord mathnormal">c</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)}</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">RIP 三要点</td>
+<td align="left"><strong>仅邻居、整张表、30 秒</strong>（+拓扑变化及时通告）</td>
+</tr>
+<tr>
+<td align="left">RIP 距离</td>
+<td align="left">直连 &#x3D; 1；非直连 &#x3D; <strong>路由器数 + 1</strong>；<strong>16 &#x3D; 不可达</strong></td>
+</tr>
+<tr>
+<td align="left">RIP 更新规则</td>
+<td align="left">先 <strong>+1、改下一跳</strong>；没有→加入；同下一跳→替换；更小→更新；否则不动；3min 未收到置 16</td>
+</tr>
+<tr>
+<td align="left">坏消息传得慢</td>
+<td align="left"><strong>无穷计数</strong>（互相抬价到 16）；<strong>水平分割、毒性逆转</strong>缓解</td>
+</tr>
+<tr>
+<td align="left">链路状态核心</td>
+<td align="left">向<strong>全网</strong>洪泛 <strong>LSA</strong> → 全网一致 <strong>LSDB</strong> → 各自跑 <strong>Dijkstra</strong></td>
+</tr>
+<tr>
+<td align="left">OSPF 承载</td>
+<td align="left"><strong>直接封装在 IP 中，协议号 89</strong>；组播 <strong>224.0.0.5 &#x2F; 224.0.0.6</strong></td>
+</tr>
+<tr>
+<td align="left">OSPF 度量</td>
+<td align="left"><strong>代价</strong>（可配置、与带宽相关），无跳数限制；<strong>等代价多路径负载均衡</strong></td>
+</tr>
+<tr>
+<td align="left">OSPF 区域</td>
+<td align="left">骨干区域 <strong>0.0.0.0</strong> 连通下层区域；<strong>ABR</strong> 连接区域、<strong>ASBR</strong> 连接外部 AS</td>
+</tr>
+<tr>
+<td align="left">OSPF 细节</td>
+<td align="left">Hello <strong>10s &#x2F; 40s</strong>；<strong>LSU</strong> 最核心；LSDB 30 分钟刷新；收敛 &lt; 100ms、无坏消息问题</td>
+</tr>
+<tr>
+<td align="left">层次路由</td>
+<td align="left">AS 划分解决<strong>路由表规模 + 管理边界</strong>；IGP 域内（RIP&#x2F;OSPF）、EGP 域间（BGP）</td>
+</tr>
+<tr>
+<td align="left">BGP</td>
+<td align="left"><strong>路径向量</strong>、AS 间、<strong>TCP 179</strong>、eBGP&#x2F;iBGP、<strong>策略选路、不保证最短</strong></td>
+</tr>
+<tr>
+<td align="left">三巨头承载</td>
+<td align="left"><strong>RIP &#x3D; UDP 520；OSPF &#x3D; IP 89；BGP &#x3D; TCP 179</strong></td>
+</tr>
+<tr>
+<td align="left">三种算法</td>
+<td align="left">距离向量换<strong>表</strong>、链路状态泛洪<strong>链路</strong>、路径向量传 <strong>AS 路径</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:47:42.510Z" itemprop="dateUpdated">2026-08-29 13:47:42</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C%E5%B1%82/" rel="tag">网络层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%B7%AF%E7%94%B1/" rel="tag">路由</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&title=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&title=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E4%BC%A0%E8%BE%93%E5%B1%82%E4%B8%8EUDP%E5%8D%8F%E8%AE%AE/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">传输层与UDP协议</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/IPv6%E5%8D%8F%E8%AE%AE/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">IPv6协议</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&title=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&title=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《路由算法与路由协议》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%B7%AF%E7%94%B1%E7%AE%97%E6%B3%95%E4%B8%8E%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

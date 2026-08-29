@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Cache与虚拟存储器 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理,存储器">
+    <meta name="description" content="Cache（高速缓冲存储器）是位于 CPU 与主存之间的小容量高速 SRAM，依靠程序访问的局部性原理缓解 CPU 与主存的速度差距；虚拟存储器则把主存和辅存统一编址，由硬件（MMU）+ 操作系统配合，给程序员一个远大于实际主存的地址空间。两者一管速度、一管容量，是存储层次结构中并列的两级核心。408 对本部分的考查集中在：命中率与平均访问时间计算、三种映射方式的地址划分与计算、替换算法、写策略组">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cache与虚拟存储器">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="Cache（高速缓冲存储器）是位于 CPU 与主存之间的小容量高速 SRAM，依靠程序访问的局部性原理缓解 CPU 与主存的速度差距；虚拟存储器则把主存和辅存统一编址，由硬件（MMU）+ 操作系统配合，给程序员一个远大于实际主存的地址空间。两者一管速度、一管容量，是存储层次结构中并列的两级核心。408 对本部分的考查集中在：命中率与平均访问时间计算、三种映射方式的地址划分与计算、替换算法、写策略组">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cache-%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cache-%E5%85%A8%E7%9B%B8%E8%81%94%E6%98%A0%E5%B0%84.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cache-%E7%BB%84%E7%9B%B8%E8%81%94%E6%98%A0%E5%B0%84.png">
+<meta property="article:published_time" content="2026-08-29T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:04:21.710Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="存储器">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC3%E7%AB%A0%20%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84.assets/cache-%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Cache与虚拟存储器</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Cache与虚拟存储器</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T13:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cache-%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="post-toc-number">1.</span> <span class="post-toc-text">Cache 的基本工作原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%91%BD%E4%B8%AD%E7%8E%87%E4%B8%8E%E5%B9%B3%E5%9D%87%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">命中率与平均访问时间</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cache-%E5%92%8C%E4%B8%BB%E5%AD%98%E4%B9%8B%E9%97%B4%E7%9A%84%E6%98%A0%E5%B0%84%E6%96%B9%E5%BC%8F"><span class="post-toc-number">2.</span> <span class="post-toc-text">Cache 和主存之间的映射方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">直接映射</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%A8%E7%9B%B8%E8%81%94%E6%98%A0%E5%B0%84"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">全相联映射</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%84%E7%9B%B8%E8%81%94%E6%98%A0%E5%B0%84"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">组相联映射</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%89%E7%A7%8D%E6%98%A0%E5%B0%84%E6%96%B9%E5%BC%8F%E5%A4%A7%E5%AF%B9%E6%AF%94"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">三种映射方式大对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cache-%E4%B8%AD%E4%B8%BB%E5%AD%98%E5%9D%97%E7%9A%84%E6%9B%BF%E6%8D%A2%E7%AE%97%E6%B3%95"><span class="post-toc-number">3.</span> <span class="post-toc-text">Cache 中主存块的替换算法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cache-%E7%9A%84%E5%86%99%E7%AD%96%E7%95%A5"><span class="post-toc-number">4.</span> <span class="post-toc-text">Cache 的写策略</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%99%E5%91%BD%E4%B8%AD%EF%BC%9A%E5%85%A8%E5%86%99%E6%B3%95%E4%B8%8E%E5%9B%9E%E5%86%99%E6%B3%95"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">写命中：全写法与回写法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%99%E4%B8%8D%E5%91%BD%E4%B8%AD%EF%BC%9A%E5%86%99%E5%88%86%E9%85%8D%E4%B8%8E%E9%9D%9E%E5%86%99%E5%88%86%E9%85%8D"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">写不命中：写分配与非写分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9B%E7%A7%8D%E7%BB%84%E5%90%88%E4%B8%8E%E5%B8%B8%E7%94%A8%E6%90%AD%E9%85%8D"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">四种组合与常用搭配</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.</span> <span class="post-toc-text">虚拟存储器</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A1%B5%E5%BC%8F%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">页式虚拟存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AE%B5%E5%BC%8F%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">段式虚拟存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AE%B5%E9%A1%B5%E5%BC%8F%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">段页式虚拟存储器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BF%AB%E8%A1%A8-TLB%EF%BC%9A%E9%A1%B5%E8%A1%A8%E9%A1%B9%E7%9A%84-Cache"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">快表 TLB：页表项的 Cache</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Cache与虚拟存储器"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Cache与虚拟存储器</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 21:00:00" datetime="2026-08-29T13:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>Cache（高速缓冲存储器）<strong>是位于 CPU 与主存之间的</strong>小容量高速 SRAM</strong>，依靠程序访问的<strong>局部性原理</strong>缓解 CPU 与主存的速度差距；<strong>虚拟存储器</strong>则把主存和辅存统一编址，由<strong>硬件（MMU）+ 操作系统</strong>配合，给程序员一个远大于实际主存的地址空间。两者一管<strong>速度</strong>、一管<strong>容量</strong>，是存储层次结构中并列的两级核心。408 对本部分的考查集中在：<strong>命中率与平均访问时间计算、三种映射方式的地址划分与计算、替换算法、写策略组合，以及 TLB 与 Cache 组合下的访存次数分析</strong>。</p>
+<h2 id="Cache-的基本工作原理"><a href="#Cache-的基本工作原理" class="headerlink" title="Cache 的基本工作原理"></a>Cache 的基本工作原理</h2><p>Cache 对程序员<strong>完全透明</strong>：CPU 只发出访存地址，由硬件自动判断该字是否已在 Cache 中。读一次数据的完整流程：</p>
+<ol>
+<li>CPU 送出访存地址，Cache 控制逻辑<strong>同时</strong>收到该地址</li>
+<li>按映射方式选出待比较的行（或全部行），比较<strong>标记 + 有效位</strong></li>
+<li><strong>命中</strong>：直接从 Cache 行取出该字送 CPU，结束</li>
+<li><strong>缺失</strong>：从主存读取该字送 CPU，<strong>同时把整个块调入 Cache</strong>（替换算法、写策略此时登场）</li>
+</ol>
+<ul>
+<li><strong>命中（Hit）</strong>：要访问的字在 Cache 中 → 直接从 Cache 读取，不访问主存</li>
+<li><strong>缺失（Miss）</strong>：字不在 Cache → 把包含该字的<strong>整个主存块</strong>调入 Cache（必要时淘汰一行），再从中取字</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">传送路径</th>
+<th align="left">传送单位</th>
+<th align="left">原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">CPU ↔ Cache</td>
+<td align="left"><strong>字</strong></td>
+<td align="left">CPU 每次只请求一个字的指令&#x2F;数据</td>
+</tr>
+<tr>
+<td align="left">Cache ↔ 主存</td>
+<td align="left"><strong>块（Block &#x2F; Cache Line）</strong></td>
+<td align="left">利用<strong>空间局部性</strong>，一次调入连续多个字</td>
+</tr>
+</tbody></table>
+<p>Cache 行的结构 &#x3D; <strong>有效位 + 标记（Tag）+ 数据</strong>：有效位为 1 表示该行数据可用；标记记录该行当前存放的是<strong>哪个</strong>主存块。Cache 能有效工作全靠局部性原理——时间局部性（刚访问过的数据很快再访问）、空间局部性（相邻数据将被访问），与虚拟存储器同出一源，原理详见《虚拟内存与页面置换算法》。</p>
+<blockquote>
+<p><strong>考点</strong>：Cache 缺失分三类——<strong>强制缺失</strong>（该块首次被访问，”冷启动”）、<strong>容量缺失</strong>（工作集超出 Cache 容量）、<strong>冲突缺失</strong>（映射方式导致多个块争用同一行）。<br><strong>易错点</strong>：全相联映射<strong>没有冲突缺失</strong>；增大块大小主要利用空间局部性，但块太大会增加未用数据的调入开销。</p>
+</blockquote>
+<h3 id="命中率与平均访问时间"><a href="#命中率与平均访问时间" class="headerlink" title="命中率与平均访问时间"></a>命中率与平均访问时间</h3><p>设 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 为命中次数、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 为缺失次数，命中率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p>平均访问时间有<strong>两种口径</strong>，做题前先看清题目假设：</p>
+<table>
+<thead>
+<tr>
+<th align="left">口径</th>
+<th align="left">公式</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>先后访问</strong>（默认，缺失才去访主存）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">命中只花 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，缺失只花 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+<tr>
+<td align="left"><strong>同时访问</strong>（每次同时启动 Cache 和主存）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mclose">)</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">缺失时主存时间叠加在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 之上</td>
+</tr>
+</tbody></table>
+<p><strong>例题</strong>：命中率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.95</span></span></span></span>，Cache 存取时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span>，主存存取时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span>，求平均访问时间。</p>
+<ul>
+<li><strong>先后口径</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.95</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.05</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">9.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">14.5</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span></li>
+<li><strong>同时口径</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.95</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.05</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">100</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">9.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">15</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span></li>
+</ul>
+<p>无论哪种口径，都远小于直接访主的 100 ns；命中率越高，平均访问时间越接近 Cache 速度。</p>
+<blockquote>
+<p><strong>易错点</strong>：题目说”<strong>Cache 与主存同时启动访问</strong>“必须用同时口径（缺失时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>）；无特殊说明一般按先后口径。另外注意 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 有时给的是主存<strong>存取周期</strong>而非存取时间，读清题面再代入。</p>
+</blockquote>
+<p><strong>Cache 总容量</strong>（存储位，不含比较&#x2F;控制逻辑）：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Cache </span><span class="mord cjk_fallback">总容量</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">行数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">标记位数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">数据位数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord cjk_fallback">有效位</span></span><span class="mclose">)</span></span></span></span></span>
+<p>回写法还要<strong>加脏位</strong>；带替换计数的还要加替换控制位。408 常考”给定主存&#x2F;Cache 容量、块大小、映射方式，反推标记位数与 Cache 总容量”。</p>
+<h2 id="Cache-和主存之间的映射方式"><a href="#Cache-和主存之间的映射方式" class="headerlink" title="Cache 和主存之间的映射方式"></a>Cache 和主存之间的映射方式</h2><p>映射方式决定<strong>主存块可以放进 Cache 的哪些行</strong>，直接影响命中率与硬件成本。主存地址的通用拆法（按字节编址）：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">块内地址位数</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">块大小</span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord cjk_fallback">行号</span><span class="mord">/</span><span class="mord cjk_fallback">组号位数</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">行数</span><span class="mord">/</span><span class="mord cjk_fallback">组数</span></span><span class="mclose">)</span><span class="mord cjk_fallback">，</span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord cjk_fallback">标记位数</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">地址总位数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">其余字段</span></span></span></span></span></span>
+<h3 id="直接映射"><a href="#直接映射" class="headerlink" title="直接映射"></a>直接映射</h3><p>每个主存块只能放入<strong>唯一固定</strong>的一行：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Cache </span><span class="mord cjk_fallback">行号</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord cjk_fallback">主存块号</span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Cache </span><span class="mord cjk_fallback">总行数</span></span></span></span></span></span>
+<p>主存地址划分 &#x3D; <strong>标记 + Cache 行号 + 块内地址</strong>。访存时用行号直接选中一行，比较该行标记与地址高位标记、且有效位为 1 即命中——硬件只需 <strong>1 个比较器</strong>，最简单最快；代价是多个主存块轮流争用同一行、互相淘汰（<strong>抖动</strong>，冲突缺失多）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/cache-直接映射.png" alt="直接映射" title="">
+                </div>
+                <div class="image-caption">直接映射</div>
+            </figure>
+
+<p><strong>例题</strong>：主存按字节编址，主存含 <strong>64 块</strong>、每块 <strong>16B</strong>；Cache 共 <strong>8 行</strong>，直接映射。求主存地址划分，并把主存地址 <code>0110110010</code> 定位到 Cache。</p>
+<ol>
+<li>主存容量 &#x3D; 64 × 16B &#x3D; 1KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span>B → <strong>主存地址共 10 位</strong></li>
+<li>主存块号 6 位（64 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span>）；块内地址 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> 位</li>
+<li>Cache 行号 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> 位（块号 mod 8 &#x3D; 取块号<strong>低 3 位</strong>）</li>
+<li>标记 &#x3D; 6 − 3 &#x3D; <strong>3 位</strong></li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">标记（3 位）</th>
+<th align="center">Cache 行号（3 位）</th>
+<th align="center">块内地址（4 位）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">011</td>
+<td align="center">011</td>
+<td align="center">0010</td>
+</tr>
+</tbody></table>
+<p><strong>地址 <code>0110110010</code> 的定位演算</strong>：</p>
+<ul>
+<li>拆分：标记 &#x3D; <code>011</code>，行号 &#x3D; <code>011</code>，块内地址 &#x3D; <code>0010</code>（块内第 2 字节）</li>
+<li>行号 <code>011</code> &#x3D; 3 → 定位到 <strong>Cache 第 3 行</strong></li>
+<li>标记 <code>011</code> &#x3D; 3 与第 3 行标记比较：相等且有效位 &#x3D; 1 → <strong>命中</strong></li>
+</ul>
+<p><strong>验算</strong>：该地址对应主存块号 &#x3D; <code>011011</code>₂ &#x3D; 27，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">27</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> ✓（27 &#x3D; 3 × 8 + 3）；主存块 3、11、19、27…全部映射到 Cache 行 3，靠标记区分是哪一块。</p>
+<blockquote>
+<p><strong>考点</strong>：直接映射中<strong>行号就是主存块号的低 3 位（低 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span></span></span></span>行数 位），直接截取、无需计算</strong>；标记位数 &#x3D; 块号位数 − 行号位数。</p>
+</blockquote>
+<h3 id="全相联映射"><a href="#全相联映射" class="headerlink" title="全相联映射"></a>全相联映射</h3><p>主存块可放入 Cache 的<strong>任意一行</strong>，无任何限制。主存地址划分 &#x3D; <strong>标记 + 块内地址</strong>（<strong>没有行号字段</strong>）。访存时把地址高位的标记与<strong>所有行的标记同时并行比较</strong>（相联存储器 CAM），某行匹配且有效位 &#x3D; 1 即命中。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/cache-全相联映射.png" alt="全相联映射" title="">
+                </div>
+                <div class="image-caption">全相联映射</div>
+            </figure>
+
+<p><strong>例题</strong>：条件同上（主存 64 块、块 16B、Cache 8 行），改为全相联。</p>
+<ul>
+<li>标记 &#x3D; 主存块号全部位数 &#x3D; <strong>6 位</strong>，块内地址 4 位，主存地址 &#x3D; 标记 + 块内 &#x3D; 6 + 4 &#x3D; 10 位</li>
+<li>地址 <code>0110110010</code> → 标记 &#x3D; <code>011011</code>（即主存块 27）、块内地址 &#x3D; <code>0010</code></li>
+<li>块 27 可放在 8 行中<strong>任意一行</strong>；查找需 8 个比较器<strong>同时</strong>比较 8 行标记</li>
+</ul>
+<p>最灵活、冲突缺失最少、空间利用率最高；但每行都要一个比较器，硬件成本随容量剧增——只适合<strong>小容量</strong>结构，典型应用就是 <strong>TLB（快表）</strong>。</p>
+<h3 id="组相联映射"><a href="#组相联映射" class="headerlink" title="组相联映射"></a>组相联映射</h3><p>Cache 先分组，<strong>组间直接映射、组内全相联</strong>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Cache </span><span class="mord cjk_fallback">组号</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord cjk_fallback">主存块号</span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Cache </span><span class="mord cjk_fallback">组数</span></span></span></span></span></span>
+<p>主存地址划分 &#x3D; <strong>标记 + 组号 + 块内地址</strong>。”<strong>n 路组相联</strong>“指每组含 n 行，访存时用组号选中一组，组内 n 个标记并行比较。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第3章 存储器层次结构.assets/cache-组相联映射.png" alt="组相联映射" title="">
+                </div>
+                <div class="image-caption">组相联映射</div>
+            </figure>
+
+<p><strong>例题</strong>：条件同上，改为 <strong>2 路组相联</strong>（8 行 ÷ 每组 2 行 &#x3D; <strong>4 组</strong>）。求地址划分并定位地址 <code>0110110010</code>。</p>
+<ol>
+<li>组号 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 位；块内地址 4 位；标记 &#x3D; 6 − 2 &#x3D; <strong>4 位</strong></li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="center">标记（4 位）</th>
+<th align="center">组号（2 位）</th>
+<th align="center">块内地址（4 位）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0110</td>
+<td align="center">11</td>
+<td align="center">0010</td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li>组号 <code>11</code> &#x3D; 3 → 定位到<strong>第 3 组</strong>（含 Cache 第 6、7 两行）</li>
+<li>标记 &#x3D; <code>0110</code>：与第 3 组内 2 行的标记分别比较，匹配且有效位 &#x3D; 1 → 命中，按块内地址 <code>0010</code> 取字节</li>
+</ol>
+<p><strong>验算</strong>：主存块号 &#x3D; <code>011011</code>₂ &#x3D; 27，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">27</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> ✓。两个极端：<strong>每组 1 行 &#x3D; 直接映射，只有 1 组（每组行数 &#x3D; 总行数）&#x3D; 全相联</strong>——三种映射是同一谱系上的三个点。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>n 路组相联 &#x3D; 组间直接映射 + 组内全相联</strong>；路数越多命中率越高但比较器越多；2&#126;8 路组相联是<strong>现代 CPU 的主流选择</strong>。</p>
+</blockquote>
+<h3 id="三种映射方式大对比"><a href="#三种映射方式大对比" class="headerlink" title="三种映射方式大对比"></a>三种映射方式大对比</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">直接映射</th>
+<th align="left">全相联映射</th>
+<th align="left">组相联映射</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">映射规则</td>
+<td align="left">行号 &#x3D; 块号 <strong>mod 行数</strong></td>
+<td align="left"><strong>任意行</strong></td>
+<td align="left">组号 &#x3D; 块号 mod 组数，组内任意</td>
+</tr>
+<tr>
+<td align="left">主存地址划分</td>
+<td align="left">标记 + 行号 + 块内</td>
+<td align="left">标记 + 块内</td>
+<td align="left">标记 + 组号 + 块内</td>
+</tr>
+<tr>
+<td align="left">标记位数（同参数下）</td>
+<td align="left">最短</td>
+<td align="left"><strong>最长</strong></td>
+<td align="left">居中</td>
+</tr>
+<tr>
+<td align="left">标记比较</td>
+<td align="left">1 次（1 个比较器）</td>
+<td align="left"><strong>全部行并行比较（CAM）</strong></td>
+<td align="left">组内 n 路并行（n 个比较器）</td>
+</tr>
+<tr>
+<td align="left">灵活性 &#x2F; 命中率</td>
+<td align="left">最低</td>
+<td align="left"><strong>最高</strong></td>
+<td align="left">高</td>
+</tr>
+<tr>
+<td align="left">冲突缺失</td>
+<td align="left"><strong>多（抖动）</strong></td>
+<td align="left">无</td>
+<td align="left">少</td>
+</tr>
+<tr>
+<td align="left">硬件成本</td>
+<td align="left">最低</td>
+<td align="left"><strong>极高</strong></td>
+<td align="left">中等</td>
+</tr>
+<tr>
+<td align="left">典型应用</td>
+<td align="left">早期 &#x2F; 大容量 Cache</td>
+<td align="left"><strong>TLB</strong>、小容量 Cache</td>
+<td align="left"><strong>现代 CPU 主流</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：同参数下<strong>标记位数：全相联 &gt; 组相联 &gt; 直接映射</strong>；冲突缺失：直接映射最多、全相联为 0。给容量和块大小反推”标记 + 行号&#x2F;组号 + 块内”三位划分，是 408 计算题的基本盘。</p>
+</blockquote>
+<h2 id="Cache-中主存块的替换算法"><a href="#Cache-中主存块的替换算法" class="headerlink" title="Cache 中主存块的替换算法"></a>Cache 中主存块的替换算法</h2><p>缺失且可用行已满时，需要选一行淘汰：</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">淘汰对象</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>RAND（随机）</strong></td>
+<td align="left">随机选一行</td>
+<td align="left">硬件最简单，命中率不稳定</td>
+</tr>
+<tr>
+<td align="left"><strong>FIFO（先进先出）</strong></td>
+<td align="left"><strong>最早调入</strong>的行</td>
+<td align="left">实现简单；可能淘汰热块，有 Belady 异常</td>
+</tr>
+<tr>
+<td align="left"><strong>LRU（最久未使用）</strong></td>
+<td align="left"><strong>最久未被访问</strong>的行</td>
+<td align="left"><strong>命中率最高</strong>，需硬件记录访问时序，成本稍高</td>
+</tr>
+</tbody></table>
+<p>LRU&#x2F;FIFO 的完整逐帧演算表、Belady 异常与 Clock（二次机会）算法见《虚拟内存与页面置换算法》——Cache 替换与 OS 页面置换<strong>思想完全一致</strong>，区别只是：<strong>Cache 替换由硬件实现，页面置换由操作系统软件实现</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>直接映射的主存块只有唯一去处，冲突时只能换掉那一行，无需替换算法</strong>；只有全相联和组相联才需要。<br><strong>易错点</strong>：组相联的替换在<strong>组内</strong>进行——每组独立维护自己的 LRU&#x2F;FIFO 信息，某个块只可能替换<strong>同组</strong>内的行，绝不会跨组淘汰。</p>
+</blockquote>
+<p>小例体会 LRU 与 FIFO 的差别——全相联 3 行，访问序列 1, 2, 3, 1, 2, 4：</p>
+<table>
+<thead>
+<tr>
+<th align="center">访问</th>
+<th align="center">结果</th>
+<th align="left">LRU（右侧最新）</th>
+<th align="left">FIFO（右侧最新调入）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">缺</td>
+<td align="left">[1]</td>
+<td align="left">[1]</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">缺</td>
+<td align="left">[1, 2]</td>
+<td align="left">[1, 2]</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">缺</td>
+<td align="left">[1, 2, 3]</td>
+<td align="left">[1, 2, 3]</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center"><strong>命中</strong></td>
+<td align="left">[2, 3, <strong>1</strong>]（1 刷新为最新）</td>
+<td align="left">[1, 2, 3]（顺序不动）</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center"><strong>命中</strong></td>
+<td align="left">[3, 1, <strong>2</strong>]</td>
+<td align="left">[1, 2, 3]</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">缺</td>
+<td align="left">淘汰 3 → [1, 2, 4]</td>
+<td align="left"><strong>淘汰 1</strong> → [2, 3, 4]</td>
+</tr>
+</tbody></table>
+<p>两种算法缺块次数同为 4，但<strong>淘汰对象不同</strong>：FIFO 把刚被访问过的热块 1 淘汰，LRU 淘汰的是真正最久未用的 3。本质区别：<strong>LRU 每次命中都要调整该行的”新旧”位置，FIFO 只记录进入顺序</strong>，故 LRU 命中率更高但硬件更贵。</p>
+<h2 id="Cache-的写策略"><a href="#Cache-的写策略" class="headerlink" title="Cache 的写策略"></a>Cache 的写策略</h2><p>读操作缺失只需调块；<strong>写操作</strong>的难点在于：写入 Cache 后，主存里的旧副本如何处理。</p>
+<h3 id="写命中：全写法与回写法"><a href="#写命中：全写法与回写法" class="headerlink" title="写命中：全写法与回写法"></a>写命中：全写法与回写法</h3><table>
+<thead>
+<tr>
+<th align="left">策略</th>
+<th align="left">做法</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>全写法（write-through，写直达）</strong></td>
+<td align="left"><strong>同时写入 Cache 和主存</strong></td>
+<td align="left">主存始终最新，<strong>一致性好</strong>，实现简单</td>
+<td align="left">每次写都访问慢速主存，写入慢、占带宽</td>
+</tr>
+<tr>
+<td align="left"><strong>回写法（write-back）</strong></td>
+<td align="left"><strong>只写 Cache</strong>，置该行<strong>脏位（dirty bit）</strong>；该行被<strong>替换出去时</strong>才一次性写回主存</td>
+<td align="left">写速度同 Cache，大幅减少访存次数</td>
+<td align="left">主存暂时”过时”，需脏位支持，实现复杂</td>
+</tr>
+</tbody></table>
+<p>全写法常配<strong>写缓冲（write buffer）</strong>：写主存的请求先进 FIFO 缓冲，CPU 不等主存写完即可继续工作，由写缓冲在后台慢慢写入，缓解速度瓶颈（缓冲满时 CPU 仍需暂停）。</p>
+<h3 id="写不命中：写分配与非写分配"><a href="#写不命中：写分配与非写分配" class="headerlink" title="写不命中：写分配与非写分配"></a>写不命中：写分配与非写分配</h3><table>
+<thead>
+<tr>
+<th align="left">策略</th>
+<th align="left">做法</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>写分配法（write-allocate）</strong></td>
+<td align="left">先把该主存块<strong>调入 Cache</strong>，再在 Cache 中写</td>
+<td align="left">赌后续还要读写（局部性），<strong>通常搭配回写法</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>非写分配法（no-write-allocate）</strong></td>
+<td align="left"><strong>不调入 Cache</strong>，直接写主存</td>
+<td align="left">适合一次写入的大块数据，<strong>通常搭配全写法</strong></td>
+</tr>
+</tbody></table>
+<h3 id="四种组合与常用搭配"><a href="#四种组合与常用搭配" class="headerlink" title="四种组合与常用搭配"></a>四种组合与常用搭配</h3><table>
+<thead>
+<tr>
+<th align="left">组合</th>
+<th align="left">常用度</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>全写法 + 非写分配</strong></td>
+<td align="left">✅ 常用</td>
+<td align="left">经典搭配：写缺失直接写主存，不污染 Cache</td>
+</tr>
+<tr>
+<td align="left"><strong>回写法 + 写分配</strong></td>
+<td align="left">✅ <strong>常用（现代 CPU 主流）</strong></td>
+<td align="left">写缺失也调块，写操作尽量在 Cache 内完成</td>
+</tr>
+<tr>
+<td align="left">全写法 + 写分配</td>
+<td align="left">少见</td>
+<td align="left">逻辑自洽但无益：刚把块调进 Cache 又立即同步写主存</td>
+</tr>
+<tr>
+<td align="left">回写法 + 非写分配</td>
+<td align="left">少见</td>
+<td align="left">写不进 Cache，脏位无从使用</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>全写法通常配非写分配、回写法配写分配</strong>——两两成对记忆。<br><strong>易错点</strong>：写分配&#x2F;非写分配只针对<strong>写缺失</strong>，写命中只谈全写&#x2F;回写；回写法下主存不是最新值，<strong>DMA 设备直接读写主存时会读到旧数据</strong>，需 OS 或硬件保证 Cache 与主存一致性（考纲边缘，了解即可）。另有<strong>写一次法</strong>：首次写命中按全写法处理、之后按回写法，用于多处理器一致性场景。</p>
+</blockquote>
+<h2 id="虚拟存储器"><a href="#虚拟存储器" class="headerlink" title="虚拟存储器"></a>虚拟存储器</h2><p><strong>虚拟存储器</strong>将主存和辅存统一编址：程序员按<strong>虚拟地址（逻辑地址）<strong>编程，运行时由</strong>硬件（MMU）+ 操作系统</strong>自动把虚地址转换成<strong>物理地址（实地址）</strong>。三个地址空间：</p>
+<table>
+<thead>
+<tr>
+<th align="left">地址空间</th>
+<th align="left">谁在用</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>虚拟地址</strong></td>
+<td align="left">程序员 &#x2F; CPU 发出</td>
+<td align="left">程序看到的连续大空间</td>
+</tr>
+<tr>
+<td align="left"><strong>物理地址</strong></td>
+<td align="left">MMU 转换后产生</td>
+<td align="left">实际访问主存（查 Cache &#x2F; 主存）用</td>
+</tr>
+<tr>
+<td align="left"><strong>磁盘地址</strong></td>
+<td align="left">OS 内部</td>
+<td align="left">缺页时定位辅存上的数据</td>
+</tr>
+</tbody></table>
+<p>三种实现——<strong>页式、段式、段页式</strong>——与 OS 侧的管理机制（《内存管理：连续分配与分页分段》《虚拟内存与页面置换算法》）一一对应；计组只关注<strong>地址转换的数据通路</strong>。</p>
+<p><strong>虚拟存储器与 Cache 的异同</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比</th>
+<th align="left">Cache</th>
+<th align="left">虚拟存储器</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">解决的矛盾</td>
+<td align="left">CPU 与主存的<strong>速度</strong>差</td>
+<td align="left">主存与磁盘的<strong>容量</strong>差</td>
+</tr>
+<tr>
+<td align="left">层次</td>
+<td align="left">Cache ↔ 主存（SRAM ↔ DRAM）</td>
+<td align="left">主存 ↔ 磁盘（DRAM ↔ 磁盘）</td>
+</tr>
+<tr>
+<td align="left">传送单位</td>
+<td align="left">块（几十 B）</td>
+<td align="left">页（通常 4KB）</td>
+</tr>
+<tr>
+<td align="left">缺失处理</td>
+<td align="left"><strong>硬件</strong>自动调块</td>
+<td align="left"><strong>OS 缺页中断</strong>调页（软件）</td>
+</tr>
+<tr>
+<td align="left">加速手段</td>
+<td align="left">本身即高速缓存</td>
+<td align="left"><strong>TLB</strong> 加速地址转换</td>
+</tr>
+</tbody></table>
+<h3 id="页式虚拟存储器"><a href="#页式虚拟存储器" class="headerlink" title="页式虚拟存储器"></a>页式虚拟存储器</h3><p>虚拟空间与物理空间都划分成<strong>固定大小</strong>的页（主存侧对应称页框），通常 <strong>4KB</strong>。</p>
+<ul>
+<li>虚拟地址 &#x3D; <strong>虚页号（VPN）+ 页内偏移</strong>；页的划分对程序员透明</li>
+<li><strong>页表放在主存中</strong>，页表基址寄存器指向页表；页表项含<strong>有效位（装入位）+ 物理页框号</strong>（及修改位、访问位、权限位等）</li>
+<li>转换过程：虚页号查页表 → 有效位 &#x3D; 1 则取出<strong>页框号</strong>，<strong>拼接页内偏移</strong>得到物理地址；有效位 &#x3D; 0 → <strong>缺页中断</strong>，OS 调页并可能触发页面置换</li>
+</ul>
+<p><strong>例题</strong>：页大小 <strong>4KB</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>B），虚拟地址 32 位 → 页内偏移 <strong>12 位</strong>、虚页号 <strong>20 位</strong>。设虚拟地址 &#x3D; <code>0x00005294</code>，页表中页 5 对应页框 <code>0x1B</code> 且有效，求物理地址。</p>
+<ol>
+<li>拆分：<code>0x00005294</code> → 虚页号 &#x3D; <code>0x00005</code> &#x3D; <strong>5</strong>，页内偏移 &#x3D; <code>0x294</code></li>
+<li>查页表：页 5 有效，页框号 &#x3D; <code>0x1B</code></li>
+<li>拼接：物理地址 &#x3D; <code>0x1B</code> × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span> + <code>0x294</code> &#x3D; <strong><code>0x0001B294</code></strong></li>
+</ol>
+<p><strong>验算</strong>：<code>0x1B000 + 0x294 = 0x1B294</code> ✓，页内偏移 <code>0x294</code> 原样保留。</p>
+<blockquote>
+<p><strong>易错点</strong>：<strong>页内偏移转换前后不变</strong>（页大小 &#x3D; 页框大小）；页表项存放的是页<strong>框号</strong>而非完整物理地址。</p>
+</blockquote>
+<h3 id="段式虚拟存储器"><a href="#段式虚拟存储器" class="headerlink" title="段式虚拟存储器"></a>段式虚拟存储器</h3><p>按程序的<strong>逻辑结构</strong>分段（代码段、数据段、栈段…），<strong>各段长度不等</strong>。</p>
+<ul>
+<li>虚拟地址 &#x3D; <strong>段号 + 段内偏移</strong></li>
+<li><strong>段表项</strong> &#x3D; 段基址 + <strong>段长</strong>（+ 有效位、权限位）</li>
+<li>转换过程：段号查段表 → 取出段基址，<strong>先越界检查</strong>（段内偏移 &lt; 段长，否则保护中断）→ 物理地址 &#x3D; <strong>段基址 + 段内偏移</strong></li>
+<li>优点：模块边界清晰，<strong>便于共享与保护</strong>（按段设置读写权限）；缺点：段长可变，主存易产生<strong>外部碎片</strong></li>
+</ul>
+<h3 id="段页式虚拟存储器"><a href="#段页式虚拟存储器" class="headerlink" title="段页式虚拟存储器"></a>段页式虚拟存储器</h3><p>先按逻辑<strong>分段</strong>，段内再<strong>定长分页</strong>：虚拟地址 &#x3D; <strong>段号 + 段内页号 + 页内偏移</strong>。转换需<strong>两次查表</strong>：段号查<strong>段表</strong>得该段页表的基址 → 段内页号查<strong>页表</strong>得页框号 → 拼接页内偏移。兼得”便于共享保护”（段）与”管理规整、无外部碎片”（页），代价是地址转换多查一次表。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比</th>
+<th align="left">页式</th>
+<th align="left">段式</th>
+<th align="left">段页式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">划分依据</td>
+<td align="left">固定大小（物理划分）</td>
+<td align="left">逻辑结构（可变长）</td>
+<td align="left">先逻辑分段、段内定长分页</td>
+</tr>
+<tr>
+<td align="left">碎片</td>
+<td align="left">内部碎片</td>
+<td align="left"><strong>外部碎片</strong></td>
+<td align="left">内部碎片</td>
+</tr>
+<tr>
+<td align="left">共享 &#x2F; 保护</td>
+<td align="left">不方便</td>
+<td align="left"><strong>方便</strong></td>
+<td align="left">方便</td>
+</tr>
+<tr>
+<td align="left">地址转换</td>
+<td align="left">1 次查表（页表）</td>
+<td align="left">1 次查表（段表）+ 越界检查</td>
+<td align="left"><strong>2 次查表</strong>（段表 + 页表）</td>
+</tr>
+</tbody></table>
+<h3 id="快表-TLB：页表项的-Cache"><a href="#快表-TLB：页表项的-Cache" class="headerlink" title="快表 TLB：页表项的 Cache"></a>快表 TLB：页表项的 Cache</h3><p>页表放在主存 → 每次地址转换都要<strong>多访问一次主存</strong>（多级页表更多），加上取数本身，一次访存变成两三次，速度损失大。解决办法：<strong>TLB（快表，Translation Lookaside Buffer）——页表项的小容量高速缓存</strong>，用 SRAM 相联存储器存放最近用过的”虚页号 → 页框号”映射。</p>
+<ul>
+<li>TLB 条目 &#x3D; <strong>有效位 + 虚页号 + 物理页框号</strong>（附加权限、修改位等）</li>
+<li>容量很小（几十&#126;几百项），通常<strong>全相联</strong>或高路数组相联；命中率 <strong>&gt; 99%</strong>（页访问局部性极强）</li>
+<li><strong>TLB 命中 → 直接得到页框号，无需访问主存中的页表</strong>；TLB 未命中 → 访主存查页表，并把该页表项<strong>调入 TLB</strong></li>
+<li>TLB 与 Cache 的分工：<strong>TLB 缓存的是”页表项”（服务地址转换），Cache 缓存的是”数据”（服务取指令&#x2F;操作数）</strong>——两者都是 SRAM 高速缓存、都靠局部性、都要替换算法，但缓存对象与所处流程不同</li>
+</ul>
+<p>完整访存流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">虚地址 ──查TLB──命中──▶ 页框号+页内偏移=物理地址 ──查Cache──命中──▶ 取数完成（0次访主存）</span><br><span class="line">           │未命中                                        │缺失</span><br><span class="line">           ▼                                              ▼</span><br><span class="line">   访问主存中的页表（得页框号，并更新TLB）            访问主存取数据（同时调块入Cache）</span><br></pre></td></tr></table></figure>
+
+<p><strong>TLB &#x2F; Cache 组合例题</strong>：查 TLB 需 1ns，查 Cache 需 10ns，访问主存一次需 100ns（页表项与数据都在主存；TLB 未命中时页表项直接从主存读取，忽略 TLB 与 Cache 的更新时间、缺页情形单独讨论）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">情形</th>
+<th align="center">TLB</th>
+<th align="center">Cache</th>
+<th align="center">访问主存次数</th>
+<th align="left">耗时</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="center">命中</td>
+<td align="center">命中</td>
+<td align="center"><strong>0 次</strong>（最快）</td>
+<td align="left">1 + 10 &#x3D; <strong>11 ns</strong></td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="center">命中</td>
+<td align="center">缺失</td>
+<td align="center">1 次（取数据）</td>
+<td align="left">1 + 10 + 100 &#x3D; 111 ns</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="center">缺失</td>
+<td align="center">命中</td>
+<td align="center">1 次（取页表项）</td>
+<td align="left">1 + 100 + 10 &#x3D; 111 ns</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="center">缺失</td>
+<td align="center">缺失</td>
+<td align="center"><strong>2 次</strong>（先取页表项、再取数据，最慢）</td>
+<td align="left">1 + 100 + 10 + 100 &#x3D; <strong>211 ns</strong></td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="center"><strong>缺页</strong>：另行触发缺页中断</td>
+<td align="left">OS 访磁盘调页，毫秒级，调页后重新执行本指令</td>
+</tr>
+</tbody></table>
+<p><strong>平均访问时间</strong>：设 TLB 命中率 90%、Cache 命中率 95%。</p>
+<ul>
+<li>TLB 命中（概率 0.9）：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0.95</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.05</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">100</span><span class="mclose">)]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">9.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">5.5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16.5</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span></li>
+<li>TLB 未命中（概率 0.1）：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">15.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">116.5</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span></li>
+<li>平均访问时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.9</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">116.5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">14.85</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">11.65</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">26.5</span><span class="mord text"><span class="mord"> ns</span></span></span></span></span></span></li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：一次成功访存中 TLB、页表、Cache 各自可命中&#x2F;缺失——<strong>最小访存 0 次（双命中）、最多 2 次（双缺失）</strong>，缺页另算；<strong>TLB 命中则免访主存中的页表</strong>。<br><strong>易错点</strong>：必须<strong>先生成物理地址、再查 Cache</strong>（页内偏移转换前后不变，故实际 CPU 中 TLB 查找与 Cache 索引可部分并行——VIPT 技术，了解即可）。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">工作原理</td>
+<td align="left">CPU↔Cache 按<strong>字</strong>、Cache↔主存按<strong>块</strong>；行 &#x3D; 有效位 + 标记 + 数据</td>
+</tr>
+<tr>
+<td align="left">命中率与平均访问时间</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>；先后口径 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>；<strong>同时启动</strong>则 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">a</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mclose">)</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">Cache 容量</td>
+<td align="left">行数 ×（标记位 + 数据位 + 有效位 + 脏位等控制位）</td>
+</tr>
+<tr>
+<td align="left">直接映射</td>
+<td align="left">行号 &#x3D; 块号 <strong>mod 行数</strong>；1 个比较器；冲突缺失多（抖动）</td>
+</tr>
+<tr>
+<td align="left">全相联</td>
+<td align="left">可放<strong>任意行</strong>；地址 &#x3D; 标记 + 块内；CAM 全行并行比较；成本极高 → 用于 <strong>TLB</strong></td>
+</tr>
+<tr>
+<td align="left">组相联</td>
+<td align="left"><strong>组间直接、组内全相联</strong>；组号 &#x3D; 块号 mod 组数；2&#126;8 路为现代 CPU 主流</td>
+</tr>
+<tr>
+<td align="left">地址划分</td>
+<td align="left">块内 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span></span></span></span>块大小；行号&#x2F;组号 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span></span></span></span>行数&#x2F;组数；标记 &#x3D; 总位数 − 其余；同参数标记位数<strong>全相联 &gt; 组相联 &gt; 直接映射</strong></td>
+</tr>
+<tr>
+<td align="left">缺失类型</td>
+<td align="left"><strong>强制</strong>（首访）&#x2F; <strong>容量</strong>（装不下）&#x2F; <strong>冲突</strong>（争行）；全相联无冲突缺失</td>
+</tr>
+<tr>
+<td align="left">替换算法</td>
+<td align="left">RAND &#x2F; FIFO &#x2F; <strong>LRU（命中率最高）</strong>；<strong>直接映射无需替换算法</strong>；思想同 OS 页面置换</td>
+</tr>
+<tr>
+<td align="left">写命中</td>
+<td align="left"><strong>全写法</strong>（同时写主存，配写缓冲）vs <strong>回写法</strong>（脏位，替换时才写回）</td>
+</tr>
+<tr>
+<td align="left">写缺失与搭配</td>
+<td align="left"><strong>写分配</strong>（调块入 Cache）vs <strong>非写分配</strong>（直写主存）；常用：<strong>全写 + 非写分配</strong>、<strong>回写 + 写分配（主流）</strong>；DMA 直接访主存有一致性问题</td>
+</tr>
+<tr>
+<td align="left">Cache vs 虚存</td>
+<td align="left">速度层次 vs 容量层次；Cache 缺失<strong>硬件</strong>调块、缺页 <strong>OS 中断</strong>调页</td>
+</tr>
+<tr>
+<td align="left">页式转换</td>
+<td align="left">虚页号查页表得<strong>页框号</strong>，拼接<strong>不变的页内偏移</strong>；页表在<strong>主存</strong></td>
+</tr>
+<tr>
+<td align="left">段式与段页式</td>
+<td align="left">段表项 &#x3D; 基址 + <strong>段长</strong>（越界检查）；段页式<strong>两次查表</strong>（段表 + 页表）</td>
+</tr>
+<tr>
+<td align="left">TLB</td>
+<td align="left"><strong>页表项的 Cache</strong>，全相联小容量、命中率 &gt;99%；<strong>命中则免访主存页表</strong></td>
+</tr>
+<tr>
+<td align="left">TLB&#x2F;Cache 组合</td>
+<td align="left">最快 <strong>0 次</strong>访主存（双命中）、最慢 <strong>2 次</strong>（双缺失）；缺页毫秒级</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:04:21.710Z" itemprop="dateUpdated">2026-08-29 16:04:21</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%AD%98%E5%82%A8%E5%99%A8/" rel="tag">存储器</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&title=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&title=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">指令系统</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%82%A8%E5%99%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">存储系统与主存储器</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&title=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&title=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Cache与虚拟存储器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

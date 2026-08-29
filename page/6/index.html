@@ -166,11 +166,11 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
-            <article id="post-顺序栈的实现"
+            <article id="post-快速排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:30:00" datetime="2026-08-09T01:30:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 12:20:00" datetime="2026-08-09T04:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -184,7 +184,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/">顺序栈的实现（静态与动态）</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/">快速排序</a>
     </h3>
   
 
@@ -194,26 +194,26 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        顺序栈利用一段物理地址连续的存储空间（数组）存储栈内元素，分静态和动态两种，核心区别在于底层数组容量是否可以在运行期间改变。
+        快速排序是分治算法：每次选一个枢轴（pivot），将序列划分为左右两部分——左边全部 ≤ pivot，右边全部 ≥ pivot，然后递归排序左右子序列。
 
                 
                     
                     
                 
-                栈的结构示意图
+                快速排序示意图
             
 
-静态顺序栈容量在编译时就固定，通常用宏...
+算法实现1...
     
 
-        <a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%88/" rel="tag">栈</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -222,11 +222,11 @@
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-循环链表与双链表"
+            <article id="post-冒泡排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:25:00" datetime="2026-08-09T01:25:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 12:15:00" datetime="2026-08-09T04:15:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -240,7 +240,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/">循环链表与双链表</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/">冒泡排序</a>
     </h3>
   
 
@@ -250,26 +250,18 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        循环链表将原本指向 NULL 的尾巴重新连回头结点；双链表在每个节点多塞一个指针 prior，用空间换时间把”找前驱”从 O(n) 降到 O(1)。
-
-                
-                    
-                    
-                
-                循环链表头尾指针示意
-            
-
-循环单链...
+        每趟从头到尾依次比较相邻元素，若逆序则交换——每趟把最大值”冒”到末尾。若某趟无交换，则已有序，提前结束。
+排序过程示例12345初始:  49  38  65  97  76  13  27第1趟: 38↙49  65  76↙97  13↙97  27↙97   → 38  49  65  76  13  27  [97]第2趟: 38  49  65  13↙76  27↙76 [76...
     
 
-        <a href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -278,11 +270,11 @@
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-单链表删除重复节点"
+            <article id="post-希尔排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:20:00" datetime="2026-08-09T01:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 12:10:00" datetime="2026-08-09T04:10:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -296,7 +288,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E8%8A%82%E7%82%B9/">单链表删除重复节点</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/">希尔排序</a>
     </h3>
   
 
@@ -306,20 +298,18 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        在无序链表中，重复的元素可能隔得很远（如 10 -&gt; 20 -&gt; 30 -&gt; 10）。彻底去重需要三个指针各司其职：”双层嵌套循环 + 三指针暴力扫荡”。
-核心战术：为什么要用三个指针？
-锚点 p（基准）：站在原地的指挥官。如果 p 站在 10 上，它就向后下达命令：”后面所有人，谁也是 10，格杀勿论。”
-巡视员 ptr（探路）：顺着链表往下挨个查身份证，看是否跟指挥官 ...
+        希尔排序（Shell Sort，又称缩小增量法）是一种分组插入排序方法。
+排序思想① 先取一个正整数 d1​（d1​&lt;n）作为第一个增量，将全部 n 个记录分成 d1​ 组，把所有相隔 d1​ 的记录放在一组中，即对于每个 k（k=1,2,…,d1​），R[k], R[d1​+k], R[2d1​+k], … 分在同一组中，在各组内进行直接插入排序。这样一次分组和排序过程称为一趟希尔排...
     
 
-        <a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E8%8A%82%E7%82%B9/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -328,11 +318,11 @@
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-单链表的插入与删除"
+            <article id="post-折半插入排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:15:00" datetime="2026-08-09T01:15:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 12:05:00" datetime="2026-08-09T04:05:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -346,7 +336,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%8F%92%E5%85%A5%E4%B8%8E%E5%88%A0%E9%99%A4/">单链表的插入与删除</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/">折半插入排序</a>
     </h3>
   
 
@@ -356,23 +346,23 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        单链表插入&#x2F;删除的核心都是”寻找前驱“。已知位置时插入&#x2F;删除仅需改指针，O(1)；按位操作需先遍历找前驱，O(n)。
-按位插入（在第 i 个位置插入元素 e）黄金法则：先连后面大部队，再让前驱牵自己——指针赋值顺序绝对不能反！
+        当将待排序的记录 Ri​ 插入到已排好序的记录子表 R[1..i−1] 中时，由于 R1​,R2​,…,Ri−1​ 已排好序，则查找插入位置可以用**”折半查找”**实现，直接插入排序就变为折半插入排序。
 
-                
-                    
-                    
-             ...
+比较次数：折半查找定位 → O(logn) 每趟
+移动次数：不变（仍需逐个后移）
+总体：比较次数减少，移动次数不变，仍为 O(n2)
+
+算法实现123456789101112131415...
     
 
-        <a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%8F%92%E5%85%A5%E4%B8%8E%E5%88%A0%E9%99%A4/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -381,11 +371,11 @@
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-单链表的查找-按序号与按值"
+            <article id="post-直接插入排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:10:00" datetime="2026-08-09T01:10:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 12:00:00" datetime="2026-08-09T04:00:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -399,7 +389,7 @@
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%9F%A5%E6%89%BE-%E6%8C%89%E5%BA%8F%E5%8F%B7%E4%B8%8E%E6%8C%89%E5%80%BC/">单链表的查找：按序号与按值</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/">直接插入排序</a>
     </h3>
   
 
@@ -409,24 +399,24 @@
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        与顺序表（数组）O(1) 的随机访问不同，单链表的物理内存是分散的。要想找到第 i 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 next 指针一节一节往后数。因此单链表只能顺序存取，查找复杂度 O(n)。
-遍历时指针移动的三种基本操作：
+        将待排序的记录 Ri​ 插入到已排好序的记录表 R1​,R2​,…,Ri−1​ 中，得到一个新的、记录数增加 1 的有序表，直到所有记录都插入完为止。
+排序的某一时刻，记录序列分成两部分：
 
-q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和 p 指向内存中的同一个实体：
+R[1..i-1]：已排好序的有序部分
+R[i..n]：未排好序的无序部分
 
-
-                
-     ...
+刚开始排序时，R[1] 已经是排好序的。
+排序过程示例1234567初始:  [49]  38   65   97   76...
     
 
-        <a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E6%9F%A5%E6%89%BE-%E6%8C%89%E5%BA%8F%E5%8F%B7%E4%B8%8E%E6%8C%89%E5%80%BC/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
 
     </div>
     
@@ -435,11 +425,11 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-单链表的建立-头插法与尾插法"
+            <article id="post-散列表哈希表"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:05:00" datetime="2026-08-09T01:05:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 11:55:00" datetime="2026-08-09T03:55:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -453,7 +443,7 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E5%BB%BA%E7%AB%8B-%E5%A4%B4%E6%8F%92%E6%B3%95%E4%B8%8E%E5%B0%BE%E6%8F%92%E6%B3%95/">单链表的建立：头插法与尾插法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%95%A3%E5%88%97%E8%A1%A8%E5%93%88%E5%B8%8C%E8%A1%A8/">散列表（哈希表）算法</a>
     </h3>
   
 
@@ -463,18 +453,20 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        单链表通过”指针”将一个个零散的内存块（节点）串联起来。每个节点包含数据域 (data) 和指针域 (next)。
-1234typedef struct LNode &#123;    ElemType data;        // 数据域    struct LNode *next;   // 指针域，指向下一个节点&#125; LNode, *LinkList;       // LN...
+        前面所有查找方法都依赖于”比较”——通过多次关键字比较逐步缩小查找范围。散列表另辟蹊径：设计一个散列函数 H(key)，将关键字直接映射为存储地址，理想情况下一次计算即可定位，无需比较，时间复杂度 O(1)。
+
+核心思路：以空间换时间——预设一个足够大的表，用散列函数将关键字”分散”到不同地址
+冲突不可避免：当 H(k1​)=H(k2​) 且 k1​=k2​ 时发生冲突——需要冲突处理方法...
     
 
-        <a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%9A%84%E5%BB%BA%E7%AB%8B-%E5%A4%B4%E6%8F%92%E6%B3%95%E4%B8%8E%E5%B0%BE%E6%8F%92%E6%B3%95/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E6%95%A3%E5%88%97%E8%A1%A8%E5%93%88%E5%B8%8C%E8%A1%A8/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
 
     </div>
     
@@ -483,11 +475,11 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-顺序表的基本操作"
+            <article id="post-B树与B加树"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 09:00:00" datetime="2026-08-09T01:00:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 11:50:00" datetime="2026-08-09T03:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -501,7 +493,7 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E8%A1%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">顺序表的基本操作</a>
+      <a class="post-title-link" href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/">B树与B+树</a>
     </h3>
   
 
@@ -511,19 +503,20 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        顺序表（Sequential List）用顺序存储的方式实现线性表——把逻辑上相邻的元素存储在**物理位置上也相邻（地址连续）**的存储单元中。随机存取 O(1)，但插入&#x2F;删除需移动大量元素。
-结构定义静态分配（数组方式，长度定死）：
-123456#define MaxSize 10          // 定义最大长度typedef struct &#123;    ElemTy...
+        大型数据库中数据存储在磁盘，磁盘 I&#x2F;O 次数是性能瓶颈。平衡 BST 每次比较可能访问一个新结点（一次磁盘 I&#x2F;O），log2​n 次 I&#x2F;O 无法接受。
+解决思路：让一个结点容纳多个关键字 → 多路查找树。一个结点大小 ≈ 一个磁盘页，一次 I&#x2F;O 读取多个关键字，大幅降低树高。
+
+R. Bayer 和 E. McCreight（1972）提出 B...
     
 
-        <a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E8%A1%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
 
     </div>
     
@@ -532,14 +525,14 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-搭建个人博客"
+            <article id="post-红黑树算法"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-07-23 14:00:00" datetime="2026-07-23T06:00:00.000Z"  itemprop="datePublished">2026-07-23</time>
+        <time class="post-time" title="2026-08-09 11:45:00" datetime="2026-08-09T03:45:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E5%8D%9A%E5%AE%A2/">博客</a></li></ul>
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
 
 
 
@@ -550,7 +543,7 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/07/23/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">搭建个人博客</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E7%BA%A2%E9%BB%91%E6%A0%91%E7%AE%97%E6%B3%95/">红黑树算法</a>
     </h3>
   
 
@@ -560,22 +553,129 @@ q = p（共享同一节点）：没有产生新的物理节点，只是让 q 和
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        前言本博客使用 Hexo 搭建，选用 Material Design 风格的 hexo-theme-indigo 主题。
-环境准备
-Node.js：Hexo 基于 Node.js，需提前安装
-Git：用于版本管理和部署到 GitHub Pages
+        AVL 通过严格的平衡因子（∥BF∥≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。
+定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：
 
-快速开始123456789101112# 安装 Hexo CLInpm install -g hexo-cli# 初始化博客hexo init ...
+
+
+#
+性质
+说明
+
+
+
+①
+每个结点是红色或黑色
+...
     
 
-        <a href="/blog/2026/07/23/%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E7%BA%A2%E9%BB%91%E6%A0%91%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
     
     <div class="post-footer">
         
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/GitHub-Pages/" rel="tag">GitHub Pages</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Hexo/" rel="tag">Hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" rel="tag">个人博客</a></li></ul>
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-分块查找算法"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 11:40:00" datetime="2026-08-09T03:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">分块查找算法</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        将数据分块，块间有序但块内无序。建立索引表记录每块的最大关键字和起始地址。查找分两步：① 在索引表中折半（或顺序）确定所在块 → ② 在块内顺序查找。
+结构示意123456789101112index table:           data table (3 blocks, 3 elems each):┌────┬──────┐          ┌───┬───┬───┬───┬───...
+    
+
+        <a href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-折半查找算法"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 11:35:00" datetime="2026-08-09T03:35:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">折半查找算法</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        每次取中间位置元素与关键字比较，每次将查找范围缩小一半，直到找到或区间为空。
+
+前提：查找表必须有序，且采用顺序存储（随机访问）。
+
+算法实现1234567891011121314int BinarySearch(int a[], int n, int key) &#123;    int low = 0, high = n - 1, mid;    while (low &lt;= hig...
+    
+
+        <a href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
 
     </div>
     
@@ -588,7 +688,7 @@ Git：用于版本管理和部署到 GitHub Pages
     
 <nav id="page-nav">
     <div class="inner">
-    <a class="extend prev" rel="prev" href="/blog/page/5/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span>
+    <a class="extend prev" rel="prev" href="/blog/page/5/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><a class="page-number" href="/blog/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" href="/blog/page/7/">下一页</a>
     </div>
 </nav>
 

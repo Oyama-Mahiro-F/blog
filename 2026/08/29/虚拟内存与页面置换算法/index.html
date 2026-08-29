@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>虚拟内存与页面置换算法 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统,内存管理">
+    <meta name="description" content="连续分配、基本分页&#x2F;分段（见姊妹篇《内存管理：连续分配与分页分段》）有一个共同瓶颈：程序必须一次性全部装入内存，且装入后一直驻留到运行结束——大程序装不进，多道程序并发度也上不去。虚拟存储器（Virtual Memory）利用局部性原理突破这一限制：程序只需部分装入即可启动，其余部分”用时再调、缺了再换”，让进程在逻辑上拥有比物理内存大得多的存储空间。408 对本章的考查集中在：虚拟内存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟内存与页面置换算法">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="连续分配、基本分页&#x2F;分段（见姊妹篇《内存管理：连续分配与分页分段》）有一个共同瓶颈：程序必须一次性全部装入内存，且装入后一直驻留到运行结束——大程序装不进，多道程序并发度也上不去。虚拟存储器（Virtual Memory）利用局部性原理突破这一限制：程序只需部分装入即可启动，其余部分”用时再调、缺了再换”，让进程在逻辑上拥有比物理内存大得多的存储空间。408 对本章的考查集中在：虚拟内存">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-29T09:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:26:12.746Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">虚拟内存与页面置换算法</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">虚拟内存与页面置换算法</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T09:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.</span> <span class="post-toc-text">虚拟内存的基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7%E5%8E%9F%E7%90%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">局部性原理：虚拟内存的理论基础</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E7%89%B9%E5%BE%81"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">虚拟存储器的定义与特征</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F%E4%B8%8E%E5%AE%B9%E9%87%8F"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">实现方式与容量</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AF%B7%E6%B1%82%E5%88%86%E9%A1%B5%E7%AE%A1%E7%90%86%E6%96%B9%E5%BC%8F"><span class="post-toc-number">2.</span> <span class="post-toc-text">请求分页管理方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AF%B7%E6%B1%82%E9%A1%B5%E8%A1%A8%E6%9C%BA%E6%9E%84%EF%BC%9A%E6%96%B0%E5%A2%9E%E5%9B%9B%E4%B8%AA%E5%AD%97%E6%AE%B5"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">请求页表机构：新增四个字段</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BC%BA%E9%A1%B5%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">缺页中断与处理流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AF%B7%E6%B1%82%E5%88%86%E9%A1%B5%E7%9A%84%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2%E8%BF%87%E7%A8%8B"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">请求分页的地址变换过程</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%A1%B5%E6%A1%86%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="post-toc-number">3.</span> <span class="post-toc-text">页框分配与回收</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A9%BB%E7%95%99%E9%9B%86%EF%BC%9A%E5%88%86%E9%85%8D%E5%A4%9A%E5%B0%91%E9%A1%B5%E6%A1%86%E6%89%8D%E5%90%88%E9%80%82"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">驻留集：分配多少页框才合适</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A1%B5%E6%A1%86%E5%88%86%E9%85%8D%E7%9A%84%E4%B8%89%E7%A7%8D%E7%AE%97%E6%B3%95"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">页框分配的三种算法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%BA%E5%AE%9A-vs-%E5%8F%AF%E5%8F%98%E3%80%81%E5%85%A8%E5%B1%80-vs-%E5%B1%80%E9%83%A8%E7%BD%AE%E6%8D%A2"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">固定 vs 可变、全局 vs 局部置换</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95"><span class="post-toc-number">4.</span> <span class="post-toc-text">页面置换算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9C%80%E4%BD%B3%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95-OPT"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">最佳置换算法 OPT</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%88%E8%BF%9B%E5%85%88%E5%87%BA%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95-FIFO-%E4%B8%8E-Belady-%E5%BC%82%E5%B8%B8"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">先进先出置换算法 FIFO 与 Belady 异常</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9C%80%E8%BF%91%E6%9C%80%E4%B9%85%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95-LRU"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">最近最久未使用置换算法 LRU</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%97%B6%E9%92%9F%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95-Clock%EF%BC%88NRU%EF%BC%89%E4%B8%8E%E6%94%B9%E8%BF%9B%E5%9E%8B"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">时钟置换算法 Clock（NRU）与改进型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BC%BA%E9%A1%B5%E7%8E%87%E6%BC%94%E7%AE%97%EF%BC%9A%E5%90%8C%E4%B8%80%E5%BA%8F%E5%88%97%E8%B7%91%E4%B8%89%E7%A7%8D%E7%AE%97%E6%B3%95%EF%BC%88%E6%A0%B8%E5%BF%83%E4%BE%8B%E9%A2%98%EF%BC%89"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">缺页率演算：同一序列跑三种算法（核心例题）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9B%E7%A7%8D%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95%E5%A4%A7%E5%AF%B9%E6%AF%94"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">四种置换算法大对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6"><span class="post-toc-number">5.</span> <span class="post-toc-text">内存映射文件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D%E5%9B%A0%E7%B4%A0%E5%8F%8A%E6%94%B9%E8%BF%9B%E6%96%B9%E6%B3%95"><span class="post-toc-number">6.</span> <span class="post-toc-text">虚拟存储器性能的影响因素及改进方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8A%96%E5%8A%A8%EF%BC%88%E9%A2%A0%E7%B0%B8%EF%BC%89"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">抖动（颠簸）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B7%A5%E4%BD%9C%E9%9B%86"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">工作集</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9C%89%E6%95%88%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4%E4%B8%8E%E7%BC%BA%E9%A1%B5%E7%8E%87"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">有效访问时间与缺页率</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BD%B1%E5%93%8D%E7%BC%BA%E9%A1%B5%E7%8E%87%E7%9A%84%E5%9B%A0%E7%B4%A0%E4%B8%8E%E6%94%B9%E8%BF%9B%E6%96%B9%E6%B3%95"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">影响缺页率的因素与改进方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-虚拟内存与页面置换算法"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">虚拟内存与页面置换算法</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 17:30:00" datetime="2026-08-29T09:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>连续分配、基本分页&#x2F;分段（见姊妹篇《内存管理：连续分配与分页分段》）有一个共同瓶颈：<strong>程序必须一次性全部装入内存，且装入后一直驻留到运行结束</strong>——大程序装不进，多道程序并发度也上不去。<strong>虚拟存储器（Virtual Memory）<strong>利用</strong>局部性原理</strong>突破这一限制：程序只需<strong>部分装入</strong>即可启动，其余部分”用时再调、缺了再换”，让进程在逻辑上拥有比物理内存大得多的存储空间。408 对本章的考查集中在：<strong>虚拟内存的概念与特征、请求分页与缺页中断、页框分配策略、页面置换算法（OPT &#x2F; FIFO &#x2F; Clock &#x2F; LRU）的缺页率演算、抖动与工作集</strong>——其中置换算法的手算快照几乎年年出现。</p>
+<h2 id="虚拟内存的基本概念"><a href="#虚拟内存的基本概念" class="headerlink" title="虚拟内存的基本概念"></a>虚拟内存的基本概念</h2><h3 id="局部性原理：虚拟内存的理论基础"><a href="#局部性原理：虚拟内存的理论基础" class="headerlink" title="局部性原理：虚拟内存的理论基础"></a>局部性原理：虚拟内存的理论基础</h3><p>程序运行时对存储器的访问是<strong>不均匀、相对集中</strong>的，这一现象称为<strong>局部性原理（Locality）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">局部性</th>
+<th align="left">含义</th>
+<th align="left">典型例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>时间局部性</strong></td>
+<td align="left">刚被访问过的项，<strong>不久后再次被访问</strong></td>
+<td align="left">循环语句、反复调用的函数、热点变量</td>
+</tr>
+<tr>
+<td align="left"><strong>空间局部性</strong></td>
+<td align="left">刚被访问过的存储单元，其<strong>附近单元即将被访问</strong></td>
+<td align="left">顺序执行的指令、按行遍历的数组</td>
+</tr>
+</tbody></table>
+<p>正因局部性存在，程序在任一时间段内真正活跃的只是<strong>一小部分页面</strong>——只把这部分装入内存，缺页率就不会太高，程序便能”部分装入”照常运行。<strong>局部性原理是虚拟存储器能够实现的理论基础</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：题目问”虚拟内存的理论基础是什么”，答<strong>局部性原理</strong>（时间局部性 + 空间局部性）。</p>
+</blockquote>
+<h3 id="虚拟存储器的定义与特征"><a href="#虚拟存储器的定义与特征" class="headerlink" title="虚拟存储器的定义与特征"></a>虚拟存储器的定义与特征</h3><p><strong>虚拟存储器</strong>：基于局部性原理，程序装入时<strong>只装入部分页面</strong>即可运行，运行过程中再把它需要的页面（或段）<strong>陆续调入内存</strong>；暂不运行的内容可<strong>换出</strong>到外存。进程按<strong>逻辑地址空间</strong>编址，仿佛拥有一个容量远大于物理内存的”存储器”。</p>
+<p><strong>传统存储管理 vs 虚拟存储管理</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">传统存储管理</th>
+<th align="left">虚拟存储管理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">装入方式</td>
+<td align="left"><strong>一次性</strong>：作业必须整体装入才能运行（瓶颈一）</td>
+<td align="left"><strong>多次性</strong>：分多次调入，每次只装一部分（<strong>最重要特征</strong>）</td>
+</tr>
+<tr>
+<td align="left">驻留方式</td>
+<td align="left"><strong>驻留性</strong>：装入后一直占住内存直到结束（瓶颈二）</td>
+<td align="left"><strong>对换性</strong>：运行中可在内存与外存间<strong>换入换出</strong></td>
+</tr>
+<tr>
+<td align="left">逻辑容量</td>
+<td align="left">逻辑空间 <strong>≤ 物理内存</strong></td>
+<td align="left"><strong>虚拟性</strong>：逻辑上扩充内存，容量可远大于物理内存（<strong>最终目标</strong>）</td>
+</tr>
+<tr>
+<td align="left">中断支持</td>
+<td align="left">无缺页&#x2F;缺段机制</td>
+<td align="left">访问未调入的页&#x2F;段时产生<strong>缺页&#x2F;缺段中断</strong></td>
+</tr>
+<tr>
+<td align="left">主要代价</td>
+<td align="left">内存利用率低、大作业无法运行</td>
+<td align="left">有缺页开销，<strong>依赖好的置换算法</strong>降低缺页率</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：三特征 &#x3D; <strong>多次性（区别于传统管理的关键、最重要）、对换性、虚拟性（最终目标）</strong>；多次性、对换性是手段，虚拟性是结果。</p>
+</blockquote>
+<h3 id="实现方式与容量"><a href="#实现方式与容量" class="headerlink" title="实现方式与容量"></a>实现方式与容量</h3><p>虚拟存储器的实现 &#x3D; <strong>某种基本管理方式 + 请求调入功能 + 置换功能</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">实现方式</th>
+<th align="left">组成</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>请求分页存储管理</strong>（重点）</td>
+<td align="left">基本分页 + <strong>请求调页</strong> + <strong>页面置换</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>请求分段存储管理</strong></td>
+<td align="left">基本分段 + 请求调段 + 段置换</td>
+</tr>
+<tr>
+<td align="left"><strong>请求段页式存储管理</strong></td>
+<td align="left">基本段页式 + 请求调页&#x2F;调段 + 置换</td>
+</tr>
+</tbody></table>
+<p><strong>虚拟内存容量</strong>受两方面限制——CPU 的<strong>地址结构</strong>（地址位数）与<strong>内外存总容量</strong>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord cjk_fallback">虚拟内存容量</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1413em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">地址位数</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">内存容量</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord cjk_fallback">外存容量之和</span><span class="mclose">)</span></span></span></span></span>
+<blockquote>
+<p><strong>易错点</strong>：</p>
+<ul>
+<li>32 位系统虚拟地址空间上限为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">32</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord text"><span class="mord">GB</span></span></span></span></span>，<strong>与物理内存多大无关</strong>；虚存容量也不是”内存容量”本身。</li>
+<li>虚拟存储<strong>不能凭空运行</strong>：被访问的信息必须<strong>已存在于外存</strong>，只是不必常驻内存。</li>
+<li>“扩大内存”只是<strong>逻辑上的</strong>，物理内存容量并未改变。</li>
+</ul>
+</blockquote>
+<p>实现虚拟存储器需要四个支撑：<strong>一定容量的内存 + 相当容量的外存</strong>（物质基础）、<strong>页表&#x2F;段表机制</strong>（数据结构，记录状态与外存地址）、<strong>缺页中断机构</strong>（请求调入）、<strong>地址变换机构</strong>（逻辑地址到物理地址）。</p>
+<h2 id="请求分页管理方式"><a href="#请求分页管理方式" class="headerlink" title="请求分页管理方式"></a>请求分页管理方式</h2><p><strong>请求分页</strong> &#x3D; 基本分页 + <strong>请求调页</strong>（访问到才调入）+ <strong>页面置换</strong>（内存不足时换出）。它是在基本分页基础上加装”缺页中断 + 置换”两套机构而成，是虚拟存储<strong>最常用、最爱考</strong>的实现。</p>
+<h3 id="请求页表机构：新增四个字段"><a href="#请求页表机构：新增四个字段" class="headerlink" title="请求页表机构：新增四个字段"></a>请求页表机构：新增四个字段</h3><p>基本分页的页表项只有<strong>页框号</strong>；请求分页在其基础上<strong>新增四位</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">新增字段</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>状态位 P（存在位）</strong></td>
+<td align="left">该页是否已调入内存：P&#x3D;1 在内存，正常变换；<strong>P&#x3D;0 不在内存，触发缺页中断</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>访问位 A（访问字段）</strong></td>
+<td align="left">记录该页近期<strong>是否&#x2F;何时被访问</strong>，供<strong>置换算法</strong>使用（Clock 扫描、LRU 近似依据）</td>
+</tr>
+<tr>
+<td align="left"><strong>修改位 M（脏位）</strong></td>
+<td align="left">该页调入后是否被<strong>写过</strong>：换出时 M&#x3D;1 必须<strong>先写回外存</strong>；M&#x3D;0 可<strong>直接丢弃覆盖</strong>（省一次写盘）</td>
+</tr>
+<tr>
+<td align="left"><strong>外存地址</strong></td>
+<td align="left">该页在外存（对换区&#x2F;文件区）的存放位置，缺页调入时按它<strong>找到并读入页面</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>看状态位 P 判断是否缺页</strong>；<strong>看修改位 M 判断换出时是否写盘</strong>；<strong>访问位 A 是 Clock&#x2F;LRU 的硬件依据</strong>；外存地址只在缺页调入时用。<br><strong>易错点</strong>：四个字段各司其职，别把”修改位决定是否写回”与”状态位决定是否缺页”混为一谈。</p>
+</blockquote>
+<h3 id="缺页中断与处理流程"><a href="#缺页中断与处理流程" class="headerlink" title="缺页中断与处理流程"></a>缺页中断与处理流程</h3><p>CPU 访问的页面<strong>状态位 P&#x3D;0</strong>（尚未调入内存）时，硬件触发<strong>缺页中断（Page Fault）</strong>——它属于<strong>内中断中的”故障”</strong>，由地址变换机构在指令执行过程中检测并发出。完整处理流程共七步：</p>
+<ol>
+<li><strong>保留现场</strong>：保存断点与寄存器现场，转入缺页中断处理程序；</li>
+<li><strong>找页</strong>：按页表项中的<strong>外存地址</strong>在磁盘上定位缺页；</li>
+<li><strong>分配页框</strong>：查空闲页框，若有空闲页框则直接分配；</li>
+<li><strong>淘汰换出</strong>：若无空闲页框，执行<strong>页面置换算法</strong>选出一页淘汰；被淘汰页<strong>修改位 M&#x3D;1 时先写回外存</strong>，M&#x3D;0 直接覆盖；</li>
+<li><strong>调入</strong>：启动磁盘 I&#x2F;O，把缺页读入所分配的页框；</li>
+<li><strong>更新页表与快表</strong>：填入页框号、<strong>状态位置 1</strong>（若淘汰过页面，同步改写对应表项）；</li>
+<li><strong>恢复现场，重新执行被中断的那条指令</strong>（是”重做”这条指令，不是执行下一条）。</li>
+</ol>
+<p><strong>缺页中断与普通（外）中断的区别</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">缺页中断</th>
+<th align="left">普通外部中断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">中断类别</td>
+<td align="left"><strong>内中断（异常，故障类）</strong></td>
+<td align="left">外中断（时钟、I&#x2F;O 等）</td>
+</tr>
+<tr>
+<td align="left">产生时机</td>
+<td align="left"><strong>一条指令执行期间</strong>（取指&#x2F;访存地址变换时）检测并响应</td>
+<td align="left">一条指令<strong>执行结束后</strong>才检查响应</td>
+</tr>
+<tr>
+<td align="left">发生次数</td>
+<td align="left"><strong>一条指令可能产生多次</strong>（指令跨页、间接寻址、块传送都要多次访存）</td>
+<td align="left">一条指令一般至多响应一次</td>
+</tr>
+<tr>
+<td align="left">处理结果</td>
+<td align="left">调页后<strong>重新执行原指令</strong></td>
+<td align="left">处理后接着执行<strong>下一条</strong>指令</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：缺页中断是”故障”——<strong>排除故障（调入页面）后指令可以重新执行成功</strong>；区别于”终止”型异常（如除 0 非法）。<br><strong>易错点</strong>：处理完后<strong>重新执行触发缺页的那条指令</strong>；跨页指令、块传送指令一条可引发<strong>多次</strong>缺页中断。</p>
+</blockquote>
+<h3 id="请求分页的地址变换过程"><a href="#请求分页的地址变换过程" class="headerlink" title="请求分页的地址变换过程"></a>请求分页的地址变换过程</h3><p>逻辑地址 (页号 P, 页内偏移 W) 的变换路径：<strong>查快表 TLB → 命中则直接拼接物理地址（1 次访存）→ 未命中查内存页表（2 次访存）→ 状态位 P&#x3D;0 则进入上述缺页中断流程，调页更新页表与快表后重新执行指令</strong>。快表命中 1 次访存、页表命中 2 次；发生缺页时要先完成一次磁盘 I&#x2F;O（毫秒级），代价远高于前两者——这正是后面”降低缺页率”如此重要的原因。</p>
+<h2 id="页框分配与回收"><a href="#页框分配与回收" class="headerlink" title="页框分配与回收"></a>页框分配与回收</h2><h3 id="驻留集：分配多少页框才合适"><a href="#驻留集：分配多少页框才合适" class="headerlink" title="驻留集：分配多少页框才合适"></a>驻留集：分配多少页框才合适</h3><p><strong>驻留集</strong>：操作系统分配给某进程、当前<strong>驻留在内存中的页框（页面）集合</strong>，其大小直接影响缺页率：</p>
+<table>
+<thead>
+<tr>
+<th align="left">驻留集大小</th>
+<th align="left">后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>过小</strong></td>
+<td align="left">活跃页放不下，<strong>缺页率骤增</strong>，CPU 大量时间耗在换页上（滑向<strong>抖动</strong>）</td>
+</tr>
+<tr>
+<td align="left"><strong>过大</strong></td>
+<td align="left">超过一定数目后缺页率改善甚微，<strong>浪费内存</strong>，且能容纳的进程数减少、<strong>多道程序并发度下降</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：驻留集要<strong>折中</strong>——判据是”驻留集 ≥ 该进程的<strong>工作集</strong>“（见后文），既不频繁缺页也不浪费。</p>
+</blockquote>
+<h3 id="页框分配的三种算法"><a href="#页框分配的三种算法" class="headerlink" title="页框分配的三种算法"></a>页框分配的三种算法</h3><p>系统共有的空闲页框按什么规则分给各进程：</p>
+<table>
+<thead>
+<tr>
+<th align="left">分配策略</th>
+<th align="left">做法</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>平均分配</strong></td>
+<td align="left">空闲页框<strong>平均</strong>分给各进程</td>
+<td align="left">简单；小程序浪费、大程序不够</td>
+</tr>
+<tr>
+<td align="left"><strong>按比例分配</strong></td>
+<td align="left">按各进程<strong>大小（页面数）占系统总页面数的比例</strong>分配</td>
+<td align="left">大小进程各得其所，较公平</td>
+</tr>
+<tr>
+<td align="left"><strong>优先级分配</strong></td>
+<td align="left"><strong>优先级高</strong>的进程多分（常与按比例结合）</td>
+<td align="left">保证重要、紧迫进程先运行；分静态与动态两种</td>
+</tr>
+</tbody></table>
+<p>进程结束或被挂起换出时，它占用的页框由系统<strong>回收</strong>（清位示图、作废相应表项），重新进入空闲池参与下一次分配。</p>
+<h3 id="固定-vs-可变、全局-vs-局部置换"><a href="#固定-vs-可变、全局-vs-局部置换" class="headerlink" title="固定 vs 可变、全局 vs 局部置换"></a>固定 vs 可变、全局 vs 局部置换</h3><p><strong>固定分配</strong>：进程运行期间页框数<strong>固定不变</strong>；<strong>可变分配</strong>：页框数可随缺页情况动态增减。<strong>局部置换</strong>：缺页时只能淘汰<strong>本进程</strong>的页面；<strong>全局置换</strong>：可淘汰<strong>任何进程</strong>的页面。四种组合：</p>
+<table>
+<thead>
+<tr>
+<th align="left">策略组合</th>
+<th align="left">是否采用</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>固定分配 + 局部置换</strong></td>
+<td align="left">采用</td>
+<td align="left">页框数固定，缺页只能<strong>换自己的页</strong>；难点是预先定不准合适的页框数</td>
+</tr>
+<tr>
+<td align="left"><strong>可变分配 + 全局置换</strong></td>
+<td align="left">采用</td>
+<td align="left">缺页时新页先占空闲页框，不够就<strong>抢占其他进程的页框</strong>；实现最简单、最常用</td>
+</tr>
+<tr>
+<td align="left"><strong>可变分配 + 局部置换</strong></td>
+<td align="left">采用</td>
+<td align="left">缺页换自己的页；<strong>缺页频繁 → 增加页框</strong>，缺页过少 → <strong>减少页框</strong>（兼顾双方优点）</td>
+</tr>
+<tr>
+<td align="left"><strong>固定分配 + 全局置换</strong></td>
+<td align="left"><strong>不可行</strong></td>
+<td align="left">全局置换会增减本进程页框数，与”固定”自相矛盾</td>
+</tr>
+</tbody></table>
+<p><strong>全局置换 vs 局部置换</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">全局置换</th>
+<th align="left">局部置换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">淘汰范围</td>
+<td align="left">内存中<strong>任意进程</strong>的页面</td>
+<td align="left"><strong>仅本进程</strong>自己的页面</td>
+</tr>
+<tr>
+<td align="left">驻留集大小</td>
+<td align="left">随缺页被动变化（可能被抢走）</td>
+<td align="left">固定，或按缺页率<strong>主动调整</strong></td>
+</tr>
+<tr>
+<td align="left">优点</td>
+<td align="left">灵活，页框自动流向更需要的进程</td>
+<td align="left">各进程<strong>互不干扰</strong>，缺页率可控</td>
+</tr>
+<tr>
+<td align="left">缺点</td>
+<td align="left">缺页多的进程”抢”别人的页，<strong>把抖动传染给全系统</strong></td>
+<td align="left">无法在进程间动态调剂富余页框</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：分析”抖动为什么会蔓延”要抓住<strong>全局置换</strong>——某进程缺页率高时会不断抢占其他进程页框，把别人也拖进抖动；<strong>局部置换</strong>则把缺页隔离在本进程内。<br><strong>易错点</strong>：不存在”固定分配 + 全局置换”这种组合；可变分配通常配合缺页率高低来增减页框。</p>
+</blockquote>
+<h2 id="页面置换算法"><a href="#页面置换算法" class="headerlink" title="页面置换算法"></a>页面置换算法</h2><p>缺页时若无空闲页框，必须<strong>淘汰</strong>一页腾位置。理想是淘汰”以后最久不再使用”的页，但<strong>未来无法预知</strong>，只能用不同策略近似——评价标准就是<strong>缺页率</strong>。</p>
+<h3 id="最佳置换算法-OPT"><a href="#最佳置换算法-OPT" class="headerlink" title="最佳置换算法 OPT"></a>最佳置换算法 OPT</h3><p><strong>OPT（Optimal，最佳置换）</strong>：淘汰<strong>从现在起以后最长时间不再被访问</strong>（或永不再用）的页面。</p>
+<ul>
+<li><strong>缺页率最低，理论最优</strong>；</li>
+<li>需要<strong>预知未来的访问序列</strong>——<strong>无法实现</strong>；</li>
+<li>价值在于作为<strong>评价基准</strong>：拿它与实际算法的缺页数对比，衡量后者接近最优的程度。</li>
+</ul>
+<h3 id="先进先出置换算法-FIFO-与-Belady-异常"><a href="#先进先出置换算法-FIFO-与-Belady-异常" class="headerlink" title="先进先出置换算法 FIFO 与 Belady 异常"></a>先进先出置换算法 FIFO 与 Belady 异常</h3><p><strong>FIFO</strong>：淘汰<strong>最早进入内存</strong>的页面，进程页面排成一个队列，换页时队首出队。</p>
+<ul>
+<li>实现<strong>最简单</strong>（一个队列即可），但性能通常最差——它只看”来得早晚”，<strong>与是否常用毫无关系</strong>；</li>
+<li>可能产生 <strong>Belady 异常</strong>：<strong>分配的页框数增加，缺页次数反而增多</strong>。</li>
+</ul>
+<p><strong>Belady 异常例题</strong>：页面访问序列 <strong>1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5</strong>（12 次访问），分别用 <strong>3 个页框</strong>和 <strong>4 个页框</strong>做 FIFO 置换，求缺页次数。</p>
+<p><strong>三个页框</strong>（内存内容为该步结束后的页框状态）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步</th>
+<th align="left">访问</th>
+<th align="left">内存内容（3 个页框）</th>
+<th align="left">是否缺页</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">2</td>
+<td align="left">1, 2</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">3</td>
+<td align="left">1, 2, 3</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">4</td>
+<td align="left">4, 2, 3（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">1</td>
+<td align="left">4, 1, 3（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">2</td>
+<td align="left">4, 1, 2（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">5</td>
+<td align="left">5, 1, 2（淘汰 4）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">1</td>
+<td align="left">5, 1, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">2</td>
+<td align="left">5, 1, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">3</td>
+<td align="left">5, 3, 2（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">4</td>
+<td align="left">5, 3, 4（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">5</td>
+<td align="left">5, 3, 4</td>
+<td align="left">命中</td>
+</tr>
+</tbody></table>
+<p><strong>四个页框</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步</th>
+<th align="left">访问</th>
+<th align="left">内存内容（4 个页框）</th>
+<th align="left">是否缺页</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">2</td>
+<td align="left">1, 2</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">3</td>
+<td align="left">1, 2, 3</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">4</td>
+<td align="left">1, 2, 3, 4</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">1</td>
+<td align="left">1, 2, 3, 4</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">2</td>
+<td align="left">1, 2, 3, 4</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">5</td>
+<td align="left">5, 2, 3, 4（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">1</td>
+<td align="left">5, 1, 3, 4（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">2</td>
+<td align="left">5, 1, 2, 4（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">3</td>
+<td align="left">5, 1, 2, 3（淘汰 4）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">4</td>
+<td align="left">4, 1, 2, 3（淘汰 5）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">5</td>
+<td align="left">4, 5, 2, 3（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+</tbody></table>
+<p><strong>结果对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">页框数</th>
+<th align="left">缺页次数</th>
+<th align="left">命中次数</th>
+<th align="left">缺页率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">3 个</td>
+<td align="left"><strong>9</strong></td>
+<td align="left">3</td>
+<td align="left">9&#x2F;12 &#x3D; <strong>75%</strong></td>
+</tr>
+<tr>
+<td align="left">4 个</td>
+<td align="left"><strong>10</strong></td>
+<td align="left">2</td>
+<td align="left">10&#x2F;12 ≈ <strong>83.3%</strong></td>
+</tr>
+</tbody></table>
+<p>页框多了 1 个，缺页反而从 9 次涨到 10 次——<strong>Belady 异常</strong>实锤。4 框时 1、2 号页在前段命中过，却按”来得早”被 5、1、2、3、4 连续挤出；3 框时 1、2 的命中恰好拖后了它们的淘汰，反而少缺一次。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>只有 FIFO 会产生 Belady 异常</strong>；OPT、LRU、Clock 都不会——页框越多缺页只减不增。<br><strong>易错点</strong>：并非所有序列都会异常。例如访问序列 1, 2, 3, 4 做 FIFO：3 框缺页 4 次，4 框也缺页 4 次（未增多）——Belady 异常只对<strong>特定序列</strong>发生，答题时别写”页框增加缺页必增多”。</p>
+</blockquote>
+<h3 id="最近最久未使用置换算法-LRU"><a href="#最近最久未使用置换算法-LRU" class="headerlink" title="最近最久未使用置换算法 LRU"></a>最近最久未使用置换算法 LRU</h3><p><strong>LRU（Least Recently Used）</strong>：淘汰<strong>过去最长时间没有被访问</strong>的页面——用”<strong>过去的访问历史</strong>“预测未来：最近用过的页大概率马上还用。</p>
+<ul>
+<li><strong>性能最接近 OPT</strong>（OPT 看”未来最久不用”，LRU 看”过去最久未用”，一字之差）；</li>
+<li>需要硬件支持记录访问时间：<strong>计数器</strong>（每页一个时间戳寄存器，每次访存都更新）或<strong>寄存器栈</strong>（每次访问把页号压到栈顶，栈底即最久未用页）；</li>
+<li>因为<strong>每条访存指令都要更新记录</strong>，硬件开销大，实际系统常用 <strong>Clock 算法近似</strong>。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：LRU <strong>可实现但开销大</strong>；OPT <strong>不可实现</strong>。”淘汰最久未使用的”对应 LRU，”淘汰未来最久不使用的”对应 OPT——选择填空高频混淆点。</p>
+</blockquote>
+<h3 id="时钟置换算法-Clock（NRU）与改进型"><a href="#时钟置换算法-Clock（NRU）与改进型" class="headerlink" title="时钟置换算法 Clock（NRU）与改进型"></a>时钟置换算法 Clock（NRU）与改进型</h3><p><strong>Clock 算法</strong>（又称 <strong>NRU，最近未使用</strong>）：给每页配一个<strong>访问位 A</strong>，内存中所有页面排成<strong>循环队列</strong>，扫描指针逐帧轮转。</p>
+<ul>
+<li>页面<strong>装入内存或被访问（命中）时</strong>，硬件把它的访问位置 1（软件<strong>不清位</strong>，命中不清零）；</li>
+<li><strong>缺页时</strong>指针从当前位置<strong>循环扫描</strong>：遇到 <strong>A&#x3D;1 的页，清 0 后继续前进</strong>（给它”第二次机会”）；遇到 <strong>A&#x3D;0 的页，淘汰</strong>，装入新页，指针停在下一位置；</li>
+<li>是 <strong>LRU 的低开销近似</strong>：无需精确时间戳，只记”最近用没用过”。</li>
+</ul>
+<p><strong>改进型 Clock</strong>：在访问位之外再引入<strong>修改位 M</strong>——优先淘汰<strong>既没被访问、又不用写回</strong>的页，把换出代价降到最低。页面按 (A, M) 分为四类，淘汰优先级从高到低：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别 (A, M)</th>
+<th align="left">含义</th>
+<th align="left">淘汰优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>(0, 0)</strong></td>
+<td align="left">最近未访问、未修改</td>
+<td align="left"><strong>第一优先</strong>（代价最小：不写盘）</td>
+</tr>
+<tr>
+<td align="left"><strong>(0, 1)</strong></td>
+<td align="left">最近未访问、已修改</td>
+<td align="left">第二优先（需写回外存）</td>
+</tr>
+<tr>
+<td align="left"><strong>(1, 0)</strong></td>
+<td align="left">最近被访问、未修改</td>
+<td align="left">第三优先</td>
+</tr>
+<tr>
+<td align="left"><strong>(1, 1)</strong></td>
+<td align="left">最近被访问、已修改</td>
+<td align="left"><strong>最后</strong>（最不该淘汰）</td>
+</tr>
+</tbody></table>
+<p>扫描过程最多四轮：<strong>第一轮</strong>找 (0,0)；<strong>第二轮</strong>找 (0,1)，扫过的页<strong>顺带把 A 清 0</strong>；<strong>第三轮</strong>再找 (0,0)（原 (1,0) 已被清成 (0,0)）；<strong>第四轮</strong>必能淘汰 (0,1)（原 (1,1) 已变成 (0,1)）。</p>
+<blockquote>
+<p><strong>考点</strong>：改进型 Clock <strong>优先淘汰 (0,0)</strong>——既”最近没用”（大概率近期也不会用）又”没改过”（淘汰<strong>不用写回外存</strong>），两项开销同时最小。<br><strong>易错点</strong>：简单 Clock 最坏情形（所有页 A 全为 1）会退化成”扫一整圈全清 0、再淘汰指针处的页”，行为趋近 FIFO。</p>
+</blockquote>
+<h3 id="缺页率演算：同一序列跑三种算法（核心例题）"><a href="#缺页率演算：同一序列跑三种算法（核心例题）" class="headerlink" title="缺页率演算：同一序列跑三种算法（核心例题）"></a>缺页率演算：同一序列跑三种算法（核心例题）</h3><p><strong>题目</strong>：页面走向 <strong>7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1</strong>（共 20 次访问），分配 <strong>3 个页框</strong>，分别用 FIFO、LRU、OPT 置换，求各自缺页次数与缺页率。其中</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">缺页率</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">访问总次数</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">缺页次数</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p><strong>FIFO（淘汰最早进入的页）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步</th>
+<th align="left">访问</th>
+<th align="left">内存内容（3 个页框）</th>
+<th align="left">是否缺页</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">0</td>
+<td align="left">7, 0</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">7, 0, 1</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">2</td>
+<td align="left">2, 0, 1（淘汰 7）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">0</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">3</td>
+<td align="left">2, 3, 1（淘汰 0）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">0</td>
+<td align="left">2, 3, 0（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">4</td>
+<td align="left">4, 3, 0（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">2</td>
+<td align="left">4, 2, 0（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">3</td>
+<td align="left">4, 2, 3（淘汰 0）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">0</td>
+<td align="left">0, 2, 3（淘汰 4）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">3</td>
+<td align="left">0, 2, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">2</td>
+<td align="left">0, 2, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">1</td>
+<td align="left">0, 1, 3（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">2</td>
+<td align="left">0, 1, 2（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">0</td>
+<td align="left">0, 1, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">17</td>
+<td align="left">1</td>
+<td align="left">0, 1, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">18</td>
+<td align="left">7</td>
+<td align="left">7, 1, 2（淘汰 0）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">19</td>
+<td align="left">0</td>
+<td align="left">7, 0, 2（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">20</td>
+<td align="left">1</td>
+<td align="left">7, 0, 1（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+</tbody></table>
+<p><strong>LRU（淘汰过去最久未使用的页）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步</th>
+<th align="left">访问</th>
+<th align="left">内存内容（3 个页框）</th>
+<th align="left">是否缺页</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">0</td>
+<td align="left">7, 0</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">7, 0, 1</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">2</td>
+<td align="left">2, 0, 1（淘汰 7）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">0</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">3</td>
+<td align="left">2, 0, 3（淘汰 1）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">0</td>
+<td align="left">2, 0, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">4</td>
+<td align="left">4, 0, 3（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">2</td>
+<td align="left">4, 0, 2（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">3</td>
+<td align="left">4, 3, 2（淘汰 0）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">0</td>
+<td align="left">0, 3, 2（淘汰 4）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">3</td>
+<td align="left">0, 3, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">2</td>
+<td align="left">0, 3, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">1</td>
+<td align="left">1, 3, 2（淘汰 0）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">2</td>
+<td align="left">1, 3, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">0</td>
+<td align="left">1, 0, 2（淘汰 3）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">17</td>
+<td align="left">1</td>
+<td align="left">1, 0, 2</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">18</td>
+<td align="left">7</td>
+<td align="left">1, 0, 7（淘汰 2）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">19</td>
+<td align="left">0</td>
+<td align="left">1, 0, 7</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">20</td>
+<td align="left">1</td>
+<td align="left">1, 0, 7</td>
+<td align="left">命中</td>
+</tr>
+</tbody></table>
+<p><strong>OPT（淘汰未来最久不再使用的页）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步</th>
+<th align="left">访问</th>
+<th align="left">内存内容（3 个页框）</th>
+<th align="left">是否缺页</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">0</td>
+<td align="left">7, 0</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">7, 0, 1</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">2</td>
+<td align="left">2, 0, 1（淘汰 7，之后再也不用）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">0</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">3</td>
+<td align="left">2, 0, 3（淘汰 1，下一次使用最远）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">0</td>
+<td align="left">2, 0, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">4</td>
+<td align="left">2, 4, 3（淘汰 0，下一次使用最远）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">2</td>
+<td align="left">2, 4, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">3</td>
+<td align="left">2, 4, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">0</td>
+<td align="left">2, 0, 3（淘汰 4，之后再也不用）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">3</td>
+<td align="left">2, 0, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">2</td>
+<td align="left">2, 0, 3</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">1</td>
+<td align="left">2, 0, 1（淘汰 3，之后再也不用）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">2</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">0</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">17</td>
+<td align="left">1</td>
+<td align="left">2, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">18</td>
+<td align="left">7</td>
+<td align="left">7, 0, 1（淘汰 2，之后再也不用）</td>
+<td align="left">缺页</td>
+</tr>
+<tr>
+<td align="left">19</td>
+<td align="left">0</td>
+<td align="left">7, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+<tr>
+<td align="left">20</td>
+<td align="left">1</td>
+<td align="left">7, 0, 1</td>
+<td align="left">命中</td>
+</tr>
+</tbody></table>
+<p><strong>三种算法结果汇总</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">缺页次数</th>
+<th align="left">命中次数</th>
+<th align="left">缺页率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">OPT</td>
+<td align="left"><strong>9</strong></td>
+<td align="left">11</td>
+<td align="left">9&#x2F;20 &#x3D; <strong>45%</strong></td>
+</tr>
+<tr>
+<td align="left">LRU</td>
+<td align="left"><strong>12</strong></td>
+<td align="left">8</td>
+<td align="left">12&#x2F;20 &#x3D; <strong>60%</strong></td>
+</tr>
+<tr>
+<td align="left">FIFO</td>
+<td align="left"><strong>15</strong></td>
+<td align="left">5</td>
+<td align="left">15&#x2F;20 &#x3D; <strong>75%</strong></td>
+</tr>
+</tbody></table>
+<p><strong>结论</strong>：缺页次数 <strong>OPT(9) &lt; LRU(12) &lt; FIFO(15)</strong>——LRU 用”过去的局部性”很好地逼近了 OPT；FIFO 无视使用情况，最差。</p>
+<blockquote>
+<p><strong>考点</strong>：手算大题按”步”列表逐个填，每一步先判<strong>命中&#x2F;缺页</strong>，缺页再按算法<strong>选定淘汰页</strong>；3 个页框需要 3 步”冷启动”装满，这 3 步必缺页。<br><strong>易错点</strong>：FIFO 的淘汰顺序按<strong>调入时间</strong>而非页号；LRU 在命中后要<strong>更新该页的”最近使用时间”</strong>——第 5 步命中 0 之后，最久未用页就从 7 变成了 1。</p>
+</blockquote>
+<h3 id="四种置换算法大对比"><a href="#四种置换算法大对比" class="headerlink" title="四种置换算法大对比"></a>四种置换算法大对比</h3><table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">淘汰依据</th>
+<th align="left">能否实现</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+<th align="left">Belady 异常</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>OPT</strong></td>
+<td align="left"><strong>未来</strong>最久不被访问</td>
+<td align="left"><strong>否</strong>（需预知未来）</td>
+<td align="left">缺页率最低，理论最优</td>
+<td align="left">只能作评价基准</td>
+<td align="left">不会</td>
+</tr>
+<tr>
+<td align="left"><strong>FIFO</strong></td>
+<td align="left"><strong>最早进入内存</strong></td>
+<td align="left">是</td>
+<td align="left">实现极简（一个队列）</td>
+<td align="left">与使用频率无关，性能最差</td>
+<td align="left"><strong>可能发生</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Clock</strong></td>
+<td align="left">访问位 A（最近是否用过）</td>
+<td align="left">是</td>
+<td align="left">近似 LRU，开销小</td>
+<td align="left">记录粒度粗，性能略逊 LRU</td>
+<td align="left">不会</td>
+</tr>
+<tr>
+<td align="left"><strong>LRU</strong></td>
+<td align="left"><strong>过去</strong>最久未被访问</td>
+<td align="left">是（需计数器&#x2F;栈）</td>
+<td align="left">性能最接近 OPT</td>
+<td align="left">每次访存都要更新，<strong>硬件开销大</strong></td>
+<td align="left">不会</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：题目给”改进性能”的选项时——换用 LRU&#x2F;Clock、增加页框、预调页都可降低缺页率；而”增加页框”对 FIFO 不一定有效（Belady 异常）。</p>
+</blockquote>
+<h2 id="内存映射文件"><a href="#内存映射文件" class="headerlink" title="内存映射文件"></a>内存映射文件</h2><p><strong>内存映射文件（Memory-Mapped File）</strong>：通过 <code>mmap</code> 把磁盘上的<strong>文件映射到进程虚拟地址空间</strong>的一段区域，之后像访问内存数组一样读写文件——首次访问某页时经<strong>缺页中断按需从文件调入</strong>，修改后由系统写回文件；<strong>多个进程映射同一文件</strong>即共享同一片物理页框，可作**进程间通信（共享内存）**的实现方式。</p>
+<blockquote>
+<p><strong>考点</strong>：内存映射文件 &#x3D; <strong>请求分页思想在文件访问上的应用</strong>；映射同一文件实现<strong>共享内存</strong>，还省去了 read&#x2F;write 的系统调用与两次数据拷贝。</p>
+</blockquote>
+<h2 id="虚拟存储器性能的影响因素及改进方法"><a href="#虚拟存储器性能的影响因素及改进方法" class="headerlink" title="虚拟存储器性能的影响因素及改进方法"></a>虚拟存储器性能的影响因素及改进方法</h2><h3 id="抖动（颠簸）"><a href="#抖动（颠簸）" class="headerlink" title="抖动（颠簸）"></a>抖动（颠簸）</h3><p><strong>抖动（Thrashing）</strong>：进程<strong>刚换出的页马上又要用</strong>，系统不停地在内存与外存之间倒腾页面，<strong>CPU 大部分时间忙于换页，利用率急剧下降</strong>。</p>
+<ul>
+<li><strong>直接原因</strong>：分配给进程的<strong>页框数小于其工作集</strong>（活跃页装不下），或内存中<strong>进程过多</strong>、页框被摊薄；</li>
+<li><strong>恶性循环</strong>：CPU 利用率低 → 系统误以为进程太少，<strong>继续调入更多进程</strong> → 页框更紧张 → 缺页更凶，抖动加剧；</li>
+<li>到达”抖动拐点”后，<strong>增加进程数&#x2F;换入进程只会更糟</strong>。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：抖动是<strong>全局性</strong>现象（全系统缺页率高、CPU 利用率骤降），不是单个进程偶尔缺页多；根因是<strong>驻留集 &lt; 工作集</strong>。</p>
+</blockquote>
+<h3 id="工作集"><a href="#工作集" class="headerlink" title="工作集"></a>工作集</h3><p><strong>工作集 W(t, Δ)</strong>：进程在时刻 t 之前的 <strong>Δ 次页面访问</strong>中实际访问到的<strong>页面集合</strong>（滑动窗口，随时间变化）。例：访问序列 … 4, 3, 2, 4, 3, 2, 4, 3, 2, 1, 2, 1, 2, 1, 3，取 Δ&#x3D;5，则时刻 t 的最近 5 次访问为 [3, 2, 4, 3, 2]，<strong>工作集 &#x3D; {2, 3, 4}</strong>。</p>
+<ul>
+<li>工作集大小反映进程当前的<strong>局部性程度</strong>；</li>
+<li><strong>驻留集 ≥ 工作集</strong> → 缺页少、运行平稳；<strong>驻留集 &lt; 工作集</strong> → 频繁缺页 → 抖动。</li>
+</ul>
+<h3 id="有效访问时间与缺页率"><a href="#有效访问时间与缺页率" class="headerlink" title="有效访问时间与缺页率"></a>有效访问时间与缺页率</h3><p>设缺页率为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>，一次访存时间为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，一次缺页处理的平均时间为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9012em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>（含缺页中断处理与磁盘 I&#x2F;O，<strong>毫秒级</strong>，比纳秒级访存慢约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span> 倍）：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9012em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span>
+<p><strong>例题</strong>：访存时间 100ns，缺页处理时间 8ms，缺页率 f &#x3D; 0.0001：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.9999</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.0001</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">99.99</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">800</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">900</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">ns</span></span></span></span></span></span>
+<p>缺页率仅万分之一，有效访问时间就涨到原来的约 <strong>9 倍</strong>——<strong>降低缺页率是提升虚拟存储器性能的核心</strong>。</p>
+<h3 id="影响缺页率的因素与改进方法"><a href="#影响缺页率的因素与改进方法" class="headerlink" title="影响缺页率的因素与改进方法"></a>影响缺页率的因素与改进方法</h3><table>
+<thead>
+<tr>
+<th align="left">影响因素</th>
+<th align="left">对缺页率的影响</th>
+<th align="left">改进方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>页面大小</strong></td>
+<td align="left">页大 → 页表小、页内碎片大；页小 → 页表大、缺页次数多</td>
+<td align="left"><strong>折中选取</strong>页面大小</td>
+</tr>
+<tr>
+<td align="left"><strong>程序局部性</strong></td>
+<td align="left">局部性越好缺页越少</td>
+<td align="left">改写程序：数组<strong>按行遍历</strong>、顺序访问</td>
+</tr>
+<tr>
+<td align="left"><strong>驻留集（页框数）</strong></td>
+<td align="left">页框越多缺页越少，但边际递减</td>
+<td align="left">保证<strong>驻留集 ≥ 工作集</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>置换算法</strong></td>
+<td align="left">LRU&#x2F;Clock 明显优于 FIFO</td>
+<td align="left">选用<strong>更好的置换算法</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>调入策略</strong></td>
+<td align="left">请求调页一次只调一页</td>
+<td align="left"><strong>预调页</strong>：利用空间局部性一次调入若干相邻页</td>
+</tr>
+<tr>
+<td align="left"><strong>写回开销</strong></td>
+<td align="left">M&#x3D;1 的页换出要先写盘，拖慢缺页处理</td>
+<td align="left">延迟写&#x2F;成批写回，减少写盘次数</td>
+</tr>
+</tbody></table>
+<p><strong>程序结构经典例题</strong>：128×128 的 int 数组按行连续存放，<strong>每页恰好放一行</strong>，进程只有 1 个页框——行优先遍历（外层 i 内层 j）<strong>每行缺页一次，共 128 次</strong>；列优先遍历（外层 j 内层 i）每次访问都跳到别的页，缺页 <strong>128×128 &#x3D; 16384 次</strong>。同样的程序与页框数，仅访问顺序不同，缺页相差 <strong>128 倍</strong>。</p>
+<p><strong>预防&#x2F;消除抖动的措施</strong>：采用<strong>局部置换</strong>（隔离缺页）；按<strong>工作集模型</strong>动态调整驻留集；遵循 <strong>L&#x3D;S 准则</strong>（缺页间隔 L 与缺页处理时间 S 相当时效率最高）；<strong>挂起（换出）部分进程</strong>腾出页框；选用 LRU&#x2F;Clock 等好算法。</p>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">局部性原理</td>
+<td align="left"><strong>时间局部性</strong>（循环、重复调用）+ <strong>空间局部性</strong>（顺序执行、数组）——虚拟内存的理论基础</td>
+</tr>
+<tr>
+<td align="left">虚拟内存三特征</td>
+<td align="left"><strong>多次性</strong>（最重要、区别于传统管理）、<strong>对换性</strong>、<strong>虚拟性</strong>（最终目标）</td>
+</tr>
+<tr>
+<td align="left">虚存容量</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0913em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">地址位数</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">内外存容量之和</span><span class="mclose">)</span></span></span></span>；32 位系统上限 4GB，<strong>与物理内存大小无关</strong></td>
+</tr>
+<tr>
+<td align="left">实现方式</td>
+<td align="left">请求分页 &#x2F; 请求分段 &#x2F; 请求段页式 &#x3D; 基本管理 + <strong>请求调入 + 置换</strong></td>
+</tr>
+<tr>
+<td align="left">请求页表新增字段</td>
+<td align="left"><strong>状态位 P</strong>（是否在内存）、<strong>访问位 A</strong>（供置换用）、<strong>修改位 M</strong>（换出是否写回）、<strong>外存地址</strong></td>
+</tr>
+<tr>
+<td align="left">缺页中断</td>
+<td align="left"><strong>内中断（故障）</strong>；<strong>指令执行期间</strong>产生、一条指令可产生<strong>多次</strong>；处理后<strong>重新执行原指令</strong></td>
+</tr>
+<tr>
+<td align="left">缺页处理七步</td>
+<td align="left">保留现场 → 找页 → 分配页框 →（无空则置换，M&#x3D;1 先写回）→ 调入 → 更新页表快表 → 重执行指令</td>
+</tr>
+<tr>
+<td align="left">驻留集</td>
+<td align="left">进程在内存中的页面集合：<strong>过小 → 缺页多 CPU 忙换页；过大 → 浪费内存、并发度下降</strong></td>
+</tr>
+<tr>
+<td align="left">页框分配算法</td>
+<td align="left"><strong>平均分配 &#x2F; 按比例分配（按进程大小）&#x2F; 优先级分配</strong></td>
+</tr>
+<tr>
+<td align="left">置换组合</td>
+<td align="left">可行：<strong>固定+局部、可变+全局、可变+局部</strong>；不可行：<strong>固定+全局</strong></td>
+</tr>
+<tr>
+<td align="left">OPT</td>
+<td align="left">淘汰<strong>未来最久不用</strong>；缺页率最低但<strong>不可实现</strong>，只作评价基准</td>
+</tr>
+<tr>
+<td align="left">FIFO</td>
+<td align="left">淘汰<strong>最早进入</strong>；实现最简单、性能最差；<strong>唯一可能 Belady 异常</strong>（3 框 9 次 vs 4 框 10 次）</td>
+</tr>
+<tr>
+<td align="left">LRU</td>
+<td align="left">淘汰<strong>过去最久未用</strong>；<strong>性能最接近 OPT</strong>；需计数器&#x2F;栈，<strong>开销大</strong></td>
+</tr>
+<tr>
+<td align="left">Clock &#x2F; 改进 Clock</td>
+<td align="left">访问位循环扫描：A&#x3D;1 清 0 继续、A&#x3D;0 淘汰；改进型优先淘汰 <strong>(A&#x3D;0, M&#x3D;0)</strong> → (0,1) → (1,0) → (1,1)</td>
+</tr>
+<tr>
+<td align="left">抖动与工作集</td>
+<td align="left">驻留集 <strong>&lt; 工作集</strong> → 抖动（CPU 利用率骤降）；<strong>驻留集 ≥ 工作集</strong>才平稳；措施：局部置换、L&#x3D;S、挂起进程</td>
+</tr>
+<tr>
+<td align="left">EAT 与性能</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>；缺页处理毫秒级，缺页率极小也致命；改进：预调页、按行访问、好算法</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T07:26:12.746Z" itemprop="dateUpdated">2026-08-29 15:26:12</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag">内存管理</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&title=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&title=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">文件管理</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">内存管理：连续分配与分页分段</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&title=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&title=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《虚拟内存与页面置换算法》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

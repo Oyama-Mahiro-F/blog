@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>操作系统概述 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统">
+    <meta name="description" content="操作系统（Operating System, OS）是指控制和管理整个计算机系统的硬件与软件资源、合理地组织调度计算机的工作与资源分配、为用户和其他软件提供方便的接口与环境的程序集合，是计算机系统中最基本、最重要的系统软件。它位于硬件之上、应用程序之下，是两者的”中间人”。408 对本章的考查以选择题为主，集中在：四大特征（并发与共享互为存在条件）、发展历程各阶段解决了什么问题、内核态&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统概述">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="操作系统（Operating System, OS）是指控制和管理整个计算机系统的硬件与软件资源、合理地组织调度计算机的工作与资源分配、为用户和其他软件提供方便的接口与环境的程序集合，是计算机系统中最基本、最重要的系统软件。它位于硬件之上、应用程序之下，是两者的”中间人”。408 对本章的考查以选择题为主，集中在：四大特征（并发与共享互为存在条件）、发展历程各阶段解决了什么问题、内核态&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/os-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/os-%E5%BC%95%E5%AF%BC%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/os-%E4%B8%A4%E7%B1%BB%E8%99%9A%E6%8B%9F%E6%9C%BA.png">
+<meta property="article:published_time" content="2026-08-29T06:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T06:26:17.808Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/os-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">操作系统概述</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">操作系统概述</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T06:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="post-toc-number">1.</span> <span class="post-toc-text">什么是操作系统</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E8%80%85%E8%A7%86%E8%A7%92%EF%BC%9A%E5%9B%9B%E5%A4%A7%E7%AE%A1%E7%90%86%E8%81%8C%E8%83%BD"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">资源管理者视角：四大管理职能</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%90%91%E4%B8%8A%E5%B1%82%E6%8F%90%E4%BE%9B%E7%9A%84%E4%B8%89%E7%A7%8D%E6%8E%A5%E5%8F%A3"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">向上层提供的三种接口</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9B%9B%E4%B8%AA%E5%9F%BA%E6%9C%AC%E7%89%B9%E5%BE%81%EF%BC%9A%E5%B9%B6%E5%8F%91%E3%80%81%E5%85%B1%E4%BA%AB%E3%80%81%E8%99%9A%E6%8B%9F%E3%80%81%E5%BC%82%E6%AD%A5"><span class="post-toc-number">2.</span> <span class="post-toc-text">四个基本特征：并发、共享、虚拟、异步</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%B9%B6%E8%A1%8C"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">并发与并行</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B1%E4%BA%AB%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">共享的两种方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%EF%BC%9A%E4%B8%80%E4%B8%AA%E7%89%A9%E7%90%86%E5%AE%9E%E4%BD%93%E5%8F%98%E6%88%90%E8%8B%A5%E5%B9%B2%E9%80%BB%E8%BE%91%E5%AF%B9%E5%BA%94%E7%89%A9"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">虚拟：一个物理实体变成若干逻辑对应物</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BC%82%E6%AD%A5"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">异步</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%8F%91%E5%B1%95%E5%8E%86%E7%A8%8B"><span class="post-toc-number">3.</span> <span class="post-toc-text">操作系统的发展历程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%89%8B%E5%B7%A5%E6%93%8D%E4%BD%9C%E4%B8%8E%E8%84%B1%E6%9C%BA%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">手工操作与脱机输入输出</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8D%95%E9%81%93%E6%89%B9%E5%A4%84%E7%90%86%EF%BC%9A%E8%87%AA%E5%8A%A8%E6%80%A7"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">单道批处理：自动性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E9%81%93%E6%89%B9%E5%A4%84%E7%90%86%EF%BC%9A%E6%8F%90%E9%AB%98%E5%88%A9%E7%94%A8%E7%8E%87%EF%BC%8COS-%E6%AD%A3%E5%BC%8F%E8%AF%9E%E7%94%9F"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">多道批处理：提高利用率，OS 正式诞生</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E9%81%93%E5%B9%B6%E5%8F%91%E5%88%A9%E7%94%A8%E7%8E%87%E4%BE%8B%E9%A2%98%EF%BC%88%E7%94%98%E7%89%B9%E5%9B%BE%EF%BC%89"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">多道并发利用率例题（甘特图）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E6%97%B6%E7%B3%BB%E7%BB%9F%EF%BC%9A%E6%97%B6%E9%97%B4%E7%89%87%E8%BD%AE%E8%BD%AC%E8%A7%A3%E5%86%B3%E4%BA%BA%E6%9C%BA%E4%BA%A4%E4%BA%92"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">分时系统：时间片轮转解决人机交互</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9E%E6%97%B6%E7%B3%BB%E7%BB%9F%EF%BC%9A%E6%88%AA%E6%AD%A2%E6%97%B6%E9%97%B4"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">实时系统：截止时间</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BD%91%E7%BB%9C%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E7%AD%89%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="post-toc-number">3.7.</span> <span class="post-toc-text">网络与分布式等其他操作系统</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8F%91%E5%B1%95%E5%8E%86%E7%A8%8B%E9%80%9F%E8%A7%88"><span class="post-toc-number">3.8.</span> <span class="post-toc-text">发展历程速览</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%A8%8B%E5%BA%8F%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83"><span class="post-toc-number">4.</span> <span class="post-toc-text">程序的运行环境</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CPU-%E7%9A%84%E4%B8%A4%E7%A7%8D%E7%8A%B6%E6%80%81%E4%B8%8E%E4%B8%A4%E7%B1%BB%E6%8C%87%E4%BB%A4"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">CPU 的两种状态与两类指令</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%AD%E6%96%AD%E4%B8%8E%E5%BC%82%E5%B8%B8"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">中断与异常</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">系统调用</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A8%8B%E5%BA%8F%E7%9A%84%E9%93%BE%E6%8E%A5%E4%B8%8E%E8%A3%85%E5%85%A5"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">程序的链接与装入</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E6%97%B6%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%83%8F%E4%B8%8E%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">程序运行时的内存映像与地址空间</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="post-toc-number">5.</span> <span class="post-toc-text">操作系统的体系结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E5%B1%82%E6%B3%95%E4%B8%8E%E6%A8%A1%E5%9D%97%E5%8C%96"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">分层法与模块化</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%8F%E5%86%85%E6%A0%B8-vs-%E5%BE%AE%E5%86%85%E6%A0%B8%EF%BC%88%E9%87%8D%E7%82%B9%E5%AF%B9%E6%AF%94%EF%BC%89"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">宏内核 vs 微内核（重点对比）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%96%E6%A0%B8%EF%BC%88exokernel%EF%BC%89"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">外核（exokernel）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%BC%95%E5%AF%BC"><span class="post-toc-number">6.</span> <span class="post-toc-text">操作系统的引导</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="post-toc-number">7.</span> <span class="post-toc-text">虚拟机</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">8.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-操作系统概述"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">操作系统概述</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 14:30:00" datetime="2026-08-29T06:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>操作系统（Operating System, OS）<strong>是指</strong>控制和管理</strong>整个计算机系统的<strong>硬件与软件资源</strong>、合理地组织调度计算机的工作与资源分配、<strong>为用户和其他软件提供方便的接口与环境</strong>的程序集合，是计算机系统中<strong>最基本、最重要的系统软件</strong>。它位于<strong>硬件之上、应用程序之下</strong>，是两者的”中间人”。408 对本章的考查以选择题为主，集中在：<strong>四大特征（并发与共享互为存在条件）、发展历程各阶段解决了什么问题、内核态&#x2F;用户态与中断异常、系统调用过程、程序的装入与链接、体系结构（宏内核&#x2F;微内核&#x2F;外核）、引导流程与虚拟机</strong>。</p>
+<h2 id="什么是操作系统"><a href="#什么是操作系统" class="headerlink" title="什么是操作系统"></a>什么是操作系统</h2><p>可以从三个角度理解操作系统：<strong>系统资源的管理者、用户与计算机硬件之间的接口、最接近硬件的扩充机器</strong>。</p>
+<h3 id="资源管理者视角：四大管理职能"><a href="#资源管理者视角：四大管理职能" class="headerlink" title="资源管理者视角：四大管理职能"></a>资源管理者视角：四大管理职能</h3><table>
+<thead>
+<tr>
+<th align="left">管理职能</th>
+<th align="left">管理对象</th>
+<th align="left">主要工作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>处理机管理</strong></td>
+<td align="left">CPU（进程）</td>
+<td align="left">进程控制、进程同步、进程通信、处理机调度</td>
+</tr>
+<tr>
+<td align="left"><strong>存储器管理</strong></td>
+<td align="left">内存</td>
+<td align="left">内存分配与回收、地址映射、内存保护与共享、内存扩充</td>
+</tr>
+<tr>
+<td align="left"><strong>文件管理</strong></td>
+<td align="left">外存中的文件</td>
+<td align="left">文件存储空间管理、目录管理、文件读&#x2F;写管理、文件保护</td>
+</tr>
+<tr>
+<td align="left"><strong>设备管理</strong></td>
+<td align="left">各类 I&#x2F;O 设备</td>
+<td align="left">设备分配与回收、缓冲管理、设备驱动，<strong>屏蔽 I&#x2F;O 设备的差异</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：处理机管理的本质是<strong>进程管理</strong>；OS 管理资源的目标是<strong>安全、高效</strong>。多道程序并发带来的”分配 CPU、分配内存、管理文件、管理共享设备”四大问题，正是这四大管理职能的来源。</p>
+</blockquote>
+<h3 id="向上层提供的三种接口"><a href="#向上层提供的三种接口" class="headerlink" title="向上层提供的三种接口"></a>向上层提供的三种接口</h3><table>
+<thead>
+<tr>
+<th align="left">接口</th>
+<th align="left">使用者</th>
+<th align="left">形式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>命令接口</strong></td>
+<td align="left">普通用户</td>
+<td align="left"><strong>联机命令接口</strong>（交互式，”说一句做一句”，如 cmd）；<strong>脱机命令接口</strong>（批处理，”说一堆做一堆”，如 .bat 脚本）</td>
+</tr>
+<tr>
+<td align="left"><strong>程序接口</strong></td>
+<td align="left">程序员&#x2F;应用程序</td>
+<td align="left">由一组<strong>系统调用</strong>组成，程序通过它请求内核服务</td>
+</tr>
+<tr>
+<td align="left"><strong>GUI</strong></td>
+<td align="left">普通用户</td>
+<td align="left">图形化界面；严格说<strong>不属于操作系统本身</strong>（借助命令接口与图形库实现的程序）</td>
+</tr>
+</tbody></table>
+<p>操作系统的目标可概括为：<strong>方便性</strong>（易于使用）、<strong>有效性</strong>（提高资源利用率与吞吐量）、<strong>可扩充性</strong>（便于增加新功能）、<strong>开放性</strong>（遵循标准互联互通）。</p>
+<blockquote>
+<p><strong>易错点</strong>：GUI 通常不算操作系统的一部分；OS 直接提供的是<strong>命令接口</strong>与<strong>程序接口（系统调用）</strong>。</p>
+</blockquote>
+<h2 id="四个基本特征：并发、共享、虚拟、异步"><a href="#四个基本特征：并发、共享、虚拟、异步" class="headerlink" title="四个基本特征：并发、共享、虚拟、异步"></a>四个基本特征：并发、共享、虚拟、异步</h2><p>其中<strong>并发与共享是两个最基本的特征，且互为存在条件</strong>。</p>
+<h3 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">并发</th>
+<th align="left">并行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">时间</td>
+<td align="left">同一<strong>时间间隔</strong>内发生</td>
+<td align="left">同一<strong>时刻</strong>发生</td>
+</tr>
+<tr>
+<td align="left">微观</td>
+<td align="left">交替执行（轮流使用 CPU）</td>
+<td align="left">同时执行</td>
+</tr>
+<tr>
+<td align="left">硬件要求</td>
+<td align="left"><strong>单核即可</strong></td>
+<td align="left">需要多核&#x2F;多处理器</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：单核 CPU 上多个进程只能<strong>并发</strong>、不可能并行；只有多核才能真正并行。</p>
+</blockquote>
+<h3 id="共享的两种方式"><a href="#共享的两种方式" class="headerlink" title="共享的两种方式"></a>共享的两种方式</h3><table>
+<thead>
+<tr>
+<th align="left">共享方式</th>
+<th align="left">含义</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>互斥共享</strong></td>
+<td align="left">一个时间段内<strong>只允许一个进程</strong>访问（<strong>临界资源</strong>）</td>
+<td align="left">打印机、磁带机</td>
+</tr>
+<tr>
+<td align="left"><strong>同时共享</strong></td>
+<td align="left">一个时间段内允许多个进程”同时”访问（<strong>宏观同时、微观交替</strong>）</td>
+<td align="left">磁盘、可重入代码</td>
+</tr>
+</tbody></table>
+<p><strong>并发与共享互为存在条件</strong>（高频辨析）：</p>
+<ul>
+<li><strong>共享以并发为前提</strong>：若系统不允许并发（单道环境），资源就不存在被多个进程”同时”使用的问题；</li>
+<li><strong>并发以共享为条件</strong>：若资源不能被有效共享（如都独占），多道程序便无法并发执行。</li>
+</ul>
+<h3 id="虚拟：一个物理实体变成若干逻辑对应物"><a href="#虚拟：一个物理实体变成若干逻辑对应物" class="headerlink" title="虚拟：一个物理实体变成若干逻辑对应物"></a>虚拟：一个物理实体变成若干逻辑对应物</h3><table>
+<thead>
+<tr>
+<th align="left">虚拟技术</th>
+<th align="left">原理</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>时分复用</strong></td>
+<td align="left">把物理<strong>时间</strong>分片，轮流服务</td>
+<td align="left"><strong>虚拟处理器</strong>：一个 CPU 虚拟为多个”逻辑 CPU”</td>
+</tr>
+<tr>
+<td align="left"><strong>空分复用</strong></td>
+<td align="left">把物理<strong>空间</strong>划分使用</td>
+<td align="left"><strong>虚拟存储器</strong>：以外存扩充内存，程序感觉内存很大</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：虚拟处理器 &#x3D; <strong>时分复用</strong>，虚拟内存 &#x3D; <strong>空分复用</strong>（选择题常考）；虚拟<strong>以并发为前提</strong>——没有多个程序并发运行，一个 CPU 何须虚拟成多个。</p>
+</blockquote>
+<h3 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h3><p>多道程序环境下资源有限，进程的执行<strong>走走停停</strong>，以<strong>不可预知的速度</strong>向前推进；<strong>只有系统拥有并发性，才可能导致异步性</strong>。</p>
+<h2 id="操作系统的发展历程"><a href="#操作系统的发展历程" class="headerlink" title="操作系统的发展历程"></a>操作系统的发展历程</h2><p>发展主线是”<strong>为了解决上一个阶段的问题</strong>“：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">人工操作 --&gt; 脱机I/O --&gt; 单道批处理 --&gt; 多道批处理 --&gt; 分时系统 --&gt; 实时系统 --&gt; 网络/分布式/个人</span><br><span class="line"> 无OS       卫星机      监督程序(OS雏形)  OS正式诞生    时间片轮转   截止时间     各有侧重</span><br></pre></td></tr></table></figure>
+
+<h3 id="手工操作与脱机输入输出"><a href="#手工操作与脱机输入输出" class="headerlink" title="手工操作与脱机输入输出"></a>手工操作与脱机输入输出</h3><ul>
+<li><strong>手工操作（无 OS）</strong>：用户<strong>独占全机</strong>，<strong>人机速度矛盾</strong>突出（人的操作秒级，CPU 运算毫秒&#x2F;微秒级），CPU 大量时间空闲，资源利用率极低。</li>
+<li><strong>脱机输入&#x2F;输出</strong>：引入一台<strong>外围机（卫星机）</strong>，先把纸带上的作业读入<strong>高速磁带</strong>，主机从磁带取作业、结果也经磁带输出——<strong>主机与慢速 I&#x2F;O 设备脱离</strong>，缓解人机速度矛盾。</li>
+</ul>
+<h3 id="单道批处理：自动性"><a href="#单道批处理：自动性" class="headerlink" title="单道批处理：自动性"></a>单道批处理：自动性</h3><p><strong>监督程序</strong>（操作系统的雏形）+ 脱机 I&#x2F;O：作业成批装入磁带，监督程序<strong>逐个</strong>自动调入内存运行。三大特点：<strong>自动性、顺序性、单道性</strong>（内存中只有一道用户程序）。缺点：程序计算时 I&#x2F;O 空闲、I&#x2F;O 工作时 CPU 空闲，<strong>CPU 大量时间在等待 I&#x2F;O</strong>，利用率仍然很低。</p>
+<h3 id="多道批处理：提高利用率，OS-正式诞生"><a href="#多道批处理：提高利用率，OS-正式诞生" class="headerlink" title="多道批处理：提高利用率，OS 正式诞生"></a>多道批处理：提高利用率，OS 正式诞生</h3><p><strong>多道程序设计</strong>：内存中同时存放<strong>多道相互独立的程序</strong>，<strong>并发执行</strong>并共享资源。两个技术前提：<strong>中断技术</strong>（设备完成&#x2F;出错时打断 CPU）+ <strong>通道技术</strong>（独立于 CPU 的 I&#x2F;O 控制部件）。</p>
+<ul>
+<li>特征：<strong>多道性、无序性</strong>（作业先提交未必先完成）、<strong>调度性</strong>（<strong>作业调度</strong>选作业入内存 + <strong>进程调度</strong>分配 CPU，两级调度）。</li>
+<li>优点：CPU 与 I&#x2F;O 设备<strong>并行工作</strong>，资源利用率大幅提升、<strong>系统吞吐量大</strong>。</li>
+<li>缺点：<strong>没有交互性</strong>（提交后无法干预）、作业平均周转时间长。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">单道批处理</th>
+<th align="left">多道批处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内存中的程序数</td>
+<td align="left">一道</td>
+<td align="left"><strong>多道</strong></td>
+</tr>
+<tr>
+<td align="left">是否并发</td>
+<td align="left">否（顺序执行）</td>
+<td align="left"><strong>是（并发执行）</strong></td>
+</tr>
+<tr>
+<td align="left">操作系统</td>
+<td align="left">监督程序（雏形）</td>
+<td align="left"><strong>正式操作系统</strong></td>
+</tr>
+<tr>
+<td align="left">人机交互</td>
+<td align="left">无</td>
+<td align="left"><strong>无</strong></td>
+</tr>
+<tr>
+<td align="left">资源利用率</td>
+<td align="left">低（CPU 等 I&#x2F;O）</td>
+<td align="left">高（CPU 与 I&#x2F;O 并行）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>多道批处理系统标志着操作系统的正式诞生</strong>；其两大前提是<strong>中断与通道</strong>；多道的”无序性”指完成顺序与提交顺序可以不一致。</p>
+</blockquote>
+<h3 id="多道并发利用率例题（甘特图）"><a href="#多道并发利用率例题（甘特图）" class="headerlink" title="多道并发利用率例题（甘特图）"></a>多道并发利用率例题（甘特图）</h3><p><strong>例题</strong>：内存中同时驻留 Job1、Job2 两道作业，单 CPU，CPU 与 I&#x2F;O 设备可以并行，CPU 调度从 Job1 开始，作业的执行序列如下（单位 ms）：</p>
+<ul>
+<li><strong>Job1</strong>：CPU 计算 20 → I&#x2F;O 30 → CPU 计算 10，完成</li>
+<li><strong>Job2</strong>：CPU 计算 30 → I&#x2F;O 20 → CPU 计算 10，完成</li>
+</ul>
+<p><strong>求</strong>：并发执行的总时间与 CPU 利用率，并与单道顺序执行比较。</p>
+<p><strong>第一步：画甘特图</strong>（Job1 在 t&#x3D;20 转 I&#x2F;O 后 Job2 立即上 CPU；t&#x3D;50 时 Job2 转 I&#x2F;O、Job1 的 I&#x2F;O 恰好完成拿回 CPU）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0         10        20        30        40        50        60        70        80   (ms)</span><br><span class="line">|------Job1 CPU------|-----------Job2 CPU-----------| Job1 CPU |   idle   | Job2 CPU |  &lt;- CPU</span><br><span class="line">|--------free--------|-----------Job1 I/O-----------|------Job2 I/O-------|   free   |  &lt;- Device</span><br></pre></td></tr></table></figure>
+
+<p><strong>第二步：算总时间</strong>。以<strong>最后完成的 Job2</strong> 为准：总时间 &#x3D; <strong>80ms</strong>。而单道顺序执行时 Job1 单独需 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">60</span></span></span></span>ms、Job2 单独需 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">60</span></span></span></span>ms，合计 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">60</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">60</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">120</span></span></span></span>ms。</p>
+<p><strong>第三步：算 CPU 利用率</strong>（利用率 &#x3D; CPU 忙碌时间 ÷ 总时间）：</p>
+<ul>
+<li>多道并发：CPU 忙碌 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">70</span></span></span></span>ms，利用率 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">80</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">70</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">100%</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">87.5%</span></span></span></span></li>
+<li>单道顺序：CPU 忙碌仍为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">30</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">40</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">70</span></span></span></span>ms，利用率 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">120</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">70</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">100%</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8056em;vertical-align:-0.0556em;"></span><span class="mord">58.3%</span></span></span></span></li>
+</ul>
+<p><strong>验算</strong>：80ms 内 CPU 各段无冲突（0&#126;20 Job1、20&#126;50 Job2、50&#126;60 Job1、70&#126;80 Job2）；Job1 的 I&#x2F;O（20&#126;50）与 Job2 的 CPU 并行、Job2 的 I&#x2F;O（50&#126;70）与 Job1 的 CPU（50&#126;60）并行，设备段与 CPU 段互不重叠 ✓</p>
+<blockquote>
+<p><strong>考点</strong>：多道批处理<strong>总时间以最后完成的作业为准</strong>；收益来自 <strong>CPU 与 I&#x2F;O 设备并行</strong>——idle 段（60&#126;70ms）正是因为 Job1 已完成而 Job2 还在做 I&#x2F;O，此时 CPU 无活可干。</p>
+</blockquote>
+<h3 id="分时系统：时间片轮转解决人机交互"><a href="#分时系统：时间片轮转解决人机交互" class="headerlink" title="分时系统：时间片轮转解决人机交互"></a>分时系统：时间片轮转解决人机交互</h3><p><strong>背景</strong>：多道批处理<strong>无人机交互</strong>，用户提交作业后无法干预。<strong>核心思想——时间片轮转</strong>：把 CPU 时间划分为<strong>时间片</strong>，按时间片<strong>轮流</strong>为各终端用户服务，时间片用完立即切换。四大特征：<strong>同时性（多路性）、独立性、及时性、交互性</strong>。缺点：<strong>不能优先处理紧急任务</strong>（再紧急也得排队等时间片）。</p>
+<h3 id="实时系统：截止时间"><a href="#实时系统：截止时间" class="headerlink" title="实时系统：截止时间"></a>实时系统：截止时间</h3><p>系统能在<strong>规定的时间（截止时间）内</strong>完成对外部事件的处理。按严格程度分：<strong>硬实时</strong>（必须绝对准时，如导弹制导、工业过程控制、自动驾驶）与<strong>软实时</strong>（偶尔超时可接受，如多媒体播放、信息查询）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">分时系统</th>
+<th align="left">实时系统</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">服务对象</td>
+<td align="left">多个用户（人）</td>
+<td align="left">外部事件&#x2F;实时任务</td>
+</tr>
+<tr>
+<td align="left">核心目标</td>
+<td align="left">交互性、公平性</td>
+<td align="left"><strong>及时性、高可靠性</strong></td>
+</tr>
+<tr>
+<td align="left">响应要求</td>
+<td align="left">尽快响应（时间片轮流）</td>
+<td align="left"><strong>必须在截止时间内完成</strong></td>
+</tr>
+<tr>
+<td align="left">紧急任务</td>
+<td align="left">不能优先</td>
+<td align="left"><strong>可优先处理</strong></td>
+</tr>
+</tbody></table>
+<h3 id="网络与分布式等其他操作系统"><a href="#网络与分布式等其他操作系统" class="headerlink" title="网络与分布式等其他操作系统"></a>网络与分布式等其他操作系统</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">一句话特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">网络操作系统</td>
+<td align="left">各结点<strong>自治</strong>、各管各的，提供网络通信与资源共享</td>
+</tr>
+<tr>
+<td align="left">分布式操作系统</td>
+<td align="left">多机<strong>协同如一台机器</strong>，统一管理、对用户<strong>透明</strong></td>
+</tr>
+<tr>
+<td align="left">个人计算机 OS</td>
+<td align="left">单用户多任务、简单易用（Windows&#x2F;macOS 桌面版）</td>
+</tr>
+<tr>
+<td align="left">嵌入式 OS</td>
+<td align="left">微型化、实时性、可裁剪（VxWorks、FreeRTOS）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：网络 OS 与分布式 OS 的区别——网络 OS 各计算机<strong>自治</strong>；分布式 OS 由<strong>统一的操作系统</strong>管理，用户感觉像<strong>一台虚拟的整体计算机</strong>。</p>
+</blockquote>
+<h3 id="发展历程速览"><a href="#发展历程速览" class="headerlink" title="发展历程速览"></a>发展历程速览</h3><table>
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">关键技术</th>
+<th align="left">意义</th>
+<th align="left">遗留缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">人工操作</td>
+<td align="left">无 OS</td>
+<td align="left">—</td>
+<td align="left">用户独占全机、人机速度矛盾</td>
+</tr>
+<tr>
+<td align="left">单道批处理</td>
+<td align="left">脱机 I&#x2F;O、监督程序</td>
+<td align="left">OS 雏形</td>
+<td align="left">CPU 等待 I&#x2F;O，利用率低</td>
+</tr>
+<tr>
+<td align="left">多道批处理</td>
+<td align="left">多道程序、中断、通道</td>
+<td align="left"><strong>OS 正式诞生</strong></td>
+<td align="left"><strong>无人机交互</strong></td>
+</tr>
+<tr>
+<td align="left">分时系统</td>
+<td align="left">时间片轮转</td>
+<td align="left"><strong>解决人机交互</strong></td>
+<td align="left">不能优先处理紧急任务</td>
+</tr>
+<tr>
+<td align="left">实时系统</td>
+<td align="left">截止时间</td>
+<td align="left"><strong>解决及时性</strong></td>
+<td align="left">—</td>
+</tr>
+</tbody></table>
+<h2 id="程序的运行环境"><a href="#程序的运行环境" class="headerlink" title="程序的运行环境"></a>程序的运行环境</h2><h3 id="CPU-的两种状态与两类指令"><a href="#CPU-的两种状态与两类指令" class="headerlink" title="CPU 的两种状态与两类指令"></a>CPU 的两种状态与两类指令</h3><table>
+<thead>
+<tr>
+<th align="left">指令</th>
+<th align="left">例子</th>
+<th align="left">谁能执行</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>特权指令</strong></td>
+<td align="left"><strong>I&#x2F;O 指令</strong>（启动外设）、<strong>置时钟</strong>、<strong>清内存（内存清零）</strong>、置中断屏蔽&#x2F;关中断、切换 CPU 状态（修改 PSW）</td>
+<td align="left"><strong>仅内核态</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>非特权指令</strong></td>
+<td align="left">算术运算、逻辑运算、移位、取数&#x2F;存数、数据传送</td>
+<td align="left">用户态、内核态均可</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">用户态（目态）</th>
+<th align="left">内核态（管态&#x2F;核心态&#x2F;特权态）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">运行的程序</td>
+<td align="left">应用程序</td>
+<td align="left">操作系统<strong>内核程序</strong></td>
+</tr>
+<tr>
+<td align="left">指令权限</td>
+<td align="left">只能执行<strong>非特权指令</strong></td>
+<td align="left">可执行<strong>特权指令 + 非特权指令</strong></td>
+</tr>
+<tr>
+<td align="left">状态记录</td>
+<td align="left">**PSW（程序状态字寄存器）**中的标志位</td>
+<td align="left">同左</td>
+</tr>
+<tr>
+<td align="left"><strong>进入方式</strong></td>
+<td align="left">经<strong>中断&#x2F;异常</strong>（含系统调用的陷入）进入内核态，由<strong>硬件自动</strong>完成</td>
+<td align="left">—</td>
+</tr>
+<tr>
+<td align="left"><strong>退出方式</strong></td>
+<td align="left">—</td>
+<td align="left">内核<strong>执行特权指令</strong>修改 PSW（如中断返回指令），<strong>OS 主动</strong>让出 CPU</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：用户态→内核态<strong>唯一的途径是中断&#x2F;异常</strong>，由<strong>硬件</strong>自动切换；内核态→用户态是 OS <strong>主动执行特权指令</strong>。用户态程序执行特权指令会触发<strong>异常（非法指令&#x2F;保护违例）</strong>。内核的组成：<strong>时钟管理</strong>（时间片轮转的基础）、<strong>中断机制</strong>、<strong>原语</strong>（原子操作、最底层）、<strong>系统控制的数据结构</strong>（PCB 等）。</p>
+</blockquote>
+<p><strong>例题（状态切换判断）</strong>：判断下列事件是否引起”用户态→内核态”的切换：</p>
+<table>
+<thead>
+<tr>
+<th align="left">事件</th>
+<th align="left">是否切换</th>
+<th align="left">原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">执行 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span></td>
+<td align="left">否</td>
+<td align="left">算术运算是<strong>非特权指令</strong>，用户态完成</td>
+</tr>
+<tr>
+<td align="left">除零</td>
+<td align="left"><strong>是</strong></td>
+<td align="left"><strong>内中断（故障）</strong>，硬件转入内核处理程序</td>
+</tr>
+<tr>
+<td align="left">调用 read() 读文件</td>
+<td align="left"><strong>是</strong></td>
+<td align="left"><strong>陷入指令</strong>引发内中断，进入内核执行系统调用</td>
+</tr>
+<tr>
+<td align="left">时钟中断到达</td>
+<td align="left"><strong>是</strong></td>
+<td align="left"><strong>外中断</strong>，硬件自动进入内核处理时间片</td>
+</tr>
+<tr>
+<td align="left">内核处理完毕返回</td>
+<td align="left">否（方向相反）</td>
+<td align="left">执行<strong>特权指令</strong>修改 PSW：内核态→用户态</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：一次系统调用包含<strong>两次状态切换</strong>（陷入进入 + 返回退出），加上保存&#x2F;恢复现场，开销比普通函数调用<strong>高出几个数量级</strong>，所以频繁的系统调用会显著拖慢程序。</p>
+</blockquote>
+<h3 id="中断与异常"><a href="#中断与异常" class="headerlink" title="中断与异常"></a>中断与异常</h3><p><strong>中断的定义</strong>：程序执行过程中发生某事件时，<strong>中止 CPU 上现行程序</strong>、引出处理该事件的程序执行的过程。<strong>作用</strong>：让内核<strong>强行夺回 CPU 的使用权</strong>，是<strong>实现多道程序并发的前提</strong>——没有中断，用户程序一旦运行就永远不会把 CPU 交还给操作系统。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">信号来源</th>
+<th align="left">与现行指令</th>
+<th align="left">典型例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>内中断（异常 exception）</strong></td>
+<td align="left">CPU <strong>内部</strong></td>
+<td align="left"><strong>有关</strong>（同步）</td>
+<td align="left">陷阱 trap、故障 fault、终止 abort</td>
+</tr>
+<tr>
+<td align="left"><strong>外中断（狭义中断 interrupt）</strong></td>
+<td align="left">CPU <strong>外部</strong></td>
+<td align="left"><strong>无关</strong>（异步）</td>
+<td align="left">时钟中断、I&#x2F;O 中断、键盘输入</td>
+</tr>
+</tbody></table>
+<p>内中断（异常）的三种类型：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">成因</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>陷阱（trap，陷入）</strong></td>
+<td align="left">程序<strong>有意</strong>引发</td>
+<td align="left"><strong>系统调用</strong>（访管指令）、断点调试</td>
+</tr>
+<tr>
+<td align="left"><strong>故障（fault）</strong></td>
+<td align="left">错误条件引起，<strong>可修复</strong></td>
+<td align="left"><strong>缺页</strong>、除零、溢出、非法指令</td>
+</tr>
+<tr>
+<td align="left"><strong>终止（abort）</strong></td>
+<td align="left"><strong>致命硬件错误</strong>，不可恢复</td>
+<td align="left">控制器故障、内存校验错、总线错误</td>
+</tr>
+</tbody></table>
+<p>外中断再分为<strong>可屏蔽中断（INTR）<strong>与</strong>不可屏蔽中断（NMI，如电源掉电、内存校验错）</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>外中断是异步的，只能在两条指令之间响应</strong>；<strong>内中断是同步的，一条指令执行期间即可响应</strong>（如缺页、除零）。</p>
+</blockquote>
+<p><strong>中断处理流程</strong>：关中断 → <strong>保存断点</strong>（PC 压栈）→ 查<strong>中断向量表</strong>引出中断服务程序（<strong>中断向量</strong> &#x3D; 服务程序入口地址）→ <strong>保存现场</strong>（寄存器、PSW）→ 开中断 → 执行中断服务程序 → 恢复现场 → 中断返回。中断处理程序的四项工作：<strong>保护状态、识别中断源、处理事件、恢复正常操作</strong>。</p>
+<blockquote>
+<p><strong>易错点</strong>：系统调用 ≠ 陷入指令——<strong>系统调用是目的，陷入（访管）指令是引发内中断的手段</strong>；陷入指令<strong>在用户态执行</strong>，且<strong>不是特权指令</strong>（否则用户程序根本无法执行它）。</p>
+</blockquote>
+<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p><strong>系统调用</strong>是 OS 提供给应用程序（程序员）的接口。凡涉及<strong>共享资源</strong>（文件、设备、内存）的操作都必须由内核在<strong>内核态</strong>代做，以保证系统的稳定与安全。</p>
+<p><strong>执行过程</strong>（见下图）：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第1章 计算机系统概述.assets/os-系统调用过程.png" alt="系统调用的执行过程" title="">
+                </div>
+                <div class="image-caption">系统调用的执行过程</div>
+            </figure>
+
+<ol>
+<li>用户程序传递<strong>系统调用号与参数</strong>（方式：寄存器 &#x2F; 参数放内存块、寄存器传块地址 &#x2F; 堆栈）</li>
+<li>执行<strong>陷入指令</strong>（访管指令，在<strong>用户态</strong>执行）→ 引发<strong>内中断</strong></li>
+<li>CPU <strong>硬件自动</strong>切换到内核态，按调用号查<strong>系统调用表</strong>，转入对应内核处理程序</li>
+<li>内核处理完毕，<strong>返回用户态</strong>，继续执行用户程序的下一条指令</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">系统调用</th>
+<th align="left">库函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">执行位置</td>
+<td align="left">内核（<strong>内核态</strong>）</td>
+<td align="left">用户态</td>
+</tr>
+<tr>
+<td align="left">状态切换</td>
+<td align="left"><strong>是</strong>（陷入 + 返回）</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">开销</td>
+<td align="left">大</td>
+<td align="left">小</td>
+</tr>
+<tr>
+<td align="left">例子</td>
+<td align="left">read()、write()、fork()</td>
+<td align="left">printf()、malloc()</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：printf 是<strong>库函数</strong>（用户态完成格式转换），内部封装 <strong>write() 系统调用</strong>把结果写到屏幕；malloc 内部调用 <strong>brk()&#x2F;mmap()</strong> 向内核申请内存。</p>
+</blockquote>
+<h3 id="程序的链接与装入"><a href="#程序的链接与装入" class="headerlink" title="程序的链接与装入"></a>程序的链接与装入</h3><table>
+<thead>
+<tr>
+<th align="left">装入方式</th>
+<th align="left">地址转换时机</th>
+<th align="left">特点与应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>绝对装入</strong></td>
+<td align="left"><strong>编译时</strong>即确定<strong>绝对地址</strong></td>
+<td align="left">仅适用于单道批处理环境下的单目标程序</td>
+</tr>
+<tr>
+<td align="left"><strong>可重定位装入（静态重定位）</strong></td>
+<td align="left"><strong>装入内存时一次性</strong>把逻辑地址全部转为物理地址</td>
+<td align="left">装入后<strong>不能再移动</strong>，无法实现内存扩充；早期多道系统使用</td>
+</tr>
+<tr>
+<td align="left"><strong>动态运行时装入（动态重定位）</strong></td>
+<td align="left">装入时不转换，<strong>运行时</strong>借助<strong>重定位寄存器</strong>转换</td>
+<td align="left"><strong>现代 OS 采用</strong>；程序可<strong>移动</strong>、可部分装入（配合<strong>页表</strong>），便于共享与虚拟存储</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">链接方式</th>
+<th align="left">时机</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>静态链接</strong></td>
+<td align="left">运行前把各目标模块 + 库<strong>拼成一个完整装配模块</strong></td>
+<td align="left">之后不再拆开；模块更新需整体重新链接</td>
+</tr>
+<tr>
+<td align="left"><strong>动态链接</strong></td>
+<td align="left"><strong>装入时</strong>边装入边链接，或<strong>运行时</strong>用到该模块才链接</td>
+<td align="left">便于<strong>多个进程共享</strong>同一库的副本、便于模块单独更新；运行时动态链接还能”不用不装入”</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：动态重定位允许程序在内存中<strong>浮动</strong>（移动），是实现<strong>虚拟存储</strong>（部分装入、对换）的基础；静态重定位一旦装入，地址就”焊死”了。</p>
+</blockquote>
+<h3 id="程序运行时的内存映像与地址空间"><a href="#程序运行时的内存映像与地址空间" class="headerlink" title="程序运行时的内存映像与地址空间"></a>程序运行时的内存映像与地址空间</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">高地址  +------------------+</span><br><span class="line">        |       栈         | &lt;- 函数调用帧/局部变量，向下增长</span><br><span class="line">        +------------------+</span><br><span class="line">        |   共享库映射区    | &lt;- 动态链接库 .so/.dll</span><br><span class="line">        +------------------+</span><br><span class="line">        |       堆         | &lt;- malloc/new 动态分配，向上增长</span><br><span class="line">        +------------------+</span><br><span class="line">        |      数据段       | &lt;- 全局变量、静态变量</span><br><span class="line">        +------------------+</span><br><span class="line">低地址  |      代码段       | &lt;- 程序指令，只读、可共享</span><br><span class="line">        +------------------+</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">区域</th>
+<th align="left">内容</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>代码段</strong></td>
+<td align="left">程序指令</td>
+<td align="left">只读，多个进程可<strong>共享</strong>同一份代码</td>
+</tr>
+<tr>
+<td align="left"><strong>数据段</strong></td>
+<td align="left">已初始化的全局&#x2F;静态变量</td>
+<td align="left">装入时确定</td>
+</tr>
+<tr>
+<td align="left"><strong>堆</strong></td>
+<td align="left">动态分配的内存（malloc&#x2F;new）</td>
+<td align="left"><strong>向高地址增长</strong>，程序员手动&#x2F;垃圾回收释放</td>
+</tr>
+<tr>
+<td align="left"><strong>栈</strong></td>
+<td align="left">函数调用帧、局部变量、返回地址</td>
+<td align="left"><strong>向低地址增长</strong>，随函数调用&#x2F;返回伸缩</td>
+</tr>
+<tr>
+<td align="left"><strong>PCB</strong></td>
+<td align="left">进程控制块</td>
+<td align="left">位于<strong>内核空间</strong>，由 OS 管理，<strong>不在用户地址空间</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>共享库</strong></td>
+<td align="left">动态链接库的映射</td>
+<td align="left">对应<strong>动态链接</strong>，多个进程映射同一份</td>
+</tr>
+</tbody></table>
+<p>编译链接后程序使用<strong>逻辑地址（虚拟地址）</strong>，运行时由 OS + 硬件（MMU、重定位寄存器&#x2F;页表）转换为<strong>物理地址</strong>；每个进程拥有<strong>独立的虚拟地址空间</strong>。</p>
+<h2 id="操作系统的体系结构"><a href="#操作系统的体系结构" class="headerlink" title="操作系统的体系结构"></a>操作系统的体系结构</h2><h3 id="分层法与模块化"><a href="#分层法与模块化" class="headerlink" title="分层法与模块化"></a>分层法与模块化</h3><ul>
+<li><strong>分层法</strong>：OS 分为若干层，<strong>层 0 为硬件、层 N 为用户接口</strong>，<strong>每层只能调用紧邻它的低层</strong>（单向依赖）。优点：结构清晰、<strong>便于调试与维护</strong>（自底向上逐层测试）；缺点：一个功能要<strong>层层穿越</strong>，<strong>层间通信开销大</strong>。</li>
+<li><strong>模块化</strong>：按功能划分为<strong>具有一定独立性的模块</strong>，规定好模块间<strong>接口</strong>进行通信（如 Linux 的可加载内核模块 LKM）。优点：灵活、可加载、可维护性好；缺点：接口定义复杂，模块依赖多时难以调试。</li>
+</ul>
+<h3 id="宏内核-vs-微内核（重点对比）"><a href="#宏内核-vs-微内核（重点对比）" class="headerlink" title="宏内核 vs 微内核（重点对比）"></a>宏内核 vs 微内核（重点对比）</h3><p><strong>宏内核（大内核&#x2F;单内核）</strong>：进程管理、内存管理、文件系统、设备驱动等<strong>主要功能模块全部放在内核态</strong>，模块间直接函数调用。<strong>微内核</strong>：内核只保留<strong>与硬件紧密相关的处理、中断处理、进程间通信（IPC）、基本调度</strong>等最基本功能，文件系统、驱动等作为<strong>用户态服务进程</strong>（客户&#x2F;服务器模式），微内核<strong>常驻内存</strong>、<strong>并非一个完整的 OS</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">宏内核（大内核）</th>
+<th align="left">微内核</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内核规模</td>
+<td align="left">大（功能全在内核）</td>
+<td align="left">小（只留核心功能）</td>
+</tr>
+<tr>
+<td align="left">状态切换次数</td>
+<td align="left">少（函数直接调用）</td>
+<td align="left"><strong>多</strong>（服务请求需频繁切换）</td>
+</tr>
+<tr>
+<td align="left">性能</td>
+<td align="left"><strong>高</strong></td>
+<td align="left"><strong>低</strong>（切换 + IPC 消息传递开销）</td>
+</tr>
+<tr>
+<td align="left">可靠性</td>
+<td align="left">低（一处崩溃全系统崩溃）</td>
+<td align="left"><strong>高</strong>（服务进程崩溃可重启）</td>
+</tr>
+<tr>
+<td align="left">扩展性&#x2F;可维护性</td>
+<td align="left">差（代码庞大、结构混乱）</td>
+<td align="left"><strong>好</strong>（结构清晰，可动态添加服务）</td>
+</tr>
+<tr>
+<td align="left">典型系统</td>
+<td align="left"><strong>Linux、Windows</strong></td>
+<td align="left"><strong>Mach、Minix、QNX、L4</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：微内核性能低的根源 &#x3D; <strong>频繁的用户态&#x2F;内核态切换 + 进程间通信（消息传递）开销</strong>；客户&#x2F;服务器模式下<strong>所有请求都经过内核转发</strong>。</p>
+</blockquote>
+<h3 id="外核（exokernel）"><a href="#外核（exokernel）" class="headerlink" title="外核（exokernel）"></a>外核（exokernel）</h3><p><strong>外核（exokernel）<strong>是考纲新增点：运行在</strong>内核态</strong>的底层程序，职责只有两件事——<strong>为虚拟机分配资源</strong>（每台虚拟机只能使用<strong>已申请并获得分配</strong>的资源）与<strong>检查这些资源使用的安全性</strong>（确保不使用他人的资源，内存访问由内存控制器协调）；其余的资源管理交给每台虚拟机上运行的**库操作系统（libOS）**完成。优点：<strong>效率高、灵活</strong>；缺点：实现复杂、安全性难保证。</p>
+<blockquote>
+<p><strong>易错点</strong>：外核不是”把内核放到外面”，而是<strong>内核只管分配与保护，管理策略上移到库 OS</strong>；与微内核”把服务搬到用户态”方向不同。</p>
+</blockquote>
+<h2 id="操作系统的引导"><a href="#操作系统的引导" class="headerlink" title="操作系统的引导"></a>操作系统的引导</h2><p><strong>引导（Boot）</strong>：开机时把 OS 内核从磁盘装入内存并初始化的过程。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第1章 计算机系统概述.assets/os-引导流程.png" alt="操作系统引导流程" title="">
+                </div>
+                <div class="image-caption">操作系统引导流程</div>
+            </figure>
+
+<ol>
+<li>CPU 加电后从 **ROM（BIOS）**中的固定地址取第一条指令，执行引导程序</li>
+<li><strong>硬件自检（POST）</strong>：检测 CPU、内存、显卡等是否正常</li>
+<li>读入磁盘 <strong>0 号扇区——主引导记录（MBR）</strong>（内含<strong>磁盘引导程序 + 分区表 DPT</strong>），扫描分区表找到<strong>活动分区</strong></li>
+<li>从活动分区读入<strong>分区引导记录（PBR）</strong>，由它加载<strong>启动管理器</strong>（如 GRUB）</li>
+<li>启动管理器装入 <strong>OS 内核</strong>（Windows 的 ntoskrnl &#x2F; Linux 的 vmlinuz），内核初始化硬件、建立数据结构，创建<strong>第一个进程（init&#x2F;systemd）</strong>，引导完成</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">位置</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>BIOS</strong></td>
+<td align="left">主板 ROM（固件）</td>
+<td align="left">加电后最先执行的引导程序，负责自检</td>
+</tr>
+<tr>
+<td align="left"><strong>MBR</strong></td>
+<td align="left">磁盘 <strong>0 号扇区</strong></td>
+<td align="left">存放磁盘引导程序和<strong>磁盘分区表</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>PBR</strong></td>
+<td align="left">活动分区首扇区</td>
+<td align="left">加载启动管理器</td>
+</tr>
+<tr>
+<td align="left"><strong>启动管理器（Bootloader）</strong></td>
+<td align="left">磁盘（如 &#x2F;boot 分区）</td>
+<td align="left"><strong>选择并加载操作系统内核</strong>（GRUB）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>双系统就是由启动管理器在引导阶段列出菜单、选择进入哪个操作系统</strong>。现代机器多改用 <strong>UEFI</strong> 引导（读 <strong>ESP 分区</strong>上的 EFI 文件，分区格式只能是 FAT16&#x2F;FAT32），但 408 的主线仍是 <strong>BIOS → MBR → PBR → 启动管理器 → 内核</strong>。</p>
+</blockquote>
+<h2 id="虚拟机"><a href="#虚拟机" class="headerlink" title="虚拟机"></a>虚拟机</h2><p><strong>虚拟机（Virtual Machine, VM）</strong>：利用<strong>虚拟化技术</strong>把一台物理机器虚拟为<strong>多台逻辑上独立的机器</strong>，每台虚拟机拥有自己”虚拟的”CPU、内存、磁盘，可以安装运行<strong>独立的操作系统</strong>（注意与”扩充机器”区分：扩充机器是”硬件+OS”对上层应用的整体抽象，虚拟机强调<strong>一机分多台</strong>）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">第一类 VMM（裸金属型）</th>
+<th align="left">第二类 VMM（宿主型）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">运行位置</td>
+<td align="left"><strong>直接运行在硬件之上</strong></td>
+<td align="left">运行在<strong>宿主操作系统</strong>之上（作为宿主的一个进程）</td>
+</tr>
+<tr>
+<td align="left">是否有宿主 OS</td>
+<td align="left">无</td>
+<td align="left">有</td>
+</tr>
+<tr>
+<td align="left">性能</td>
+<td align="left"><strong>高</strong>（直接管理硬件）</td>
+<td align="left">低（经宿主 OS 间接访问硬件）</td>
+</tr>
+<tr>
+<td align="left">安全性&#x2F;隔离</td>
+<td align="left">好</td>
+<td align="left">受宿主 OS 影响</td>
+</tr>
+<tr>
+<td align="left">典型例子</td>
+<td align="left"><strong>VMware ESXi、Xen、KVM</strong></td>
+<td align="left"><strong>VMware Workstation、VirtualBox</strong></td>
+</tr>
+</tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第1章 计算机系统概述.assets/os-两类虚拟机.png" alt="第一类与第二类虚拟机管理程序" title="">
+                </div>
+                <div class="image-caption">第一类与第二类虚拟机管理程序</div>
+            </figure>
+
+<p><strong>半虚拟化</strong>：对<strong>客户操作系统进行修改</strong>，使其”知道”自己运行在虚拟机上，敏感操作通过 **hypercall（类似系统调用）**与 VMM 协作完成，从而减少全虚拟化中陷入-模拟的开销。</p>
+<blockquote>
+<p><strong>考点</strong>：区分两类 VMM 的关键是<strong>看它下面有没有宿主 OS</strong>——直接跑在硬件上是第一类（性能高，用于数据中心），跑在宿主 OS 上是第二类（方便个人使用）。虚拟机是<strong>硬件级</strong>虚拟化（每台 VM 独立 OS），容器（Docker）是<strong>操作系统级</strong>虚拟化（<strong>共享宿主内核</strong>、启动快、占用小）。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">OS 的三个视角</td>
+<td align="left"><strong>资源管理者</strong>（四大职能）、<strong>用户接口</strong>（命令&#x2F;程序接口）、<strong>扩充机器</strong>；处理机管理本质 &#x3D; <strong>进程管理</strong></td>
+</tr>
+<tr>
+<td align="left">四大特征</td>
+<td align="left"><strong>并发、共享互为存在条件</strong>（最基本）；虚拟 &#x3D; 时分复用（虚拟处理器）&#x2F;空分复用（虚拟内存）；异步 &#x3D; 并发致走走停停</td>
+</tr>
+<tr>
+<td align="left">并发 vs 并行</td>
+<td align="left">同一时间<strong>间隔</strong> vs 同一<strong>时刻</strong>；<strong>单核只能并发</strong>，多核才可并行</td>
+</tr>
+<tr>
+<td align="left">OS 正式诞生</td>
+<td align="left"><strong>多道批处理</strong>；前提 &#x3D; <strong>中断 + 通道</strong>；特征 &#x3D; 多道、无序、调度；缺点 &#x3D; 无人机交互</td>
+</tr>
+<tr>
+<td align="left">分时 vs 实时</td>
+<td align="left">分时 &#x3D; <strong>时间片轮转</strong>解决人机交互；实时 &#x3D; <strong>截止时间内</strong>完成，分<strong>硬&#x2F;软</strong>实时</td>
+</tr>
+<tr>
+<td align="left">特权指令</td>
+<td align="left"><strong>仅内核态</strong>可执行：I&#x2F;O、置时钟、清内存、改 PSW；用户态执行触发<strong>异常</strong></td>
+</tr>
+<tr>
+<td align="left">状态切换</td>
+<td align="left">用户态→内核态：<strong>中断</strong>（<strong>硬件</strong>自动、唯一途径）；内核态→用户态：<strong>特权指令</strong>修改 PSW（OS 主动）</td>
+</tr>
+<tr>
+<td align="left">内中断三类</td>
+<td align="left">陷阱 trap &#x3D; 系统调用（有意）；故障 fault &#x3D; 缺页&#x2F;除零（可修复）；终止 abort &#x3D; 致命硬件错误</td>
+</tr>
+<tr>
+<td align="left">外中断</td>
+<td align="left">时钟、I&#x2F;O 中断；<strong>INTR 可屏蔽</strong>，<strong>NMI 不可屏蔽</strong>（掉电、校验错）</td>
+</tr>
+<tr>
+<td align="left">响应时机</td>
+<td align="left">外中断<strong>异步</strong>（<strong>两条指令之间</strong>响应）；内中断<strong>同步</strong>（<strong>一条指令执行期间</strong>响应）</td>
+</tr>
+<tr>
+<td align="left">系统调用</td>
+<td align="left"><strong>陷入（访管）指令在用户态执行</strong>、非特权指令；系统调用是目的、陷入是手段；printf 是库函数、内部调 write()</td>
+</tr>
+<tr>
+<td align="left">三种装入</td>
+<td align="left">绝对装入（编译时）；可重定位（装入时一次转换、不能移动）；动态运行时（<strong>重定位寄存器</strong>、现代 OS 采用）</td>
+</tr>
+<tr>
+<td align="left">链接</td>
+<td align="left">静态链接（运行前拼死）；动态链接（装入时&#x2F;运行时，便于<strong>共享与更新</strong>）</td>
+</tr>
+<tr>
+<td align="left">宏内核 vs 微内核</td>
+<td align="left">宏内核<strong>性能高</strong>难维护（Linux）；微内核<strong>可靠、易扩展</strong>但切换+IPC 开销大（Mach&#x2F;Minix）；外核 &#x3D; <strong>分配资源 + 安全检查</strong> + 库 OS</td>
+</tr>
+<tr>
+<td align="left">引导流程</td>
+<td align="left"><strong>BIOS(ROM) → POST 自检 → MBR(0 号扇区，含分区表) → PBR → 启动管理器(GRUB) → 内核</strong>；双系统由启动管理器选择</td>
+</tr>
+<tr>
+<td align="left">虚拟机</td>
+<td align="left">第一类直接跑硬件（Xen&#x2F;ESXi&#x2F;KVM）；第二类跑宿主 OS（VMware Workstation&#x2F;VirtualBox）；半虚拟化 &#x3D; 改造客户 OS + hypercall</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T06:26:17.808Z" itemprop="dateUpdated">2026-08-29 14:26:17</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&title=《操作系统概述》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&title=《操作系统概述》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《操作系统概述》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">进程与线程</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/HTTP%E4%B8%8EWWW/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">HTTP与WWW</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&title=《操作系统概述》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&title=《操作系统概述》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《操作系统概述》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

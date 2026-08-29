@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>CPU调度算法 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统,调度">
+    <meta name="description" content="处理机调度（CPU 调度）：从就绪队列中按某种算法选择一个进程（线程），把处理机分配给它。当内存中的进程数远多于 CPU 个数时，”下一个 CPU 给谁用、用多久”就决定了系统的吞吐与响应。408 对本章的考查集中在：三级调度、评价指标、调度器与调度时机（抢占&#x2F;非抢占、闲逛进程）、六种调度算法的计算与对比、上下文切换，其中画甘特图算周转时间是大题高频模式。 调度的基本概念：三级调度调度按">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CPU调度算法">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="处理机调度（CPU 调度）：从就绪队列中按某种算法选择一个进程（线程），把处理机分配给它。当内存中的进程数远多于 CPU 个数时，”下一个 CPU 给谁用、用多久”就决定了系统的吞吐与响应。408 对本章的考查集中在：三级调度、评价指标、调度器与调度时机（抢占&#x2F;非抢占、闲逛进程）、六种调度算法的计算与对比、上下文切换，其中画甘特图算周转时间是大题高频模式。 调度的基本概念：三级调度调度按">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC2%E7%AB%A0%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.assets/cpu-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%BB%84%E6%88%90.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC2%E7%AB%A0%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.assets/cpu-%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97.png">
+<meta property="article:published_time" content="2026-08-29T07:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T06:39:46.472Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="调度">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC2%E7%AB%A0%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.assets/cpu-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%BB%84%E6%88%90.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">CPU调度算法</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">CPU调度算法</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T07:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B0%83%E5%BA%A6%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%EF%BC%9A%E4%B8%89%E7%BA%A7%E8%B0%83%E5%BA%A6"><span class="post-toc-number">1.</span> <span class="post-toc-text">调度的基本概念：三级调度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B0%83%E5%BA%A6%E7%9A%84%E7%9B%AE%E6%A0%87%EF%BC%9A%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="post-toc-number">2.</span> <span class="post-toc-text">调度的目标：评价指标</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%B0%83%E5%BA%A6%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">3.</span> <span class="post-toc-text">调度的实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E4%B8%8E%E5%88%86%E6%B4%BE%E7%A8%8B%E5%BA%8F"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">调度器与分派程序</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B0%83%E5%BA%A6%E7%9A%84%E6%97%B6%E6%9C%BA"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">调度的时机</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8A%A2%E5%8D%A0%E5%BC%8F%E4%B8%8E%E9%9D%9E%E6%8A%A2%E5%8D%A0%E5%BC%8F"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">抢占式与非抢占式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%97%B2%E9%80%9B%E8%BF%9B%E7%A8%8B"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">闲逛进程</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1%EF%BC%88FCFS%EF%BC%89"><span class="post-toc-number">4.</span> <span class="post-toc-text">先来先服务（FCFS）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%9F%AD%E4%BD%9C%E4%B8%9A%E4%BC%98%E5%85%88%EF%BC%88SJF%EF%BC%89%E4%B8%8E%E6%9C%80%E7%9F%AD%E5%89%A9%E4%BD%99%E6%97%B6%E9%97%B4%E4%BC%98%E5%85%88%EF%BC%88SRTN%EF%BC%89"><span class="post-toc-number">5.</span> <span class="post-toc-text">短作业优先（SJF）与最短剩余时间优先（SRTN）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SRTN-%E4%BE%8B%E9%A2%98%EF%BC%9A%E5%88%B0%E8%BE%BE%E5%8D%B3%E6%AF%94%E8%BE%83%E5%89%A9%E4%BD%99%E6%97%B6%E9%97%B4"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">SRTN 例题：到达即比较剩余时间</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E5%93%8D%E5%BA%94%E6%AF%94%E4%BC%98%E5%85%88%EF%BC%88HRRN%EF%BC%89"><span class="post-toc-number">6.</span> <span class="post-toc-text">高响应比优先（HRRN）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%BC%E5%90%88%E4%BE%8B%E9%A2%98%EF%BC%9AFCFS-SJF-HRRN"><span class="post-toc-number">7.</span> <span class="post-toc-text">综合例题：FCFS &#x2F; SJF &#x2F; HRRN</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BD%9C%E4%B8%9A%E4%BF%A1%E6%81%AF"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">作业信息</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#FCFS-%E8%B0%83%E5%BA%A6"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">FCFS 调度</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SJF%EF%BC%88%E9%9D%9E%E6%8A%A2%E5%8D%A0%EF%BC%89%E8%B0%83%E5%BA%A6"><span class="post-toc-number">7.3.</span> <span class="post-toc-text">SJF（非抢占）调度</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#HRRN-%E8%B0%83%E5%BA%A6"><span class="post-toc-number">7.4.</span> <span class="post-toc-text">HRRN 调度</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%89%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="post-toc-number">7.5.</span> <span class="post-toc-text">三算法对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E8%BD%AE%E8%BD%AC%EF%BC%88RR%EF%BC%89"><span class="post-toc-number">8.</span> <span class="post-toc-text">时间片轮转（RR）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#RR-%E4%BE%8B%E9%A2%98%EF%BC%88q-2%EF%BC%89"><span class="post-toc-number">8.1.</span> <span class="post-toc-text">RR 例题（q&#x3D;2）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BC%98%E5%85%88%E7%BA%A7%E8%B0%83%E5%BA%A6"><span class="post-toc-number">9.</span> <span class="post-toc-text">优先级调度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%E8%B0%83%E5%BA%A6%EF%BC%88MLFQ%EF%BC%89"><span class="post-toc-number">10.</span> <span class="post-toc-text">多级反馈队列调度（MLFQ）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%E4%BE%8B%E9%A2%98%EF%BC%88%E6%97%B6%E9%97%B4%E7%89%87-1-2-4%EF%BC%89"><span class="post-toc-number">10.1.</span> <span class="post-toc-text">多级反馈队列例题（时间片 1&#x2F;2&#x2F;4）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%9A%E5%A4%84%E7%90%86%E6%9C%BA%E8%B0%83%E5%BA%A6"><span class="post-toc-number">11.</span> <span class="post-toc-text">多处理机调度</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%8F%8A%E5%85%B6%E5%88%87%E6%8D%A2%E6%9C%BA%E5%88%B6"><span class="post-toc-number">12.</span> <span class="post-toc-text">上下文及其切换机制</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%A5%A5%E9%A5%BF%E8%BE%A8%E6%9E%90"><span class="post-toc-number">13.</span> <span class="post-toc-text">饥饿辨析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%AD%E7%A7%8D%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E5%A4%A7%E5%AF%B9%E6%AF%94"><span class="post-toc-number">14.</span> <span class="post-toc-text">六种调度算法大对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">15.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-CPU调度算法"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">CPU调度算法</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 15:30:00" datetime="2026-08-29T07:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>处理机调度（CPU 调度）</strong>：从就绪队列中<strong>按某种算法</strong>选择一个进程（线程），把处理机分配给它。当内存中的进程数远多于 CPU 个数时，”下一个 CPU 给谁用、用多久”就决定了系统的吞吐与响应。408 对本章的考查集中在：<strong>三级调度、评价指标、调度器与调度时机（抢占&#x2F;非抢占、闲逛进程）、六种调度算法的计算与对比、上下文切换</strong>，其中<strong>画甘特图算周转时间</strong>是大题高频模式。</p>
+<h2 id="调度的基本概念：三级调度"><a href="#调度的基本概念：三级调度" class="headerlink" title="调度的基本概念：三级调度"></a>调度的基本概念：三级调度</h2><p>调度按”做什么”分为三个层次，发生频率从低到高：</p>
+<table>
+<thead>
+<tr>
+<th align="left">层次</th>
+<th align="left">别名</th>
+<th align="left">功能</th>
+<th align="left">频率</th>
+<th align="left">对应状态转换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>高级调度（长程）</strong></td>
+<td align="left"><strong>作业调度</strong></td>
+<td align="left">从外存<strong>后备队列</strong>中选作业调入内存，为其建立进程（分配内存等资源）</td>
+<td align="left">最低（秒&#x2F;分钟级）</td>
+<td align="left">无 → 创建 → <strong>就绪态</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>中级调度（中程）</strong></td>
+<td align="left"><strong>内存调度</strong></td>
+<td align="left">决定哪个进程<strong>换出&#x2F;换入</strong>内存（<strong>挂起 &#x2F; 激活</strong>），提高内存利用率和系统吞吐</td>
+<td align="left">中等</td>
+<td align="left"><strong>就绪 ⇄ 就绪挂起、阻塞 ⇄ 阻塞挂起</strong>（内存 ⇄ 外存）</td>
+</tr>
+<tr>
+<td align="left"><strong>低级调度（短程）</strong></td>
+<td align="left"><strong>进程调度</strong></td>
+<td align="left">从就绪队列中选一个进程&#x2F;线程，<strong>把 CPU 分配给它</strong></td>
+<td align="left"><strong>最高</strong>（毫秒级）</td>
+<td align="left"><strong>就绪态 → 运行态</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>中级调度与挂起态直接关联</strong>：引入挂起态后的<strong>七态模型</strong>中，”就绪挂起、阻塞挂起”与”就绪、阻塞”之间的双向转换，正是中级调度（换出到外存 &#x2F; 换回内存）完成的；暂时不运行的进程被换出到外存，腾出内存给更需要的进程。</li>
+<li>三级调度中<strong>只有低级调度真正”分配 CPU”</strong>；高级调度控制”谁有资格进内存”，中级调度控制”内存里留谁”。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：进程调度（低级调度）是<strong>最基本、最频繁</strong>的调度，所有操作系统都必须配置；中级调度是为<strong>提高内存利用率</strong>而引入的，与<strong>挂起态</strong>成对出现。</p>
+</blockquote>
+<h2 id="调度的目标：评价指标"><a href="#调度的目标：评价指标" class="headerlink" title="调度的目标：评价指标"></a>调度的目标：评价指标</h2><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">周转</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">完成</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">到达</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">带权</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1963em;vertical-align:-0.836em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">运行</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">周转</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">等待</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">周转</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">运行</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span>
+<table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">定义 &#x2F; 公式</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>CPU 利用率</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">总时间</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace"> </span><span class="mord cjk_fallback">忙碌的时间</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td align="left">越高越好</td>
+</tr>
+<tr>
+<td align="left"><strong>系统吞吐量</strong></td>
+<td align="left">单位时间内完成的作业 &#x2F; 进程数</td>
+<td align="left">越高越好（批处理关心）</td>
+</tr>
+<tr>
+<td align="left"><strong>周转时间</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">完成</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">到达</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>（作业提交到完成的总时间）</td>
+<td align="left">越短越好（批处理关心）</td>
+</tr>
+<tr>
+<td align="left"><strong>带权周转时间</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">带权</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.3339em;vertical-align:-0.4453em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8886em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3567em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">运行</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1433em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4103em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3567em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">周转</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1433em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4453em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td align="left">恒 <strong>≥ 1</strong>，越接近 1 越好；常看<strong>平均值</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>等待时间</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">周转</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">运行</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，即<strong>在就绪队列中等待</strong>的时间之和</td>
+<td align="left">越短越好；纯计算题中 &#x3D; 周转 − 运行</td>
+</tr>
+<tr>
+<td align="left"><strong>响应时间</strong></td>
+<td align="left">从提交请求到<strong>首次</strong>产生响应的时间</td>
+<td align="left">越短越好，<strong>交互（分时）系统</strong>最重要</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>周转时间、吞吐量对批处理系统重要，响应时间对分时（交互）系统重要</strong>；调度算法的优劣主要用<strong>平均周转 &#x2F; 平均等待时间</strong>衡量。<br><strong>易错点</strong>：响应时间是”<strong>首次</strong>响应”不是”完成”；带权周转时间一定 <strong>≥ 1</strong>（运行时间不可能为负）。</p>
+</blockquote>
+<h2 id="调度的实现"><a href="#调度的实现" class="headerlink" title="调度的实现"></a>调度的实现</h2><h3 id="调度器与分派程序"><a href="#调度器与分派程序" class="headerlink" title="调度器与分派程序"></a>调度器与分派程序</h3><p><strong>调度程序（scheduler）</strong> 运行在内核态，由三部分协作完成一次调度：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第2章 进程管理.assets/cpu-调度器组成.png" alt="调度程序的组成（排队器、分派器、上下文切换器）" title="">
+                </div>
+                <div class="image-caption">调度程序的组成（排队器、分派器、上下文切换器）</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>排队器</strong></td>
+<td align="left">将就绪进程按调度策略排入就绪队列</td>
+</tr>
+<tr>
+<td align="left"><strong>分派器</strong></td>
+<td align="left">取出队首（被选中）进程，准备分配 CPU</td>
+</tr>
+<tr>
+<td align="left"><strong>上下文切换器</strong></td>
+<td align="left">保存旧进程现场到其 PCB，装入新进程现场</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>一句区分</strong>：调度程序（scheduler）负责”<strong>选谁上 CPU</strong>“（策略）；分派程序（dispatcher）负责”<strong>怎么换上 CPU</strong>“——切换上下文、从内核态转回用户态、跳转到新进程程序入口（机制），分派本身也有开销，所以时间片不能取得太小。</li>
+<li><strong>线程调度一句</strong>：<strong>用户级线程</strong>由线程库在用户态自行调度，内核看不见，仍按进程分配 CPU；<strong>内核级线程</strong>才是操作系统内核调度的真正对象。</li>
+</ul>
+<h3 id="调度的时机"><a href="#调度的时机" class="headerlink" title="调度的时机"></a>调度的时机</h3><p><strong>可以 &#x2F; 需要进行调度与切换的时机</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">时机</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>主动放弃 CPU</strong></td>
+<td align="left">进程<strong>终止</strong>（正常结束 &#x2F; 异常退出）</td>
+<td align="left">必须重新调度</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">进程<strong>阻塞</strong>（请求 I&#x2F;O、P 操作失败、等待事件）</td>
+<td align="left">运行 → 阻塞，让出 CPU</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">进程被<strong>挂起</strong>、或执行 <strong>yield</strong> 主动让权</td>
+<td align="left">暂停参与调度 &#x2F; 自愿回队尾</td>
+</tr>
+<tr>
+<td align="left"><strong>被动剥夺 CPU</strong></td>
+<td align="left">当前进程<strong>时间片用完</strong></td>
+<td align="left">运行 → 就绪，排回就绪队列</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left"><strong>更高优先级</strong>进程就绪（抢占式方式下）</td>
+<td align="left">立即抢占当前进程</td>
+</tr>
+<tr>
+<td align="left">也提供调度机会</td>
+<td align="left"><strong>新进程创建</strong>、<strong>I&#x2F;O 完成唤醒</strong>某进程</td>
+<td align="left">被唤醒者只是<strong>进入就绪队列</strong>，不一定立即上 CPU</td>
+</tr>
+</tbody></table>
+<p><strong>不能进行调度与切换的两种情形（考纲新点）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">情形</th>
+<th align="left">原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">① <strong>在处理中断的过程中</strong></td>
+<td align="left">中断处理必须快速完成，处理完毕后才能考虑调度</td>
+</tr>
+<tr>
+<td align="left">② <strong>进程在 OS 内核程序临界区中</strong></td>
+<td align="left">正在修改就绪队列等内核临界资源（信号量 P&#x2F;V 原语等原子操作同理），中途切换会破坏数据一致性</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：区分两种”临界区”——进程在<strong>普通临界资源</strong>（如打印机）的临界区中<strong>可以</strong>被调度切换走；只有在<strong>操作系统内核程序临界区</strong>中才<strong>不能</strong>切换。<br><strong>易错点</strong>：I&#x2F;O 完成使进程”阻塞 → 就绪”，只是<strong>入队</strong>，是否立即切换取决于调度方式与算法，<strong>不一定</strong>立即被调度。</p>
+</blockquote>
+<h3 id="抢占式与非抢占式"><a href="#抢占式与非抢占式" class="headerlink" title="抢占式与非抢占式"></a>抢占式与非抢占式</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">非抢占式（非剥夺）</th>
+<th align="left">抢占式（剥夺）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">切换原则</td>
+<td align="left">仅当运行进程<strong>主动放弃</strong> CPU（终止 &#x2F; 阻塞）时才调度</td>
+<td align="left">时间片到、或有<strong>更高优先级 &#x2F; 更短剩余时间</strong>进程就绪时<strong>立即剥夺</strong></td>
+</tr>
+<tr>
+<td align="left">响应速度</td>
+<td align="left">慢，紧急任务要等当前进程让位</td>
+<td align="left">快，能及时处理紧急任务</td>
+</tr>
+<tr>
+<td align="left">开销与复杂度</td>
+<td align="left">小、实现简单</td>
+<td align="left">大、需时钟中断与现场保护支持</td>
+</tr>
+<tr>
+<td align="left">典型算法</td>
+<td align="left">FCFS、非抢占 SJF、HRRN</td>
+<td align="left">SRTN、RR、抢占式优先级、多级反馈队列</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：抢占的依据只有时钟中断（时间片）和”更紧急者就绪”两类事件；非抢占方式下一个计算型进程可霸占 CPU 很久。</p>
+</blockquote>
+<h3 id="闲逛进程"><a href="#闲逛进程" class="headerlink" title="闲逛进程"></a>闲逛进程</h3><ul>
+<li>就绪队列为空时，CPU 运行<strong>闲逛进程（idle）</strong>，<strong>PID 为 0</strong>。</li>
+<li>特点：<strong>优先级最低</strong>、<strong>不需要调度</strong>（队列空时自动上 CPU）、<strong>不需要 CPU 以外的资源</strong>、因此<strong>不会被阻塞</strong>。</li>
+<li>作用：让 CPU”永远有事可做”，避免空转指令失控，简化”无进程可运行”的边界处理。</li>
+</ul>
+<h2 id="先来先服务（FCFS）"><a href="#先来先服务（FCFS）" class="headerlink" title="先来先服务（FCFS）"></a>先来先服务（FCFS）</h2><ul>
+<li><strong>思想</strong>：按<strong>到达的先后顺序</strong>调度，<strong>非抢占</strong>；就绪队列就是一个 FIFO 队列。</li>
+<li><strong>优点</strong>：公平、实现简单、<strong>不会饥饿</strong>。</li>
+<li><strong>缺点</strong>：存在<strong>护航效应（Convoy Effect）</strong>——一个长作业排在前头，后面一批短作业全部”陪跑”等待，<strong>平均等待 &#x2F; 周转时间长</strong>；有利于 <strong>CPU 繁忙型</strong>作业，不利于 <strong>I&#x2F;O 繁忙型</strong>作业（CPU 被长计算占住，I&#x2F;O 设备闲置）。</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：FCFS 单独使用时对短作业极不友好，但它常与优先级、多级反馈队列<strong>配合</strong>（低级队列内部用 FCFS）。</p>
+</blockquote>
+<h2 id="短作业优先（SJF）与最短剩余时间优先（SRTN）"><a href="#短作业优先（SJF）与最短剩余时间优先（SRTN）" class="headerlink" title="短作业优先（SJF）与最短剩余时间优先（SRTN）"></a>短作业优先（SJF）与最短剩余时间优先（SRTN）</h2><ul>
+<li><strong>SJF（非抢占）</strong>：每次从就绪队列中选<strong>预计运行时间最短</strong>的进程，运行到完成。</li>
+<li><strong>SRTN（抢占式 SJF）</strong>：新进程到达时（或每个调度时刻），比较<strong>剩余时间</strong>——新进程的剩余时间 &lt; 当前进程的剩余时间就<strong>立即抢占</strong>。</li>
+<li><strong>优点</strong>：在同一组作业下，<strong>平均等待时间、平均周转时间最短</strong>（理论最优）。</li>
+<li><strong>缺点</strong>：<ul>
+<li><strong>运行时间需要预估</strong>（用户可”谎报”短时间获得优先）；</li>
+<li><strong>长作业可能饥饿</strong>——短作业源源不断地到达，长作业被不断插队。</li>
+</ul>
+</li>
+<li><strong>关系</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> 的平均等待时间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span></span></span></span> 非抢占 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0962em;">J</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span></span></span></span> 其他算法（同组作业下）。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：考题问”平均等待时间最短的算法”答 <strong>SJF（或 SRTN）</strong>；问”最公平、不会饥饿”答 <strong>FCFS &#x2F; RR</strong>。</p>
+</blockquote>
+<h3 id="SRTN-例题：到达即比较剩余时间"><a href="#SRTN-例题：到达即比较剩余时间" class="headerlink" title="SRTN 例题：到达即比较剩余时间"></a>SRTN 例题：到达即比较剩余时间</h3><p>作业信息（本篇所有例题共用）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达时间</th>
+<th align="left">运行时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+</tr>
+</tbody></table>
+<p>逐时刻决策：</p>
+<table>
+<thead>
+<tr>
+<th align="left">时刻</th>
+<th align="left">事件与决策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">只有 Job1（剩余 7）→ 运行 Job1</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">Job2 到达，剩余 4 &lt; Job1 剩余 5 → <strong>抢占</strong>，Job1 回就绪（剩 5）</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">Job3 到达，剩余 1 &lt; Job2 剩余 2 → <strong>抢占</strong>，Job2 回就绪（剩 2）</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">Job3 完成；Job2（2）&lt; Job4（4）&lt; Job1（5）→ 继续运行 Job2</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">Job2 完成；Job4（4）&lt; Job1（5）→ 运行 Job4</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">Job4 完成；最后运行 Job1 至时刻 16</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0        2        4    5        7               11                   16</span><br><span class="line">+--------+--------+----+--------+----------------+--------------------+</span><br><span class="line">|  Job1  |  Job2  |Job3|  Job2  |      Job4      |        Job1        |</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达</th>
+<th align="left">运行</th>
+<th align="left">完成</th>
+<th align="left">周转</th>
+<th align="left">带权周转</th>
+<th align="left">等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+<td align="left">16</td>
+<td align="left">16</td>
+<td align="left">2.29</td>
+<td align="left">9</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left">7</td>
+<td align="left">5</td>
+<td align="left">1.25</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+<td align="left">5</td>
+<td align="left">1</td>
+<td align="left">1.00</td>
+<td align="left">0</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">11</td>
+<td align="left">6</td>
+<td align="left">1.50</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left"><strong>平均</strong></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>7.00</strong></td>
+<td align="left"><strong>1.51</strong></td>
+<td align="left"><strong>3.00</strong></td>
+</tr>
+</tbody></table>
+<h2 id="高响应比优先（HRRN）"><a href="#高响应比优先（HRRN）" class="headerlink" title="高响应比优先（HRRN）"></a>高响应比优先（HRRN）</h2><p>每次调度时为就绪队列中<strong>每个</strong>进程计算<strong>响应比</strong>，选<strong>响应比最高</strong>者运行（<strong>非抢占</strong>）：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">要求服务时间</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">等待时间</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord cjk_fallback">要求服务时间</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">要求服务时间</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">等待时间</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<ul>
+<li><strong>同时等待时，运行越短响应比越高</strong> → 体现了 SJF 的优点；</li>
+<li><strong>运行相同时，等得越久响应比越高</strong> → 长作业等待足够久后必然被选中，<strong>不会饥饿</strong>（FCFS 的优点）；</li>
+<li>是 FCFS 与 SJF 的<strong>折中</strong>。</li>
+<li><strong>缺点</strong>：每次调度都要<strong>重新计算所有就绪进程的响应比</strong>，开销大；平均性能仍不如 SJF。</li>
+</ul>
+<h2 id="综合例题：FCFS-SJF-HRRN"><a href="#综合例题：FCFS-SJF-HRRN" class="headerlink" title="综合例题：FCFS &#x2F; SJF &#x2F; HRRN"></a>综合例题：FCFS &#x2F; SJF &#x2F; HRRN</h2><h3 id="作业信息"><a href="#作业信息" class="headerlink" title="作业信息"></a>作业信息</h3><table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达时间</th>
+<th align="left">运行时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+</tr>
+</tbody></table>
+<h3 id="FCFS-调度"><a href="#FCFS-调度" class="headerlink" title="FCFS 调度"></a>FCFS 调度</h3><p>严格按到达顺序 Job1 → Job2 → Job3 → Job4，均非抢占运行到结束：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0                            7               11   12               16</span><br><span class="line">+----------------------------+----------------+----+----------------+</span><br><span class="line">|            Job1            |      Job2      |Job3|      Job4      |</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达</th>
+<th align="left">运行</th>
+<th align="left">完成</th>
+<th align="left">周转</th>
+<th align="left">带权周转</th>
+<th align="left">等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">1.00</td>
+<td align="left">0</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left">11</td>
+<td align="left">9</td>
+<td align="left">2.25</td>
+<td align="left">5</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+<td align="left">12</td>
+<td align="left">8</td>
+<td align="left">8.00</td>
+<td align="left">7</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">16</td>
+<td align="left">11</td>
+<td align="left">2.75</td>
+<td align="left">7</td>
+</tr>
+<tr>
+<td align="left"><strong>平均</strong></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>8.75</strong></td>
+<td align="left"><strong>3.50</strong></td>
+<td align="left"><strong>4.75</strong></td>
+</tr>
+</tbody></table>
+<p>只运行 1 个单位的 Job3 被拖到 12 才完成、带权周转高达 8.00——这就是<strong>护航效应</strong>。</p>
+<h3 id="SJF（非抢占）调度"><a href="#SJF（非抢占）调度" class="headerlink" title="SJF（非抢占）调度"></a>SJF（非抢占）调度</h3><ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>：只有 Job1 → 运行 Job1（0&#126;7）。</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span>：就绪 {Job2(4), Job3(1), Job4(4)}，<strong>运行时间最短</strong>的 Job3 先行（7&#126;8）。</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>：Job2 与 Job4 运行时间同为 4，<strong>先到达者</strong> Job2 先行（8&#126;12）；最后 Job4（12&#126;16）。</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0                            7    8               12               16</span><br><span class="line">+----------------------------+----+----------------+----------------+</span><br><span class="line">|            Job1            |Job3|      Job2      |      Job4      |</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达</th>
+<th align="left">运行</th>
+<th align="left">完成</th>
+<th align="left">周转</th>
+<th align="left">带权周转</th>
+<th align="left">等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">1.00</td>
+<td align="left">0</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left">12</td>
+<td align="left">10</td>
+<td align="left">2.50</td>
+<td align="left">6</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+<td align="left">8</td>
+<td align="left">4</td>
+<td align="left">4.00</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">16</td>
+<td align="left">11</td>
+<td align="left">2.75</td>
+<td align="left">7</td>
+</tr>
+<tr>
+<td align="left"><strong>平均</strong></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>8.00</strong></td>
+<td align="left"><strong>2.56</strong></td>
+<td align="left"><strong>4.00</strong></td>
+</tr>
+</tbody></table>
+<h3 id="HRRN-调度"><a href="#HRRN-调度" class="headerlink" title="HRRN 调度"></a>HRRN 调度</h3><ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>：只有 Job1 → 运行 Job1（0&#126;7）。</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span> 计算响应比（响应比 &#x3D; 1 + 等待 ÷ 运行）：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">等待</th>
+<th align="left">运行</th>
+<th align="left">响应比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job2</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.25</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4.00</span></span></span></span> ← <strong>最高</strong></td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1.50</span></span></span></span></td>
+</tr>
+</tbody></table>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>（Job3 完成后）：Job2 等待 6、Job4 等待 3 → Job2 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.50</span></span></span></span> &gt; Job4 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1.75</span></span></span></span> → Job2（8&#126;12），最后 Job4（12&#126;16）。</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0                            7    8               12               16</span><br><span class="line">+----------------------------+----+----------------+----------------+</span><br><span class="line">|            Job1            |Job3|      Job2      |      Job4      |</span><br></pre></td></tr></table></figure>
+
+<p>指标与 SJF 完全相同：平均周转 <strong>8.00</strong>、平均带权周转 <strong>2.56</strong>、平均等待 <strong>4.00</strong>。</p>
+<h3 id="三算法对比"><a href="#三算法对比" class="headerlink" title="三算法对比"></a>三算法对比</h3><table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">调度顺序</th>
+<th align="left">平均周转</th>
+<th align="left">平均带权周转</th>
+<th align="left">平均等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">FCFS</td>
+<td align="left">1 → 2 → 3 → 4</td>
+<td align="left">8.75</td>
+<td align="left">3.50</td>
+<td align="left">4.75</td>
+</tr>
+<tr>
+<td align="left">SJF（非抢占）</td>
+<td align="left">1 → 3 → 2 → 4</td>
+<td align="left">8.00</td>
+<td align="left">2.56</td>
+<td align="left">4.00</td>
+</tr>
+<tr>
+<td align="left">HRRN</td>
+<td align="left">1 → 3 → 2 → 4</td>
+<td align="left">8.00</td>
+<td align="left">2.56</td>
+<td align="left">4.00</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：本例 HRRN 与 SJF 选中顺序恰好一致（Job3 运行极短，响应比必然最高），<strong>不代表两算法总相同</strong>——当长作业等待很久后，其响应比会反超新来的短作业，HRRN 会转而照顾长作业，因此<strong>永远不饥饿</strong>，这是它相对 SJF 的本质优势。</p>
+</blockquote>
+<h2 id="时间片轮转（RR）"><a href="#时间片轮转（RR）" class="headerlink" title="时间片轮转（RR）"></a>时间片轮转（RR）</h2><ul>
+<li><strong>思想</strong>：就绪队列按 FCFS 排队，队首进程运行<strong>一个时间片 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span></strong>；时间片内未完成则<strong>剥夺 CPU、排到队尾</strong>，完成了则<strong>立即释放</strong> CPU。<strong>天然是抢占式</strong>（靠时钟中断）。</li>
+<li><strong>适用</strong>：<strong>分时（交互）系统</strong>——公平、响应快。</li>
+<li><strong>时间片大小的权衡</strong>：<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span> <strong>太大</strong>：进程在时间片内都跑完了，退化为 <strong>FCFS</strong>，响应变慢；</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span> <strong>太小</strong>：上下文切换过于频繁，<strong>切换开销</strong>占比过大，真正干活的时间变少；</li>
+<li>一般取<strong>略大于一次交互所需的开销</strong>（如 20&#126;50 ms）。</li>
+</ul>
+</li>
+<li><strong>缺点</strong>：不区分作业长短，平均周转时间<strong>不一定</strong>最优；时间片选择敏感。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：RR 下<strong>等待时间 &#x3D; 每次排队时间之和</strong>，作业最终总能轮到，<strong>不会饥饿</strong>；RR 追求的是<strong>响应</strong>而非周转。</p>
+</blockquote>
+<h3 id="RR-例题（q-2）"><a href="#RR-例题（q-2）" class="headerlink" title="RR 例题（q&#x3D;2）"></a>RR 例题（q&#x3D;2）</h3><p>同一组作业，时间片 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>。入队规则：<strong>同一时刻新到达的先入队，时间片用完的进程再入队尾</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">时刻</th>
+<th align="left">事件与就绪队列（队首在左）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">Job1 到达入队：[Job1] → 运行 Job1（0&#126;2）</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">Job1 时间片到（剩 5）；Job2 <strong>先</strong>到达入队，Job1 <strong>再</strong>入队 → [Job2, Job1] → 运行 Job2（2&#126;4）</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">Job2 时间片到（剩 2）；Job3 先入队，Job2 再入队 → [Job1, Job3, Job2] → 运行 Job1（4&#126;6）</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">Job4 到达，排到队尾 → [Job1, Job3, Job2, Job4]（排队中）</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">Job1 时间片到（剩 3）→ [Job3, Job2, Job4, Job1] → 运行 Job3（6&#126;7，只需 1 个单位）</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">Job3 <strong>完成</strong> → [Job2, Job4, Job1] → 运行 Job2（7&#126;9，恰好完成）</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">Job2 <strong>完成</strong> → [Job4, Job1] → 运行 Job4（9&#126;11）</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">Job4 时间片到（剩 2）→ [Job1, Job4] → 运行 Job1（11&#126;13）</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">Job1 时间片到（剩 1）→ [Job4, Job1] → 运行 Job4（13&#126;15，完成）</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">Job4 <strong>完成</strong> → [Job1] → 运行 Job1（15&#126;16，完成）</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0        2        4        6    7        9       11       13       15   16</span><br><span class="line">+--------+--------+--------+----+--------+--------+--------+--------+----+</span><br><span class="line">|  Job1  |  Job2  |  Job1  |Job3|  Job2  |  Job4  |  Job1  |  Job4  |Job1|</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达</th>
+<th align="left">运行</th>
+<th align="left">完成</th>
+<th align="left">周转</th>
+<th align="left">带权周转</th>
+<th align="left">等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">7</td>
+<td align="left">16</td>
+<td align="left">16</td>
+<td align="left">2.29</td>
+<td align="left">9</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left">9</td>
+<td align="left">7</td>
+<td align="left">1.75</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">Job3</td>
+<td align="left">4</td>
+<td align="left">1</td>
+<td align="left">7</td>
+<td align="left">3</td>
+<td align="left">3.00</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">Job4</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">15</td>
+<td align="left">10</td>
+<td align="left">2.50</td>
+<td align="left">6</td>
+</tr>
+<tr>
+<td align="left"><strong>平均</strong></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>9.00</strong></td>
+<td align="left"><strong>2.38</strong></td>
+<td align="left"><strong>5.00</strong></td>
+</tr>
+</tbody></table>
+<p>可见 RR 的平均周转（9.00）反而<strong>劣于</strong> FCFS（8.75）——RR 的目标在<strong>响应快与公平</strong>，不在周转最短。</p>
+<h2 id="优先级调度"><a href="#优先级调度" class="headerlink" title="优先级调度"></a>优先级调度</h2><ul>
+<li><strong>思想</strong>：为每个进程设<strong>优先级</strong>，就绪队列按优先级排序（可用优先队列 &#x2F; 分级队列组织），<strong>高者优先</strong>；<strong>抢占、非抢占均可</strong>——抢占式下更高优先级进程就绪会立即剥夺 CPU。</li>
+<li><strong>静态优先级</strong>：创建时确定、运行期间<strong>不变</strong>。简单、开销小，但低优先级进程可能<strong>长期得不到服务</strong>。</li>
+<li><strong>动态优先级</strong>：运行中<strong>调整</strong>，如”<strong>等待时间越长优先级越高</strong>“（<strong>老化 Aging</strong>）、”占 CPU 越久优先级越低”——更公平、可防饥饿，但开销大。</li>
+<li><strong>设置原则</strong>（越高越优先）：<strong>系统进程 &gt; 用户进程</strong>；<strong>交互型 &gt; 非交互型</strong>；<strong>I&#x2F;O 繁忙型 &gt; CPU 繁忙型</strong>（I&#x2F;O 型进程占 CPU 短，让它先跑能提高设备利用率、实现 CPU 与 I&#x2F;O 并行）。</li>
+<li><strong>缺点</strong>：低优先级进程可能<strong>饥饿</strong>，用<strong>老化</strong>缓解。</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：”系统进程优先级高”是原则而非绝对；考试常考”让 I&#x2F;O 型先运行的理由”——<strong>腾出 CPU 的同时让 I&#x2F;O 设备忙起来</strong>。</p>
+</blockquote>
+<h2 id="多级反馈队列调度（MLFQ）"><a href="#多级反馈队列调度（MLFQ）" class="headerlink" title="多级反馈队列调度（MLFQ）"></a>多级反馈队列调度（MLFQ）</h2><p><strong>规则</strong>：</p>
+<ol>
+<li>设置多个就绪队列，优先级<strong>从第 1 级到第 n 级递减</strong>；时间片<strong>逐级加倍</strong>（第 2 级是第 1 级的 2 倍……），最低级可用 FCFS。</li>
+<li>新进程<strong>先进入第 1 级队列</strong>（最高优先级）队尾。</li>
+<li>仅当第 1&#126;i−1 级队列<strong>全空</strong>时，第 i 级队首才能上 CPU；<strong>高优先级队列可以抢占</strong>低优先级队列正在运行的进程。</li>
+<li>进程在本级队列中运行<strong>一个本级时间片</strong>：用完未完成 → <strong>降入下一级队列队尾</strong>；在最后一级用完 → 回最后一级队尾；提前完成 → 立即释放 CPU。</li>
+</ol>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第2章 进程管理.assets/cpu-多级反馈队列.png" alt="多级反馈队列调度（时间片 1/2/4，逐级降队列）" title="">
+                </div>
+                <div class="image-caption">多级反馈队列调度（时间片 1/2/4，逐级降队列）</div>
+            </figure>
+
+<ul>
+<li><strong>优点</strong>：短作业在前几级的小时间片内就能跑完（近似 SJF）；交互作业始终能得到快速响应（近似 RR）；长作业逐级降队列后仍会被运行（FCFS 兜底）——<strong>综合了 FCFS、SJF、RR 的优点</strong>，是<strong>现代操作系统</strong>广泛采用的方案。</li>
+<li><strong>缺点</strong>：实现复杂；若高优先级队列源源不断有新进程，低级队列进程仍可能<strong>饥饿</strong>（可对低级队列中等待过久的进程<strong>提升队列级</strong>来缓解）。</li>
+</ul>
+<h3 id="多级反馈队列例题（时间片-1-2-4）"><a href="#多级反馈队列例题（时间片-1-2-4）" class="headerlink" title="多级反馈队列例题（时间片 1&#x2F;2&#x2F;4）"></a>多级反馈队列例题（时间片 1&#x2F;2&#x2F;4）</h3><p>三个队列 Q1、Q2、Q3，时间片分别为 1、2、4；高优先级可抢占。两个作业：</p>
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达时间</th>
+<th align="left">运行时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">1</td>
+<td align="left">8</td>
+</tr>
+</tbody></table>
+<p>逐级降队列全过程：</p>
+<table>
+<thead>
+<tr>
+<th align="left">时刻</th>
+<th align="left">事件</th>
+<th align="left">Q1</th>
+<th align="left">Q2</th>
+<th align="left">Q3</th>
+<th align="left">CPU（区间）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">Job1 进入 Q1</td>
+<td align="left">[Job1]</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">Job1（0&#126;1，Q1 片 1）</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">Job1 用完<strong>降到 Q2</strong>；Job2 到达进 Q1</td>
+<td align="left">[Job2]</td>
+<td align="left">[Job1]</td>
+<td align="left">—</td>
+<td align="left">Job2（1&#126;2，Q1 片 1）</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">Job2 用完<strong>降到 Q2</strong>（排 Job1 后）；Q1 空</td>
+<td align="left">—</td>
+<td align="left">[Job1, Job2]</td>
+<td align="left">—</td>
+<td align="left">Job1（2&#126;4，Q2 片 2）</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">Job1 剩 1，用完<strong>降到 Q3</strong></td>
+<td align="left">—</td>
+<td align="left">[Job2]</td>
+<td align="left">[Job1]</td>
+<td align="left">Job2（4&#126;6，Q2 片 2）</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">Job2 剩 5，用完<strong>降到 Q3</strong>（排 Job1 后）；Q1、Q2 全空</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">[Job1, Job2]</td>
+<td align="left">Job1（6&#126;7，Q3 片 4）</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">Job1 <strong>完成</strong>（1+2+1 &#x3D; 4）</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">[Job2]</td>
+<td align="left">Job2（7&#126;11，Q3 片 4）</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">Job2 剩 1，回 Q3 队尾（最后一级不再降）</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">[Job2]</td>
+<td align="left">Job2（11&#126;12，完成）</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">Job2 <strong>完成</strong>（1+2+4+1 &#x3D; 8）</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0    1    2        4        6    7               11   12</span><br><span class="line">+----+----+--------+--------+----+----------------+----+</span><br><span class="line">|Job1|Job2|  Job1  |  Job2  |Job1|      Job2      |Job2|</span><br><span class="line">| Q1 | Q1 |   Q2   |   Q2   | Q3 |       Q3       | Q3 |</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">作业</th>
+<th align="left">到达</th>
+<th align="left">运行</th>
+<th align="left">完成</th>
+<th align="left">周转</th>
+<th align="left">带权周转</th>
+<th align="left">等待</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Job1</td>
+<td align="left">0</td>
+<td align="left">4</td>
+<td align="left">7</td>
+<td align="left">7</td>
+<td align="left">1.75</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">Job2</td>
+<td align="left">1</td>
+<td align="left">8</td>
+<td align="left">12</td>
+<td align="left">11</td>
+<td align="left">1.38</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left"><strong>平均</strong></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>9.00</strong></td>
+<td align="left"><strong>1.56</strong></td>
+<td align="left"><strong>3.00</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：短作业 Job1 只用了 3 个小时间片就完成；若本例只有 1 个作业，它也会一路降级最终在 Q3 跑完——<strong>长短兼顾</strong>正是 MLFQ 的精髓。</p>
+</blockquote>
+<h2 id="多处理机调度"><a href="#多处理机调度" class="headerlink" title="多处理机调度"></a>多处理机调度</h2><p>多处理机（多核）系统中，调度还要决定进程 &#x2F; 线程<strong>放到哪个处理机上运行</strong>，需考虑<strong>负载均衡</strong>与<strong>处理机亲和性</strong>（尽量固定 CPU 以复用高速缓存），常见方式有<strong>成组调度</strong>、<strong>专用处理机分配</strong>等——408 仅要求概念性了解。</p>
+<h2 id="上下文及其切换机制"><a href="#上下文及其切换机制" class="headerlink" title="上下文及其切换机制"></a>上下文及其切换机制</h2><ul>
+<li><strong>上下文（Context）</strong>：进程在 CPU 上运行所需的全部状态信息——通用寄存器、PC、PSW、栈指针等（记录在 PCB 中）。</li>
+<li><strong>上下文切换（Context Switch）</strong>：把旧进程的上下文<strong>存入其 PCB</strong>，再把新进程的上下文<strong>从其 PCB 装入</strong>。</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">进程 A 运行 ──► 1. 保存 A 的上下文到 A.PCB（寄存器、PC、PSW、栈指针等）</span><br><span class="line">             ──► 2. 更新 A.PCB 状态为就绪，把 A 插入就绪队列</span><br><span class="line">             ──► 3. 调度程序选中 B，更新 B.PCB 状态为运行</span><br><span class="line">             ──► 4. 从 B.PCB 恢复 B 的上下文 ──► 进程 B 运行</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>切换开销是<strong>纯系统开销</strong>（不给任何用户进程干活）；切换前必先发生<strong>调度</strong>（先”选人”，后”换人”）。</li>
+<li><strong>何时不能切换</strong>：① 处理中断的过程中；② 进程在 <strong>OS 内核程序临界区</strong>中（普通临界资源的临界区<strong>可以</strong>切换）。</li>
+</ul>
+<p><strong>进程切换 vs 模式切换</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">进程切换（上下文切换）</th>
+<th align="left">模式切换（用户态 ⇄ 内核态）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">切换对象</td>
+<td align="left">不同的<strong>进程</strong></td>
+<td align="left">同一进程的两种模式</td>
+</tr>
+<tr>
+<td align="left">是否保存 &#x2F; 恢复 PCB</td>
+<td align="left"><strong>是</strong>（完整现场）</td>
+<td align="left"><strong>否</strong>（现场仍在，进程不变）</td>
+</tr>
+<tr>
+<td align="left">是否经过调度</td>
+<td align="left"><strong>是</strong>（先调度再切换）</td>
+<td align="left">否（中断 &#x2F; 系统调用直接触发）</td>
+</tr>
+<tr>
+<td align="left">开销</td>
+<td align="left">大</td>
+<td align="left">小</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>陷入内核（系统调用 &#x2F; 中断）不是进程切换</strong>——它只是模式切换，运行进程没变；由”调度”引起的才叫进程切换。</p>
+</blockquote>
+<h2 id="饥饿辨析"><a href="#饥饿辨析" class="headerlink" title="饥饿辨析"></a>饥饿辨析</h2><table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">会否饥饿</th>
+<th align="left">原因 &#x2F; 对策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">FCFS</td>
+<td align="left">不会</td>
+<td align="left">严格按到达顺序，人人可达队首</td>
+</tr>
+<tr>
+<td align="left">HRRN</td>
+<td align="left">不会</td>
+<td align="left">等待越久响应比越高，迟早被选中</td>
+</tr>
+<tr>
+<td align="left">RR</td>
+<td align="left">不会</td>
+<td align="left">轮流给时间片，谁都能轮到</td>
+</tr>
+<tr>
+<td align="left">SJF &#x2F; SRTN</td>
+<td align="left"><strong>会</strong>（长作业）</td>
+<td align="left">短作业源源不断，长作业被无限插队</td>
+</tr>
+<tr>
+<td align="left">优先级</td>
+<td align="left"><strong>会</strong>（低优先级）</td>
+<td align="left">高优先级持续到达 → 用<strong>老化</strong>解决</td>
+</tr>
+<tr>
+<td align="left">多级反馈队列</td>
+<td align="left"><strong>可能</strong>（低级队列）</td>
+<td align="left">高级队列一直不空则低级队列难得运行 → 定期提升队列级</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：”饥饿”是<strong>调度策略</strong>问题，进程仍处于就绪态；”死锁”是<strong>资源分配</strong>问题，进程互相等待——二者原因不同，饥饿可用合理调度避免。</p>
+</blockquote>
+<h2 id="六种调度算法大对比"><a href="#六种调度算法大对比" class="headerlink" title="六种调度算法大对比"></a>六种调度算法大对比</h2><table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">是否可抢占</th>
+<th align="left">核心思想</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+<th align="left">适用</th>
+<th align="left">饥饿？</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>FCFS</strong></td>
+<td align="left">否</td>
+<td align="left">按<strong>到达先后</strong>服务</td>
+<td align="left">公平、实现简单</td>
+<td align="left">护航效应，短作业 &#x2F; I&#x2F;O 型吃亏</td>
+<td align="left">批处理</td>
+<td align="left">不会</td>
+</tr>
+<tr>
+<td align="left"><strong>SJF &#x2F; SRTN</strong></td>
+<td align="left">SJF 否 &#x2F; SRTN 是</td>
+<td align="left">短（剩余）时间优先</td>
+<td align="left"><strong>平均等待最短</strong></td>
+<td align="left">需预知运行时间；长作业饥饿</td>
+<td align="left">批处理</td>
+<td align="left"><strong>会</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>HRRN</strong></td>
+<td align="left">否</td>
+<td align="left">响应比 &#x3D; 1 + 等待÷运行，最高者先</td>
+<td align="left">FCFS 与 SJF 的<strong>折中</strong>，不饥饿</td>
+<td align="left">每次重算响应比，开销大</td>
+<td align="left">批处理</td>
+<td align="left">不会</td>
+</tr>
+<tr>
+<td align="left"><strong>RR</strong></td>
+<td align="left">是（时间片到）</td>
+<td align="left">时间片轮转，用完排队尾</td>
+<td align="left">公平、<strong>响应快</strong>，适合交互</td>
+<td align="left">时间片难定；平均周转不一定优</td>
+<td align="left"><strong>分时系统</strong></td>
+<td align="left">不会</td>
+</tr>
+<tr>
+<td align="left"><strong>优先级</strong></td>
+<td align="left">均可</td>
+<td align="left">优先级高者先</td>
+<td align="left">灵活，区分缓急</td>
+<td align="left">低优先级<strong>饥饿</strong>（老化缓解）</td>
+<td align="left">通用</td>
+<td align="left"><strong>会</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>多级反馈队列</strong></td>
+<td align="left">是</td>
+<td align="left">多级队列 + 降级 + 时间片加倍</td>
+<td align="left"><strong>综合各算法优点</strong>，长短兼顾</td>
+<td align="left">实现复杂；低级队列可能饥饿</td>
+<td align="left">通用（现代 OS 主流）</td>
+<td align="left"><strong>可能</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>选择口诀</strong>：平均等待最短 → SJF &#x2F; SRTN；交互响应 → RR；折中不饥饿 → HRRN；综合全能、现代主流 → 多级反馈队列。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">三级调度</td>
+<td align="left">高级 &#x3D; <strong>作业</strong>调度（外存 → 内存创建进程）；中级 &#x3D; <strong>内存</strong>调度（挂起 &#x2F; 激活）；低级 &#x3D; <strong>进程</strong>调度（分配 CPU，最频繁）</td>
+</tr>
+<tr>
+<td align="left">中级调度</td>
+<td align="left">与<strong>挂起态</strong>关联：就绪 ⇄ 就绪挂起、阻塞 ⇄ 阻塞挂起，目的是<strong>提高内存利用率</strong></td>
+</tr>
+<tr>
+<td align="left">周转时间</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">完成</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">到达</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>；带权 &#x3D; 周转 ÷ 运行（≥ 1，越接近 1 越好）；等待 &#x3D; 周转 − 运行</td>
+</tr>
+<tr>
+<td align="left">指标侧重</td>
+<td align="left">批处理看<strong>周转 &#x2F; 吞吐</strong>；分时交互看<strong>响应时间</strong>（首次响应）</td>
+</tr>
+<tr>
+<td align="left">scheduler vs dispatcher</td>
+<td align="left">scheduler “<strong>选谁</strong>“（策略）；dispatcher “<strong>换人</strong>“（切上下文、转用户态、跳入口）</td>
+</tr>
+<tr>
+<td align="left">调度时机</td>
+<td align="left">主动放弃（<strong>终止 &#x2F; 阻塞 &#x2F; 挂起 &#x2F; yield</strong>）+ 被动剥夺（<strong>时间片到 &#x2F; 更高优先级到达</strong>）；被唤醒只是<strong>入队</strong></td>
+</tr>
+<tr>
+<td align="left">不能切换两情形</td>
+<td align="left"><strong>处理中断的过程中</strong>；<strong>OS 内核程序临界区中</strong>（普通临界资源的临界区<strong>可以</strong>切换）</td>
+</tr>
+<tr>
+<td align="left">闲逛进程</td>
+<td align="left">PID &#x3D; 0、优先级最低、<strong>不需调度</strong>、不会被阻塞；就绪队列空时运行</td>
+</tr>
+<tr>
+<td align="left">FCFS</td>
+<td align="left">非抢占、公平不饥饿；<strong>护航效应</strong>，对短作业 &#x2F; I&#x2F;O 型不利</td>
+</tr>
+<tr>
+<td align="left">SJF &#x2F; SRTN</td>
+<td align="left">平均等待<strong>最短</strong>；长作业<strong>饥饿</strong>；运行时间需估计；SRTN 到达即比较<strong>剩余时间</strong>抢占</td>
+</tr>
+<tr>
+<td align="left">HRRN</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">运行</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">等待</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，最高者先；折中、<strong>不饥饿</strong>；每次要重算</td>
+</tr>
+<tr>
+<td align="left">RR</td>
+<td align="left">时间片轮转、公平响应快（分时）；q 太大退化 <strong>FCFS</strong>、太小<strong>切换开销</strong>大；不会饥饿</td>
+</tr>
+<tr>
+<td align="left">优先级调度</td>
+<td align="left">静态 &#x2F; 动态；系统 &gt; 用户、交互 &gt; 非交互、<strong>I&#x2F;O 型 &gt; 计算型</strong>；饥饿用<strong>老化</strong>解</td>
+</tr>
+<tr>
+<td align="left">多级反馈队列</td>
+<td align="left">新进程进<strong>最高队列</strong>、用完<strong>降级</strong>、时间片<strong>加倍</strong>、高队列可<strong>抢占</strong>低队列；综合优点，现代 OS 主流</td>
+</tr>
+<tr>
+<td align="left">多处理机调度</td>
+<td align="left">还要解决”放哪块 CPU”：负载均衡 + <strong>处理机亲和性</strong>；成组调度 &#x2F; 专用处理机</td>
+</tr>
+<tr>
+<td align="left">上下文切换</td>
+<td align="left">存旧 PCB → 恢复新 PCB，<strong>纯系统开销</strong>；<strong>陷入内核 ≠ 进程切换</strong>（只是模式切换）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T06:39:46.472Z" itemprop="dateUpdated">2026-08-29 14:39:46</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%B0%83%E5%BA%A6/" rel="tag">调度</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&title=《CPU调度算法》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&title=《CPU调度算法》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CPU调度算法》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5%E4%B8%8E%E4%BA%92%E6%96%A5/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">进程同步与互斥</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">进程与线程</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&title=《CPU调度算法》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&title=《CPU调度算法》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CPU调度算法》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

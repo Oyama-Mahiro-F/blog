@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>内存管理：连续分配与分页分段 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统,内存管理">
+    <meta name="description" content="内存管理要解决的根本问题是：程序按逻辑地址（从 0 开始相对编址）编写，CPU 却必须按物理地址访存，中间靠地址变换打通；操作系统还要在多个进程之间分配与回收内存、做内存保护、支持内存共享。408 对这部分基础内容（虚拟内存另行成文）的考查集中在：连续分配（单一连续、固定分区、动态分区与 FF&#x2F;BF&#x2F;WF 算法）、基本分页（页表、地址变换、快表 TLB、二级页表）、基本分段（段">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存管理：连续分配与分页分段">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="内存管理要解决的根本问题是：程序按逻辑地址（从 0 开始相对编址）编写，CPU 却必须按物理地址访存，中间靠地址变换打通；操作系统还要在多个进程之间分配与回收内存、做内存保护、支持内存共享。408 对这部分基础内容（虚拟内存另行成文）的考查集中在：连续分配（单一连续、固定分区、动态分区与 FF&#x2F;BF&#x2F;WF 算法）、基本分页（页表、地址变换、快表 TLB、二级页表）、基本分段（段">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC3%E7%AB%A0%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/page-table-frame-mapping.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC3%E7%AB%A0%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/paging-address-translate.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC3%E7%AB%A0%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/two-level-page-table.png">
+<meta property="article:published_time" content="2026-08-29T09:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T06:58:57.284Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="内存管理">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC3%E7%AB%A0%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.assets/page-table-frame-mapping.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">内存管理：连续分配与分页分段</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">内存管理：连续分配与分页分段</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T09:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%80%BB%E8%BE%91%E5%9C%B0%E5%9D%80%E4%B8%8E%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80"><span class="post-toc-number">1.</span> <span class="post-toc-text">逻辑地址与物理地址</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E5%AD%98%E4%BF%9D%E6%8A%A4"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">内存保护</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E5%AD%98%E5%85%B1%E4%BA%AB"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">内存共享</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E7%AE%A1%E7%90%86%E6%96%B9%E5%BC%8F"><span class="post-toc-number">2.</span> <span class="post-toc-text">连续分配管理方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">动态分区分配与回收</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E9%83%A8%E7%A2%8E%E7%89%87-vs-%E5%A4%96%E9%83%A8%E7%A2%8E%E7%89%87%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">内部碎片 vs 外部碎片（重点）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D%E7%AE%97%E6%B3%95"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">动态分区分配算法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E5%8C%BA%E5%88%86%E9%85%8D%E4%BE%8B%E9%A2%98"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">动态分区分配例题</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E5%88%86%E9%A1%B5%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86"><span class="post-toc-number">3.</span> <span class="post-toc-text">基本分页存储管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A1%B5%E9%9D%A2%E3%80%81%E9%A1%B5%E6%A1%86%E4%B8%8E%E9%A1%B5%E8%A1%A8"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">页面、页框与页表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84%E4%B8%8E%E5%9F%BA%E6%9C%AC%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">地址结构与基本地址变换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E9%A1%B5%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2%E4%BE%8B%E9%A2%98"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">分页地址变换例题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BF%AB%E8%A1%A8-TLB"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">快表 TLB</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%A4%E7%BA%A7%E9%A1%B5%E8%A1%A8"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">两级页表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BA%8C%E7%BA%A7%E9%A1%B5%E8%A1%A8%E4%BE%8B%E9%A2%98"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">二级页表例题</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E5%88%86%E6%AE%B5%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86"><span class="post-toc-number">4.</span> <span class="post-toc-text">基本分段存储管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AE%B5%E8%A1%A8%E4%B8%8E%E5%88%86%E6%AE%B5%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">段表与分段地址变换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AE%B5%E5%BC%8F%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2%E4%BE%8B%E9%A2%98"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">段式地址变换例题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E6%AE%B5%E7%9A%84%E5%85%B1%E4%BA%AB%E4%B8%8E%E4%BF%9D%E6%8A%A4"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">分段的共享与保护</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E9%A1%B5-vs-%E5%88%86%E6%AE%B5%EF%BC%88%E9%87%8D%E7%82%B9%E5%AF%B9%E6%AF%94%EF%BC%89"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">分页 vs 分段（重点对比）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AE%B5%E9%A1%B5%E5%BC%8F%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86"><span class="post-toc-number">5.</span> <span class="post-toc-text">段页式存储管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AE%B5%E9%A1%B5%E5%BC%8F%E5%9C%B0%E5%9D%80%E5%8F%98%E6%8D%A2"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">段页式地址变换</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A1%B5%E5%BC%8F%E3%80%81%E6%AE%B5%E5%BC%8F%E3%80%81%E6%AE%B5%E9%A1%B5%E5%BC%8F%E8%AE%BF%E9%97%AE%E8%BF%87%E7%A8%8B%E5%AF%B9%E6%AF%94"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">页式、段式、段页式访问过程对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-内存管理：连续分配与分页分段"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">内存管理：连续分配与分页分段</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 17:00:00" datetime="2026-08-29T09:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>内存管理</strong>要解决的根本问题是：程序按<strong>逻辑地址</strong>（从 0 开始相对编址）编写，CPU 却必须按<strong>物理地址</strong>访存，中间靠<strong>地址变换</strong>打通；操作系统还要在多个进程之间<strong>分配与回收</strong>内存、做<strong>内存保护</strong>、支持<strong>内存共享</strong>。408 对这部分基础内容（虚拟内存另行成文）的考查集中在：<strong>连续分配（单一连续、固定分区、动态分区与 FF&#x2F;BF&#x2F;WF 算法）、基本分页（页表、地址变换、快表 TLB、二级页表）、基本分段（段表、两次越界检查）、分页 vs 分段对比、段页式</strong>。</p>
+<h2 id="逻辑地址与物理地址"><a href="#逻辑地址与物理地址" class="headerlink" title="逻辑地址与物理地址"></a>逻辑地址与物理地址</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">逻辑地址</th>
+<th align="left">物理地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">别名</td>
+<td align="left">相对地址、<strong>虚地址</strong></td>
+<td align="left">绝对地址、<strong>实地址</strong></td>
+</tr>
+<tr>
+<td align="left">编号起点</td>
+<td align="left">从 0 开始（程序内相对编址）</td>
+<td align="left">从 0 开始（内存单元真实编址）</td>
+</tr>
+<tr>
+<td align="left">空间大小由谁决定</td>
+<td align="left"><strong>CPU 地址位数</strong>（32 位 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">32</span></span></span></span></span></span></span></span></span></span></span></span> &#x3D; 4GB）</td>
+<td align="left"><strong>内存条容量</strong></td>
+</tr>
+<tr>
+<td align="left">使用者</td>
+<td align="left">程序员、编译器、链接器</td>
+<td align="left">CPU 访存（送入 MAR 的地址）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：逻辑地址空间大小 ≠ 物理内存大小——32 位系统逻辑空间恒为 4GB，实际装机可能是 2GB；两者互不相干，这也是后面虚拟内存能”逻辑扩充”的基础。</p>
+</blockquote>
+<p><strong>地址重定位（地址变换、地址映射）</strong>：把逻辑地址转换为物理地址的过程，由 <strong>MMU（存储管理单元）</strong> 硬件配合操作系统完成。按转换时机分为<strong>绝对装入、静态重定位、动态重定位</strong>三种装入方式（详见《操作系统概述》一文）。现代操作系统采用<strong>动态重定位</strong>：装入时不转换，运行时每次访存由<strong>重定位寄存器（基址寄存器）<strong>动态相加，进程因此</strong>可移动、可换出换入</strong>，也为”紧凑”操作提供了前提。</p>
+<h3 id="内存保护"><a href="#内存保护" class="headerlink" title="内存保护"></a>内存保护</h3><p>目标：各进程只能访问自己的内存区域，越界即产生<strong>越界中断</strong>。两种硬件机制：</p>
+<table>
+<thead>
+<tr>
+<th align="left">实现方式</th>
+<th align="left">寄存器存放内容</th>
+<th align="left">判别流程</th>
+<th align="left">判别对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>上下限寄存器</strong></td>
+<td align="left">上限地址 + 下限地址</td>
+<td align="left">检查 下限 ≤ 地址 ≤ 上限</td>
+<td align="left"><strong>物理地址</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>重定位寄存器 + 界地址寄存器</strong></td>
+<td align="left">重定位寄存器存<strong>起始地址（基址）</strong>；界地址寄存器存<strong>最大逻辑地址（限长）</strong></td>
+<td align="left">先判 逻辑地址 &lt; 界地址寄存器，再加基址得物理地址</td>
+<td align="left"><strong>逻辑地址</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>重定位寄存器管”起址”、界地址寄存器管”限长”</strong>——物理地址 &#x3D; 逻辑地址 + 重定位寄存器；逻辑地址 ≥ 界地址寄存器则越界中断。<br><strong>易错点</strong>：两种方案判别的对象不同——上下限方案判的是<strong>物理地址</strong>，”重定位 + 界地址”方案先判<strong>逻辑地址</strong>再变换；这些寄存器只能由操作系统（内核态、特权指令）修改，用户程序改不了。</p>
+</blockquote>
+<h3 id="内存共享"><a href="#内存共享" class="headerlink" title="内存共享"></a>内存共享</h3><p>只有<strong>只读</strong>的”可重入代码（纯代码）”区域才能被共享。<strong>分段共享更容易</strong>——段是完整的逻辑单位（如整个代码段），各进程段表项指向同一物理段即可；<strong>分页共享困难</strong>——页只是物理切块，一个逻辑功能可能被切进多页，且每个进程都要维护自己的页表。</p>
+<h2 id="连续分配管理方式"><a href="#连续分配管理方式" class="headerlink" title="连续分配管理方式"></a>连续分配管理方式</h2><p><strong>连续分配</strong>：为进程分配一整段<strong>地址连续</strong>的内存空间。三种方式：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">划分方法</th>
+<th align="left">碎片</th>
+<th align="left">支持道数</th>
+<th align="left">管理结构</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>单一连续分配</strong></td>
+<td align="left">内存分<strong>系统区 + 用户区</strong>，一次只装一道</td>
+<td align="left"><strong>内部碎片</strong>（用户区剩余）</td>
+<td align="left">单道</td>
+<td align="left">无需复杂结构</td>
+</tr>
+<tr>
+<td align="left"><strong>固定分区分配</strong></td>
+<td align="left">用户区<strong>预先</strong>划分为固定大小分区（可相等、不等），每区一道</td>
+<td align="left"><strong>内部碎片</strong>（分区内剩余）、无外部碎片</td>
+<td align="left">多道</td>
+<td align="left"><strong>分区说明表</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>动态分区分配</strong></td>
+<td align="left">不预先划分，装入时<strong>按作业大小动态</strong>划</td>
+<td align="left"><strong>外部碎片</strong>（分区之间）、无内部碎片</td>
+<td align="left">多道</td>
+<td align="left"><strong>空闲分区表 &#x2F; 空闲分区链</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：固定分区”个数、大小都固定”，作业装不满分区就产生<strong>内部碎片</strong>；动态分区”要多少给多少”，没有内部碎片，但反复分配回收后内存被切成<strong>外部碎片</strong>。</p>
+</blockquote>
+<h3 id="动态分区分配与回收"><a href="#动态分区分配与回收" class="headerlink" title="动态分区分配与回收"></a>动态分区分配与回收</h3><ul>
+<li><strong>数据结构</strong>：空闲分区表 &#x2F; 空闲分区链，记录每个空闲分区的起始地址、大小。</li>
+<li><strong>外部碎片</strong>解决：<strong>紧凑（Compaction，拼接）</strong>——移动已分配分区，把零散空闲区拼成大块。紧凑要求<strong>动态重定位</strong>支持（分区移动后改基址寄存器即可），且开销大，不能频繁做。</li>
+<li><strong>回收</strong>：看回收区的<strong>上邻、下邻</strong>是否空闲——都空闲则<strong>三区合并</strong>；仅一邻空闲则并入该邻；都不空闲则单独登记为新空闲分区。</li>
+</ul>
+<h3 id="内部碎片-vs-外部碎片（重点）"><a href="#内部碎片-vs-外部碎片（重点）" class="headerlink" title="内部碎片 vs 外部碎片（重点）"></a>内部碎片 vs 外部碎片（重点）</h3><table>
+<thead>
+<tr>
+<th align="left">分配方式</th>
+<th align="left">内部碎片</th>
+<th align="left">外部碎片</th>
+<th align="left">说明 &#x2F; 解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">单一连续分配</td>
+<td align="left"><strong>有</strong></td>
+<td align="left">无</td>
+<td align="left">用户区装不满的部分</td>
+</tr>
+<tr>
+<td align="left">固定分区</td>
+<td align="left"><strong>有</strong></td>
+<td align="left">无</td>
+<td align="left">分区内装不满的部分</td>
+</tr>
+<tr>
+<td align="left">动态分区</td>
+<td align="left">无</td>
+<td align="left"><strong>有</strong></td>
+<td align="left">分区之间的小空隙 → <strong>紧凑</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>分页</strong></td>
+<td align="left"><strong>有</strong>（页内）</td>
+<td align="left">无</td>
+<td align="left">只有<strong>最后一页</strong>装不满，平均约半页</td>
+</tr>
+<tr>
+<td align="left"><strong>分段</strong></td>
+<td align="left">无</td>
+<td align="left"><strong>有</strong></td>
+<td align="left">段间空隙 → 紧凑</td>
+</tr>
+<tr>
+<td align="left">段页式</td>
+<td align="left"><strong>有</strong>（页内）</td>
+<td align="left">无</td>
+<td align="left">段内以页离散分配</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：判碎片归属先看”分配单位”——<strong>按固定单位切（固定分区、分页、段页式）→ 内部碎片；按需分配但要求连续（动态分区、分段）→ 外部碎片</strong>。<br><strong>易错点</strong>：动态分区”无内部碎片”不等于”无浪费”，外部碎片总和可能很可观；分页的内部碎片<strong>只出现在最后一个页面</strong>（前面的页都装满）。</p>
+</blockquote>
+<h3 id="动态分区分配算法"><a href="#动态分区分配算法" class="headerlink" title="动态分区分配算法"></a>动态分区分配算法</h3><table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">空闲分区排列</th>
+<th align="left">分配策略</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>首次适应 FF</strong></td>
+<td align="left"><strong>地址递增</strong></td>
+<td align="left">从头找<strong>第一个</strong>够用的分区</td>
+<td align="left"><strong>综合性能通常最好</strong>：低地址先用，高地址保留大块、查找快；低地址端易积小碎片</td>
+</tr>
+<tr>
+<td align="left"><strong>最佳适应 BF</strong></td>
+<td align="left"><strong>容量递增</strong></td>
+<td align="left">找<strong>最小的够用</strong>分区</td>
+<td align="left">每次”最省”，但产生<strong>大量难以利用的小碎片</strong>（外部碎片最多）</td>
+</tr>
+<tr>
+<td align="left"><strong>最坏适应 WF</strong></td>
+<td align="left"><strong>容量递减</strong></td>
+<td align="left">找<strong>最大的</strong>分区</td>
+<td align="left">切剩部分仍较大，<strong>后续中小作业易装入</strong>；但<strong>大分区被切碎</strong>，大作业反而可能装不下</td>
+</tr>
+<tr>
+<td align="left">就近适应 NF</td>
+<td align="left">地址循环</td>
+<td align="left">从<strong>上次分配位置</strong>继续向后找</td>
+<td align="left">查找开销小、空闲区分布均匀；高地址大分区易被切碎</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>首次适应综合性能最好</strong>，是最常用算法；BF 是”选<strong>最小的能满足</strong>的分区”（不是选最小的分区），WF 反之。<br><strong>易错点</strong>：三种算法都要求空闲分区表<strong>有序</strong>（FF&#x2F;NF 按地址递增、BF 按容量递增、WF 按容量递减），每次分配回收后要<strong>重新维护顺序</strong>。</p>
+</blockquote>
+<h3 id="动态分区分配例题"><a href="#动态分区分配例题" class="headerlink" title="动态分区分配例题"></a>动态分区分配例题</h3><p>系统用户区 <strong>100KB</strong>（地址 0&#126;100K），作业时序如下：</p>
+<p>① J1 申请 25KB → ② J2 申请 30KB → ③ J3 申请 25KB → ④ <strong>J1 完成，释放 25KB</strong> → ⑤ J4 申请 15KB → ⑥ J5 申请 10KB → ⑦ J6 申请 12KB</p>
+<p><strong>前 ④ 步</strong>始终只有一个空闲分区，三种算法动作一致：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+<th align="left">选中分区</th>
+<th align="left">操作后空闲分区</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left">[0&#126;100K]：100KB</td>
+</tr>
+<tr>
+<td align="left">①</td>
+<td align="left">J1 申请 25KB</td>
+<td align="left">100KB 块</td>
+<td align="left">[25&#126;100K]：75KB</td>
+</tr>
+<tr>
+<td align="left">②</td>
+<td align="left">J2 申请 30KB</td>
+<td align="left">75KB 块</td>
+<td align="left">[55&#126;100K]：45KB</td>
+</tr>
+<tr>
+<td align="left">③</td>
+<td align="left">J3 申请 25KB</td>
+<td align="left">45KB 块</td>
+<td align="left">[80&#126;100K]：20KB</td>
+</tr>
+<tr>
+<td align="left">④</td>
+<td align="left">J1 释放 25KB</td>
+<td align="left">下邻 J2 不空闲，<strong>单独登记</strong></td>
+<td align="left">[0&#126;25K]：25KB；[80&#126;100K]：20KB</td>
+</tr>
+</tbody></table>
+<p><strong>第 ⑤ 步起</strong>空闲分区不止一块，三种算法开始分化：</p>
+<p><strong>首次适应 FF</strong>（按地址递增，从头找第一个够用的）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+<th align="left">命中分区</th>
+<th align="left">操作后空闲分区</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">⑤</td>
+<td align="left">J4 申请 15KB</td>
+<td align="left">25KB 块（地址最靠前）</td>
+<td align="left">[15&#126;25K]：10KB；[80&#126;100K]：20KB</td>
+</tr>
+<tr>
+<td align="left">⑥</td>
+<td align="left">J5 申请 10KB</td>
+<td align="left">10KB 块（<strong>恰好装满</strong>）</td>
+<td align="left">[80&#126;100K]：20KB</td>
+</tr>
+<tr>
+<td align="left">⑦</td>
+<td align="left">J6 申请 12KB</td>
+<td align="left">20KB 块</td>
+<td align="left">[92&#126;100K]：8KB，<strong>J6 装入成功</strong></td>
+</tr>
+</tbody></table>
+<p><strong>最佳适应 BF</strong>（按容量递增，选最小够用的）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+<th align="left">命中分区</th>
+<th align="left">操作后空闲分区</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">⑤</td>
+<td align="left">J4 申请 15KB</td>
+<td align="left"><strong>20KB 块</strong>（20K &lt; 25K，最小够用）</td>
+<td align="left">[0&#126;25K]：25KB；[95&#126;100K]：5KB</td>
+</tr>
+<tr>
+<td align="left">⑥</td>
+<td align="left">J5 申请 10KB</td>
+<td align="left">25KB 块（5KB 不够用）</td>
+<td align="left">[10&#126;25K]：15KB；[95&#126;100K]：5KB</td>
+</tr>
+<tr>
+<td align="left">⑦</td>
+<td align="left">J6 申请 12KB</td>
+<td align="left">15KB 块</td>
+<td align="left">[22&#126;25K]：3KB；[95&#126;100K]：5KB，成功但<strong>剩两块小碎片</strong></td>
+</tr>
+</tbody></table>
+<p><strong>最坏适应 WF</strong>（按容量递减，选最大的）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+<th align="left">命中分区</th>
+<th align="left">操作后空闲分区</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">⑤</td>
+<td align="left">J4 申请 15KB</td>
+<td align="left">25KB 块（最大）</td>
+<td align="left">[15&#126;25K]：10KB；[80&#126;100K]：20KB</td>
+</tr>
+<tr>
+<td align="left">⑥</td>
+<td align="left">J5 申请 10KB</td>
+<td align="left">20KB 块（最大）</td>
+<td align="left">[15&#126;25K]：10KB；[90&#126;100K]：10KB</td>
+</tr>
+<tr>
+<td align="left">⑦</td>
+<td align="left">J6 申请 12KB</td>
+<td align="left"><strong>无 ≥12KB 的空闲分区</strong></td>
+<td align="left"><strong>分配失败，J6 等待</strong></td>
+</tr>
+</tbody></table>
+<p><strong>三算法结果对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">最终内存布局（0&#126;100K）</th>
+<th align="left">外部碎片</th>
+<th align="left">J6(12KB) 结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">首次适应</td>
+<td align="left">J4(15K)、J5(10K)、J2(30K)、J3(25K)、J6(12K) 依次排布</td>
+<td align="left"><strong>8KB（1 块）</strong></td>
+<td align="left">✅ 装入成功</td>
+</tr>
+<tr>
+<td align="left">最佳适应</td>
+<td align="left">J5(10K)、J6(12K)、空闲3K、J2(30K)、J3(25K)、J4(15K)、空闲5K</td>
+<td align="left">3KB + 5KB（2 块）</td>
+<td align="left">✅ 成功，但碎片更碎</td>
+</tr>
+<tr>
+<td align="left">最坏适应</td>
+<td align="left">J4(15K)、空闲10K、J2(30K)、J3(25K)、J5(10K)、空闲10K</td>
+<td align="left">10KB + 10KB（2 块）</td>
+<td align="left">❌ <strong>失败，等待</strong></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：FF 已分配 15+10+30+25+12 &#x3D; 92KB + 空闲 8KB &#x3D; 100KB ✓；BF 已分配 10+12+30+25+15 &#x3D; 92KB + 3KB + 5KB &#x3D; 100KB ✓；WF 已分配 15+30+25+10 &#x3D; 80KB + 10KB + 10KB &#x3D; 100KB ✓</p>
+<blockquote>
+<p><strong>考点</strong>：WF 把 100KB 大块逐步切碎，连 12KB 的 J6 都进不了——“切剩的还大”只对<strong>中小作业</strong>短期友好；BF 留下的 3KB、5KB 碎片很难再利用；<strong>FF 碎片最少且全部装入</strong>，印证”首次适应综合性能最好”。</p>
+</blockquote>
+<h2 id="基本分页存储管理"><a href="#基本分页存储管理" class="headerlink" title="基本分页存储管理"></a>基本分页存储管理</h2><p><strong>引入动机</strong>：连续分配必有碎片——内部碎片浪费分区、外部碎片要靠开销大的紧凑解决。<strong>分页</strong>把进程逻辑空间和物理内存都切成<strong>等大的块</strong>，进程的页可以<strong>离散</strong>放进任意空闲页框——<strong>物理上离散、逻辑上连续</strong>，从根源上<strong>消灭外部碎片</strong>（只剩很小的页内碎片）。</p>
+<h3 id="页面、页框与页表"><a href="#页面、页框与页表" class="headerlink" title="页面、页框与页表"></a>页面、页框与页表</h3><table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>页面（页 Page）</strong></td>
+<td align="left">进程<strong>逻辑地址空间</strong>等分出的块，大小为 <strong>2 的整数次幂</strong>（通常 4KB）</td>
+</tr>
+<tr>
+<td align="left"><strong>页框（页帧、物理块 Frame）</strong></td>
+<td align="left"><strong>物理内存</strong>等分出的块，<strong>大小与页面相同</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>页表（Page Table）</strong></td>
+<td align="left">记录<strong>页号 → 页框号</strong>映射，<strong>每个进程一张</strong>，存放在内存中</td>
+</tr>
+</tbody></table>
+<p>基本分页的页表项主体就是<strong>页框号</strong>；扩展到请求分页时再增加<strong>访问位、修改位</strong>等状态字段（详见虚拟内存一文）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第3章 内存管理.assets/page-table-frame-mapping.png" alt="页表：页号到页框号的映射" title="">
+                </div>
+                <div class="image-caption">页表：页号到页框号的映射</div>
+            </figure>
+
+<h3 id="地址结构与基本地址变换"><a href="#地址结构与基本地址变换" class="headerlink" title="地址结构与基本地址变换"></a>地址结构与基本地址变换</h3><p>逻辑地址被<strong>硬件自动</strong>拆成两部分，程序员无感、程序仍从 0 连续编址——所以分页是<strong>一维地址</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">┌──────── 页号 P（高位）────────┬── 页内偏移 W（低 m 位）──┐</span><br><span class="line">└───────────────────────────────┴──────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>关键公式（页面大小 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span></span></span></span>）：</p>
+<ul>
+<li>页内偏移占<strong>低 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 位</strong>：4KB → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span> 位；1KB → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 位</li>
+<li>页号位数 &#x3D; 逻辑地址总位数 − <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord cjk_fallback">逻辑地址</span><span class="mord">/</span><span class="mord cjk_fallback">页面大小</span><span class="mclose">⌋</span></span></span></span>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord cjk_fallback">逻辑地址</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">页面大小</span></span></span></span></li>
+</ul>
+<p><strong>基本地址变换流程</strong>（页表寄存器 PTR 存放<strong>页表始址 + 页表长度</strong>）：</p>
+<p>① 拆分：硬件按位拆出页号 P、页内偏移 W<br>② 越界检查：P ≥ 页表长度 → 越界中断<br>③ 查页表（访存一次）：到 页表始址 + P × 页表项大小 处取页框号 F<br>④ 拼接：物理地址 &#x3D; F × 页面大小 + W</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">物理地址</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">页框号</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">页面大小</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">页内偏移</span></span></span></span></span>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第3章 内存管理.assets/paging-address-translate.png" alt="基本分页的地址变换过程" title="">
+                </div>
+                <div class="image-caption">基本分页的地址变换过程</div>
+            </figure>
+
+<blockquote>
+<p><strong>考点</strong>：无快表时访问一个数据要 <strong>2 次访存</strong>——① 查页表、② 取数据，速度几乎减半，这是分页的主要缺点，用<strong>快表</strong>缓解。</p>
+</blockquote>
+<h3 id="分页地址变换例题"><a href="#分页地址变换例题" class="headerlink" title="分页地址变换例题"></a>分页地址变换例题</h3><p>某系统按字节编址，页面大小 <strong>1KB</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span>），某进程共 4 页（逻辑地址 12 位），页表如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">页号</th>
+<th align="left">0</th>
+<th align="left">1</th>
+<th align="left">2</th>
+<th align="left">3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">页框号</td>
+<td align="left">5</td>
+<td align="left">10</td>
+<td align="left">8</td>
+<td align="left">12</td>
+</tr>
+</tbody></table>
+<p>求逻辑地址 <strong>2500</strong> 的物理地址。</p>
+<p><strong>第一步 拆分</strong>：1KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> → 低 10 位是页内偏移，其余高位是页号。</p>
+<p>2500 &#x3D; 2048 + 452 &#x3D; <strong>100111000100₂</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">逻辑地址  10 | 0111000100</span><br><span class="line">          页号 P=2   页内偏移 W=0111000100₂ = 452</span><br></pre></td></tr></table></figure>
+
+<p>除法验证：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">2500/1024</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">2500</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">452</span></span></span></span> ✓</p>
+<p><strong>第二步 查页表</strong>：页 2 → 页框号 <strong>8</strong>。</p>
+<p><strong>第三步 拼接</strong>：页框号 8 &#x3D; 0000001000₂（10 位），与偏移直接<strong>拼接</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">物理地址  0000001000 | 0111000100</span><br><span class="line">          页框号=8      页内偏移=452</span><br></pre></td></tr></table></figure>
+
+<p>十进制验算：$8 \times 1024 + 452 &#x3D; 8192 + 452 &#x3D; $ <strong>8644</strong> ✓</p>
+<blockquote>
+<p><strong>方法</strong>：页面大小是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 时，<strong>低 n 位就是偏移、高位就是页号</strong>——二进制&#x2F;十六进制地址直接按位拆，十进制地址用除法拆；物理地址是页框号与偏移的<strong>拼接</strong>（千万别用页号相加）。</p>
+</blockquote>
+<h3 id="快表-TLB"><a href="#快表-TLB" class="headerlink" title="快表 TLB"></a>快表 TLB</h3><p>页表在内存中，每次访存都要先访存查页表。<strong>快表（TLB, Translation Lookaside Buffer）<strong>是一组</strong>相联存储器</strong>（按<strong>内容并行</strong>查找的高速硬件缓存，不是按地址存取），存放<strong>最近访问过的页表项</strong>；变换时<strong>快表与慢表（内存页表）同时开始查</strong>，快表命中则直接取页框号。</p>
+<table>
+<thead>
+<tr>
+<th align="left">情况</th>
+<th align="left">访存次数</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">快表<strong>命中</strong></td>
+<td align="left"><strong>1 次</strong>（直接取数）</td>
+<td align="left">页表项在 TLB 中</td>
+</tr>
+<tr>
+<td align="left">快表<strong>未命中</strong></td>
+<td align="left"><strong>2 次</strong>（查页表 + 取数）</td>
+<td align="left">并把该页表项<strong>装入快表</strong>（满了按替换策略淘汰）</td>
+</tr>
+</tbody></table>
+<p><strong>有效访问时间 EAT</strong>（命中率 a，一次访存耗时 t，快表查询时间忽略）：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6984em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span></span></span></span></span>
+<p><strong>例</strong>：t &#x3D; 100ns、a &#x3D; 90%：EAT &#x3D; 0.9 × 100 + 0.1 × 200 &#x3D; <strong>110ns</strong>（无快表恒为 200ns）。若快表查询耗时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">tl</span><span class="mord mathnormal mtight">b</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 不可忽略，则 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">tl</span><span class="mord mathnormal mtight">b</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0197em;">tl</span><span class="mord mathnormal mtight">b</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>——命中与未命中<strong>都含快表查询时间</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：快表能生效靠<strong>局部性原理</strong>（最近访问的页很快会再访问）；快表是<strong>硬件</strong>，慢表是内存中的数据结构。<br><strong>易错点</strong>：刚开机或进程切换后快表失效，<strong>首次访问某页仍是 2 次访存</strong>；快表命中时慢表查询虽然也启动了，但结果作废，不算访存。</p>
+</blockquote>
+<h3 id="两级页表"><a href="#两级页表" class="headerlink" title="两级页表"></a>两级页表</h3><p><strong>单级页表的两个问题</strong>（32 位逻辑地址、4KB 页面、4B 页表项）：</p>
+<ol>
+<li><strong>页表太大</strong>：页号 20 位 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span></span></span></span> 项 × 4B &#x3D; <strong>4MB</strong>，每个进程一张；</li>
+<li><strong>页表必须连续存放、且整个常驻内存</strong>——给 4MB 找连续空间，本身就违背了分页”离散存放”的初衷。</li>
+</ol>
+<p><strong>两级页表</strong>：把 20 位页号再拆成<strong>页目录号（一级，高 10 位）+ 二级页号（低 10 位）</strong>：</p>
+<ul>
+<li><strong>页目录表（外层页表）</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> 项 × 4B &#x3D; 4KB，表项存<strong>页表始址</strong>，<strong>常驻内存</strong>；</li>
+<li><strong>每张二级页表</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> 项 × 4B &#x3D; 4KB，<strong>可离散存放</strong>，且可<strong>只调入用到的页表</strong>。</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第3章 内存管理.assets/two-level-page-table.png" alt="两级页表的原理与地址结构" title="">
+                </div>
+                <div class="image-caption">两级页表的原理与地址结构</div>
+            </figure>
+
+<blockquote>
+<p><strong>考点</strong>：多级页表<strong>不减少页表项总数</strong>（反而多出页目录），它解决的是”<strong>页表本身也要能离散存放、按需调入</strong>“的问题；代价是无快表时<strong>访存 3 次</strong>（页目录 → 页表 → 数据），每多一级多一次访存。<br><strong>易错点</strong>：<strong>各级页表大小不能超过一个页面</strong>——每级页表项数 ≤ 页面大小 ÷ 页表项大小，页号按此位数逐级切分；页目录表必须<strong>常驻内存</strong>。</p>
+</blockquote>
+<h3 id="二级页表例题"><a href="#二级页表例题" class="headerlink" title="二级页表例题"></a>二级页表例题</h3><p>32 位逻辑地址、按字节编址、页面 4KB、页表项 4B，采用两级页表，按 <strong>10 &#x2F; 10 &#x2F; 12</strong> 拆分：</p>
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">位数</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">一级页号（页目录号）</td>
+<td align="left">10</td>
+<td align="left">查页目录表 → 得<strong>页表始址</strong></td>
+</tr>
+<tr>
+<td align="left">二级页号</td>
+<td align="left">10</td>
+<td align="left">查二级页表 → 得<strong>页框号</strong></td>
+</tr>
+<tr>
+<td align="left">页内偏移</td>
+<td align="left">12</td>
+<td align="left">4KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>每张页表的项数</strong> &#x3D; 页面大小 ÷ 页表项大小 &#x3D; 4KB ÷ 4B &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span></span></span></span> 项 → 每张页表恰好 <strong>4KB</strong>（正好装进一个页框）</li>
+<li><strong>页目录项数</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span></span></span></span> 项，页目录表大小 &#x3D; 1024 × 4B &#x3D; <strong>4KB</strong>（也恰好一页，常驻内存）</li>
+<li>进程最多 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span></span></span></span> 个页面 → 最多需要 <strong>1024 张</strong>二级页表</li>
+<li>访存次数：无快表 <strong>3 次</strong>；快表命中 <strong>1 次</strong></li>
+</ul>
+<p><strong>为什么引入二级页表？</strong> 单级页表 4MB 且要求<strong>连续存放 + 全部常驻</strong>内存；拆成两级后，页表本身以 4KB 为单位<strong>离散存放</strong>、<strong>按需调入</strong>，常驻的只剩 4KB 页目录——用多一次访存的代价，换来”大页表也能像普通页面一样被分页管理”。</p>
+<h2 id="基本分段存储管理"><a href="#基本分段存储管理" class="headerlink" title="基本分段存储管理"></a>基本分段存储管理</h2><p><strong>动机</strong>：分页按<strong>物理</strong>大小切块，与程序逻辑结构无关；而程序天然按模块组织（主程序段、子程序段、数据段、栈段、共享段）。<strong>分段</strong>按<strong>逻辑模块</strong>划分：<strong>段长由程序决定、各段不等</strong>，对程序员<strong>可见</strong>（编程时必须显式给出段号）——逻辑地址是<strong>二维</strong>的：<strong>段号 S + 段内偏移 W</strong>。</p>
+<h3 id="段表与分段地址变换"><a href="#段表与分段地址变换" class="headerlink" title="段表与分段地址变换"></a>段表与分段地址变换</h3><p><strong>段表</strong>：每个进程一张，表项 &#x3D; <strong>段基址（段在内存的起始地址）+ 段长</strong>——段长不等，<strong>必须记录段长</strong>做越界检查。</p>
+<p><strong>变换流程</strong>（段表寄存器存<strong>段表始址 + 段表长度</strong>）：</p>
+<p>① 越界检查一：S ≥ 段表长度 → 越界中断（<strong>段号越界</strong>）<br>② 查段表（访存一次）：得段基址 B、段长 L<br>③ 越界检查二：W ≥ L → 越界中断（<strong>段内偏移越界</strong>）<br>④ 相加：物理地址 &#x3D; B + W</p>
+<blockquote>
+<p><strong>考点</strong>：分段有<strong>两次越界检查</strong>（段号、段内偏移），分页只有一次（页号）；分段物理地址 &#x3D; <strong>基址 + 偏移（相加）</strong>，分页 &#x3D; 页框号<strong>拼接</strong>偏移——根源是<strong>段长不固定、页长固定</strong>。</p>
+</blockquote>
+<h3 id="段式地址变换例题"><a href="#段式地址变换例题" class="headerlink" title="段式地址变换例题"></a>段式地址变换例题</h3><p>段表如下（段表长度为 4，即段号 0&#126;3）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">段号</th>
+<th align="left">基址</th>
+<th align="left">段长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0</td>
+<td align="left">210</td>
+<td align="left">500</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">2350</td>
+<td align="left">20</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">100</td>
+<td align="left">90</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">1350</td>
+<td align="left">590</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">逻辑地址</th>
+<th align="left">判断过程</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">(0, 430)</td>
+<td align="left">0 &lt; 4 且 430 &lt; 500 → 210 + 430</td>
+<td align="left"><strong>640</strong></td>
+</tr>
+<tr>
+<td align="left">(2, 88)</td>
+<td align="left">2 &lt; 4 且 88 &lt; 90 → 100 + 88</td>
+<td align="left"><strong>188</strong></td>
+</tr>
+<tr>
+<td align="left">(3, 600)</td>
+<td align="left">600 ≥ 590（段长）</td>
+<td align="left"><strong>越界中断</strong></td>
+</tr>
+<tr>
+<td align="left">(4, 10)</td>
+<td align="left">段号 4 ≥ 段表长度 4</td>
+<td align="left"><strong>越界中断</strong></td>
+</tr>
+</tbody></table>
+<h3 id="分段的共享与保护"><a href="#分段的共享与保护" class="headerlink" title="分段的共享与保护"></a>分段的共享与保护</h3><ul>
+<li><strong>共享</strong>：多个进程的段表项<strong>指向同一物理段</strong>即可（各进程可用不同段号访问）；共享段必须是<strong>可重入代码</strong>，并配引用计数（减到 0 才回收）。段是<strong>完整逻辑单位</strong>，所以<strong>分段共享比分页容易</strong>。</li>
+<li><strong>保护</strong>：两次越界检查天然提供保护，段表项还可设<strong>只读 &#x2F; 只执行 &#x2F; 读写</strong>存取权限——分页只有一次页号检查，保护能力弱。</li>
+</ul>
+<h3 id="分页-vs-分段（重点对比）"><a href="#分页-vs-分段（重点对比）" class="headerlink" title="分页 vs 分段（重点对比）"></a>分页 vs 分段（重点对比）</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">分页</th>
+<th align="left">分段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">划分依据</td>
+<td align="left"><strong>物理划分</strong>，页大小<strong>固定</strong>（2 的幂，系统定）</td>
+<td align="left"><strong>逻辑划分</strong>，段长<strong>不固定</strong>（程序决定）</td>
+</tr>
+<tr>
+<td align="left">地址维度</td>
+<td align="left"><strong>一维</strong>（一个数即可定位，硬件自动拆分）</td>
+<td align="left"><strong>二维</strong>（必须显式给出段号 + 段内偏移）</td>
+</tr>
+<tr>
+<td align="left">对程序员</td>
+<td align="left"><strong>透明</strong>（不可见）</td>
+<td align="left"><strong>可见</strong></td>
+</tr>
+<tr>
+<td align="left">表项内容</td>
+<td align="left">页框号（+ 状态位）</td>
+<td align="left"><strong>基址 + 段长</strong></td>
+</tr>
+<tr>
+<td align="left">越界检查</td>
+<td align="left">1 次（页号 ≥ 页表长度）</td>
+<td align="left"><strong>2 次</strong>（段号、偏移 ≥ 段长）</td>
+</tr>
+<tr>
+<td align="left">碎片</td>
+<td align="left"><strong>页内碎片</strong>（内部碎片）</td>
+<td align="left"><strong>外部碎片</strong>（段间，可紧凑）</td>
+</tr>
+<tr>
+<td align="left">共享 &#x2F; 保护</td>
+<td align="left">困难 &#x2F; 弱</td>
+<td align="left"><strong>容易 &#x2F; 强</strong></td>
+</tr>
+<tr>
+<td align="left">物理地址</td>
+<td align="left">页框号 × 页面大小 + 偏移（拼接）</td>
+<td align="left">基址 + 偏移（相加）</td>
+</tr>
+<tr>
+<td align="left">出发点</td>
+<td align="left">提高内存利用率（<strong>系统</strong>需要）</td>
+<td align="left">方便编程、共享、保护（<strong>用户</strong>需要）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：一句话——<strong>分页是系统视角（一维、透明、仅页内碎片），分段是用户视角（二维、可见、共享保护方便）</strong>；”一维&#x2F;二维、透明&#x2F;可见、拼接&#x2F;相加”三组词是选择题常客。</p>
+</blockquote>
+<h2 id="段页式存储管理"><a href="#段页式存储管理" class="headerlink" title="段页式存储管理"></a>段页式存储管理</h2><p><strong>思想</strong>：<strong>先按逻辑模块分段（用户可见），段内再按固定大小分页（系统透明）</strong>——用户享受分段的共享与保护，系统利用分页消灭外部碎片。</p>
+<ul>
+<li>逻辑地址<strong>三维</strong>：<strong>段号 S &#x2F; 段内页号 P &#x2F; 页内偏移 W</strong></li>
+<li><strong>每个进程一张段表</strong>：表项 &#x3D; 该段的<strong>页表始址 + 页表长度</strong>（<strong>不是基址</strong>！）</li>
+<li><strong>每段一张页表</strong>：表项 &#x3D; 页号 → 页框号；一个进程的页表数 &#x3D; 它的段数</li>
+<li>段以页为单位<strong>离散</strong>存放：无外部碎片、只有页内碎片</li>
+</ul>
+<h3 id="段页式地址变换"><a href="#段页式地址变换" class="headerlink" title="段页式地址变换"></a>段页式地址变换</h3><p>① S ≥ 段表长度？越界中断 → 查段表得<strong>页表始址、页表长度</strong><br>② P ≥ 页表长度？越界中断 → 查页表得<strong>页框号 F</strong><br>③ 拼接：物理地址 &#x3D; F × 页面大小 + W</p>
+<p>无快表 <strong>3 次访存</strong>（查段表 → 查页表 → 取数）；快表命中则降为 1 次。</p>
+<h3 id="页式、段式、段页式访问过程对比"><a href="#页式、段式、段页式访问过程对比" class="headerlink" title="页式、段式、段页式访问过程对比"></a>页式、段式、段页式访问过程对比</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">页式</th>
+<th align="left">段式</th>
+<th align="left">段页式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">逻辑地址结构</td>
+<td align="left">页号 + 偏移（<strong>一维</strong>）</td>
+<td align="left">段号 + 偏移（<strong>二维</strong>）</td>
+<td align="left">段号 + 页号 + 偏移（<strong>三维</strong>）</td>
+</tr>
+<tr>
+<td align="left">表结构</td>
+<td align="left">页表（→页框号）</td>
+<td align="left">段表（→基址 + 段长）</td>
+<td align="left">段表（→页表始址 + 页表长）+ 页表</td>
+</tr>
+<tr>
+<td align="left">越界检查次数</td>
+<td align="left">1 次</td>
+<td align="left">2 次</td>
+<td align="left">2 次（段号、页号）</td>
+</tr>
+<tr>
+<td align="left">无快表访存次数</td>
+<td align="left"><strong>2 次</strong></td>
+<td align="left"><strong>2 次</strong></td>
+<td align="left"><strong>3 次</strong></td>
+</tr>
+<tr>
+<td align="left">快表命中访存</td>
+<td align="left">1 次</td>
+<td align="left">1 次</td>
+<td align="left">1 次</td>
+</tr>
+<tr>
+<td align="left">碎片</td>
+<td align="left">页内碎片</td>
+<td align="left">外部碎片</td>
+<td align="left">页内碎片</td>
+</tr>
+<tr>
+<td align="left">共享难易</td>
+<td align="left">难</td>
+<td align="left">易</td>
+<td align="left">易（按段共享其页表）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：段页式的段表项是”<strong>页表始址 + 页表长度</strong>“而非段基址——段已被切成页<strong>离散</strong>存放，不存在连续的”基址”。<br><strong>易错点</strong>：段页式 &#x3D; 分段 + 分页，但<strong>访存 3 次</strong>不是 2+2&#x3D;4 次；它与二级页表（也是 3 次访存）的区别在于：段页式<strong>先查段表</strong>且对用户可见，二级页表两级都是页号、对用户透明。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">逻辑地址 vs 物理地址</td>
+<td align="left">逻辑空间由 <strong>CPU 位数</strong>定（32 位 → 4GB），物理空间由<strong>内存容量</strong>定</td>
+</tr>
+<tr>
+<td align="left">内存保护</td>
+<td align="left">上下限寄存器判<strong>物理地址</strong>；重定位寄存器管<strong>起址</strong>、界地址寄存器管<strong>限长</strong>，先判逻辑地址再加基址</td>
+</tr>
+<tr>
+<td align="left">碎片归属</td>
+<td align="left">单一连续&#x2F;固定分区&#x2F;分页&#x2F;段页式 → <strong>内部碎片</strong>；动态分区&#x2F;分段 → <strong>外部碎片</strong>（紧凑解决）</td>
+</tr>
+<tr>
+<td align="left">分页内碎片</td>
+<td align="left">只产生在<strong>最后一个页面</strong>，平均约半页</td>
+</tr>
+<tr>
+<td align="left">动态分区算法</td>
+<td align="left"><strong>FF 按地址第一个够用（综合最佳）</strong>；BF 最小够用（小碎片多）；WF 最大（切碎大分区、中小作业友好）；NF 从上次继续；<strong>紧凑</strong>仅适用于动态重定位</td>
+</tr>
+<tr>
+<td align="left">页 &#x2F; 页框</td>
+<td align="left">页面 &#x3D; 逻辑等分块，页框 &#x3D; 物理等分块，<strong>大小相同</strong>（2 的幂）；页表<strong>每进程一张</strong></td>
+</tr>
+<tr>
+<td align="left">地址拆分</td>
+<td align="left">页面 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> → 低 n 位为偏移；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord mathnormal">A</span><span class="mord">/</span><span class="mord cjk_fallback">页面大小</span><span class="mclose">⌋</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">页面大小</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">物理地址</td>
+<td align="left">页式 &#x3D; 页框号 × 页面大小 + 偏移（<strong>拼接</strong>）；段式 &#x3D; <strong>基址 + 偏移（相加）</strong></td>
+</tr>
+<tr>
+<td align="left">访存次数</td>
+<td align="left">无快表 <strong>2 次</strong>；TLB 命中 <strong>1 次</strong>；二级页表 &#x2F; 段页式 <strong>3 次</strong>（每多一级多一次）</td>
+</tr>
+<tr>
+<td align="left">快表 TLB</td>
+<td align="left"><strong>相联存储器</strong>（按内容并行查找的硬件）存最近页表项，与慢表<strong>同时查</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6984em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal">t</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">二级页表</td>
+<td align="left"><strong>不减少页表项总数</strong>，让页表<strong>离散存放 + 按需调入</strong>；各级页表 ≤ 1 页（项数 ≤ 页面大小 ÷ 表项大小）；32 位按 <strong>10&#x2F;10&#x2F;12</strong> 拆</td>
+</tr>
+<tr>
+<td align="left">段表项</td>
+<td align="left">段式 &#x3D; <strong>基址 + 段长</strong>；段页式 &#x3D; <strong>页表始址 + 页表长度</strong></td>
+</tr>
+<tr>
+<td align="left">分段越界</td>
+<td align="left"><strong>两次检查</strong>：段号 ≥ 段表长度、偏移 ≥ 段长</td>
+</tr>
+<tr>
+<td align="left">分页 vs 分段</td>
+<td align="left">分页<strong>物理划分、一维、透明、页内碎片、共享难</strong>；分段<strong>逻辑划分、二维、可见、外部碎片、共享易</strong></td>
+</tr>
+<tr>
+<td align="left">段页式</td>
+<td align="left"><strong>先分段再分页</strong>；每进程一张段表、<strong>每段一张页表</strong>；逻辑地址三维；<strong>3 次访存</strong></td>
+</tr>
+<tr>
+<td align="left">内存共享</td>
+<td align="left">共享段 &#x3D; 可重入代码 + 引用计数；<strong>分段共享比分页容易</strong>（段是完整逻辑单位）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T06:58:57.284Z" itemprop="dateUpdated">2026-08-29 14:58:57</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag">内存管理</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&title=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&title=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">虚拟内存与页面置换算法</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E6%AD%BB%E9%94%81/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">死锁</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&title=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&title=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《内存管理：连续分配与分页分段》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

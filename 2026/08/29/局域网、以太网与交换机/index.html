@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>局域网、以太网与交换机 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="网络,408,数据链路层,以太网">
+    <meta name="description" content="局域网（LAN）是把有限地理范围（一栋楼、一个园区）内的计算机互联起来的网络，其数据链路层的代表协议就是以太网（IEEE 802.3）；广域网（WAN）跨城市、跨国家组网，链路层最常用 PPP 协议；而把主机接入局域网、隔离广播域，靠的是集线器、交换机与 VLAN 技术。408 对本部分考查集中在：IEEE 802 体系结构、MAC 帧格式与 MAC 地址、802.11 无线局域网、VLAN 与">
+<meta property="og:type" content="article">
+<meta property="og:title" content="局域网、以太网与交换机">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="局域网（LAN）是把有限地理范围（一栋楼、一个园区）内的计算机互联起来的网络，其数据链路层的代表协议就是以太网（IEEE 802.3）；广域网（WAN）跨城市、跨国家组网，链路层最常用 PPP 协议；而把主机接入局域网、隔离广播域，靠的是集线器、交换机与 VLAN 技术。408 对本部分考查集中在：IEEE 802 体系结构、MAC 帧格式与 MAC 地址、802.11 无线局域网、VLAN 与">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/mac-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/802.11-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/ppp-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
+<meta property="article:published_time" content="2026-08-29T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:39:57.613Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="以太网">
+<meta property="article:tag" content="数据链路层">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/mac-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">局域网、以太网与交换机</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">局域网、以太网与交换机</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T01:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B1%80%E5%9F%9F%E7%BD%91%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8E-IEEE-802-%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="post-toc-number">1.</span> <span class="post-toc-text">局域网基本概念与 IEEE 802 体系结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E-IEEE-802-3"><span class="post-toc-number">2.</span> <span class="post-toc-text">以太网与 IEEE 802.3</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MAC-%E5%9C%B0%E5%9D%80"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">MAC 地址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MAC-%E5%B8%A7%E6%A0%BC%E5%BC%8F%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">MAC 帧格式（重点）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF%E4%B8%8E%E5%B8%A7%E9%95%BF%E8%AE%A1%E7%AE%97%EF%BC%88%E4%BE%8B%E9%A2%98%EF%BC%89"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">最小帧长与帧长计算（例题）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#IEEE-802-11-%E6%97%A0%E7%BA%BF%E5%B1%80%E5%9F%9F%E7%BD%91"><span class="post-toc-number">3.</span> <span class="post-toc-text">IEEE 802.11 无线局域网</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%84%E6%88%90%E7%BB%93%E6%9E%84%EF%BC%9AAP%E3%80%81BSS-%E4%B8%8E-SSID"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">组成结构：AP、BSS 与 SSID</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#VLAN-%E8%99%9A%E6%8B%9F%E5%B1%80%E5%9F%9F%E7%BD%91"><span class="post-toc-number">4.</span> <span class="post-toc-text">VLAN 虚拟局域网</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#802-1Q-%E5%B8%A7%E6%A0%BC%E5%BC%8F"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">802.1Q 帧格式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#VLAN-%E7%9A%84%E5%88%92%E5%88%86%E6%96%B9%E5%BC%8F"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">VLAN 的划分方式</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%BF%E5%9F%9F%E7%BD%91%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">5.</span> <span class="post-toc-text">广域网基本概念</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PPP-%E5%8D%8F%E8%AE%AE"><span class="post-toc-number">6.</span> <span class="post-toc-text">PPP 协议</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#PPP-%E7%9A%84%E4%B8%89%E4%B8%AA%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">PPP 的三个组成部分</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#PPP-%E5%B8%A7%E6%A0%BC%E5%BC%8F"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">PPP 帧格式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%8F%E6%98%8E%E4%BC%A0%E8%BE%93%EF%BC%9A%E5%AD%97%E8%8A%82%E5%A1%AB%E5%85%85%E4%B8%8E%E9%9B%B6%E6%AF%94%E7%89%B9%E5%A1%AB%E5%85%85"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">透明传输：字节填充与零比特填充</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%BA%A4%E6%8D%A2%E6%9C%BA"><span class="post-toc-number">7.</span> <span class="post-toc-text">以太网交换机</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%87%AA%E5%AD%A6%E4%B9%A0%E4%B8%8E%E8%BD%AC%E5%8F%91-%E8%BF%87%E6%BB%A4%EF%BC%88%E4%BE%8B%E9%A2%98%EF%BC%89"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">自学习与转发&#x2F;过滤（例题）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BA%E7%9A%84%E7%89%B9%E7%82%B9%E4%B8%8E%E7%94%9F%E6%88%90%E6%A0%91"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">交换机的特点与生成树</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%9B%86%E7%BA%BF%E5%99%A8-vs-%E4%BA%A4%E6%8D%A2%E6%9C%BA-vs-%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="post-toc-number">8.</span> <span class="post-toc-text">集线器 vs 交换机 vs 路由器</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">9.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-局域网、以太网与交换机"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">局域网、以太网与交换机</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 09:00:00" datetime="2026-08-29T01:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>局域网（LAN）<strong>是把有限地理范围（一栋楼、一个园区）内的计算机互联起来的网络，其数据链路层的代表协议就是</strong>以太网（IEEE 802.3）</strong>；<strong>广域网（WAN）<strong>跨城市、跨国家组网，链路层最常用 <strong>PPP</strong> 协议；而把主机接入局域网、隔离广播域，靠的是</strong>集线器、交换机</strong>与 <strong>VLAN</strong> 技术。408 对本部分考查集中在：<strong>IEEE 802 体系结构、MAC 帧格式与 MAC 地址、802.11 无线局域网、VLAN 与 802.1Q、PPP 协议、交换机自学习与三大设备对比</strong>。</p>
+<h2 id="局域网基本概念与-IEEE-802-体系结构"><a href="#局域网基本概念与-IEEE-802-体系结构" class="headerlink" title="局域网基本概念与 IEEE 802 体系结构"></a>局域网基本概念与 IEEE 802 体系结构</h2><p><strong>局域网（LAN, Local Area Network）<strong>的特点：覆盖范围小、<strong>高速、低误码率</strong>、多站点</strong>共享传输介质</strong>、由单位<strong>自建自管</strong>；主要技术要素是<strong>拓扑结构、传输介质和介质访问控制方式</strong>。</p>
+<p><strong>IEEE 802 委员会</strong>制定的局域网标准把数据链路层拆成<strong>两个子层</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">子层</th>
+<th align="left">全称</th>
+<th align="left">职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>LLC 子层（802.2）</strong></td>
+<td align="left">逻辑链路控制</td>
+<td align="left">与介质无关：给网络层提供服务、流量与差错控制</td>
+</tr>
+<tr>
+<td align="left"><strong>MAC 子层</strong></td>
+<td align="left">介质访问控制</td>
+<td align="left">与介质相关：帧封装&#x2F;拆装、<strong>MAC 寻址</strong>、信道争用</td>
+</tr>
+</tbody></table>
+<p>常用的 802 标准：</p>
+<table>
+<thead>
+<tr>
+<th align="left">标准</th>
+<th align="left">内容</th>
+<th align="left">备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>IEEE 802.3</strong></td>
+<td align="left">以太网（CSMA&#x2F;CD）</td>
+<td align="left">有线局域网主流，本文重点</td>
+</tr>
+<tr>
+<td align="left"><strong>IEEE 802.11</strong></td>
+<td align="left">无线局域网（WLAN）</td>
+<td align="left">Wi-Fi，用 CSMA&#x2F;CA</td>
+</tr>
+<tr>
+<td align="left"><strong>IEEE 802.1Q</strong></td>
+<td align="left">VLAN 帧标签</td>
+<td align="left">属 802.1 桥接&#x2F;管理类标准</td>
+</tr>
+<tr>
+<td align="left">IEEE 802.5</td>
+<td align="left">令牌环</td>
+<td align="left">已淘汰，仅了解</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：局域网中数据链路层 &#x3D; <strong>LLC 子层 + MAC 子层</strong>；<strong>以太网（V2）只保留 MAC 子层</strong>（用”类型”字段取代了 LLC 功能）。802.3 有线用 <strong>CSMA&#x2F;CD</strong>，802.11 无线用 <strong>CSMA&#x2F;CA</strong>。</p>
+</blockquote>
+<h2 id="以太网与-IEEE-802-3"><a href="#以太网与-IEEE-802-3" class="headerlink" title="以太网与 IEEE 802.3"></a>以太网与 IEEE 802.3</h2><p><strong>以太网（Ethernet）<strong>提供</strong>无连接、不编号、不确认</strong>的<strong>不可靠交付</strong>（尽最大努力），差错恢复交给高层（TCP）完成。经典共享式以太网用 <strong>CSMA&#x2F;CD</strong> 协调信道（先听后发、边发边听，机制详见《介质访问控制》一文）；现代<strong>全双工交换式以太网不再需要 CSMA&#x2F;CD</strong>。</p>
+<h3 id="MAC-地址"><a href="#MAC-地址" class="headerlink" title="MAC 地址"></a>MAC 地址</h3><p>**MAC 地址（物理地址）**长 <strong>48 位（6 字节）</strong>，出厂固化在网卡 ROM 中，全球唯一，常用十六进制连字符表示（如 <code>00-1A-2B-3C-4D-5E</code>）。</p>
+<ul>
+<li>前 <strong>3 字节 &#x3D; OUI（组织唯一标识符）</strong>：由 IEEE 分配给网卡厂商；后 3 字节由厂商自行分配。</li>
+<li><strong>广播地址 &#x3D; FF-FF-FF-FF-FF-FF（48 位全 1）</strong>：发往该地址的帧本网段所有站都接收。</li>
+<li>地址中某位置 1 还可表示<strong>组播地址</strong>（一对多）。</li>
+<li>网卡按目的 MAC <strong>过滤接收</strong>：只收<strong>单播发给自己</strong>、<strong>广播帧</strong>和<strong>所属组播组</strong>的帧。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：MAC 地址<strong>前 3 字节是 OUI（IEEE 分配的厂商号）</strong>，<strong>48 位全 1 是广播地址</strong>。跨网传输时 <strong>IP 地址端到端不变、MAC 地址逐链路改变</strong>（每过一个路由器重新封装，靠 ARP 解析下一跳 MAC）。</p>
+</blockquote>
+<h3 id="MAC-帧格式（重点）"><a href="#MAC-帧格式（重点）" class="headerlink" title="MAC 帧格式（重点）"></a>MAC 帧格式（重点）</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第3章 数据链路层.assets/mac-帧格式.png" alt="以太网帧格式" title="">
+                </div>
+                <div class="image-caption">以太网帧格式</div>
+            </figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    7B        1B       6B         6B       2B        46-1500B      4B</span><br><span class="line">┌───────────┬──────┬──────────┬──────────┬────────┬───────────────┬──────┐</span><br><span class="line">│ Preamble  │ SFD  │Dest Addr │ Src Addr │  Type  │     Data      │ FCS  │</span><br><span class="line">└───────────┴──────┴──────────┴──────────┴────────┴───────────────┴──────┘</span><br><span class="line">← 物理层加入，不计入帧长 →←———— MAC 帧本体（计入帧长 64-1518B）————→</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">长度</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>目的地址（Dest Addr）</strong></td>
+<td align="left">6B</td>
+<td align="left">目的站 MAC（单播&#x2F;组播&#x2F;广播）</td>
+</tr>
+<tr>
+<td align="left"><strong>源地址（Src Addr）</strong></td>
+<td align="left">6B</td>
+<td align="left">发送站 MAC</td>
+</tr>
+<tr>
+<td align="left"><strong>类型（Type）</strong></td>
+<td align="left">2B</td>
+<td align="left">标识上层协议：<strong>0x0800 &#x3D; IP、0x0806 &#x3D; ARP</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>数据（Data）</strong></td>
+<td align="left"><strong>46&#126;1500B</strong></td>
+<td align="left">网络层交来的分组（如 IP 数据报）；不足 46B 须<strong>填充（Padding）</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>FCS</strong></td>
+<td align="left">4B</td>
+<td align="left">CRC 帧检验序列，检验范围 &#x3D; <strong>目的地址 → 数据</strong>（不含前导码）</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>前导码（Preamble）</strong> &#x3D; 7B 前同步码 + 1B 帧开始定界符 SFD，共 <strong>8B</strong>，由物理层加上：<strong>不计入帧长、也不被 FCS 校验</strong>。</li>
+<li><strong>帧长范围 64&#126;1518B</strong>：最小 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">46</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span>B，最大 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1518</span></span></span></span>B。</li>
+<li>数据字段上限 <strong>1500B 就是以太网 MTU</strong>；IP 数据报超过 1500B 时由<strong>网络层分片</strong>，链路层不管分片。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>前导码 8B 不算进帧长</strong>；”类型”字段标识<strong>上层协议</strong>（不是数据长度）；FCS 校验<strong>不含前导码</strong>。<br><strong>易错点</strong>：64&#126;1518B 指地址 + 类型 + 数据 + FCS 的总长；算”线上实际比特”时才另加 8B 前导码。</p>
+</blockquote>
+<h3 id="最小帧长与帧长计算（例题）"><a href="#最小帧长与帧长计算（例题）" class="headerlink" title="最小帧长与帧长计算（例题）"></a>最小帧长与帧长计算（例题）</h3><p><strong>最小帧长为什么是 64B</strong>：CSMA&#x2F;CD 要求发送方在<strong>帧尚未发完</strong>时就能检测到冲突，即发送时延不得小于争用期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">最短帧长</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">数据率</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Mbps</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">512</span><span class="mspace"> </span><span class="mord text"><span class="mord">bit</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">64</span><span class="mspace"> </span><span class="mord text"><span class="mord">B</span></span></span></span></span></span>
+<p>数据字段下限 46B 正是”凑够 64B”凑出来的：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">18</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">46</span></span></span></span>（18B &#x3D; 6 + 6 + 2 + 4 的首尾开销）。</p>
+<p><strong>例题：三种长度的 IP 数据报封装成 MAC 帧</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">网络层交来的 IP 数据报</th>
+<th align="left">数据字段处理</th>
+<th align="left">帧长计算</th>
+<th align="left">MAC 帧总长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>30B</strong></td>
+<td align="left">填充 16B 至 <strong>46B</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">46</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><strong>64B（最小帧）</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>1000B</strong></td>
+<td align="left">直接装入</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><strong>1018B</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>1500B</strong></td>
+<td align="left">恰好等于 MTU</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><strong>1518B（最大帧）</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li>30B 情形填充的 16B 是无用字节，靠高层（IP 首部总长度字段）识别后丢弃。</li>
+<li>若 IP 数据报 <strong>超过 1500B</strong>：不能直接装帧，必须先由<strong>网络层分片</strong>（每片 ≤ 1500B 再分别封装）。</li>
+<li>线上实际传输还要加 8B 前导码：最大帧线上长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1518</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1526</span></span></span></span>B。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：帧长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">数据</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">18</span></span></span></span>B；<strong>数据 46&#126;1500B</strong> 对应<strong>帧长 64&#126;1518B</strong>；最小帧长 64B 由 <strong>CSMA&#x2F;CD 争用期</strong>决定，与 MTU 无关。</p>
+</blockquote>
+<h2 id="IEEE-802-11-无线局域网"><a href="#IEEE-802-11-无线局域网" class="headerlink" title="IEEE 802.11 无线局域网"></a>IEEE 802.11 无线局域网</h2><h3 id="组成结构：AP、BSS-与-SSID"><a href="#组成结构：AP、BSS-与-SSID" class="headerlink" title="组成结构：AP、BSS 与 SSID"></a>组成结构：AP、BSS 与 SSID</h3><table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>AP（接入点）</strong></td>
+<td align="left">无线接入点（基站），站点经它接入有线网络</td>
+</tr>
+<tr>
+<td align="left"><strong>BSS（基本服务集）</strong></td>
+<td align="left">一个 AP 及其覆盖范围内的若干移动站，是 WLAN 的最小组成单元</td>
+</tr>
+<tr>
+<td align="left"><strong>BSSID</strong></td>
+<td align="left"><strong>AP 的 MAC 地址</strong>，唯一标识一个 BSS</td>
+</tr>
+<tr>
+<td align="left"><strong>SSID</strong></td>
+<td align="left">服务集标识符（”网络名”），站点按 SSID 选择接入哪个网络</td>
+</tr>
+<tr>
+<td align="left"><strong>ESS（扩展服务集）</strong></td>
+<td align="left">多个 BSS 通过**分配系统（DS，通常为以太网）**互联而成</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>有固定基础设施的 WLAN</strong>：站点间通信<strong>先发给 AP，再由 AP 转发</strong>（目的站、有线网）；AP 负责协调无线信道。</li>
+<li><strong>无固定基础设施的移动自组织网络（Ad hoc）</strong>：<strong>没有 AP</strong>，各站地位平等、互相直接（或多跳）通信，自身承担路由功能——一般不能接入互联网。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>BSS &#x3D; AP + 站点</strong>；<strong>SSID 是网络名，BSSID 是 AP 的 MAC 地址</strong>；Ad hoc 模式<strong>无 AP</strong>、不依赖基础设施。</p>
+</blockquote>
+<p>802.11 的 MAC 帧最多有 <strong>4 个地址字段</strong>（以太网只有源、目的 2 个），具体用哪几个由帧控制中的”去往 AP &#x2F; 来自 AP”两个标志决定；无线信道采用 **CSMA&#x2F;CA（碰撞避免）**而非 CSMA&#x2F;CD——无线环境无法”边发边听”检测冲突，具体机制详见《介质访问控制》一文。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第3章 数据链路层.assets/802.11-帧格式.png" alt="802.11 MAC 帧格式" title="">
+                </div>
+                <div class="image-caption">802.11 MAC 帧格式</div>
+            </figure>
+
+<h2 id="VLAN-虚拟局域网"><a href="#VLAN-虚拟局域网" class="headerlink" title="VLAN 虚拟局域网"></a>VLAN 虚拟局域网</h2><p>交换机<strong>不隔离广播域</strong>——一台主机发广播帧，全网都收得到，既浪费带宽又不安全。<strong>VLAN（虚拟局域网）<strong>在</strong>一台&#x2F;多台交换机</strong>上把物理局域网<strong>逻辑划分</strong>成多个广播域：每个 VLAN 是一个独立广播域（独立的逻辑子网），广播帧只在<strong>本 VLAN 内</strong>传播；<strong>不同 VLAN 之间二层不通，必须经路由器&#x2F;三层交换机转发</strong>。</p>
+<h3 id="802-1Q-帧格式"><a href="#802-1Q-帧格式" class="headerlink" title="802.1Q 帧格式"></a>802.1Q 帧格式</h3><p><strong>IEEE 802.1Q</strong> 在以太网帧的<strong>源地址字段之后、类型字段之前</strong>插入 <strong>4 字节 VLAN 标签（Tag）</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   6B         6B          4B         2B       1500B      4B</span><br><span class="line">┌──────────┬──────────┬────────────┬────────┬──────────┬──────┐</span><br><span class="line">│Dest Addr │ Src Addr │Tag (802.1Q)│  Type  │   Data   │ FCS  │</span><br><span class="line">└──────────┴──────────┴────────────┴────────┴──────────┴──────┘</span><br><span class="line">                               ↑</span><br><span class="line">         Tag = TPID（2B，0x8100）+ TCI（2B：优先级 3bit + CFI 1bit + VLAN ID 12bit）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>TPID（2B）&#x3D; 0x8100</strong>：标识”这是带 VLAN 标签的帧”。</li>
+<li><strong>TCI（2B）</strong>：3 位优先级 + 1 位 CFI + <strong>12 位 VLAN ID</strong>（可标识 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4096</span></span></span></span> 个，可用 4094 个）。</li>
+<li>帧长上限相应由 <strong>1518B 变为 1522B</strong>。</li>
+<li>连终端的 <strong>Access（接入）端口</strong>收发<strong>无标签</strong>普通帧；交换机之间的 <strong>Trunk（汇聚）端口</strong>承载多个 VLAN，帧<strong>打标签</strong>传输。</li>
+</ul>
+<p><strong>例题：802.1Q 打标签后的帧长</strong>——普通最大帧 1518B（数据 1500B）打标签后：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1500</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1522</span><span class="mspace"> </span><span class="mord text"><span class="mord">B</span></span></span></span></span></span>
+<p>即在原帧基础上<strong>净增 4B</strong>，且打标签位置在源地址之后，Dest&#x2F;Src Addr 与 Type&#x2F;Data 的相对顺序不变。</p>
+<h3 id="VLAN-的划分方式"><a href="#VLAN-的划分方式" class="headerlink" title="VLAN 的划分方式"></a>VLAN 的划分方式</h3><table>
+<thead>
+<tr>
+<th align="left">划分方式</th>
+<th align="left">依据</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>静态 VLAN（基于端口）</strong></td>
+<td align="left">交换机端口手工指定</td>
+<td align="left"><strong>最常用</strong>、简单可靠；主机换端口需重新配置</td>
+</tr>
+<tr>
+<td align="left">动态 VLAN（基于 MAC 地址）</td>
+<td align="left">网卡 MAC 地址</td>
+<td align="left">主机换端口自动跟随；需登记所有 MAC</td>
+</tr>
+<tr>
+<td align="left">动态 VLAN（基于 IP 子网）</td>
+<td align="left">主机 IP 地址</td>
+<td align="left">换网卡不影响；按逻辑子网划分</td>
+</tr>
+<tr>
+<td align="left">动态 VLAN（基于用户）</td>
+<td align="left">登录用户名</td>
+<td align="left">最灵活，管理开销大</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：VLAN <strong>隔离广播域</strong>；<strong>跨 VLAN 通信必须用三层设备（路由器&#x2F;三层交换机）</strong>；802.1Q 标签插在<strong>源地址之后、类型字段之前</strong>，帧上限 <strong>1522B</strong>。<br><strong>易错点</strong>：交换机隔离<strong>冲突域</strong>但<strong>不隔离广播域</strong>；VLAN 是链路层设备上的<strong>二层隔离</strong>技术，VLAN 之间互通仍然要靠<strong>三层转发</strong>。</p>
+</blockquote>
+<h2 id="广域网基本概念"><a href="#广域网基本概念" class="headerlink" title="广域网基本概念"></a>广域网基本概念</h2><p><strong>广域网（WAN）<strong>覆盖范围很广（跨地区、跨国），由</strong>结点交换机</strong>及连接它们的链路组成，采用<strong>存储转发</strong>方式转发分组。</p>
+<ul>
+<li><strong>结点交换机 vs 路由器</strong>：都转发分组，但<strong>结点交换机在单个网络内部转发</strong>（链路层），<strong>路由器在多个网络组成的互联网之间转发</strong>（网络层）。</li>
+<li><strong>广域网 vs 局域网</strong>：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">局域网 LAN</th>
+<th align="left">广域网 WAN</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">覆盖范围</td>
+<td align="left">楼宇&#x2F;园区（几 km 内）</td>
+<td align="left">跨城市、跨国家</td>
+</tr>
+<tr>
+<td align="left">通信方式</td>
+<td align="left">广播&#x2F;交换式</td>
+<td align="left"><strong>点对点</strong>存储转发</td>
+</tr>
+<tr>
+<td align="left">归属与目的</td>
+<td align="left">单位自建自管，重在数据传输</td>
+<td align="left">运营商组建，强调<strong>资源共享</strong></td>
+</tr>
+<tr>
+<td align="left">典型技术</td>
+<td align="left">以太网、交换机、VLAN</td>
+<td align="left">PPP、结点交换机</td>
+</tr>
+</tbody></table>
+<h2 id="PPP-协议"><a href="#PPP-协议" class="headerlink" title="PPP 协议"></a>PPP 协议</h2><p><strong>PPP（Point-to-Point Protocol，点对点协议）<strong>是用户接入 ISP（拨号、宽带）时在</strong>点对点链路</strong>上使用的数据链路层协议。点对点链路<strong>只有两个节点、无需寻址、不存在冲突</strong>，因此<strong>无需 CSMA&#x2F;CD，也没有最短帧长的限制</strong>。</p>
+<h3 id="PPP-的三个组成部分"><a href="#PPP-的三个组成部分" class="headerlink" title="PPP 的三个组成部分"></a>PPP 的三个组成部分</h3><table>
+<thead>
+<tr>
+<th align="left">组成部分</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>封装成帧</strong></td>
+<td align="left">规定帧格式与帧定界；<strong>面向字节</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>LCP（链路控制协议）</strong></td>
+<td align="left">建立、配置、测试和拆除<strong>数据链路连接</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>NCP（网络控制协议）</strong></td>
+<td align="left">协商<strong>网络层</strong>参数（如其中的 IPCP 为用户分配 IP 地址）</td>
+</tr>
+</tbody></table>
+<h3 id="PPP-帧格式"><a href="#PPP-帧格式" class="headerlink" title="PPP 帧格式"></a>PPP 帧格式</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第3章 数据链路层.assets/ppp-帧格式.png" alt="PPP 帧格式" title="">
+                </div>
+                <div class="image-caption">PPP 帧格式</div>
+            </figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   1B        1B        1B        2B         0-1500B        2B       1B</span><br><span class="line">┌────────┬────────┬────────┬──────────┬─────────────┬────────┬────────┐</span><br><span class="line">│  Flag  │  Addr  │  Ctrl  │ Protocol │    Info     │  FCS   │  Flag  │</span><br><span class="line">│  0x7E  │  0xFF  │  0x03  │          │  0-1500B    │   2B   │  0x7E  │</span><br><span class="line">└────────┴────────┴────────┴──────────┴─────────────┴────────┴────────┘</span><br><span class="line">←————————————————————————— 首部 ——————————————————————→          ← 尾部 →</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">字段</th>
+<th align="left">长度</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Flag（标志）</strong></td>
+<td align="left">1B</td>
+<td align="left"><strong>0x7E</strong>，首尾各一个，用于帧定界</td>
+</tr>
+<tr>
+<td align="left"><strong>Addr（地址）</strong></td>
+<td align="left">1B</td>
+<td align="left">固定 <strong>0xFF</strong>（点对点无需寻址，形同虚设）</td>
+</tr>
+<tr>
+<td align="left"><strong>Ctrl（控制）</strong></td>
+<td align="left">1B</td>
+<td align="left">固定 <strong>0x03</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Protocol（协议）</strong></td>
+<td align="left">2B</td>
+<td align="left"><strong>0x0021 &#x3D; IP 数据报；0xC021 &#x3D; LCP；0x8021 &#x3D; NCP</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>Info（信息）</strong></td>
+<td align="left">0&#126;1500B</td>
+<td align="left">网络层分组，<strong>无最短长度要求</strong>（点对点无 CSMA&#x2F;CD）</td>
+</tr>
+<tr>
+<td align="left"><strong>FCS</strong></td>
+<td align="left"><strong>2B</strong></td>
+<td align="left">CRC 帧检验序列（检验地址 → 信息字段）</td>
+</tr>
+</tbody></table>
+<h3 id="透明传输：字节填充与零比特填充"><a href="#透明传输：字节填充与零比特填充" class="headerlink" title="透明传输：字节填充与零比特填充"></a>透明传输：字节填充与零比特填充</h3><p><strong>字节填充（异步链路，面向字节）</strong>：信息字段出现与定界符相同的字节时，在其前插入<strong>转义字节 0x7D</strong>：</p>
+<ul>
+<li><strong>0x7E → 0x7D 0x5E</strong>（标志字节被转义，帧长 +1B）</li>
+<li><strong>0x7D → 0x7D 0x5D</strong>（转义字节自身被转义，帧长 +1B）</li>
+<li>小于 0x20 的控制字符 → 0x7D +（原字节 ⊕ 0x20）</li>
+</ul>
+<p><strong>零比特填充（同步链路，面向比特）</strong>：发送端扫描信息字段，每遇到<strong>连续 5 个 1</strong> 就在其后<strong>插入一个 0</strong>，保证数据中不会出现 6 个连续 1 而与标志 01111110（0x7E）混淆；接收端做逆操作删除。</p>
+<p>PPP 的主要特点：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特点</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>只检错、不纠错</strong></td>
+<td align="left">CRC 检出错误帧直接<strong>丢弃</strong>，不修复</td>
+</tr>
+<tr>
+<td align="left"><strong>不可靠（无序号、无确认）</strong></td>
+<td align="left">不使用序号和确认机制、不重传；因点对点链路<strong>误码率低</strong>，可靠性交给高层（TCP）保证</td>
+</tr>
+<tr>
+<td align="left"><strong>只支持全双工</strong></td>
+<td align="left">点对点链路两端可同时收发</td>
+</tr>
+<tr>
+<td align="left">面向字节</td>
+<td align="left">异步链路用字节填充、同步链路用零比特填充</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：PPP &#x3D; <strong>封装成帧 + LCP + NCP</strong>；帧定界 <strong>0x7E</strong>；协议字段 <strong>0x0021 &#x3D; IP</strong>；<strong>异步链路字节填充（0x7E→0x7D 0x5E）、同步链路零比特填充（5 个 1 后插 0）</strong>。<br><strong>易错点</strong>：PPP 的 FCS 是 <strong>2B</strong>（以太网是 4B）；PPP <strong>无序号、不确认、不重传</strong>（不是可靠传输协议）；信息字段<strong>没有最小长度</strong>。宽带接入常见的 <strong>PPPoE</strong> 即”以太网上的 PPP”，把 PPP 帧封装进以太网帧传给运营商。</p>
+</blockquote>
+<h2 id="以太网交换机"><a href="#以太网交换机" class="headerlink" title="以太网交换机"></a>以太网交换机</h2><p><strong>以太网交换机（Switch）<strong>本质是</strong>多端口网桥</strong>，工作在<strong>数据链路层</strong>，内部维护 <strong>MAC 地址表（MAC 地址 → 端口）</strong>，按表转发帧：<strong>即插即用</strong>（自学习建表）、多端口<strong>并行转发</strong>、<strong>每端口独享带宽</strong>。转发方式有<strong>存储转发</strong>（收完整帧校验后再转，可靠但时延大）与<strong>直通</strong>（查到目的端口立即转发，快但不检错）。</p>
+<h3 id="自学习与转发-过滤（例题）"><a href="#自学习与转发-过滤（例题）" class="headerlink" title="自学习与转发&#x2F;过滤（例题）"></a>自学习与转发&#x2F;过滤（例题）</h3><p>交换机收到一帧（从端口 P 进入，源 MAC &#x3D; S，目的 MAC &#x3D; D）时：</p>
+<ol>
+<li><strong>学习</strong>：把”S → P”写入地址表（表项已存在则刷新老化时间）；</li>
+<li><strong>查表转发</strong>（看目的地址 D）：<ul>
+<li>表中<strong>查不到 D</strong>（或 D 是广播地址）→ <strong>泛洪</strong>：向<strong>除 P 之外</strong>的所有端口转发；</li>
+<li>表中<strong>有 D</strong> → 只向对应端口<strong>转发</strong>，其余端口被<strong>过滤</strong>；</li>
+<li>D 对应端口<strong>恰好就是 P</strong> → <strong>丢弃</strong>（源、目的在同一端口，无需转发）。</li>
+</ul>
+</li>
+<li>长期不活跃的表项被<strong>老化删除</strong>，以适应主机位置变化。</li>
+</ol>
+<p><strong>例题：转发表逐步建立</strong>。拓扑如下（A&#126;E 表示各主机 MAC，交换机 4 个端口，端口 4 接集线器）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">交换机 S（端口 1-4）</span><br><span class="line">   /    |    \     \</span><br><span class="line">  1     2     3     4</span><br><span class="line">  │     │     │     │</span><br><span class="line">  A     B     C    [Hub]</span><br><span class="line">                 /    \</span><br><span class="line">                D      E</span><br></pre></td></tr></table></figure>
+
+<p>依次发生 5 次通信，交换机动作与转发表变化：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">帧（入端口）</th>
+<th align="left">学习表项</th>
+<th align="left">查目的地址</th>
+<th align="left">交换机动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">A→B（端口 1）</td>
+<td align="left"><strong>A → 1</strong></td>
+<td align="left">B 未知</td>
+<td align="left"><strong>泛洪</strong>到端口 2、3、4</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">B→A（端口 2）</td>
+<td align="left"><strong>B → 2</strong></td>
+<td align="left">A → 1</td>
+<td align="left">仅端口 <strong>1</strong> 转发（过滤 3、4）</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">D→A（端口 4）</td>
+<td align="left"><strong>D → 4</strong></td>
+<td align="left">A → 1</td>
+<td align="left">仅端口 <strong>1</strong> 转发</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">E→D（端口 4）</td>
+<td align="left"><strong>E → 4</strong></td>
+<td align="left">D → 4，恰为入端口</td>
+<td align="left"><strong>丢弃</strong>（过滤）</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">A→E（端口 1）</td>
+<td align="left">A 已在表（刷新）</td>
+<td align="left">E → 4</td>
+<td align="left">仅端口 <strong>4</strong> 转发，Hub 广播给 D、E</td>
+</tr>
+</tbody></table>
+<p>最终 MAC 地址表：</p>
+<table>
+<thead>
+<tr>
+<th align="left">MAC 地址</th>
+<th align="left">转发端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">A</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">B</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">D</td>
+<td align="left">4</td>
+</tr>
+<tr>
+<td align="left">E</td>
+<td align="left">4</td>
+</tr>
+</tbody></table>
+<ul>
+<li>主机 <strong>C 从未发送过帧</strong>，表中没有 C——若此时有帧发往 C，交换机只能<strong>泛洪</strong>。</li>
+<li>步骤 2、3、4 中其余端口被<strong>过滤</strong>：交换机按需转发，冲突域被隔离到每个端口。</li>
+<li>集线器收到帧后向所有端口广播——<strong>Hub 不隔离冲突域</strong>，D、E 仍在同一冲突域内。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：自学习口诀——<strong>“学源地址、查目的地址”</strong>（学习看源 MAC，转发看目的 MAC）；<strong>未知单播&#x2F;广播帧 → 泛洪，已知 → 定向转发，源目的同端口 → 丢弃</strong>。</p>
+</blockquote>
+<h3 id="交换机的特点与生成树"><a href="#交换机的特点与生成树" class="headerlink" title="交换机的特点与生成树"></a>交换机的特点与生成树</h3><ul>
+<li><strong>每个接口是独立的冲突域</strong>，支持<strong>全双工</strong>（同时收发，不再需要 CSMA&#x2F;CD）；但<strong>全部端口仍属同一个广播域</strong>（除非划分 VLAN）。</li>
+<li>交换机之间冗余互连会形成<strong>环路</strong>，广播帧沿环路兜圈造成<strong>广播风暴</strong>；<strong>生成树协议（STP）<strong>通过阻塞部分冗余端口，把有环的物理拓扑修剪成</strong>无环的逻辑树</strong>，同时保留备份链路。</li>
+</ul>
+<h2 id="集线器-vs-交换机-vs-路由器"><a href="#集线器-vs-交换机-vs-路由器" class="headerlink" title="集线器 vs 交换机 vs 路由器"></a>集线器 vs 交换机 vs 路由器</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">集线器（Hub）</th>
+<th align="left">交换机（Switch）</th>
+<th align="left">路由器（Router）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">工作层次</td>
+<td align="left"><strong>物理层</strong></td>
+<td align="left"><strong>数据链路层</strong></td>
+<td align="left"><strong>网络层</strong></td>
+</tr>
+<tr>
+<td align="left">转发依据</td>
+<td align="left">无（信号再生、广播）</td>
+<td align="left"><strong>MAC 地址表</strong></td>
+<td align="left"><strong>路由表（IP 地址）</strong></td>
+</tr>
+<tr>
+<td align="left">冲突域</td>
+<td align="left"><strong>不隔离</strong>（所有端口同一冲突域）</td>
+<td align="left"><strong>每端口一个冲突域</strong></td>
+<td align="left">隔离</td>
+</tr>
+<tr>
+<td align="left">广播域</td>
+<td align="left">不隔离</td>
+<td align="left"><strong>不隔离</strong>（可用 VLAN 隔离）</td>
+<td align="left"><strong>隔离</strong></td>
+</tr>
+<tr>
+<td align="left">带宽</td>
+<td align="left">所有端口<strong>共享</strong>总带宽</td>
+<td align="left">每端口<strong>独享</strong>、可并行通信</td>
+<td align="left">—</td>
+</tr>
+<tr>
+<td align="left">双工方式</td>
+<td align="left">半双工（需 CSMA&#x2F;CD）</td>
+<td align="left">全双工</td>
+<td align="left">—</td>
+</tr>
+<tr>
+<td align="left">典型定位</td>
+<td align="left">多端口<strong>中继器</strong></td>
+<td align="left"><strong>多端口网桥</strong></td>
+<td align="left">互联多个网络的设备</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：隔离层次一句话——<strong>物理层设备（集线器）不隔离冲突域；链路层设备（交换机）隔离冲突域、不隔离广播域；广播域只能由路由器（网络层）或 VLAN 隔离</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">IEEE 802 体系</td>
+<td align="left">数据链路层 &#x3D; <strong>LLC(802.2) + MAC</strong> 两个子层；802.3 以太网、802.11 无线、802.1Q VLAN</td>
+</tr>
+<tr>
+<td align="left">MAC 地址</td>
+<td align="left"><strong>48 位</strong>；前 3 字节 <strong>OUI</strong>（IEEE 分配厂商号）；广播地址 &#x3D; 48 位全 1</td>
+</tr>
+<tr>
+<td align="left">MAC 帧</td>
+<td align="left">目的 6 + 源 6 + 类型 2 + 数据 46&#126;1500 + FCS 4；类型 <strong>0x0800&#x3D;IP、0x0806&#x3D;ARP</strong>；帧长 <strong>64&#126;1518B</strong></td>
+</tr>
+<tr>
+<td align="left">前导码</td>
+<td align="left">**8B（7B 同步 + 1B SFD）**由物理层加入，<strong>不计入帧长、不被 FCS 校验</strong>；最小帧长 <strong>64B</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mord">×</span></span></span></span> 数据率，数据不足 46B 要填充</td>
+</tr>
+<tr>
+<td align="left">802.11</td>
+<td align="left"><strong>BSS &#x3D; AP + 站点</strong>；<strong>SSID 是网络名 &#x2F; BSSID 是 AP 的 MAC</strong>；Ad hoc 无 AP；MAC 帧有 <strong>4 个地址</strong></td>
+</tr>
+<tr>
+<td align="left">VLAN</td>
+<td align="left">802.1Q 在<strong>源地址后插 4B 标签</strong>（TPID <strong>0x8100</strong>，12 位 VLAN ID）；帧上限 <strong>1522B</strong>；<strong>隔离广播域</strong>，跨 VLAN 需三层</td>
+</tr>
+<tr>
+<td align="left">VLAN 划分</td>
+<td align="left"><strong>静态（基于端口）最常用</strong>；动态按 MAC 地址 &#x2F; IP 子网 &#x2F; 用户</td>
+</tr>
+<tr>
+<td align="left">广域网</td>
+<td align="left">覆盖广、<strong>点对点存储转发</strong>；结点交换机<strong>网内</strong>转发，路由器<strong>网间</strong>转发</td>
+</tr>
+<tr>
+<td align="left">PPP 组成</td>
+<td align="left"><strong>封装成帧 + LCP（链路协商）+ NCP（网络层配置，IPCP 分配 IP）</strong></td>
+</tr>
+<tr>
+<td align="left">PPP 帧</td>
+<td align="left">Flag <strong>0x7E</strong>、Addr FF、Ctrl 03、协议 <strong>0x0021 &#x3D; IP</strong>、FCS <strong>2B</strong>；信息 0&#126;1500B <strong>无最小帧长</strong></td>
+</tr>
+<tr>
+<td align="left">PPP 透明传输</td>
+<td align="left">异步链路<strong>字节填充</strong> 0x7E→0x7D 0x5E；同步链路<strong>零比特填充</strong>（5 个 1 后插 0）</td>
+</tr>
+<tr>
+<td align="left">PPP 可靠性</td>
+<td align="left"><strong>无序号、不确认、只检错不纠错</strong>（点对点误码率低，可靠性靠高层 TCP）</td>
+</tr>
+<tr>
+<td align="left">交换机自学习</td>
+<td align="left"><strong>学源地址、查目的地址</strong>：未知<strong>泛洪</strong> &#x2F; 已知<strong>转发</strong> &#x2F; 同端口<strong>丢弃</strong>；生成树防环路</td>
+</tr>
+<tr>
+<td align="left">设备对比</td>
+<td align="left">集线器不隔离冲突域；交换机隔离<strong>冲突域</strong>不隔离<strong>广播域</strong>；路由器全隔离</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:39:57.613Z" itemprop="dateUpdated">2026-08-29 13:39:57</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/" rel="tag">以太网</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" rel="tag">数据链路层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&title=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&title=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/ARP%E3%80%81DHCP%E4%B8%8EICMP/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ARP、DHCP与ICMP</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E4%BB%8B%E8%B4%A8%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">介质访问控制</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&title=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&title=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《局域网、以太网与交换机》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E5%B1%80%E5%9F%9F%E7%BD%91%E3%80%81%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%8E%E4%BA%A4%E6%8D%A2%E6%9C%BA/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>指令系统 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理,指令系统">
+    <meta name="description" content="指令系统（Instruction Set Architecture，ISA）是一台计算机中所有机器指令的集合，处于软件与硬件的分界面：上层软件按 ISA 编译，下层硬件按 ISA 实现，同一 ISA 可以有不同的微架构（如 Intel 与 AMD 都实现 x86）。本章 408 考查三大块：指令格式（操作码 + 地址码，扩展操作码计算必考）、寻址方式（十种寻址方式的 EA 与访存次数是绝对核心）、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="指令系统">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="指令系统（Instruction Set Architecture，ISA）是一台计算机中所有机器指令的集合，处于软件与硬件的分界面：上层软件按 ISA 编译，下层硬件按 ISA 实现，同一 ISA 可以有不同的微架构（如 Intel 与 AMD 都实现 x86）。本章 408 考查三大块：指令格式（操作码 + 地址码，扩展操作码计算必考）、寻址方式（十种寻址方式的 EA 与访存次数是绝对核心）、">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-29T13:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:13:37.817Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="指令系统">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">指令系统</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">指令系统</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T13:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8C%87%E4%BB%A4%E6%A0%BC%E5%BC%8F%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%A0%81%E4%B8%8E%E5%9C%B0%E5%9D%80%E7%A0%81"><span class="post-toc-number">1.</span> <span class="post-toc-text">指令格式：操作码与地址码</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9B%E5%9C%B0%E5%9D%80%E3%80%81%E4%B8%89%E5%9C%B0%E5%9D%80%E3%80%81%E4%BA%8C%E5%9C%B0%E5%9D%80%E3%80%81%E4%B8%80%E5%9C%B0%E5%9D%80%E4%B8%8E%E9%9B%B6%E5%9C%B0%E5%9D%80"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">四地址、三地址、二地址、一地址与零地址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9A%E9%95%BF%E6%93%8D%E4%BD%9C%E7%A0%81"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">定长操作码</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%89%A9%E5%B1%95%E6%93%8D%E4%BD%9C%E7%A0%81%EF%BC%88%E5%8F%98%E9%95%BF%E6%93%8D%E4%BD%9C%E7%A0%81%EF%BC%89"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">扩展操作码（变长操作码）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%89%A9%E5%B1%95%E6%93%8D%E4%BD%9C%E7%A0%81%E4%BE%8B%E9%A2%98%EF%BC%88%E8%AE%A1%E7%AE%97%E5%BF%85%E8%80%83%EF%BC%89"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">扩展操作码例题（计算必考）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8C%87%E4%BB%A4%E5%AF%BB%E5%9D%80%EF%BC%9A%E4%B8%8B%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%E5%9C%A8%E5%93%AA"><span class="post-toc-number">2.</span> <span class="post-toc-text">指令寻址：下一条指令在哪</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E5%AF%BB%E5%9D%80%EF%BC%9A%E5%8D%81%E7%A7%8D%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F"><span class="post-toc-number">3.</span> <span class="post-toc-text">数据寻址：十种寻址方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%9A%90%E5%90%AB%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">隐含寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AB%8B%E5%8D%B3%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">立即寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">直接寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%97%B4%E6%8E%A5%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">间接寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E5%AF%BB%E5%9D%80%E4%B8%8E%E5%AF%84%E5%AD%98%E5%99%A8%E9%97%B4%E6%8E%A5%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">寄存器寻址与寄存器间接寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%B8%E5%AF%B9%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">相对寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9F%BA%E5%9D%80%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.7.</span> <span class="post-toc-text">基址寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8F%98%E5%9D%80%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.8.</span> <span class="post-toc-text">变址寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A0%86%E6%A0%88%E5%AF%BB%E5%9D%80"><span class="post-toc-number">3.9.</span> <span class="post-toc-text">堆栈寻址</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8D%81%E7%A7%8D%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F%E5%A4%A7%E5%AF%B9%E6%AF%94"><span class="post-toc-number">3.10.</span> <span class="post-toc-text">十种寻址方式大对比</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%B8%E5%AF%B9%E3%80%81%E5%9F%BA%E5%9D%80%E3%80%81%E5%8F%98%E5%9D%80%EF%BC%9A%E4%B8%80%E5%BC%A0%E8%A1%A8%E8%BE%A8%E6%9E%90"><span class="post-toc-number">3.11.</span> <span class="post-toc-text">相对、基址、变址：一张表辨析</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F%E6%9C%89%E6%95%88%E5%9C%B0%E5%9D%80%E4%BE%8B%E9%A2%98"><span class="post-toc-number">4.</span> <span class="post-toc-text">寻址方式有效地址例题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CISC-%E5%92%8C-RISC"><span class="post-toc-number">5.</span> <span class="post-toc-text">CISC 和 RISC</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-指令系统"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">指令系统</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 21:30:00" datetime="2026-08-29T13:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>指令系统（Instruction Set Architecture，ISA）<strong>是一台计算机中</strong>所有机器指令的集合</strong>，处于软件与硬件的<strong>分界面</strong>：上层软件按 ISA 编译，下层硬件按 ISA 实现，同一 ISA 可以有不同的微架构（如 Intel 与 AMD 都实现 x86）。本章 408 考查三大块：<strong>指令格式（操作码 + 地址码，扩展操作码计算必考）、寻址方式（十种寻址方式的 EA 与访存次数是绝对核心）、CISC 与 RISC（对比表）</strong>。</p>
+<p>约定记号：<strong>(X)</strong> 表示寄存器 X 的内容，<strong>M[a]</strong> 表示主存地址 a 的单元内容，<strong>A</strong> 为指令中给出的<strong>形式地址</strong>，<strong>EA（Effective Address）</strong> 为操作数的<strong>有效地址</strong>（最终访问主存的真实地址）。</p>
+<h2 id="指令格式：操作码与地址码"><a href="#指令格式：操作码与地址码" class="headerlink" title="指令格式：操作码与地址码"></a>指令格式：操作码与地址码</h2><p>一条机器指令由<strong>操作码</strong>和<strong>地址码</strong>两部分组成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+-------------+--------------------------+</span><br><span class="line">|   操作码 OP  |         地址码 A          |</span><br><span class="line">+-------------+--------------------------+</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作码</strong>：指明指令”做什么”（加&#x2F;减&#x2F;传送&#x2F;跳转……），是指令中<strong>必须</strong>有的字段</li>
+<li><strong>地址码</strong>：指明操作数（及结果）”在哪里”——可以是<strong>主存地址</strong>，也可以是<strong>寄存器编号</strong>，还可以是<strong>立即数</strong>本身</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：地址码字段给出的不一定都是主存地址。给出<strong>寄存器编号</strong>时操作数在 CPU 内部，执行阶段<strong>无需访存</strong>；给出<strong>立即数</strong>时操作数直接藏在指令里，连主存都不用碰。</p>
+</blockquote>
+<h3 id="四地址、三地址、二地址、一地址与零地址"><a href="#四地址、三地址、二地址、一地址与零地址" class="headerlink" title="四地址、三地址、二地址、一地址与零地址"></a>四地址、三地址、二地址、一地址与零地址</h3><table>
+<thead>
+<tr>
+<th align="left">指令格式</th>
+<th align="left">字段形式</th>
+<th align="left">操作语义</th>
+<th align="left">特点与适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>四地址</strong></td>
+<td align="left">OP A1 A2 A3 A4</td>
+<td align="left">(A1) OP (A2) → A3；A4 &#x3D; 下一条指令地址</td>
+<td align="left">早期机器用；地址字段太多、字长压力大，已被 PC 取代</td>
+</tr>
+<tr>
+<td align="left"><strong>三地址</strong></td>
+<td align="left">OP A1 A2 A3</td>
+<td align="left">(A1) OP (A2) → A3</td>
+<td align="left">最直观，源操作数不被破坏；RISC 常用（结果写独立寄存器）</td>
+</tr>
+<tr>
+<td align="left"><strong>二地址</strong></td>
+<td align="left">OP A1 A2</td>
+<td align="left">(A1) OP (A2) → A1</td>
+<td align="left"><strong>最常用</strong>（x86 风格）；结果<strong>覆盖</strong>源操作数 A1；按操作数物理位置分 SS（存-存）&#x2F;RS（寄-存）&#x2F;RR（寄-寄）</td>
+</tr>
+<tr>
+<td align="left"><strong>一地址</strong></td>
+<td align="left">OP A</td>
+<td align="left">隐含累加器：ACC OP (A) → ACC；或单目：(A) OP → A</td>
+<td align="left">单操作数指令（INC、NOT）；隐含 ACC 可省一个地址字段</td>
+</tr>
+<tr>
+<td align="left"><strong>零地址</strong></td>
+<td align="left">OP</td>
+<td align="left">无操作数或操作数<strong>隐含</strong></td>
+<td align="left">NOP、HALT 等无操作数指令；<strong>堆栈计算机</strong>的 PUSH&#x2F;POP（操作数隐含在栈顶）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：零地址指令 ≠ 没有操作数——要么真的<strong>不需要操作数</strong>（空操作、停机），要么操作数<strong>隐含约定</strong>（堆栈操作隐含 SP 指向的栈顶）。<br><strong>易错点</strong>：二地址指令 <code>ADD A1, A2</code> 执行后 <strong>A1 原内容被结果覆盖</strong>；三地址指令的源操作数则保持不变。</p>
+</blockquote>
+<p>计算 C &#x3D; A + B 的对比（二地址需 3 条，三地址 1 条）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">二地址（x86 风格）            三地址（MIPS 风格）</span><br><span class="line">MOV  C, A                    ADD  C, A, B     ; C ← A + B，一条完成</span><br><span class="line">ADD  C, B                    （前提：地址字段/寄存器足够多）</span><br></pre></td></tr></table></figure>
+
+<h3 id="定长操作码"><a href="#定长操作码" class="headerlink" title="定长操作码"></a>定长操作码</h3><p>所有指令的操作码<strong>位数相同、位置固定</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 位操作码最多表示 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 条指令。</p>
+<table>
+<thead>
+<tr>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">译码简单、速度快；格式规整，<strong>利于流水线</strong>（RISC 采用，如 MIPS 固定 6 位操作码）</td>
+<td align="left">操作码占位多了地址码就少；指令数不足 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 时编码空间浪费</td>
+</tr>
+</tbody></table>
+<h3 id="扩展操作码（变长操作码）"><a href="#扩展操作码（变长操作码）" class="headerlink" title="扩展操作码（变长操作码）"></a>扩展操作码（变长操作码）</h3><p>操作码位数<strong>可变</strong>：<strong>短操作码留给高频指令，长操作码留给低频指令</strong>——这是<strong>哈夫曼编码</strong>“高频短码、低频长码”思想的应用，可在有限指令字长内容纳更多指令种类。</p>
+<ul>
+<li><strong>前缀编码原则</strong>：任一短操作码都<strong>不能</strong>是更长操作码的<strong>前缀</strong>，否则译码时产生二义性（无法判断这条指令的操作码到底多长）</li>
+<li>常用扩展手法：<strong>每级留下”全 1”码点不用</strong>，把它作为下一级扩展的公共前缀，”借”地址码字段继续当操作码用</li>
+<li>代价：硬件需逐级判断，译码复杂，不利于流水线</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：判断一组操作码是否合法，就看<strong>短码是否为长码的前缀</strong>。例如 4 位码 1111 已用作扩展前缀，就绝不能再定义成一条 4 位操作码的指令。<br><strong>易错点</strong>：扩展不是随意留码点——某一级<strong>剩余码点数 × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">借位位数</span></span></span></span></span></span></span></span></span></span></span></span></strong> 才是下一级可用的总码点数，做题必须<strong>逐级清算剩余空间</strong>。</p>
+</blockquote>
+<h3 id="扩展操作码例题（计算必考）"><a href="#扩展操作码例题（计算必考）" class="headerlink" title="扩展操作码例题（计算必考）"></a>扩展操作码例题（计算必考）</h3><p><strong>题目（正向）</strong>：指令字长 16 位，每个地址码字段 4 位。若三地址指令 15 条、二地址指令 8 条、一地址指令 127 条，其余编码全部留给零地址指令，问各级操作码位数各是多少？零地址指令最多有多少条？</p>
+<p><strong>解</strong>（逐级扩展、逐级清算剩余空间）：</p>
+<p><strong>第一级（三地址，操作码 4 位）</strong>：4 位操作码共 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 个码点，三地址指令用 15 条，编号 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1110</span></span></span></span>；剩 <strong>1 个码点 1111</strong> 作扩展前缀。</p>
+<p><strong>第二级（二地址，操作码 8 位）</strong>：前缀 1111 借地址码 A1 的 4 位，得 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 个 8 位码点；二地址指令用 8 条，编号 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">0000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">0111</span></span></span></span>；剩 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> 个码点（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span></span></span></span>）继续扩展。</p>
+<p><strong>第三级（一地址，操作码 12 位）</strong>：8 个前缀各借 A2 的 4 位，得 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">128</span></span></span></span> 个 12 位码点；一地址指令用 127 条，编号 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1000</span><span class="mspace"> </span><span class="mord">0000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1110</span></span></span></span>；剩 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">128</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">127</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个码点（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span></span></span></span>）继续扩展。</p>
+<p><strong>第四级（零地址，操作码 16 位）</strong>：1 个前缀借 A3 的 4 位，得 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 个 16 位码点，全部给零地址指令。</p>
+<table>
+<thead>
+<tr>
+<th align="left">指令类型</th>
+<th align="center">操作码位数</th>
+<th align="center">已用条数（本级共）</th>
+<th align="center">剩余码点</th>
+<th align="left">扩展去向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">三地址</td>
+<td align="center">4</td>
+<td align="center">15（共 16）</td>
+<td align="center">1（1111）</td>
+<td align="left">借 4 位 → 8 位级 16 码点</td>
+</tr>
+<tr>
+<td align="left">二地址</td>
+<td align="center">8</td>
+<td align="center">8（共 16）</td>
+<td align="center">8</td>
+<td align="left">借 4 位 → 12 位级 128 码点</td>
+</tr>
+<tr>
+<td align="left">一地址</td>
+<td align="center">12</td>
+<td align="center">127（共 128）</td>
+<td align="center">1（全 1）</td>
+<td align="left">借 4 位 → 16 位级 16 码点</td>
+</tr>
+<tr>
+<td align="left">零地址</td>
+<td align="center">16</td>
+<td align="center">最多 <strong>16</strong>（共 16）</td>
+<td align="center">0</td>
+<td align="left">末级可用满</td>
+</tr>
+</tbody></table>
+<p><strong>答</strong>：操作码依次为 <strong>4 &#x2F; 8 &#x2F; 12 &#x2F; 16 位</strong>，零地址指令最多 <strong>16 条</strong>。所有指令的操作码互不为前缀，可唯一译码 ✓</p>
+<p><strong>题目（反向）</strong>：同为 16 位指令字长、每个地址字段 4 位。若三地址 15 条、二地址 15 条、一地址 12 条，求零地址指令最多多少条？</p>
+<p><strong>解</strong>：4 位级剩 1 个前缀 1111 → 8 位级共 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 个码点，用 15 条剩 1 个前缀 1111 1111 → 12 位级共 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 个码点，用 12 条<strong>剩 4 个前缀</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1100</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span><span class="mspace"> </span><span class="mord">1111</span></span></span></span>）→ 16 位级码点 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">64</span></span></span></span></span>，零地址指令最多 <strong>64 条</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：反向题的关键是算出中间某一级<strong>剩下几个前缀</strong>——每个剩余前缀都能再分裂出 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">地址字段位数</span></span></span></span></span></span></span></span></span></span></span></span> 个下一级码点。若反过来”给零地址条数求一地址最多几条”，思路相同、自底向上逐级回推即可。</p>
+</blockquote>
+<h2 id="指令寻址：下一条指令在哪"><a href="#指令寻址：下一条指令在哪" class="headerlink" title="指令寻址：下一条指令在哪"></a>指令寻址：下一条指令在哪</h2><p><strong>指令寻址</strong>解决”下一条指令的地址如何形成”，只有两种方式：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">机制</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>顺序寻址</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span></span></span></span></td>
+<td align="left">这里的”1”指<strong>一条指令的长度</strong>：按字编址时 +1；按字节编址且指令变长时，取指后 PC 自动加<strong>该指令的实际字节数</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>跳跃寻址</strong></td>
+<td align="left">转移指令直接修改 PC</td>
+<td align="left">由转移指令（JMP、条件转移、CALL、RET 等）给出目标地址，PC 被赋值为跳转目标而非递增</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：”PC+1”的 1 不是恒等于 1 字节。定长指令按字编址时 +1 即可；x86 这类变长指令集，取指后 PC 要加<strong>本条指令的实际长度</strong>。<br><strong>考点</strong>：转移指令的目标地址常用<strong>相对寻址</strong>给出（目标 &#x3D; 取指后的 PC + 偏移量 A），程序整体搬到内存任何位置都能正确跳转——这就是**位置无关代码（PIC）**的基础。</p>
+</blockquote>
+<h2 id="数据寻址：十种寻址方式"><a href="#数据寻址：十种寻址方式" class="headerlink" title="数据寻址：十种寻址方式"></a>数据寻址：十种寻址方式</h2><p><strong>数据寻址</strong>解决”操作数在哪里”。指令中给出的地址叫<strong>形式地址 A</strong>，经寻址方式变换后得到<strong>有效地址 EA</strong>；指令中通常设<strong>寻址特征字段</strong>指明本操作数采用哪种寻址方式。</p>
+<h3 id="隐含寻址"><a href="#隐含寻址" class="headerlink" title="隐含寻址"></a>隐含寻址</h3><p>操作数地址由操作码<strong>隐含约定</strong>（不显式给出），最常见的是隐含<strong>累加器 ACC</strong>：<code>ADD A</code> 实为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">[</span><span class="mord mathnormal">A</span><span class="mclose">]</span></span></span></span>。优点是<strong>缩短指令字长</strong>，缺点是不够灵活。堆栈类指令隐含 SP、单地址指令隐含 ACC，都是典型。</p>
+<h3 id="立即寻址"><a href="#立即寻址" class="headerlink" title="立即寻址"></a>立即寻址</h3><p>操作数本身就在指令的地址码字段（<strong>立即数</strong>），取指后立即可用，执行阶段 <strong>0 次访存、速度最快</strong>。用途：给变量赋<strong>初值、常量</strong>（如 <code>MOV AX, 5</code>）。缺点：立即数位数 &#x3D; A 的位数，表示范围受限；补码立即数还需符号扩展。</p>
+<blockquote>
+<p><strong>考点</strong>：立即寻址中地址码是<strong>操作数本身</strong>而非地址——它是”没有有效地址 EA”的唯一常见情形。</p>
+</blockquote>
+<h3 id="直接寻址"><a href="#直接寻址" class="headerlink" title="直接寻址"></a>直接寻址</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span>
+<p>形式地址就是有效地址，执行阶段<strong>访存 1 次</strong>取操作数。优点：简单直观，无需计算；缺点：寻址范围受 A 位数限制（A 有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 位只能访问 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个单元），且地址写死在指令里，不便于程序浮动。</p>
+<h3 id="间接寻址"><a href="#间接寻址" class="headerlink" title="间接寻址"></a>间接寻址</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mclose">)</span></span></span></span></span>
+<p>形式地址指向的<strong>主存单元里存的才是有效地址</strong>——“地址的地址”。</p>
+<ul>
+<li><strong>一次间接</strong>：先访存读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">[</span><span class="mord mathnormal">A</span><span class="mclose">]</span></span></span></span> 得 EA，再访存取操作数 → 执行阶段共 <strong>2 次访存</strong></li>
+<li><strong>多次间接</strong>：主存单元的最高位作<strong>间址特征位</strong>，为 1 继续间接、为 0 则该单元内容即 EA；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 次间接执行阶段访存 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 次</li>
+<li>优点：<strong>扩大寻址范围</strong>（短 A 经中转可覆盖全地址空间）、便于实现指针与子程序跳转；缺点：多次访存，速度最慢</li>
+</ul>
+<h3 id="寄存器寻址与寄存器间接寻址"><a href="#寄存器寻址与寄存器间接寻址" class="headerlink" title="寄存器寻址与寄存器间接寻址"></a>寄存器寻址与寄存器间接寻址</h3><ul>
+<li><strong>寄存器（直接）寻址</strong>：地址码给出<strong>寄存器编号 R</strong>，操作数就在寄存器中：操作数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span></span></span></span>，<strong>0 次访存</strong>，速度最快；寄存器编号位数远小于主存地址位数，<strong>指令更短</strong>；受限于寄存器个数</li>
+<li><strong>寄存器间接寻址</strong>：寄存器里存的<strong>是地址</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span></span></span></span>，执行阶段<strong>访存 1 次</strong>；寻址范围取决于寄存器位宽（位宽足够即可覆盖全部主存）；比间接寻址少访存一次，是指针的常用实现</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：两者只差”一层括号”——寄存器寻址的寄存器里是<strong>操作数</strong>（0 次访存），寄存器间接寻址的寄存器里是<strong>操作数的地址</strong>（1 次访存）。</p>
+</blockquote>
+<h3 id="相对寻址"><a href="#相对寻址" class="headerlink" title="相对寻址"></a>相对寻址</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span>
+<p>以 <strong>PC 的内容为基准、A 为偏移量</strong>（补码，可正可负）。注意计算时 PC 已完成取指后的自增，即基准是<strong>下一条指令的地址</strong>，不是本条指令的地址。用途：<strong>转移指令</strong>给定跳转距离；程序整体<strong>浮动</strong>（搬到内存任意处）后仍能正确转移——<strong>位置无关</strong>。</p>
+<h3 id="基址寻址"><a href="#基址寻址" class="headerlink" title="基址寻址"></a>基址寻址</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span>
+<p>以<strong>基址寄存器 BR 的内容为基准</strong>、A 为位移量。BR 由<strong>操作系统</strong>设置（专用寄存器或指定的通用寄存器），<strong>用户程序不能修改</strong>其内容。用途：<strong>多道程序环境下的程序重定位</strong>——程序装入哪里，OS 就把基址设成哪里，程序内地址不变；BR 位数可大于 A，从而<strong>扩大寻址范围</strong>。<strong>面向系统</strong>，对用户透明。</p>
+<h3 id="变址寻址"><a href="#变址寻址" class="headerlink" title="变址寻址"></a>变址寻址</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span>
+<p>以<strong>形式地址 A 为基准</strong>、<strong>变址寄存器 IX 的内容为位移量</strong>——与基址正好”反过来”。<strong>IX 由用户设定和修改</strong>，对用户可见，执行中还可自增（自动变址）；A 指向数组<strong>首元素</strong>。用途：<strong>数组、循环</strong>处理——循环体不变，每轮 IX 加 1 即可依次访问各元素。<strong>面向用户</strong>。</p>
+<h3 id="堆栈寻址"><a href="#堆栈寻址" class="headerlink" title="堆栈寻址"></a>堆栈寻址</h3><p>操作数隐含在<strong>堆栈栈顶</strong>，由<strong>堆栈指针 SP</strong> 指示：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span></span></span></span></span>
+<ul>
+<li><strong>软堆栈</strong>（主存中划出栈区）：执行阶段访存 1 次；<strong>硬堆栈</strong>（寄存器堆实现）：0 次访存</li>
+<li>压栈 <code>PUSH</code>：先 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span>（按字节编址存 16 位数则 -2），再存数；出栈 <code>POP</code>：先取数，再 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span>——<strong>先进后出（LIFO）</strong>，栈通常向低地址生长</li>
+<li>用途：<strong>函数调用的参数传递与返回地址保存、表达式求值</strong>（零地址计算机的基础）</li>
+</ul>
+<h3 id="十种寻址方式大对比"><a href="#十种寻址方式大对比" class="headerlink" title="十种寻址方式大对比"></a>十种寻址方式大对比</h3><table>
+<thead>
+<tr>
+<th align="left">寻址方式</th>
+<th align="left">有效地址 EA</th>
+<th align="center">访存次数（取指令之外）</th>
+<th align="left">特点 &#x2F; 用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">隐含寻址</td>
+<td align="left">操作数隐含在约定位置（ACC、栈顶）</td>
+<td align="center">0</td>
+<td align="left">缩短指令字长；不够灵活</td>
+</tr>
+<tr>
+<td align="left">立即寻址</td>
+<td align="left">无（A 即操作数）</td>
+<td align="center"><strong>0</strong></td>
+<td align="left">最快；装常量&#x2F;初值；范围受 A 位数限制</td>
+</tr>
+<tr>
+<td align="left">直接寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="center"><strong>1</strong></td>
+<td align="left">简单；寻址范围受 A 位数限制</td>
+</tr>
+<tr>
+<td align="left">间接寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mclose">)</span></span></span></span></td>
+<td align="center"><strong>2</strong>（n 次间接 n+1）</td>
+<td align="left">扩大寻址范围、指针；最慢</td>
+</tr>
+<tr>
+<td align="left">寄存器寻址</td>
+<td align="left">无（操作数 &#x3D; (R)）</td>
+<td align="center"><strong>0</strong></td>
+<td align="left">最快、指令短；寄存器个数有限</td>
+</tr>
+<tr>
+<td align="left">寄存器间接寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span></span></span></span></td>
+<td align="center"><strong>1</strong></td>
+<td align="left">寄存器给地址；范围 &#x3D; 寄存器位宽</td>
+</tr>
+<tr>
+<td align="left">相对寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="center"><strong>1</strong></td>
+<td align="left">转移指令、程序浮动、位置无关</td>
+</tr>
+<tr>
+<td align="left">基址寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="center"><strong>1</strong></td>
+<td align="left">重定位、多道程序；面向 OS；扩大寻址范围</td>
+</tr>
+<tr>
+<td align="left">变址寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="center"><strong>1</strong></td>
+<td align="left">数组&#x2F;循环；面向用户；IX 可变</td>
+</tr>
+<tr>
+<td align="left">堆栈寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span></span></span></span></td>
+<td align="center"><strong>1</strong>（软堆栈）</td>
+<td align="left">LIFO；函数调用、参数传递、表达式求值</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：访存次数速记——<strong>立即、寄存器（含隐含 ACC）0 次；直接、寄存器间接、相对、基址、变址、堆栈各 1 次；一次间接 2 次</strong>（均不含取指令本身的访存）。</p>
+</blockquote>
+<h3 id="相对、基址、变址：一张表辨析"><a href="#相对、基址、变址：一张表辨析" class="headerlink" title="相对、基址、变址：一张表辨析"></a>相对、基址、变址：一张表辨析</h3><p>三者都是”两量相加”，区别在<strong>谁作基准、谁作偏移、面向谁</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">相对寻址</th>
+<th align="left">基址寻址</th>
+<th align="left">变址寻址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">有效地址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">作<strong>基准</strong>的量</td>
+<td align="left">PC 内容（自动指向下一条指令）</td>
+<td align="left"><strong>基址寄存器内容</strong>（OS 装入，用户不可改）</td>
+<td align="left"><strong>形式地址 A</strong>（程序员&#x2F;编译器给出）</td>
+</tr>
+<tr>
+<td align="left">作<strong>偏移</strong>的量</td>
+<td align="left">形式地址 A（补码，可正可负）</td>
+<td align="left">形式地址 A</td>
+<td align="left"><strong>变址寄存器内容 (IX)</strong>（用户可改、可自增）</td>
+</tr>
+<tr>
+<td align="left">面向对象</td>
+<td align="left">用户（转移指令）</td>
+<td align="left"><strong>系统</strong>（对用户透明）</td>
+<td align="left"><strong>用户</strong>（IX 对用户可见）</td>
+</tr>
+<tr>
+<td align="left">典型用途</td>
+<td align="left">转移指令、程序浮动、位置无关代码</td>
+<td align="left">多道程序<strong>重定位</strong>、扩大寻址范围</td>
+<td align="left"><strong>数组遍历、循环</strong>处理</td>
+</tr>
+<tr>
+<td align="left">一句话记忆</td>
+<td align="left">PC 基准、A 偏移</td>
+<td align="left">BR 基准、A 偏移</td>
+<td align="left">A 基准、IX 偏移</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：基址与变址公式形如孪生，判别口诀——<strong>“基址锁基准（BR 是基准、系统管），变址锁偏移（IX 是偏移、用户管）”</strong>；相对寻址的基准 PC 会<strong>自动加 1</strong>，算转移目标时基准是取指后的 PC。</p>
+</blockquote>
+<h2 id="寻址方式有效地址例题"><a href="#寻址方式有效地址例题" class="headerlink" title="寻址方式有效地址例题"></a>寻址方式有效地址例题</h2><p><strong>题目</strong>：某机主存按字编址，指令字长 16 位，地址码字段 A &#x3D; 1234H。执行某条操作数访问指令时，有关寄存器与主存内容如下，求各寻址方式下的 EA 与操作数（访存次数不含取指令）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">寄存器</th>
+<th align="center">PC</th>
+<th align="center">BR（基址）</th>
+<th align="center">IX（变址）</th>
+<th align="center">SP</th>
+<th align="center">R0</th>
+<th align="center">R1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内容</td>
+<td align="center">2000H</td>
+<td align="center">3000H</td>
+<td align="center">1000H</td>
+<td align="center">5F00H</td>
+<td align="center">1234H</td>
+<td align="center">0088H</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">主存地址</th>
+<th align="center">1234H</th>
+<th align="center">5678H</th>
+<th align="center">3234H</th>
+<th align="center">4234H</th>
+<th align="center">5F00H</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内容</td>
+<td align="center">5678H</td>
+<td align="center">1234H</td>
+<td align="center">7FF0H</td>
+<td align="center">0C00H</td>
+<td align="center">1234H</td>
+</tr>
+</tbody></table>
+<p><strong>逐个推演</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">寻址方式</th>
+<th align="left">EA 计算</th>
+<th align="center">EA</th>
+<th align="left">操作数</th>
+<th align="center">访存</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">立即</td>
+<td align="left">A 即操作数</td>
+<td align="center">—</td>
+<td align="left"><strong>1234H</strong></td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="left">直接</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>1234H</strong></td>
+<td align="left">M[1234H] &#x3D; <strong>5678H</strong></td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">一次间接</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mopen">[</span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">5678</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>5678H</strong></td>
+<td align="left">M[5678H] &#x3D; <strong>1234H</strong></td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="left">寄存器</td>
+<td align="left">操作数 &#x3D; (R1) &#x3D; 0088H</td>
+<td align="center">—</td>
+<td align="left"><strong>0088H</strong></td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="left">寄存器间接</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>1234H</strong></td>
+<td align="left">M[1234H] &#x3D; <strong>5678H</strong></td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">相对</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">2000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>3234H</strong></td>
+<td align="left">M[3234H] &#x3D; <strong>7FF0H</strong></td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">基址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">3000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>4234H</strong></td>
+<td align="left">M[4234H] &#x3D; <strong>0C00H</strong></td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">变址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">1000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>2234H</strong></td>
+<td align="left">M[2234H]（表中未列出）</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">堆栈</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">5</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">00</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span></td>
+<td align="center"><strong>5F00H</strong></td>
+<td align="left">M[5F00H] &#x3D; <strong>1234H</strong></td>
+<td align="center">1</td>
+</tr>
+</tbody></table>
+<p><strong>验算（十六进制加法，逢十六进一）</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">2000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">3234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">3000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">1000</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">1234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2234</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span> ✓</p>
+<blockquote>
+<p><strong>易错点</strong>：间接寻址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mclose">)</span></span></span></span> 要<strong>先访存一次</strong>拿地址，不能直接写 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span>；相对寻址的基准是<strong>取指后的 PC</strong>（本例指令为单字长，取指后 PC 已指向下一条）；直接与寄存器间接结果虽同（都到 1234H），但前者地址来自<strong>指令字段</strong>、后者来自<strong>寄存器</strong>。</p>
+</blockquote>
+<p><strong>相对寻址转移范围小例</strong>：转移指令存放在主存 <strong>2000H</strong> 单元（按字编址），取出该指令后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2001</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span>。若偏移量 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">3</span></span></span></span>（补码），转移目标 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">2001</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">−</span><span class="mord">3</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6861em;"></span><span class="mord"><span class="mord mathbf">1FFEH</span></span></span></span></span>（<strong>向后</strong>跳 3 个单元）；若 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">5</span></span></span></span>，目标 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2006</span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span></span></span></span>（向前跳 5 个单元）。A 为 8 位补码时偏移范围 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">128</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">127</span></span></span></span>，即相对取指后的 PC <strong>最多向后 128、向前 127 个单元</strong>。</p>
+<h2 id="CISC-和-RISC"><a href="#CISC-和-RISC" class="headerlink" title="CISC 和 RISC"></a>CISC 和 RISC</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">CISC（复杂指令集计算机）</th>
+<th align="left">RISC（精简指令集计算机）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">指令系统规模</td>
+<td align="left"><strong>多</strong>（一般 200 条以上）</td>
+<td align="left"><strong>少</strong>（一般少于 100 条）</td>
+</tr>
+<tr>
+<td align="left">指令长度</td>
+<td align="left"><strong>可变</strong>（x86 为 1&#126;15 字节）</td>
+<td align="left"><strong>定长</strong>（如 MIPS 固定 32 位）</td>
+</tr>
+<tr>
+<td align="left">指令使用频率</td>
+<td align="left">差别大（少数指令占绝大多数执行时间）</td>
+<td align="left">精简后使用频率较均衡</td>
+</tr>
+<tr>
+<td align="left">指令执行时间</td>
+<td align="left">相差悬殊（多数指令多个周期）</td>
+<td align="left"><strong>绝大多数一个时钟周期</strong></td>
+</tr>
+<tr>
+<td align="left">寻址方式</td>
+<td align="left">多（可达十种以上）</td>
+<td align="left"><strong>少</strong>（通常仅两三种）</td>
+</tr>
+<tr>
+<td align="left">通用寄存器数量</td>
+<td align="left">少</td>
+<td align="left"><strong>多</strong>（32 个以上）</td>
+</tr>
+<tr>
+<td align="left">访存限制</td>
+<td align="left"><strong>多数指令都能访存</strong></td>
+<td align="left"><strong>仅 Load &#x2F; Store 指令访存</strong>，运算只在寄存器间进行</td>
+</tr>
+<tr>
+<td align="left">控制方式</td>
+<td align="left"><strong>微程序控制</strong>为主（便于实现复杂指令）</td>
+<td align="left">**组合逻辑（硬布线）**为主（速度快）</td>
+</tr>
+<tr>
+<td align="left">流水线</td>
+<td align="left">指令长短、周期不一，难以流水优化</td>
+<td align="left">指令规整、单周期，<strong>便于流水线</strong></td>
+</tr>
+<tr>
+<td align="left">编译与代码密度</td>
+<td align="left">编译简单、目标程序短（省空间）；难以做指令级优化</td>
+<td align="left"><strong>必须优化编译</strong>、目标程序较长；时间与指令执行效率高</td>
+</tr>
+<tr>
+<td align="left">代表</td>
+<td align="left">x86 &#x2F; x86-64</td>
+<td align="left">MIPS、ARM、RISC-V、PowerPC</td>
+</tr>
+</tbody></table>
+<p><strong>RISC 的核心特征</strong>：指令<strong>定长</strong>、种类少、格式规整；<strong>Load&#x2F;Store 体系</strong>——只有取数&#x2F;存数指令访问主存，ALU 运算一律在寄存器间进行；设置<strong>大量通用寄存器</strong>减少访存；控制器以<strong>组合逻辑</strong>实现；高度依赖<strong>优化编译</strong>；天然适配<strong>流水线</strong>。从<strong>时间</strong>看，RISC 用多条简单指令替换 CISC 的一条复杂指令，单条更快、总周期数可更少；从<strong>空间</strong>看，CISC 代码密度更高；从<strong>指令效率</strong>看，RISC 把高频简单指令做到极致。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CISC:  ADD [1000H], AX        ; 一条指令：读内存 + 加法 + 写回内存</span><br><span class="line">RISC:  LOAD R1, [1000H]       ; 取数：主存 → 寄存器</span><br><span class="line">       ADD  R2, R2, R1        ; 运算：寄存器之间</span><br><span class="line">       STORE [1000H], R2      ; 存数：寄存器 → 主存</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：RISC 便于流水线的根源是<strong>指令定长 + 执行单周期 + 仅 Load&#x2F;Store 访存</strong>；CISC 用<strong>微程序</strong>控制，RISC 用**组合逻辑（硬布线）**控制。现代 CPU 走向融合：x86 内部把复杂指令翻译成类 RISC 微操作执行。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">指令基本格式</td>
+<td align="left"><strong>操作码</strong>（做什么）+ <strong>地址码</strong>（在哪）；地址码可以是主存地址、寄存器编号或立即数</td>
+</tr>
+<tr>
+<td align="left">零地址指令</td>
+<td align="left">无操作数（NOP、HALT）或操作数隐含（<strong>堆栈 PUSH&#x2F;POP 隐含 SP</strong>）</td>
+</tr>
+<tr>
+<td align="left">二地址 vs 三地址</td>
+<td align="left">二地址<strong>结果覆盖源操作数</strong>（x86 风格）；三地址结果独立（RISC 常用）</td>
+</tr>
+<tr>
+<td align="left">定长操作码</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 位 → 最多 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 条指令；规整、译码快、利于流水线（MIPS 6 位）</td>
+</tr>
+<tr>
+<td align="left">扩展操作码</td>
+<td align="left"><strong>短码给高频、长码给低频</strong>（哈夫曼思想）；<strong>短码不能是长码的前缀</strong></td>
+</tr>
+<tr>
+<td align="left">扩展计算口诀</td>
+<td align="left">逐级清算：剩余码点 × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">借位位数</span></span></span></span></span></span></span></span></span></span></span></span> &#x3D; 下一级码点；全 1 常作扩展前缀</td>
+</tr>
+<tr>
+<td align="left">经典数字</td>
+<td align="left">16 位指令：15 三 + 8 二 + 127 一 → 零地址最多 <strong>16 条</strong>；15&#x2F;15&#x2F;12 → <strong>64 条</strong></td>
+</tr>
+<tr>
+<td align="left">指令寻址</td>
+<td align="left">顺序 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（1 &#x3D; 一条指令长度）；<strong>跳跃</strong>由转移指令直接改 PC</td>
+</tr>
+<tr>
+<td align="left">访存次数</td>
+<td align="left">立即&#x2F;寄存器&#x2F;隐含 <strong>0</strong>；直接&#x2F;寄存器间接&#x2F;相对&#x2F;基址&#x2F;变址&#x2F;堆栈 <strong>1</strong>；一次间接 <strong>2</strong></td>
+</tr>
+<tr>
+<td align="left">立即寻址</td>
+<td align="left">地址码即操作数，0 次访存最快，装常量；范围受字段位数限制</td>
+</tr>
+<tr>
+<td align="left">间接寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mclose">)</span></span></span></span>”地址的地址”，扩大寻址范围，2 次访存最慢</td>
+</tr>
+<tr>
+<td align="left">基址 vs 变址</td>
+<td align="left">基址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span>：<strong>BR 基准、系统管</strong>、重定位；变址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span>：<strong>A 基准、用户管</strong>、数组循环</td>
+</tr>
+<tr>
+<td align="left">相对寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span>，基准是<strong>取指后的 PC</strong>；转移指令、位置无关代码</td>
+</tr>
+<tr>
+<td align="left">转移范围</td>
+<td align="left">8 位补码偏移 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">128</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">127</span></span></span></span>：向后最多 128、向前最多 127 个单元</td>
+</tr>
+<tr>
+<td align="left">堆栈寻址</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span></span></span></span>，LIFO；PUSH 先减 SP 再存、POP 先取再加；函数调用传参</td>
+</tr>
+<tr>
+<td align="left">CISC vs RISC</td>
+<td align="left">多&#x2F;变长&#x2F;微程序&#x2F;多数指令可访存 vs 少&#x2F;定长&#x2F;<strong>硬布线</strong>&#x2F;<strong>仅 Load&#x2F;Store 访存</strong>；RISC 利于流水线</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:13:37.817Z" itemprop="dateUpdated">2026-08-29 16:13:37</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" rel="tag">指令系统</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&title=《指令系统》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&title=《指令系统》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《指令系统》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">CPU结构与控制器</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/Cache%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Cache与虚拟存储器</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&title=《指令系统》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&title=《指令系统》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《指令系统》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

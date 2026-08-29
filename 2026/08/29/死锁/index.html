@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>死锁 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统,死锁">
+    <meta name="description" content="死锁（Deadlock）是指多个进程互相等待对方占有的资源，且都不释放自己已占有的资源，导致所有进程都无法向前推进的僵局。它与临界资源、进程同步紧密相关，是 408 操作系统的必考模块。408 对死锁的考查集中在：死锁的概念与四个必要条件、死锁预防（破坏必要条件）、死锁避免（安全序列与银行家算法完整计算）、死锁的检测与解除，以及死锁与饥饿、死循环的辨析——其中银行家算法的大题几乎年年出现。 死锁的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="死锁">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="死锁（Deadlock）是指多个进程互相等待对方占有的资源，且都不释放自己已占有的资源，导致所有进程都无法向前推进的僵局。它与临界资源、进程同步紧密相关，是 408 操作系统的必考模块。408 对死锁的考查集中在：死锁的概念与四个必要条件、死锁预防（破坏必要条件）、死锁避免（安全序列与银行家算法完整计算）、死锁的检测与解除，以及死锁与饥饿、死循环的辨析——其中银行家算法的大题几乎年年出现。 死锁的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC2%E7%AB%A0%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.assets/deadlock-%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE.png">
+<meta property="article:published_time" content="2026-08-29T08:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T06:58:07.350Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="死锁">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC2%E7%AB%A0%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.assets/deadlock-%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">死锁</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">死锁</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T08:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.</span> <span class="post-toc-text">死锁的概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%AD%BB%E9%94%81"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">什么是死锁</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E4%BA%A7%E7%94%9F%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">死锁产生的原因</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">死锁的四个必要条件</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E7%9A%84%E5%A4%84%E7%90%86%E7%AD%96%E7%95%A5%E6%80%BB%E8%A7%88"><span class="post-toc-number">2.</span> <span class="post-toc-text">死锁的处理策略总览</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E9%A2%84%E9%98%B2"><span class="post-toc-number">3.</span> <span class="post-toc-text">死锁预防</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A0%B4%E5%9D%8F%E2%80%9D%E8%AF%B7%E6%B1%82%E4%BF%9D%E6%8C%81%E2%80%9D%E6%9D%A1%E4%BB%B6%E2%80%94%E2%80%94%E9%9D%99%E6%80%81%E5%88%86%E9%85%8D"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">破坏”请求保持”条件——静态分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A0%B4%E5%9D%8F%E2%80%9D%E4%B8%8D%E5%8F%AF%E5%89%A5%E5%A4%BA%E2%80%9D%E6%9D%A1%E4%BB%B6%E2%80%94%E2%80%94%E5%89%A5%E5%A4%BA%E5%BC%8F%E5%88%86%E9%85%8D"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">破坏”不可剥夺”条件——剥夺式分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A0%B4%E5%9D%8F%E2%80%9D%E5%BE%AA%E7%8E%AF%E7%AD%89%E5%BE%85%E2%80%9D%E6%9D%A1%E4%BB%B6%E2%80%94%E2%80%94%E9%A1%BA%E5%BA%8F%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E6%B3%95"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">破坏”循环等待”条件——顺序资源分配法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E9%A2%84%E9%98%B2%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">死锁预防策略对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E9%81%BF%E5%85%8D"><span class="post-toc-number">4.</span> <span class="post-toc-text">死锁避免</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%89%E5%85%A8%E7%8A%B6%E6%80%81%E4%B8%8E%E5%AE%89%E5%85%A8%E5%BA%8F%E5%88%97"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">安全状态与安全序列</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">银行家算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9A%E5%AF%BB%E6%89%BE%E5%AE%89%E5%85%A8%E5%BA%8F%E5%88%97"><span class="post-toc-number">4.2.1.</span> <span class="post-toc-text">例题：寻找安全序列</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9A%E8%AF%B7%E6%B1%82%E5%90%91%E9%87%8F%E8%83%BD%E5%90%A6%E6%BB%A1%E8%B6%B3"><span class="post-toc-number">4.2.2.</span> <span class="post-toc-text">例题：请求向量能否满足</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E7%9A%84%E6%A3%80%E6%B5%8B%E4%B8%8E%E8%A7%A3%E9%99%A4"><span class="post-toc-number">5.</span> <span class="post-toc-text">死锁的检测与解除</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">资源分配图</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E5%AE%9A%E7%90%86%E4%B8%8E%E5%9B%BE%E5%8C%96%E7%AE%80"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">死锁定理与图化简</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95%E4%B8%8E%E6%97%B6%E6%9C%BA"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">检测算法与时机</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E7%9A%84%E8%A7%A3%E9%99%A4"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">死锁的解除</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%AD%BB%E9%94%81%E3%80%81%E9%A5%A5%E9%A5%BF%E4%B8%8E%E6%AD%BB%E5%BE%AA%E7%8E%AF%E7%9A%84%E8%BE%A8%E6%9E%90"><span class="post-toc-number">6.</span> <span class="post-toc-text">死锁、饥饿与死循环的辨析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-死锁"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">死锁</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 16:30:00" datetime="2026-08-29T08:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>死锁（Deadlock）<strong>是指多个进程</strong>互相等待对方占有的资源</strong>，且都不释放自己已占有的资源，导致所有进程<strong>都无法向前推进</strong>的僵局。它与临界资源、进程同步紧密相关，是 408 操作系统的必考模块。408 对死锁的考查集中在：<strong>死锁的概念与四个必要条件、死锁预防（破坏必要条件）、死锁避免（安全序列与银行家算法完整计算）、死锁的检测与解除</strong>，以及<strong>死锁与饥饿、死循环的辨析</strong>——其中银行家算法的大题几乎年年出现。</p>
+<h2 id="死锁的概念"><a href="#死锁的概念" class="headerlink" title="死锁的概念"></a>死锁的概念</h2><h3 id="什么是死锁"><a href="#什么是死锁" class="headerlink" title="什么是死锁"></a>什么是死锁</h3><p><strong>死锁</strong>：多个进程<strong>相互等待对方占有的资源</strong>，且都不释放自己已有的资源，使所有进程<strong>都被阻塞、无法向前推进</strong>。</p>
+<p>最典型的场景：系统只有一台打印机和一台扫描仪，P1 与 P2 互相持有对方下一步需要的设备——</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P1：占有资源 A，申请资源 B ──► B 被 P2 占有，P1 阻塞</span><br><span class="line">P2：占有资源 B，申请资源 A ──► A 被 P1 占有，P2 阻塞</span><br><span class="line">结果：P1 等 P2、P2 等 P1，谁也不放手，僵持到底</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：死锁的进程全部处于<strong>阻塞态</strong>（等待的事件永远不会到来）；死锁<strong>必须依靠外部干预</strong>（剥夺资源、撤销进程）才能解除，进程自身无法走出死锁。</p>
+</blockquote>
+<h3 id="死锁产生的原因"><a href="#死锁产生的原因" class="headerlink" title="死锁产生的原因"></a>死锁产生的原因</h3><table>
+<thead>
+<tr>
+<th align="left">原因</th>
+<th align="left">说明</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>竞争不可剥夺资源</strong></td>
+<td align="left">资源数量不足，多个进程争抢<strong>只能独占、不可抢走</strong>的资源</td>
+<td align="left">打印机等独占设备；也包括<strong>临时性资源</strong>（信号量、消息）</td>
+</tr>
+<tr>
+<td align="left"><strong>进程推进顺序不当</strong></td>
+<td align="left">申请、释放资源的<strong>顺序非法</strong>，交叉占有形成僵局</td>
+<td align="left">P1 占 A 要 B 的同时 P2 占 B 要 A</td>
+</tr>
+<tr>
+<td align="left"><strong>信号量使用不当</strong></td>
+<td align="left">P 操作顺序错误</td>
+<td align="left">生产者-消费者中先 P(mutex) 再 P(empty)，满时持有 mutex 等 empty</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：资源不足只是<strong>外部条件</strong>，根本原因是<strong>进程推进顺序非法</strong>——资源充足时顺序不当也可能死锁；反之资源紧张若推进得当也未必死锁。</p>
+</blockquote>
+<h3 id="死锁的四个必要条件"><a href="#死锁的四个必要条件" class="headerlink" title="死锁的四个必要条件"></a>死锁的四个必要条件</h3><p>四个条件<strong>缺一不可</strong>：任何一条不成立，死锁就不可能发生；反过来死锁发生时，四条<strong>必然同时满足</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">条件</th>
+<th align="left">含义</th>
+<th align="left">能否破坏</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>互斥</strong></td>
+<td align="left">资源一次只能被一个进程使用，其他进程必须等待</td>
+<td align="left"><strong>不可破坏</strong>（临界资源的固有属性）</td>
+</tr>
+<tr>
+<td align="left"><strong>占有并等待（请求保持）</strong></td>
+<td align="left">进程<strong>已占有</strong>至少一个资源，又提出新请求，等待时<strong>不放手已有的资源</strong></td>
+<td align="left">可破坏（一次性静态分配）</td>
+</tr>
+<tr>
+<td align="left"><strong>不可剥夺（不可抢占）</strong></td>
+<td align="left">已获得的资源<strong>只能由进程自己用完后主动释放</strong>，不能被强行夺走</td>
+<td align="left">可破坏（剥夺式分配）</td>
+</tr>
+<tr>
+<td align="left"><strong>循环等待</strong></td>
+<td align="left">存在等待环 P1 等 P2、P2 等 P3、……、Pn 等 P1，每个进程都在等下一家手里的资源</td>
+<td align="left">可破坏（顺序资源分配法）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>破坏四条件中的任意一个</strong>即可<strong>预防</strong>死锁；但<strong>互斥不可破坏</strong>，实际只能破坏后三个。<br><strong>易错点</strong>：<strong>死锁 ⇒ 循环等待</strong>，但<strong>循环等待 ⇏ 死锁</strong>——同类资源有<strong>多个实例</strong>时，存在等待环也可能不死锁（详见”检测与解除”）；<strong>无环则必无死锁</strong>。</p>
+</blockquote>
+<h2 id="死锁的处理策略总览"><a href="#死锁的处理策略总览" class="headerlink" title="死锁的处理策略总览"></a>死锁的处理策略总览</h2><table>
+<thead>
+<tr>
+<th align="left">策略</th>
+<th align="left">思想</th>
+<th align="left">起作用时机</th>
+<th align="left">资源利用率</th>
+<th align="left">吞吐量</th>
+<th align="left">开销</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>死锁预防</strong></td>
+<td align="left">静态<strong>破坏必要条件之一</strong>，让死锁无法发生</td>
+<td align="left">事前（设计阶段）</td>
+<td align="left"><strong>低</strong></td>
+<td align="left"><strong>低</strong></td>
+<td align="left">无算法开销，但资源浪费大</td>
+</tr>
+<tr>
+<td align="left"><strong>死锁避免</strong></td>
+<td align="left"><strong>每次分配前</strong>动态判断安全性，只在安全时分配</td>
+<td align="left">运行中（每次分配）</td>
+<td align="left">较高</td>
+<td align="left">较高</td>
+<td align="left">每次分配都要计算（银行家算法开销大）</td>
+</tr>
+<tr>
+<td align="left"><strong>检测与解除</strong></td>
+<td align="left"><strong>放任死锁发生</strong>，定期检测，发生后解除</td>
+<td align="left">事后</td>
+<td align="left">高</td>
+<td align="left">高</td>
+<td align="left">检测开销 + 解除代价（撤销进程损失大）</td>
+</tr>
+<tr>
+<td align="left"><strong>鸵鸟策略</strong></td>
+<td align="left"><strong>假装看不见</strong>，发生死锁后重启或人工处理</td>
+<td align="left">不处理</td>
+<td align="left">最高</td>
+<td align="left">最高</td>
+<td align="left">无</td>
+</tr>
+</tbody></table>
+<p><strong>鸵鸟策略</strong>：像鸵鸟把头埋进沙子一样假定死锁<strong>发生概率极低</strong>、处理它不值得——<strong>Windows、Linux 等通用操作系统都采用</strong>，是工程上最实用的选择。</p>
+<blockquote>
+<p><strong>考点</strong>：四种策略的对比核心是<strong>安全性与资源利用率的权衡</strong>——限制越强越安全但利用率越低；完全不限制的鸵鸟策略利用率最高。</p>
+</blockquote>
+<h2 id="死锁预防"><a href="#死锁预防" class="headerlink" title="死锁预防"></a>死锁预防</h2><p><strong>预防</strong>：通过限制进程申请资源的方式或顺序，<strong>静态地破坏四个必要条件之一</strong>，使死锁从原理上不可能发生。</p>
+<h3 id="破坏”请求保持”条件——静态分配"><a href="#破坏”请求保持”条件——静态分配" class="headerlink" title="破坏”请求保持”条件——静态分配"></a>破坏”请求保持”条件——静态分配</h3><p>进程运行前<strong>一次性申请</strong>整个运行期所需的<strong>全部资源</strong>：满足则全程独占运行，不满足则一个也不分配、阻塞等待。</p>
+<ul>
+<li>变体：运行前只申请<strong>初期所需</strong>资源即可开始运行；运行中<strong>逐步释放已用完的资源</strong>，且只有在无占用时才能申请新资源</li>
+<li><strong>优点</strong>：方法简单、实现容易、绝对保险</li>
+<li><strong>缺点</strong>：许多资源<strong>占而不用、长期闲置</strong>，资源利用率低；进程可能长期凑不齐全部资源而<strong>饥饿</strong></li>
+</ul>
+<h3 id="破坏”不可剥夺”条件——剥夺式分配"><a href="#破坏”不可剥夺”条件——剥夺式分配" class="headerlink" title="破坏”不可剥夺”条件——剥夺式分配"></a>破坏”不可剥夺”条件——剥夺式分配</h3><p>进程<strong>申请新资源得不到满足时，必须释放已占有的全部资源</strong>，以后需要时再重新申请。</p>
+<ul>
+<li>变体：由操作系统介入，从低优先级进程手中<strong>强制剥夺</strong>资源转给高优先级进程</li>
+<li><strong>缺点</strong>：实现<strong>复杂</strong>；被剥夺进程<strong>前功尽弃</strong>（前期工作全部作废）；反复申请-释放加大<strong>系统开销</strong>，延长进程周转时间</li>
+</ul>
+<h3 id="破坏”循环等待”条件——顺序资源分配法"><a href="#破坏”循环等待”条件——顺序资源分配法" class="headerlink" title="破坏”循环等待”条件——顺序资源分配法"></a>破坏”循环等待”条件——顺序资源分配法</h3><p>给系统<strong>全部资源类统一编号</strong>，规定进程<strong>只能按编号递增的顺序申请资源</strong>：想申请编号为 k 的资源时，必须已持有编号小于 k 的资源；同类多台设备也必须一次申请到位。</p>
+<ul>
+<li><strong>原理</strong>：若 P1 等待 P2 的资源，必有 编号(所等资源) 严格大于 编号(所持资源)；沿等待环逐段推下去编号严格递增，绕一圈回到起点便自相矛盾 → <strong>等待环不可能形成</strong></li>
+<li><strong>优点</strong>：实现简单，资源利用率和吞吐量都比静态分配高</li>
+<li><strong>缺点</strong>：编号顺序<strong>难以恰好符合实际使用顺序</strong>；进程为遵守序<strong>提前申请暂不用的资源</strong>，造成浪费；给编程者<strong>增加不便</strong></li>
+</ul>
+<h3 id="死锁预防策略对比"><a href="#死锁预防策略对比" class="headerlink" title="死锁预防策略对比"></a>死锁预防策略对比</h3><table>
+<thead>
+<tr>
+<th align="left">破坏的条件</th>
+<th align="left">做法</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>互斥</strong></td>
+<td align="left"><strong>无法破坏</strong>——临界资源必须互斥使用（SPOOLing 化只是缓解，不算破坏互斥）</td>
+<td align="left">—</td>
+<td align="left">临界资源固有属性</td>
+</tr>
+<tr>
+<td align="left"><strong>请求保持</strong></td>
+<td align="left"><strong>一次性静态分配</strong>全部资源（或用完再申请新的）</td>
+<td align="left">简单、保险</td>
+<td align="left">资源浪费、利用率低、可能<strong>饥饿</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>不可剥夺</strong></td>
+<td align="left">申请不到新资源就<strong>释放已占有的全部资源</strong>（或 OS 强制剥夺）</td>
+<td align="left">无死锁、利用率相对较高</td>
+<td align="left">实现<strong>复杂</strong>、前功尽弃、开销大</td>
+</tr>
+<tr>
+<td align="left"><strong>循环等待</strong></td>
+<td align="left">资源<strong>统一编号 + 递增申请</strong>（顺序资源分配法）</td>
+<td align="left">简单、利用率与吞吐量较高</td>
+<td align="left">编号难定、<strong>编程不便</strong>、可能提前申请占而不用</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：预防是<strong>静态策略</strong>，共同代价是<strong>资源利用率下降</strong>；要能对号入座——<strong>静态分配</strong>破坏请求保持、<strong>剥夺式分配</strong>破坏不可剥夺、<strong>有序申请</strong>破坏循环等待。</p>
+</blockquote>
+<h2 id="死锁避免"><a href="#死锁避免" class="headerlink" title="死锁避免"></a>死锁避免</h2><p><strong>避免</strong>：不事先加以限制，而是在<strong>每次资源动态分配前</strong>判断”分配之后系统是否仍然安全”，<strong>只在安全时才真正分配</strong>——典型动态策略，代表算法是<strong>银行家算法</strong>。</p>
+<h3 id="安全状态与安全序列"><a href="#安全状态与安全序列" class="headerlink" title="安全状态与安全序列"></a>安全状态与安全序列</h3><ul>
+<li><strong>安全序列</strong>：一个进程排列 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⟨</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">⟩</span></span></span></span>，按此顺序执行时，每个进程都能获得<strong>尚缺的资源并顺利运行完成</strong>（完成后归还全部资源，供后面的进程使用）</li>
+<li><strong>安全状态</strong>：系统中<strong>至少存在一个</strong>安全序列</li>
+<li><strong>不安全状态</strong>：<strong>找不到任何</strong>安全序列</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">安全状态    ──► 一定不发生死锁</span><br><span class="line">不安全状态  ──► 可能发生死锁（不是必然！）</span><br><span class="line">发生死锁    ──► 系统必定处于不安全状态</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：<strong>安全 ⇒ 无死锁</strong>，但<strong>不安全 ⇏ 死锁</strong>——不安全只说明”找不到保证人人完成的执行顺序”，<strong>可能</strong>死锁而非<strong>一定</strong>死锁。银行家算法”宁可信其有”：判为不安全就拒绝分配。<br><strong>易错点</strong>：安全序列<strong>不唯一</strong>，判断系统是否安全只需找出<strong>任意一条</strong>安全序列即可；存在安全序列的系统中<strong>仍可能有进程暂时阻塞等待</strong>。</p>
+</blockquote>
+<h3 id="银行家算法"><a href="#银行家算法" class="headerlink" title="银行家算法"></a>银行家算法</h3><p><strong>思想</strong>：像银行家放贷——已知每位客户的<strong>最大借款额</strong>，放贷前先<strong>试探性</strong>地把钱借出去，检查是否存在某种顺序让所有客户都能<strong>周转开并还清贷款</strong>；找不到就不放这笔款。</p>
+<p><strong>数据结构</strong>（n 个进程、m 类资源）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">结构</th>
+<th align="left">规模</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>Available[j]</code></td>
+<td align="left">m</td>
+<td align="left">当前<strong>可用</strong>的第 j 类资源数</td>
+</tr>
+<tr>
+<td align="left"><code>Max[i][j]</code></td>
+<td align="left">n×m</td>
+<td align="left">进程 i 对第 j 类资源的<strong>最大需求</strong></td>
+</tr>
+<tr>
+<td align="left"><code>Allocation[i][j]</code></td>
+<td align="left">n×m</td>
+<td align="left">进程 i <strong>已分得</strong>的第 j 类资源数</td>
+</tr>
+<tr>
+<td align="left"><code>Need[i][j]</code></td>
+<td align="left">n×m</td>
+<td align="left">进程 i <strong>还需要</strong>的资源数，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal">a</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">oc</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span></span></span></span></td>
+</tr>
+</tbody></table>
+<p><strong>处理进程 i 的请求 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的三个步骤</strong>：</p>
+<ol>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>？不成立则出错（申请量超过了它申报的最大需求）</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span></span></span></span>？不成立则<strong>可用资源不足</strong>，进程阻塞等待</li>
+<li><strong>试探分配</strong>：Available 减去 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、Allocation 加上 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、Need 减去 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，随后做<strong>安全性检查</strong>——仍存在安全序列才<strong>正式分配</strong>；否则<strong>回滚</strong>试探、让进程等待</li>
+</ol>
+<h4 id="例题：寻找安全序列"><a href="#例题：寻找安全序列" class="headerlink" title="例题：寻找安全序列"></a>例题：寻找安全序列</h4><p>系统有 5 个进程、3 类资源 A&#x2F;B&#x2F;C，资源<strong>总量 (10, 5, 7)</strong>，某时刻状态如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">进程</th>
+<th align="left">Max (A B C)</th>
+<th align="left">Allocation (A B C)</th>
+<th align="left">Need (A B C)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">P0</td>
+<td align="left">7 5 3</td>
+<td align="left">0 1 0</td>
+<td align="left">7 4 3</td>
+</tr>
+<tr>
+<td align="left">P1</td>
+<td align="left">3 2 2</td>
+<td align="left">2 0 0</td>
+<td align="left">1 2 2</td>
+</tr>
+<tr>
+<td align="left">P2</td>
+<td align="left">9 0 2</td>
+<td align="left">3 0 2</td>
+<td align="left">6 0 0</td>
+</tr>
+<tr>
+<td align="left">P3</td>
+<td align="left">2 2 2</td>
+<td align="left">2 1 1</td>
+<td align="left">0 1 1</td>
+</tr>
+<tr>
+<td align="left">P4</td>
+<td align="left">4 3 3</td>
+<td align="left">0 0 2</td>
+<td align="left">4 3 1</td>
+</tr>
+</tbody></table>
+<p><strong>第一步：求 Available</strong>。已分配合计 &#x3D; (0+2+3+2+0, 1+0+0+1+0, 0+0+2+1+2) &#x3D; (7, 2, 5)，故 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">10</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">7</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span>。</p>
+<p><strong>第二步：逐步找安全序列</strong>。取 Work &#x3D; Available；每轮找一个 <strong>Need ≤ Work</strong> 的未完成进程，令其完成并<strong>回收全部 Allocation</strong>（Work +&#x3D; Allocation），直到所有进程完成或无进程可选。</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">判断 Need ≤ Work</th>
+<th align="left">回收 Allocation</th>
+<th align="left">新 Work</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始</td>
+<td align="left">Work &#x3D; (3,3,2)；P0：Need (7,4,3) &gt; (3,3,2) ✗</td>
+<td align="left">—</td>
+<td align="left">(3,3,2)</td>
+</tr>
+<tr>
+<td align="left">① 选 P1</td>
+<td align="left">Need (1,2,2) ≤ (3,3,2) ✓</td>
+<td align="left">+ (2,0,0)</td>
+<td align="left">(5,3,2)</td>
+</tr>
+<tr>
+<td align="left">② 选 P3</td>
+<td align="left">Need (0,1,1) ≤ (5,3,2) ✓</td>
+<td align="left">+ (2,1,1)</td>
+<td align="left">(7,4,3)</td>
+</tr>
+<tr>
+<td align="left">③ 选 P4</td>
+<td align="left">Need (4,3,1) ≤ (7,4,3) ✓</td>
+<td align="left">+ (0,0,2)</td>
+<td align="left">(7,4,5)</td>
+</tr>
+<tr>
+<td align="left">④ 选 P0</td>
+<td align="left">Need (7,4,3) ≤ (7,4,5) ✓</td>
+<td align="left">+ (0,1,0)</td>
+<td align="left">(7,5,5)</td>
+</tr>
+<tr>
+<td align="left">⑤ 选 P2</td>
+<td align="left">Need (6,0,0) ≤ (7,5,5) ✓</td>
+<td align="left">+ (3,0,2)</td>
+<td align="left">(10,5,7)</td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：最终 Work &#x3D; (10,5,7)，恰等于资源总量，全部进程完成 ✓</p>
+<p><strong>结论</strong>：存在安全序列 <strong>P1 → P3 → P4 → P0 → P2</strong>（安全序列不唯一，如 P1 → P3 → P0 → P2 → P4 同样可行），系统当前处于<strong>安全状态</strong>。</p>
+<h4 id="例题：请求向量能否满足"><a href="#例题：请求向量能否满足" class="headerlink" title="例题：请求向量能否满足"></a>例题：请求向量能否满足</h4><p><strong>问</strong>：此刻 P1 发出请求 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span>，系统能否分配？</p>
+<p><strong>三步判断</strong>：</p>
+<ol>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span> ✓（未超过 P1 申报的最大需求）</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span> ✓（系统有足够可用资源）</li>
+<li><strong>试探分配</strong>：Available &#x3D; (3,3,2) − (1,0,2) &#x3D; <strong>(2,3,0)</strong>；P1 的 Allocation 变为 (2,0,0) + (1,0,2) &#x3D; <strong>(3,0,2)</strong>；P1 的 Need 变为 (1,2,2) − (1,0,2) &#x3D; <strong>(0,2,0)</strong></li>
+</ol>
+<p><strong>对新状态做安全性检查</strong>（方法同上）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">判断 Need ≤ Work</th>
+<th align="left">回收 Allocation</th>
+<th align="left">新 Work</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始</td>
+<td align="left">Work &#x3D; (2,3,0)；P0：Need (7,4,3) &gt; (2,3,0) ✗</td>
+<td align="left">—</td>
+<td align="left">(2,3,0)</td>
+</tr>
+<tr>
+<td align="left">① 选 P1</td>
+<td align="left">Need (0,2,0) ≤ (2,3,0) ✓</td>
+<td align="left">+ (3,0,2)</td>
+<td align="left">(5,3,2)</td>
+</tr>
+<tr>
+<td align="left">② 选 P3</td>
+<td align="left">Need (0,1,1) ≤ (5,3,2) ✓</td>
+<td align="left">+ (2,1,1)</td>
+<td align="left">(7,4,3)</td>
+</tr>
+<tr>
+<td align="left">③ 选 P4</td>
+<td align="left">Need (4,3,1) ≤ (7,4,3) ✓</td>
+<td align="left">+ (0,0,2)</td>
+<td align="left">(7,4,5)</td>
+</tr>
+<tr>
+<td align="left">④ 选 P0</td>
+<td align="left">Need (7,4,3) ≤ (7,4,5) ✓</td>
+<td align="left">+ (0,1,0)</td>
+<td align="left">(7,5,5)</td>
+</tr>
+<tr>
+<td align="left">⑤ 选 P2</td>
+<td align="left">Need (6,0,0) ≤ (7,5,5) ✓</td>
+<td align="left">+ (3,0,2)</td>
+<td align="left">(10,5,7)</td>
+</tr>
+</tbody></table>
+<p>安全序列 P1 → P3 → P4 → P0 → P2 依然存在 → 分配后系统<strong>仍安全</strong> → <strong>正式分配，批准 P1 的请求</strong>。</p>
+<p><strong>再追问两问（速判，接上一步之后的最新状态）</strong>：</p>
+<ul>
+<li><strong>P4 请求 (3,3,0)</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span></span></span></span>？A 类 3 &gt; 2 ✗ → <strong>可用资源不足</strong>，P4 阻塞等待（无需试探，更谈不上安全性检查）</li>
+<li><strong>P0 请求 (0,2,0)</strong>：两个不等式均满足；试探后 Available &#x3D; (2,1,0)、P0 的 Need &#x3D; (7,2,3)。逐一检查：P0 (7,2,3)、P1 (0,2,0)、P2 (6,0,0)、P3 (0,1,1)、P4 (4,3,1) 的 Need <strong>全部大于 Work (2,1,0)</strong> → 找不到任何安全序列 → <strong>不安全 → 拒绝分配</strong>（回滚，让 P0 等待）</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：银行家算法大题的<strong>标准答题模板</strong>——先验证 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 与 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span></span></span></span> 两个不等式，再试探分配、最后做安全性检查；检查失败必须<strong>回滚数据</strong>再下结论。<br><strong>易错点</strong>：判为”不安全而拒绝”时，系统<strong>并未死锁</strong>——不安全只是”不能保证不死锁”，银行家算法采取保守策略防患于未然。</p>
+</blockquote>
+<h2 id="死锁的检测与解除"><a href="#死锁的检测与解除" class="headerlink" title="死锁的检测与解除"></a>死锁的检测与解除</h2><p><strong>检测解除</strong>：不做任何限制，<strong>允许死锁发生</strong>；系统<strong>定期运行检测算法</strong>判断当前是否死锁，一旦发现便设法<strong>解除</strong>。适用于死锁不常发生的系统，资源利用率最高，但检测与解除都有开销。</p>
+<h3 id="资源分配图"><a href="#资源分配图" class="headerlink" title="资源分配图"></a>资源分配图</h3><p>资源分配图是描述系统资源分配状态的<strong>有向图</strong>，用它可直观判断死锁：</p>
+<ul>
+<li><strong>进程结点</strong>：圆圈，标注进程名（P1、P2……）</li>
+<li><strong>资源结点</strong>：方框，标注资源名；<strong>框内圆点数 &#x3D; 该类资源的实例数</strong></li>
+<li><strong>请求边</strong>：P → R（从进程指向资源框），表示该进程<strong>正在申请</strong>一个该类资源</li>
+<li><strong>分配边</strong>：R → P（从资源框指向进程），表示该类资源的<strong>一个实例</strong>已分配给该进程</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第2章 进程管理.assets/deadlock-资源分配图.png" alt="资源分配图：分配边与请求边" title="">
+                </div>
+                <div class="image-caption">资源分配图：分配边与请求边</div>
+            </figure>
+
+<blockquote>
+<p><strong>易错点</strong>：两类边的<strong>箭头方向相反</strong>——请求边”进程指资源”，分配边”资源指进程”；读图时先数清每类资源的<strong>实例数</strong>再判断环。</p>
+</blockquote>
+<h3 id="死锁定理与图化简"><a href="#死锁定理与图化简" class="headerlink" title="死锁定理与图化简"></a>死锁定理与图化简</h3><p><strong>死锁定理</strong>：资源分配图<strong>无环 → 一定无死锁</strong>；<strong>有环 → 不一定死锁</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">环中资源实例情况</th>
+<th align="left">有环时的结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">每类资源<strong>只有 1 个实例</strong></td>
+<td align="left"><strong>一定死锁</strong>（环上进程互卡、无实例可释放）</td>
+</tr>
+<tr>
+<td align="left">存在<strong>多个实例</strong>的资源</td>
+<td align="left"><strong>可能死锁，也可能不死锁</strong>，须<strong>化简</strong>后判断</td>
+</tr>
+</tbody></table>
+<p><strong>图化简</strong>：找一个非孤立且<strong>所有请求边都能立即满足</strong>的进程，删去它的全部请求边与分配边（相当于让它运行完成并归还资源），回收后再继续化简其他进程；若最终<strong>全部边都可删除</strong>（图可完全化简）→ <strong>无死锁</strong>；若最后残留无法化简的子图 → <strong>该子图中的进程陷入死锁</strong>。</p>
+<p>含环辨析小例（方框内为资源及其实例数）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">例 1：有环，但无死锁（R1 有 2 个实例，R2 有 1 个实例）</span><br><span class="line"></span><br><span class="line">    [R1 | 2] ──alloc──► P1        P1 ──request──► [R2 | 1]</span><br><span class="line">    [R1 | 2] ──alloc──► P2        P2 ──request──► [R1]      （环：P2 → R1 → P2）</span><br><span class="line">    [R2 | 1] ──alloc──► P3        P3 不申请任何资源</span><br><span class="line"></span><br><span class="line">    化简：P3 可完成并释放 R2 → P1 得 R2 后完成 → 释放 1 个 R1 → P2 解除等待</span><br><span class="line">    环虽存在，但环外进程先完成即可打破环 → 无死锁</span><br><span class="line"></span><br><span class="line">例 2：有环，且死锁（R1、R2 都只有 1 个实例）</span><br><span class="line"></span><br><span class="line">    [R1 | 1] ──alloc──► P1        P1 ──request──► [R2]</span><br><span class="line">    [R2 | 1] ──alloc──► P2        P2 ──request──► [R1]</span><br><span class="line"></span><br><span class="line">    环：P1 → R2 → P2 → R1 → P1；单实例、无空闲实例可释放 → 环上全部死锁</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>易错点</strong>：判断”有环是否死锁”先看<strong>实例数</strong>——<strong>单实例有环必死锁；多实例有环须化简</strong>；<strong>无环必无死锁</strong>是可秒答的判断题。</p>
+</blockquote>
+<h3 id="检测算法与时机"><a href="#检测算法与时机" class="headerlink" title="检测算法与时机"></a>检测算法与时机</h3><p><strong>检测算法</strong>（思路与银行家安全性检查一致，只是把 Need 换成<strong>已发出且尚未满足的请求矩阵 Request</strong>）：</p>
+<ol>
+<li>Work &#x3D; Available；全部进程置 Finish[i] &#x3D; false（Allocation[i] 全零者可直接置 true）</li>
+<li>寻找 Finish[i] &#x3D; false 且 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord mathnormal" style="margin-right:0.0278em;">or</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 的进程：视其<strong>可以完成</strong>，置 Finish[i] &#x3D; true，并回收资源 Work +&#x3D; Allocation[i]，返回第 2 步</li>
+<li>算法结束时<strong>仍有 Finish[i] &#x3D; false 的进程</strong> → 这些进程即处于<strong>死锁状态</strong></li>
+</ol>
+<p><strong>检测时机</strong>：进程<strong>申请资源得不到满足</strong>时立刻检测（及时但开销大）；<strong>定时（周期性）<strong>检测；或当</strong>CPU 利用率骤降</strong>、疑似死锁时触发检测。</p>
+<h3 id="死锁的解除"><a href="#死锁的解除" class="headerlink" title="死锁的解除"></a>死锁的解除</h3><table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">做法</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>资源剥夺法</strong></td>
+<td align="left">从若干死锁进程中<strong>强行剥夺</strong>足够的资源，分给其余死锁进程</td>
+<td align="left">被剥夺者前功尽弃，还要防止它<strong>再次死锁</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>撤销进程法</strong></td>
+<td align="left"><strong>逐个撤销</strong>死锁进程（按<strong>优先级、已运行时间、代价最小</strong>原则挑选），直至死锁解除；或一次性撤销全部死锁进程</td>
+<td align="left">强制撤销会丢失已完成的<strong>部分工作</strong>，代价可能很大</td>
+</tr>
+<tr>
+<td align="left"><strong>进程回退法</strong></td>
+<td align="left">让一个或多个死锁进程<strong>回退到足以回避死锁的某个历史检查点</strong>重新执行</td>
+<td align="left">系统必须<strong>保存历史信息与检查点</strong>，开销大</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：检测解除的完整流程 &#x3D; <strong>图化简发现死锁 → 挑选”代价最小”的进程剥夺资源或撤销</strong>；”逐个撤销、代价最小”是选择题高频表述。</p>
+</blockquote>
+<h2 id="死锁、饥饿与死循环的辨析"><a href="#死锁、饥饿与死循环的辨析" class="headerlink" title="死锁、饥饿与死循环的辨析"></a>死锁、饥饿与死循环的辨析</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">死锁</th>
+<th align="left">饥饿</th>
+<th align="left">死循环</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本质</td>
+<td align="left">多进程<strong>互相等待</strong>对方的资源</td>
+<td align="left">进程<strong>长期得不到</strong>资源（或 CPU）而无法推进</td>
+<td align="left">程序<strong>逻辑错误</strong>，跳不出循环</td>
+</tr>
+<tr>
+<td align="left">涉及进程数</td>
+<td align="left"><strong>至少两个</strong>且互相等待</td>
+<td align="left"><strong>一个</strong>进程也可饥饿</td>
+<td align="left">一个进程即可发生</td>
+</tr>
+<tr>
+<td align="left">进程状态</td>
+<td align="left">全部处于<strong>阻塞态</strong></td>
+<td align="left">可能<strong>阻塞</strong>（等 I&#x2F;O），也可能<strong>就绪</strong>（排队等 CPU）</td>
+<td align="left">处于<strong>运行态</strong></td>
+</tr>
+<tr>
+<td align="left">产生原因</td>
+<td align="left">竞争资源 + 推进顺序非法（操作系统层面）</td>
+<td align="left">分配<strong>策略不公</strong>（如短进程优先、静态优先级）</td>
+<td align="left">程序员代码写错（与操作系统无关）</td>
+</tr>
+<tr>
+<td align="left">能否自行解除</td>
+<td align="left"><strong>不能</strong>，必须外部干预</td>
+<td align="left"><strong>可能</strong>，等待久了自然缓解（如老化提高优先级）</td>
+<td align="left"><strong>不能</strong>，需人工干预</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：三者都表现为”进程无法推进”，抓住两点区分——<strong>进程数</strong>（死锁至少两个且互相等待）与<strong>进程状态</strong>（死锁在阻塞、死循环在运行）；<strong>死锁一定伴随饥饿，饥饿未必是死锁</strong>。<br><strong>易错点</strong>：饥饿进程可能正躺在<strong>就绪队列</strong>里，只是<strong>轮不上</strong>处理机；而死锁进程的等待事件<strong>永远不会到来</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">死锁定义</td>
+<td align="left">多进程<strong>互相等待对方资源</strong>且不释放，全部阻塞、无法推进，需外部干预</td>
+</tr>
+<tr>
+<td align="left">产生原因</td>
+<td align="left"><strong>竞争不可剥夺资源</strong>（含临时资源）+ <strong>进程推进顺序非法</strong>（信号量误用）</td>
+</tr>
+<tr>
+<td align="left">四必要条件</td>
+<td align="left"><strong>互斥、占有并等待、不可剥夺、循环等待</strong>，缺一不可；<strong>互斥不可破坏</strong>，预防只能破坏其余三个</td>
+</tr>
+<tr>
+<td align="left">破坏请求保持</td>
+<td align="left"><strong>一次性静态分配</strong>全部资源——简单保险，但浪费、利用率低、可能饥饿</td>
+</tr>
+<tr>
+<td align="left">破坏不可剥夺</td>
+<td align="left">申请不到新资源就<strong>释放已占有的全部</strong>——实现复杂、前功尽弃</td>
+</tr>
+<tr>
+<td align="left">破坏循环等待</td>
+<td align="left">资源<strong>统一编号、递增申请</strong>——利用率较高，但编号难定、编程不便</td>
+</tr>
+<tr>
+<td align="left">安全状态</td>
+<td align="left"><strong>存在安全序列</strong> ⇒ 必无死锁；<strong>不安全 ⇏ 死锁</strong>（只是有可能）</td>
+</tr>
+<tr>
+<td align="left">银行家数据结构</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal">a</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">oc</span><span class="mord mathnormal">a</span><span class="mord mathnormal">t</span><span class="mord mathnormal">i</span><span class="mord mathnormal">o</span><span class="mord mathnormal">n</span></span></span></span>；请求须满足 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 且 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">e</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord mathnormal">u</span><span class="mord mathnormal">es</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal">ai</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">ab</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mord mathnormal">e</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">银行家算法流程</td>
+<td align="left">两不等式 → 试探分配 → <strong>安全性检查</strong>，失败则<strong>回滚</strong>让进程等待</td>
+</tr>
+<tr>
+<td align="left">安全性检查</td>
+<td align="left">每轮找 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord mathnormal">ee</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord mathnormal" style="margin-right:0.0278em;">or</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 的进程，回收后 Work +&#x3D; Allocation，全部完成即安全</td>
+</tr>
+<tr>
+<td align="left">死锁定理</td>
+<td align="left"><strong>无环必无死锁</strong>；单实例<strong>有环必死锁</strong>；多实例有环须<strong>化简</strong>判断</td>
+</tr>
+<tr>
+<td align="left">检测与解除</td>
+<td align="left">放任发生 + 定期检测（图化简）；解除用剥夺资源 &#x2F; 撤销进程 &#x2F; 进程回退</td>
+</tr>
+<tr>
+<td align="left">死锁 vs 饥饿</td>
+<td align="left">死锁 ≥2 进程互等、全阻塞、需外力；饥饿 1 进程即可、可能就绪、可自行缓解</td>
+</tr>
+<tr>
+<td align="left">鸵鸟策略</td>
+<td align="left">假装不处理、利用率最高，死锁了就重启；<strong>Windows &#x2F; Linux 采用</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T06:58:07.350Z" itemprop="dateUpdated">2026-08-29 14:58:07</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E6%AD%BB%E9%94%81/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%AD%BB%E9%94%81/" rel="tag">死锁</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&title=《死锁》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&title=《死锁》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《死锁》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%9A%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D%E4%B8%8E%E5%88%86%E9%A1%B5%E5%88%86%E6%AE%B5/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">内存管理：连续分配与分页分段</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5%E4%B8%8E%E4%BA%92%E6%96%A5/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">进程同步与互斥</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&title=《死锁》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&title=《死锁》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《死锁》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%AD%BB%E9%94%81/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>计算机系统概述与性能指标 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理">
+    <meta name="description" content="计算机系统 &#x3D; 硬件 + 软件，本章是计算机组成原理的开篇，回答三个问题：计算机由什么组成、如何自动工作、用什么指标衡量快慢。408 的考查重心在：冯·诺依曼结构与存储程序思想、五大部件职责与取指→分析→执行的工作流程、软硬件逻辑等价，以及性能指标计算（时钟周期、CPI、CPU 执行时间、MIPS、FLOPS）——性能计算几乎每年必考，务必把公式练到能直接代入。 计算机系统的基本组成计算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机系统概述与性能指标">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="计算机系统 &#x3D; 硬件 + 软件，本章是计算机组成原理的开篇，回答三个问题：计算机由什么组成、如何自动工作、用什么指标衡量快慢。408 的考查重心在：冯·诺依曼结构与存储程序思想、五大部件职责与取指→分析→执行的工作流程、软硬件逻辑等价，以及性能指标计算（时钟周期、CPI、CPU 执行时间、MIPS、FLOPS）——性能计算几乎每年必考，务必把公式练到能直接代入。 计算机系统的基本组成计算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/system-hierarchy.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/von-neumann-structure.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/modern-computer-structure.png">
+<meta property="article:published_time" content="2026-08-29T11:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:22:51.364Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0.assets/system-hierarchy.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">计算机系统概述与性能指标</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">计算机系统概述与性能指标</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T11:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%84%E6%88%90"><span class="post-toc-number">1.</span> <span class="post-toc-text">计算机系统的基本组成</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">计算机系统的层次结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%89%E7%BA%A7%E8%AF%AD%E8%A8%80%E4%B8%8E%E4%B8%89%E7%A7%8D%E7%BF%BB%E8%AF%91%E7%A8%8B%E5%BA%8F"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">三级语言与三种翻译程序</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BD%AF%E4%BB%B6%E5%92%8C%E7%A1%AC%E4%BB%B6%E7%9A%84%E5%85%B3%E7%B3%BB%EF%BC%9A%E9%80%BB%E8%BE%91%E7%AD%89%E4%BB%B7"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">软件和硬件的关系：逻辑等价</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%86%AF%C2%B7%E8%AF%BA%E4%BE%9D%E6%9B%BC%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-number">2.</span> <span class="post-toc-text">冯·诺依曼计算机的结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%98%E5%82%A8%E7%A8%8B%E5%BA%8F%E6%80%9D%E6%83%B3"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">存储程序思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BA%94%E5%A4%A7%E9%83%A8%E4%BB%B6%E5%8F%8A%E5%85%B6%E5%8A%9F%E8%83%BD"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">五大部件及其功能</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%A5%E8%BF%90%E7%AE%97%E5%99%A8%E4%B8%BA%E4%B8%AD%E5%BF%83%E5%88%B0%E4%BB%A5%E5%AD%98%E5%82%A8%E5%99%A8%E4%B8%BA%E4%B8%AD%E5%BF%83"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">以运算器为中心到以存储器为中心</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="post-toc-number">3.</span> <span class="post-toc-text">计算机的工作过程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B3%E9%94%AE%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%80%E8%A7%88"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">关键寄存器一览</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%E7%9A%84%E5%AE%8C%E6%95%B4%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">一条指令的完整执行流程</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="post-toc-number">4.</span> <span class="post-toc-text">计算机的性能指标</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%97%E9%95%BF%E3%80%81%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF%E5%B8%A6%E5%AE%BD%E4%B8%8E%E4%B8%BB%E5%AD%98%E5%AE%B9%E9%87%8F"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">机器字长、数据通路带宽与主存容量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%BB%E9%A2%91%E4%B8%8E-CPU-%E6%97%B6%E9%92%9F%E5%91%A8%E6%9C%9F"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">主频与 CPU 时钟周期</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CPI-%E4%B8%8E-CPU-%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%EF%BC%88%E6%A0%B8%E5%BF%83%E5%85%AC%E5%BC%8F%EF%BC%89"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">CPI 与 CPU 执行时间（核心公式）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MIPS-%E4%B8%8E-FLOPS"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">MIPS 与 FLOPS</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%90%9E%E5%90%90%E9%87%8F%E3%80%81%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4%E4%B8%8E%E5%9F%BA%E5%87%86%E7%A8%8B%E5%BA%8F"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">吞吐量、响应时间与基准程序</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87%E5%85%B3%E7%B3%BB%E8%A1%A8"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">性能指标关系表</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">5.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-计算机系统概述与性能指标"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">计算机系统概述与性能指标</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 19:00:00" datetime="2026-08-29T11:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>计算机系统 &#x3D; 硬件 + 软件</strong>，本章是计算机组成原理的开篇，回答三个问题：计算机由什么组成、如何自动工作、用什么指标衡量快慢。408 的考查重心在：<strong>冯·诺依曼结构与存储程序思想、五大部件职责与取指→分析→执行的工作流程、软硬件逻辑等价</strong>，以及<strong>性能指标计算（时钟周期、CPI、CPU 执行时间、MIPS、FLOPS）</strong>——性能计算几乎每年必考，务必把公式练到能直接代入。</p>
+<h2 id="计算机系统的基本组成"><a href="#计算机系统的基本组成" class="headerlink" title="计算机系统的基本组成"></a>计算机系统的基本组成</h2><p>计算机系统由<strong>硬件</strong>和<strong>软件</strong>两大部分组成，缺一不可：</p>
+<table>
+<thead>
+<tr>
+<th align="left">组成</th>
+<th align="left">内容</th>
+<th align="left">举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>硬件</strong></td>
+<td align="left">看得见摸得着的物理装置</td>
+<td align="left">CPU、主存、硬盘、键盘、显示器</td>
+</tr>
+<tr>
+<td align="left"><strong>软件</strong></td>
+<td align="left">运行在硬件之上的程序、数据与文档</td>
+<td align="left">操作系统、编译器、办公软件</td>
+</tr>
+</tbody></table>
+<p>软件又分为两类：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">定义</th>
+<th align="left">举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>系统软件</strong></td>
+<td align="left">管理整个计算机系统、为应用软件提供运行平台</td>
+<td align="left">操作系统、<strong>数据库管理系统（DBMS）</strong>、编译程序、汇编程序</td>
+</tr>
+<tr>
+<td align="left"><strong>应用软件</strong></td>
+<td align="left">解决具体应用领域实际问题的程序</td>
+<td align="left">Word、浏览器、游戏</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>数据库管理系统（DBMS）属于系统软件</strong>，这是选择题高频陷阱；语言处理程序（编译、解释、汇编程序）也都是系统软件。</p>
+</blockquote>
+<h3 id="计算机系统的层次结构"><a href="#计算机系统的层次结构" class="headerlink" title="计算机系统的层次结构"></a>计算机系统的层次结构</h3><p>从底层硬件到上层软件，计算机系统可划分为六个层次：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第1章 计算机系统概述.assets/system-hierarchy.png" alt="计算机系统层次结构" title="">
+                </div>
+                <div class="image-caption">计算机系统层次结构</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">层次</th>
+<th align="left">名称</th>
+<th align="left">使用者</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">第 1 层</td>
+<td align="left">逻辑电路层</td>
+<td align="left">硬件工程师</td>
+<td align="left">逻辑门、寄存器等底层电路</td>
+</tr>
+<tr>
+<td align="left">第 2 层</td>
+<td align="left">微程序层</td>
+<td align="left">硬件工程师</td>
+<td align="left">一条机器指令由一段<strong>微程序</strong>解释执行</td>
+</tr>
+<tr>
+<td align="left">第 3 层</td>
+<td align="left">指令集体系结构层（ISA）</td>
+<td align="left"><strong>软硬件分界面</strong></td>
+<td align="left">机器指令的集合，软件与硬件的接口&#x2F;契约</td>
+</tr>
+<tr>
+<td align="left">第 4 层</td>
+<td align="left">操作系统层</td>
+<td align="left">系统程序员</td>
+<td align="left">管理硬件资源、向上提供系统调用</td>
+</tr>
+<tr>
+<td align="left">第 5 层</td>
+<td align="left">汇编语言层</td>
+<td align="left">汇编程序员</td>
+<td align="left">助记符编程，<strong>虚拟机器</strong></td>
+</tr>
+<tr>
+<td align="left">第 6 层</td>
+<td align="left">高级语言层</td>
+<td align="left">高级语言程序员</td>
+<td align="left">C、Java 等，<strong>虚拟机器</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>下层为上层服务，上层对下层透明</strong>：上层程序员无需关心下层实现细节。</li>
+<li>除第 1&#126;2 层是”实际机器”外，其余各层均由软件实现，称为<strong>虚拟机器</strong>。</li>
+<li><strong>ISA（指令集体系结构）<strong>规定指令格式、操作类型、寻址方式、寄存器组织等：同一 ISA 可用不同硬件实现（微架构），实现软硬件</strong>解耦</strong>。</li>
+<li>从程序员视角看三层机器：高级语言程序员（第 6 层）→ 汇编语言程序员（第 5 层）→ 机器级程序员（第 3 层及以下）；层次越低，越需要了解底层细节。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>ISA 是软件与硬件的分界面</strong>；一条机器语言指令的落地路径是”高级语言 →（编译）→ 汇编语言 →（汇编）→ 机器语言 →（微程序解释执行）→ 硬件”。</p>
+</blockquote>
+<h3 id="三级语言与三种翻译程序"><a href="#三级语言与三种翻译程序" class="headerlink" title="三级语言与三种翻译程序"></a>三级语言与三种翻译程序</h3><table>
+<thead>
+<tr>
+<th align="left">语言</th>
+<th align="left">特点</th>
+<th align="left">翻译方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>机器语言</strong></td>
+<td align="left">二进制代码，<strong>唯一能被硬件直接识别执行</strong></td>
+<td align="left">无需翻译</td>
+</tr>
+<tr>
+<td align="left"><strong>汇编语言</strong></td>
+<td align="left">用助记符（ADD、MOV）表示机器指令</td>
+<td align="left">由<strong>汇编程序</strong>翻译成机器语言</td>
+</tr>
+<tr>
+<td align="left"><strong>高级语言</strong></td>
+<td align="left">接近自然语言与数学表达（C、Java）</td>
+<td align="left">由<strong>编译程序</strong>或<strong>解释程序</strong>处理</td>
+</tr>
+</tbody></table>
+<p>三种翻译程序的对比（重点）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">汇编程序</th>
+<th align="left">编译程序</th>
+<th align="left">解释程序</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">翻译对象</td>
+<td align="left"><strong>汇编语言 → 机器语言</strong></td>
+<td align="left"><strong>高级语言 → 机器语言（或先译为汇编）</strong></td>
+<td align="left"><strong>高级语言逐句翻译执行</strong></td>
+</tr>
+<tr>
+<td align="left">工作方式</td>
+<td align="left">整体翻译</td>
+<td align="left"><strong>整体翻译一次</strong>，生成目标程序</td>
+<td align="left"><strong>逐句翻译、逐句执行</strong></td>
+</tr>
+<tr>
+<td align="left">是否生成目标代码</td>
+<td align="left">是</td>
+<td align="left"><strong>是</strong>（可脱离翻译程序独立反复运行）</td>
+<td align="left"><strong>否</strong>（每次执行都要解释程序在场）</td>
+</tr>
+<tr>
+<td align="left">执行速度</td>
+<td align="left">快</td>
+<td align="left">快</td>
+<td align="left">慢</td>
+</tr>
+<tr>
+<td align="left">典型场景</td>
+<td align="left">汇编源程序</td>
+<td align="left">C&#x2F;C++、Fortran</td>
+<td align="left">Python、JavaScript</td>
+</tr>
+</tbody></table>
+<h3 id="软件和硬件的关系：逻辑等价"><a href="#软件和硬件的关系：逻辑等价" class="headerlink" title="软件和硬件的关系：逻辑等价"></a>软件和硬件的关系：逻辑等价</h3><ul>
+<li><strong>任何操作既可以由硬件实现，也可以由软件实现</strong>——即软硬件<strong>逻辑等价</strong>。如乘法可用硬件乘法器（快、成本高），也可用”加法 + 移位”的软件子程序（慢、省钱）实现。</li>
+<li><strong>固件（Firmware）</strong>：具有软件特性的硬件（如固化在 ROM 中的微程序、引导程序），兼具硬件的<strong>快速性</strong>与软件的<strong>灵活性</strong>。</li>
+<li>设计权衡：性能关键、使用频繁的操作用硬件实现（硬化），灵活多变、较少使用的用软件实现（软化），按价格、速度、变更频率取舍。</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：编译程序<strong>生成目标代码</strong>、解释程序<strong>不生成目标代码</strong>——解释是”翻译一句、执行一句”，不产生可独立运行的目标程序。</p>
+</blockquote>
+<h2 id="冯·诺依曼计算机的结构"><a href="#冯·诺依曼计算机的结构" class="headerlink" title="冯·诺依曼计算机的结构"></a>冯·诺依曼计算机的结构</h2><h3 id="存储程序思想"><a href="#存储程序思想" class="headerlink" title="存储程序思想"></a>存储程序思想</h3><p>1945 年冯·诺依曼提出**存储程序（Stored Program）**概念，奠定了现代计算机体系结构的基础：</p>
+<ul>
+<li><strong>指令和数据以同等地位、用二进制形式</strong>，事先存入存储器；</li>
+<li>机器按<strong>地址</strong>访问，<strong>逐条自动取出指令并顺序执行</strong>（遇转移指令才改变顺序）；</li>
+<li>程序启动前必须先装入主存；运行就是不断循环”<strong>取指令 → 分析指令 → 执行指令</strong>“，无需人工干预。</li>
+</ul>
+<h3 id="五大部件及其功能"><a href="#五大部件及其功能" class="headerlink" title="五大部件及其功能"></a>五大部件及其功能</h3><table>
+<thead>
+<tr>
+<th align="left">部件</th>
+<th align="left">功能</th>
+<th align="left">典型内部结构</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>运算器</strong></td>
+<td align="left">完成<strong>算术运算与逻辑运算</strong></td>
+<td align="left">ALU、ACC（累加器）、MQ（乘商）、X（操作数）</td>
+</tr>
+<tr>
+<td align="left"><strong>控制器</strong></td>
+<td align="left"><strong>指挥中心</strong>：取指令、分析指令、发出控制信号协调各部件</td>
+<td align="left">PC、IR、ID、CU</td>
+</tr>
+<tr>
+<td align="left"><strong>存储器</strong></td>
+<td align="left">存放<strong>指令和数据</strong>（两者同等地位）</td>
+<td align="left">存储体、MAR、MDR</td>
+</tr>
+<tr>
+<td align="left"><strong>输入设备</strong></td>
+<td align="left">将程序和数据转换成机器能识别的形式</td>
+<td align="left">键盘、鼠标</td>
+</tr>
+<tr>
+<td align="left"><strong>输出设备</strong></td>
+<td align="left">将处理结果转换成人能识别的形式</td>
+<td align="left">显示器、打印机</td>
+</tr>
+</tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第1章 计算机系统概述.assets/von-neumann-structure.png" alt="冯·诺依曼计算机五大部件结构与数据流" title="">
+                </div>
+                <div class="image-caption">冯·诺依曼计算机五大部件结构与数据流</div>
+            </figure>
+
+<p>图中实线为<strong>数据流</strong>、虚线为<strong>控制流</strong>（反馈）：输入设备把程序和数据送入存储器，运算器与存储器交换数据，控制器发控制信号指挥全局，结果经输出设备送出。</p>
+<h3 id="以运算器为中心到以存储器为中心"><a href="#以运算器为中心到以存储器为中心" class="headerlink" title="以运算器为中心到以存储器为中心"></a>以运算器为中心到以存储器为中心</h3><p>早期冯·诺依曼机<strong>以运算器为中心</strong>：I&#x2F;O 设备与存储器之间的数据传送都要经过运算器，运算器忙于搬运数据、效率低。现代计算机改进为<strong>以存储器为中心</strong>，I&#x2F;O 设备可与主存直接交换数据（如 <strong>DMA</strong> 方式），并进行功能集成：</p>
+<ul>
+<li><strong>CPU &#x3D; 运算器 + 控制器</strong>（集成在同一芯片）</li>
+<li><strong>主机 &#x3D; CPU + 主存储器</strong></li>
+<li><strong>外设（I&#x2F;O 设备）&#x3D; 输入设备 + 输出设备 + 辅助存储器</strong></li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第1章 计算机系统概述.assets/modern-computer-structure.png" alt="现代计算机结构：CPU、主存与 I/O 设备" title="">
+                </div>
+                <div class="image-caption">现代计算机结构：CPU、主存与 I/O 设备</div>
+            </figure>
+
+<blockquote>
+<p><strong>考点</strong>：冯·诺依曼机以<strong>运算器</strong>为中心，现代计算机以<strong>存储器</strong>为中心；<strong>主机 &#x3D; CPU + 主存</strong>，辅存（外存）从主机组成角度归入外设。</p>
+</blockquote>
+<h2 id="计算机的工作过程"><a href="#计算机的工作过程" class="headerlink" title="计算机的工作过程"></a>计算机的工作过程</h2><h3 id="关键寄存器一览"><a href="#关键寄存器一览" class="headerlink" title="关键寄存器一览"></a>关键寄存器一览</h3><table>
+<thead>
+<tr>
+<th align="left">寄存器</th>
+<th align="left">全称</th>
+<th align="left">所属</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>PC</strong></td>
+<td align="left">程序计数器</td>
+<td align="left">控制器</td>
+<td align="left">存放<strong>下一条</strong>指令的地址，具有自动 <strong>+1</strong> 功能</td>
+</tr>
+<tr>
+<td align="left"><strong>IR</strong></td>
+<td align="left">指令寄存器</td>
+<td align="left">控制器</td>
+<td align="left">存放<strong>当前正在执行</strong>的指令</td>
+</tr>
+<tr>
+<td align="left"><strong>ID</strong></td>
+<td align="left">指令译码器</td>
+<td align="left">控制器</td>
+<td align="left">对操作码译码，识别指令类型</td>
+</tr>
+<tr>
+<td align="left"><strong>CU</strong></td>
+<td align="left">控制单元</td>
+<td align="left">控制器</td>
+<td align="left">产生微操作控制信号，指挥各部件</td>
+</tr>
+<tr>
+<td align="left"><strong>MAR</strong></td>
+<td align="left">存储器地址寄存器</td>
+<td align="left">主存</td>
+<td align="left">存放要访问单元的地址；n 位 → 可寻址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个单元</td>
+</tr>
+<tr>
+<td align="left"><strong>MDR</strong></td>
+<td align="left">存储器数据寄存器</td>
+<td align="left">主存</td>
+<td align="left">存放与主存交换的数据；位数 &#x3D; 存储字长</td>
+</tr>
+<tr>
+<td align="left"><strong>ACC</strong></td>
+<td align="left">累加器</td>
+<td align="left">运算器</td>
+<td align="left">存放操作数或运算结果</td>
+</tr>
+<tr>
+<td align="left"><strong>ALU</strong></td>
+<td align="left">算术逻辑单元</td>
+<td align="left">运算器</td>
+<td align="left">执行算术&#x2F;逻辑运算</td>
+</tr>
+<tr>
+<td align="left"><strong>PSW</strong></td>
+<td align="left">程序状态字寄存器</td>
+<td align="left">运算器</td>
+<td align="left">记录标志位（CF、ZF、SF、OF）</td>
+</tr>
+</tbody></table>
+<h3 id="一条指令的完整执行流程"><a href="#一条指令的完整执行流程" class="headerlink" title="一条指令的完整执行流程"></a>一条指令的完整执行流程</h3><p>以指令 <code>ADD M</code>（将主存 M 单元的内容与 ACC 相加）为例，一条指令的执行分三步：</p>
+<p><strong>① 取指令</strong>——把指令从主存取到 IR：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PC ──▶ MAR ──▶ 地址总线 ──▶ 主存 ──▶ 数据总线 ──▶ MDR ──▶ IR</span><br><span class="line">（同时 PC 自动 +1，指向下一条指令）</span><br></pre></td></tr></table></figure>
+
+<p><strong>② 分析指令</strong>——译码并产生控制信号：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IR 的操作码 OP(IR) ──▶ ID 译码 ──▶ CU 发出对应微操作控制信号</span><br></pre></td></tr></table></figure>
+
+<p><strong>③ 执行指令</strong>——取操作数并运算：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">IR 的地址码 AD(IR) ──▶ MAR ──▶ 地址总线 ──▶ 主存 ──▶ 数据总线 ──▶ MDR ──▶ X</span><br><span class="line">CU 控制 ALU 执行 (ACC) + (X)，结果写回 ACC</span><br></pre></td></tr></table></figure>
+
+<p>执行完毕后回到①取下一条指令，整个程序就是”取指→分析→执行”的循环，直到停机指令。完整的<strong>指令周期</strong>可包含：<strong>取指周期 → 间址周期（间接寻址时再访存一次取有效地址）→ 执行周期 → 中断周期</strong>（有中断请求时响应）。</p>
+<blockquote>
+<p><strong>考点</strong>：取指数据通路一步不差地记牢——<strong>PC → MAR → 主存 → MDR → IR</strong>；<strong>PC 存”下一条”指令地址、IR 存”当前”指令</strong>；PC 自动加 1 发生在<strong>取指阶段</strong>。<br><strong>易错点</strong>：<strong>MAR、MDR、IR、PSW 对程序员透明（不可见）</strong>，PC 可编程访问（可见）；间址周期是”再访存取地址”，不是”取操作数”。</p>
+</blockquote>
+<p>以 <code>c = a + b</code> 为例，编译后大致生成四条指令：<code>LOAD R1,[a]</code>、<code>LOAD R2,[b]</code>、<code>ADD R3,R1,R2</code>、<code>STORE [c],R3</code>，每条都走一遍上述取指→分析→执行的循环。</p>
+<h2 id="计算机的性能指标"><a href="#计算机的性能指标" class="headerlink" title="计算机的性能指标"></a>计算机的性能指标</h2><h3 id="机器字长、数据通路带宽与主存容量"><a href="#机器字长、数据通路带宽与主存容量" class="headerlink" title="机器字长、数据通路带宽与主存容量"></a>机器字长、数据通路带宽与主存容量</h3><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">定义</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>机器字长</strong></td>
+<td align="left">CPU <strong>一次能处理的二进制位数</strong>（内部寄存器&#x2F;ALU 宽度）</td>
+<td align="left">字长越长精度越高、寻址范围越大</td>
+</tr>
+<tr>
+<td align="left"><strong>指令字长</strong></td>
+<td align="left">一条指令的二进制位数</td>
+<td align="left">可等于或数倍于机器字长</td>
+</tr>
+<tr>
+<td align="left"><strong>存储字长</strong></td>
+<td align="left">一个存储单元存放的二进制位数</td>
+<td align="left">通常等于 MDR 位数</td>
+</tr>
+<tr>
+<td align="left"><strong>数据通路带宽</strong></td>
+<td align="left">数据总线一次能<strong>并行传送</strong>的位数</td>
+<td align="left">又称总线宽度，影响传输效率</td>
+</tr>
+<tr>
+<td align="left"><strong>主存容量</strong></td>
+<td align="left"><strong>存储单元个数 × 存储字长</strong></td>
+<td align="left">MAR 16 位、MDR 32 位 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">16</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">32</span></span></span></span> bit &#x3D; 256 KB</td>
+</tr>
+<tr>
+<td align="left"><strong>主存带宽</strong></td>
+<td align="left">每秒可从主存读&#x2F;写的最大数据量</td>
+<td align="left">&#x3D; 数据总线宽度 × 工作频率（DDR 再 ×每周期传输次数）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：主存容量由 <strong>MAR 位数决定单元个数（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span>）、MDR 位数决定存储字长</strong>；容量单位用 2 的幂（1 KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> B、1 GB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">30</span></span></span></span></span></span></span></span></span></span></span></span> B），速率单位（带宽、FLOPS）用 10 的幂。</p>
+</blockquote>
+<h3 id="主频与-CPU-时钟周期"><a href="#主频与-CPU-时钟周期" class="headerlink" title="主频与 CPU 时钟周期"></a>主频与 CPU 时钟周期</h3><ul>
+<li><strong>CPU 时钟周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></strong>：CPU 工作的<strong>最小时间单位</strong>，每个动作至少占一个时钟周期。</li>
+<li><strong>主频 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span></strong>：CPU 内数字脉冲信号的振荡频率，单位 Hz（如 2 GHz）。</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2019em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p>例：主频 2 GHz → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0908em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">ns</span></span></span></span></span>。</p>
+<h3 id="CPI-与-CPU-执行时间（核心公式）"><a href="#CPI-与-CPU-执行时间（核心公式）" class="headerlink" title="CPI 与 CPU 执行时间（核心公式）"></a>CPI 与 CPU 执行时间（核心公式）</h3><p><strong>CPI（Clock cycles Per Instruction）</strong>：执行<strong>一条指令</strong>所需的<strong>平均</strong>时钟周期数。不同指令 CPI 不同（如加法 CPI&#x3D;1、乘法可达 3&#126;5），混合程序要按<strong>占比加权平均</strong>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">总指令条数</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">总时钟周期数</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3277em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">为第</span><span class="mord"> </span></span><span class="mord mathnormal">i</span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">类指令占比</span></span><span class="mclose">)</span></span></span></span></span>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">CPU </span><span class="mord cjk_fallback">执行时间</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord cjk_fallback">指令条数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2408em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">指令条数</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<p><strong>例题 1</strong>：某 CPU 主频 2 GHz、平均 CPI 为 4，程序共含 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span> 条指令，求 CPU 执行时间与 MIPS。</p>
+<ul>
+<li>时钟周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0908em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> ns</li>
+<li>总时钟周期数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></li>
+<li><strong>CPU 执行时间</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1</span><span class="mspace"> </span><span class="mord mathbf">s</span></span></span></span></span></li>
+<li><strong>MIPS</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.1408em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2604em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">500</span></span></span></span></span> MIPS</li>
+</ul>
+<p><strong>验算</strong>：MIPS &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.1297em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">执行时间</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">指令条数</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2604em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">500</span></span></span></span> ✓</p>
+<blockquote>
+<p><strong>考点</strong>：决定 CPU 执行时间的三个因素——<strong>指令条数</strong>（算法与编译器决定）、<strong>CPI</strong>（ISA 与微架构决定）、<strong>时钟周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></strong>（硬件工艺决定）。</p>
+</blockquote>
+<p><strong>例题 2（综合例题）</strong>：某程序含三类指令：A 类 120 条（CPI&#x3D;1）、B 类 60 条（CPI&#x3D;2）、C 类 20 条（CPI&#x3D;4），机器主频 400 MHz。求平均 CPI、总时钟周期数、CPU 执行时间与 MIPS。</p>
+<ul>
+<li>总指令数 &#x3D; 120 + 60 + 20 &#x3D; <strong>200 条</strong></li>
+<li><strong>总时钟周期数</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">120</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">60</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">120</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">120</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">80</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">320</span></span></span></span></span></li>
+<li><strong>平均 CPI</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">320</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1.6</span></span></span></span></span></li>
+<li>时钟周期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0908em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.5</span></span></span></span> ns</li>
+<li><strong>CPU 执行时间</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">320</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">ns</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">800</span><span class="mspace"> </span><span class="mord mathbf">ns</span></span></span></span></span></li>
+<li><strong>MIPS</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.2604em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1.6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">250</span></span></span></span></span> MIPS</li>
+</ul>
+<p><strong>验算</strong>：MIPS &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0908em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">800</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">9</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0.8</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">250</span></span></span></span> ✓</p>
+<blockquote>
+<p><strong>易错点</strong>：平均 CPI <strong>不是</strong>各类指令 CPI 的简单算术平均，必须按条数（占比）<strong>加权</strong>；代入 MIPS 公式时注意主频与 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> 的换算。</p>
+</blockquote>
+<p><strong>例题 3（两机对比）</strong>：执行同一程序（指令条数均为 N），机器 A 主频 2 GHz、CPI&#x3D;1.5；机器 B 主频 2.5 GHz、CPI&#x3D;2，问哪台更快？</p>
+<ul>
+<li>A 的执行时间 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.5/</span><span class="mopen">(</span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">0.75</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> ns</li>
+<li>B 的执行时间 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2/</span><span class="mopen">(</span><span class="mord">2.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">0.8</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> ns</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord">0.75</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">0.8</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span>，<strong>A 更快</strong>；B 时间是 A 的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0.75</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0.8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1.07</span></span></span></span> 倍（A 性能约为 B 的 1.07 倍）。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>主频高不一定快</strong>——性能还取决于 CPI 与指令条数，比较性能只能用<strong>同一程序的总执行时间</strong>。</p>
+</blockquote>
+<p><strong>例题 4（优化前后对比）</strong>：某程序中访存指令占 40%（CPI&#x3D;3），其余指令 CPI&#x3D;1。优化后访存指令的 <strong>CPI 减半</strong>，求平均 CPI 变化与加速比（主频不变）。</p>
+<ul>
+<li>优化前平均 CPI &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1.8</span></span></span></span></span></li>
+<li>优化后平均 CPI &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1.2</span></span></span></span></span></li>
+<li>指令条数与主频不变，执行时间与 CPI 成正比：总时间变为原来的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1.8</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1.2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></li>
+<li><strong>加速比</strong> &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1.2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1.8</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord"><span class="mord mathbf">1.5</span></span></span></span></span></li>
+</ul>
+<h3 id="MIPS-与-FLOPS"><a href="#MIPS-与-FLOPS" class="headerlink" title="MIPS 与 FLOPS"></a>MIPS 与 FLOPS</h3><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1297em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">执行时间</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">指令条数</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.1408em;vertical-align:-0.7693em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">每秒执行多少百万条指令</span></span><span class="mclose">)</span></span></span></span></span>
+<p><strong>FLOPS（Floating-point Operations Per Second）</strong>：每秒浮点运算次数，衡量科学计算与超算性能；各量级每级 ×10³ 递进：</p>
+<table>
+<thead>
+<tr>
+<th align="left">单位</th>
+<th align="left">数量级</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>MFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒百万次浮点运算</td>
+</tr>
+<tr>
+<td align="left"><strong>GFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒十亿次</td>
+</tr>
+<tr>
+<td align="left"><strong>TFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒万亿次</td>
+</tr>
+<tr>
+<td align="left"><strong>PFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒千万亿次（超算常用）</td>
+</tr>
+<tr>
+<td align="left"><strong>EFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">18</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒百亿亿次</td>
+</tr>
+<tr>
+<td align="left"><strong>ZFLOPS</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">21</span></span></span></span></span></span></span></span></span></span></span></span></td>
+<td align="left">每秒十万亿亿次</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：MIPS 以<strong>指令</strong>为单位、FLOPS 以<strong>浮点运算</strong>为单位，二者不能直接换算；FLOPS 记住递推 <strong>M → G → T → P → E → Z，每级 ×10³</strong>。</p>
+</blockquote>
+<h3 id="吞吐量、响应时间与基准程序"><a href="#吞吐量、响应时间与基准程序" class="headerlink" title="吞吐量、响应时间与基准程序"></a>吞吐量、响应时间与基准程序</h3><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">定义</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>吞吐量</strong></td>
+<td align="left">系统<strong>单位时间内完成的作业&#x2F;请求数</strong></td>
+<td align="left">作业数&#x2F;s、TPS、QPS，衡量系统整体处理能力</td>
+</tr>
+<tr>
+<td align="left"><strong>响应时间</strong></td>
+<td align="left">从<strong>提交请求到获得首个结果</strong>的总时间</td>
+<td align="left">&#x3D; CPU 时间 + I&#x2F;O 与等待时间</td>
+</tr>
+<tr>
+<td align="left"><strong>利用率</strong></td>
+<td align="left">资源实际使用时间占总时间的比例</td>
+<td align="left">百分比（%）</td>
+</tr>
+</tbody></table>
+<p><strong>基准程序（Benchmark）</strong>：用一组专门设计的<strong>真实程序</strong>（如 SPEC 套件）综合测量机器性能，比单一指标（如主频）更客观；但要警惕厂商针对基准程序做<strong>针对性优化</strong>导致结果失真。吞吐量与响应时间往往相互制约：提高吞吐量（多道并发）可能拉长单个任务的响应时间。</p>
+<h3 id="性能指标关系表"><a href="#性能指标关系表" class="headerlink" title="性能指标关系表"></a>性能指标关系表</h3><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">公式 &#x2F; 关系</th>
+<th align="left">决定因素</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">时钟周期</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span></td>
+<td align="left">硬件工艺</td>
+</tr>
+<tr>
+<td align="left">主频</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></td>
+<td align="left">硬件工艺</td>
+</tr>
+<tr>
+<td align="left">CPI</td>
+<td align="left">总周期数 &#x2F; 总指令数（加权平均）</td>
+<td align="left">ISA + 微架构</td>
+</tr>
+<tr>
+<td align="left">CPU 执行时间</td>
+<td align="left">指令条数 × CPI × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> &#x3D; 指令条数 × CPI &#x2F; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span></td>
+<td align="left">三者共同决定</td>
+</tr>
+<tr>
+<td align="left">MIPS</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord">/</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">主频 + CPI</td>
+</tr>
+<tr>
+<td align="left">FLOPS</td>
+<td align="left">每秒浮点运算次数（M&#x2F;G&#x2F;T&#x2F;P&#x2F;E&#x2F;Z）</td>
+<td align="left">浮点部件吞吐能力</td>
+</tr>
+<tr>
+<td align="left">吞吐量 &#x2F; 响应时间</td>
+<td align="left">系统级指标</td>
+<td align="left">软硬件整体 + 负载情况</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：提升性能的三条路——<strong>减少指令条数</strong>（改进算法&#x2F;编译器）、<strong>降低 CPI</strong>（流水线、超标量）、<strong>缩短时钟周期</strong>（提升工艺）。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">冯·诺依曼核心</td>
+<td align="left"><strong>存储程序</strong>：指令和数据同等地位、二进制存放、按地址顺序执行</td>
+</tr>
+<tr>
+<td align="left">五大部件与主机</td>
+<td align="left">输入、输出、存储器、运算器、控制器；CPU &#x3D; 运算器 + 控制器；主机 &#x3D; CPU + 主存</td>
+</tr>
+<tr>
+<td align="left">中心转移</td>
+<td align="left">冯·诺依曼机以<strong>运算器</strong>为中心 → 现代以<strong>存储器</strong>为中心（DMA 直连主存）</td>
+</tr>
+<tr>
+<td align="left">MAR &#x2F; MDR</td>
+<td align="left">MAR n 位 → 寻址 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 个单元；MDR 位数 &#x3D; 存储字长</td>
+</tr>
+<tr>
+<td align="left">取指流程</td>
+<td align="left"><strong>PC → MAR → 主存 → MDR → IR</strong>（同时 PC+1）；PC 存下条地址、IR 存当前指令</td>
+</tr>
+<tr>
+<td align="left">指令周期</td>
+<td align="left">取指 → 间址 → 执行 → 中断；程序运行 &#x3D; “取指→分析→执行”循环</td>
+</tr>
+<tr>
+<td align="left">逻辑等价与固件</td>
+<td align="left"><strong>任何操作软&#x2F;硬件皆可实现</strong>；固件 &#x3D; 具有软件特性的硬件（快 + 活）</td>
+</tr>
+<tr>
+<td align="left">三种翻译程序</td>
+<td align="left">汇编：助记符→机器码；编译：<strong>整体翻译生成目标代码</strong>；解释：<strong>逐句执行不生成</strong></td>
+</tr>
+<tr>
+<td align="left">系统软件</td>
+<td align="left"><strong>DBMS、编译&#x2F;解释&#x2F;汇编程序、操作系统都是系统软件</strong></td>
+</tr>
+<tr>
+<td align="left">主频与时钟周期</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>；主频 2 GHz → T &#x3D; 0.5 ns</td>
+</tr>
+<tr>
+<td align="left">CPI 与执行时间</td>
+<td align="left">CPI &#x3D; 总周期数&#x2F;总指令数（<strong>加权平均</strong>）；CPU 时间 &#x3D; 指令条数 × CPI × <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">MIPS</td>
+<td align="left">&#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mord">/</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> &#x3D; 指令条数&#x2F;(执行时间×<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span>)</td>
+</tr>
+<tr>
+<td align="left">FLOPS 量级</td>
+<td align="left">M(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span>)→G(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span>)→T(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>)→P(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span>)→E(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">18</span></span></span></span></span></span></span></span></span></span></span></span>)→Z(<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">21</span></span></span></span></span></span></span></span></span></span></span></span>)，每级 ×10³</td>
+</tr>
+<tr>
+<td align="left">主频高 ≠ 快</td>
+<td align="left">还要看 CPI 与指令数；比较性能用同一程序的<strong>总执行时间</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T07:22:51.364Z" itemprop="dateUpdated">2026-08-29 15:22:51</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&title=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&title=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E5%AE%9A%E7%82%B9%E6%95%B0%E7%9A%84%E8%A1%A8%E7%A4%BA%E4%B8%8E%E8%BF%90%E7%AE%97/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">定点数的表示与运算</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/IO%E7%AE%A1%E7%90%86%E4%B8%8E%E7%A3%81%E7%9B%98/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">IO管理与磁盘</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&title=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&title=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《计算机系统概述与性能指标》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0%E4%B8%8E%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

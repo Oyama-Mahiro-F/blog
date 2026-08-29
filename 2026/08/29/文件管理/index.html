@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>文件管理 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,操作系统,文件管理">
+    <meta name="description" content="文件管理是操作系统对信息资源的管理：把磁盘这块”一维的原始空间”组织成用户眼中”按名存取的文件树”。408 对本章考查密度极高：文件的逻辑&#x2F;物理结构、FCB 与索引结点 inode、打开文件表、UNIX 混合索引计算、位示图换算、硬链接与软链接、成组链接法、VFS 与挂载都是高频命题点，其中混合索引与位示图两类计算题几乎年年出现。 文件的基本概念文件（File）：以计算机外存为载体、以文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件管理">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="文件管理是操作系统对信息资源的管理：把磁盘这块”一维的原始空间”组织成用户眼中”按名存取的文件树”。408 对本章考查密度极高：文件的逻辑&#x2F;物理结构、FCB 与索引结点 inode、打开文件表、UNIX 混合索引计算、位示图换算、硬链接与软链接、成组链接法、VFS 与挂载都是高频命题点，其中混合索引与位示图两类计算题几乎年年出现。 文件的基本概念文件（File）：以计算机外存为载体、以文">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC4%E7%AB%A0%20%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86.assets/open-file-table.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC4%E7%AB%A0%20%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86.assets/hard-soft-link.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC4%E7%AB%A0%20%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86.assets/disk-layout.png">
+<meta property="article:published_time" content="2026-08-29T10:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T07:07:48.282Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="文件管理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/OS%E7%AC%AC4%E7%AB%A0%20%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86.assets/open-file-table.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">文件管理</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">文件管理</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T10:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.</span> <span class="post-toc-text">文件的基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">文件的属性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%B8%89%E4%B8%AA%E5%B1%82%E6%AC%A1"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">文件系统的三个层次</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E6%8E%A7%E5%88%B6%E5%9D%97-FCB-%E4%B8%8E%E7%B4%A2%E5%BC%95%E7%BB%93%E7%82%B9-inode"><span class="post-toc-number">2.</span> <span class="post-toc-text">文件控制块 FCB 与索引结点 inode</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E6%8E%A7%E5%88%B6%E5%9D%97-FCB"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">文件控制块 FCB</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E7%82%B9-inode%EF%BC%9A%E7%9B%AE%E5%BD%95%E6%A3%80%E7%B4%A2%E6%8F%90%E9%80%9F%E7%9A%84%E5%85%B3%E9%94%AE"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">索引结点 inode：目录检索提速的关键</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A3%81%E7%9B%98-inode-%E4%B8%8E%E5%86%85%E5%AD%98-inode"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">磁盘 inode 与内存 inode</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E6%93%8D%E4%BD%9C%E4%B8%8E%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6%E8%A1%A8"><span class="post-toc-number">3.</span> <span class="post-toc-text">文件的操作与打开文件表</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">文件的基本操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#open-%E7%9A%84%E6%9C%AC%E8%B4%A8%EF%BC%88%E9%AB%98%E9%A2%91%EF%BC%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">open 的本质（高频）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%A4%E7%BA%A7%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6%E8%A1%A8"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">两级打开文件表</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E4%BF%9D%E6%8A%A4"><span class="post-toc-number">4.</span> <span class="post-toc-text">文件的保护</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84"><span class="post-toc-number">5.</span> <span class="post-toc-text">文件的逻辑结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">顺序文件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%B4%A2%E5%BC%95%E6%96%87%E4%BB%B6"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">索引文件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%B4%A2%E5%BC%95%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">索引顺序文件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%89%E7%A7%8D%E6%9C%89%E7%BB%93%E6%9E%84%E9%80%BB%E8%BE%91%E7%BB%93%E6%9E%84%E5%AF%B9%E6%AF%94"><span class="post-toc-number">5.4.</span> <span class="post-toc-text">三种有结构逻辑结构对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E7%89%A9%E7%90%86%E7%BB%93%E6%9E%84%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">6.</span> <span class="post-toc-text">文件的物理结构（重点）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%88%86%E9%85%8D"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">连续分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%93%BE%E6%8E%A5%E5%88%86%E9%85%8D"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">链接分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%B4%A2%E5%BC%95%E5%88%86%E9%85%8D"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">索引分配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%89%A9%E7%90%86%E7%BB%93%E6%9E%84%E5%9B%9B%E6%96%B9%E5%BC%8F%E5%A4%A7%E5%AF%B9%E6%AF%94%EF%BC%88%E5%BF%85%E8%83%8C%EF%BC%89"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">物理结构四方式大对比（必背）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#UNIX-%E6%B7%B7%E5%90%88%E7%B4%A2%E5%BC%95%EF%BC%88%E5%BF%85%E8%80%83%E8%AE%A1%E7%AE%97%EF%BC%89"><span class="post-toc-number">6.5.</span> <span class="post-toc-text">UNIX 混合索引（必考计算）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%9B%AE%E5%BD%95%E7%AE%A1%E7%90%86"><span class="post-toc-number">7.</span> <span class="post-toc-text">目录管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%AE%E5%BD%95%E4%B8%8E%E7%9B%AE%E5%BD%95%E9%A1%B9"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">目录与目录项</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%91%E5%BD%A2%E7%9B%AE%E5%BD%95%E4%B8%8E%E8%B7%AF%E5%BE%84%E8%A7%A3%E6%9E%90"><span class="post-toc-number">7.2.</span> <span class="post-toc-text">树形目录与路径解析</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A1%AC%E9%93%BE%E6%8E%A5%E4%B8%8E%E8%BD%AF%E9%93%BE%E6%8E%A5"><span class="post-toc-number">7.3.</span> <span class="post-toc-text">硬链接与软链接</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%85%A8%E5%B1%80%E7%BB%93%E6%9E%84"><span class="post-toc-number">8.</span> <span class="post-toc-text">文件系统的全局结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%96%E5%AD%98%EF%BC%88%E7%A3%81%E7%9B%98%EF%BC%89%E4%B8%8A%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-number">8.1.</span> <span class="post-toc-text">外存（磁盘）上的结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84"><span class="post-toc-number">8.2.</span> <span class="post-toc-text">内存中的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%96%E5%AD%98%E7%A9%BA%E9%97%B2%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">9.</span> <span class="post-toc-text">外存空闲空间管理（重点）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A9%BA%E9%97%B2%E8%A1%A8%E6%B3%95"><span class="post-toc-number">9.1.</span> <span class="post-toc-text">空闲表法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8%E6%B3%95"><span class="post-toc-number">9.2.</span> <span class="post-toc-text">空闲链表法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BD%8D%E7%A4%BA%E5%9B%BE%E6%B3%95%EF%BC%88%E5%BF%85%E8%80%83%E8%AE%A1%E7%AE%97%EF%BC%89"><span class="post-toc-number">9.3.</span> <span class="post-toc-text">位示图法（必考计算）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%88%90%E7%BB%84%E9%93%BE%E6%8E%A5%E6%B3%95%EF%BC%88UNIX%EF%BC%89"><span class="post-toc-number">9.4.</span> <span class="post-toc-text">成组链接法（UNIX）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A9%BA%E9%97%B2%E7%AE%A1%E7%90%86%E5%9B%9B%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="post-toc-number">9.5.</span> <span class="post-toc-text">空闲管理四方法对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F-VFS"><span class="post-toc-number">10.</span> <span class="post-toc-text">虚拟文件系统 VFS</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%8C%82%E8%BD%BD"><span class="post-toc-number">11.</span> <span class="post-toc-text">文件系统挂载</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">12.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-文件管理"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">文件管理</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 18:00:00" datetime="2026-08-29T10:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>文件管理</strong>是操作系统对<strong>信息资源</strong>的管理：把磁盘这块”一维的原始空间”组织成用户眼中”按名存取的文件树”。408 对本章考查密度极高：<strong>文件的逻辑&#x2F;物理结构、FCB 与索引结点 inode、打开文件表、UNIX 混合索引计算、位示图换算、硬链接与软链接、成组链接法、VFS 与挂载</strong>都是高频命题点，其中<strong>混合索引</strong>与<strong>位示图</strong>两类计算题几乎年年出现。</p>
+<h2 id="文件的基本概念"><a href="#文件的基本概念" class="headerlink" title="文件的基本概念"></a>文件的基本概念</h2><p><strong>文件（File）</strong>：以计算机<strong>外存</strong>为载体、以<strong>文件名</strong>为标识的一组相关信息的集合，是操作系统<strong>信息管理的最小单位</strong>。文件由<strong>文件名 + 文件属性 + 文件内容</strong>构成：用户按名存取，系统按属性管理。</p>
+<h3 id="文件的属性"><a href="#文件的属性" class="headerlink" title="文件的属性"></a>文件的属性</h3><table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>名称</strong></td>
+<td align="left">用户可见的<strong>符号名</strong>（可重名、可修改）</td>
+</tr>
+<tr>
+<td align="left"><strong>类型</strong></td>
+<td align="left">普通文件、目录文件、设备文件等</td>
+</tr>
+<tr>
+<td align="left"><strong>位置</strong></td>
+<td align="left">数据在外存上的<strong>物理地址</strong>（记录在 FCB 中）</td>
+</tr>
+<tr>
+<td align="left"><strong>大小</strong></td>
+<td align="left">文件长度（字节数或块数）</td>
+</tr>
+<tr>
+<td align="left"><strong>保护</strong></td>
+<td align="left">访问控制信息（谁可读&#x2F;写&#x2F;执行）</td>
+</tr>
+<tr>
+<td align="left"><strong>时间与用户标识</strong></td>
+<td align="left">创建、最近访问、最近修改时间，创建者</td>
+</tr>
+<tr>
+<td align="left"><strong>标识符</strong></td>
+<td align="left">系统<strong>内部唯一编号</strong>（如 inode 号），对用户透明</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：文件名是给<strong>用户</strong>用的符号名；系统定位文件最终靠<strong>标识符（inode 号）</strong>，二者通过目录建立映射。</p>
+</blockquote>
+<h3 id="文件系统的三个层次"><a href="#文件系统的三个层次" class="headerlink" title="文件系统的三个层次"></a>文件系统的三个层次</h3><p>自顶向下一句话：<strong>用户接口</strong>（提供 open&#x2F;read&#x2F;write 等系统调用）→ <strong>文件目录系统</strong>（按名检索目录，完成”文件名 → inode&#x2F;FCB”映射）→ <strong>文件实现层</strong>（把逻辑块地址换算成物理块地址，管理磁盘空间与缓冲）。注意：<strong>逻辑结构与物理结构相互独立</strong>——逻辑结构解决”用户怎么看文件”，物理结构解决”文件怎么落盘”。</p>
+<h2 id="文件控制块-FCB-与索引结点-inode"><a href="#文件控制块-FCB-与索引结点-inode" class="headerlink" title="文件控制块 FCB 与索引结点 inode"></a>文件控制块 FCB 与索引结点 inode</h2><h3 id="文件控制块-FCB"><a href="#文件控制块-FCB" class="headerlink" title="文件控制块 FCB"></a>文件控制块 FCB</h3><p><strong>文件控制块（FCB, File Control Block）</strong>：存放文件全部管理信息的数据结构，是<strong>文件存在的标志</strong>；<strong>目录项 &#x3D; FCB</strong>——目录文件的内容就是一个个 FCB。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>基本信息</strong></td>
+<td align="left">文件名、类型、大小、<strong>逻辑结构、物理结构</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>位置信息</strong></td>
+<td align="left">数据块指针（起始块号 &#x2F; 索引块地址等）</td>
+</tr>
+<tr>
+<td align="left"><strong>访问控制信息</strong></td>
+<td align="left">文件属主、访问权限</td>
+</tr>
+<tr>
+<td align="left"><strong>使用信息</strong></td>
+<td align="left">打开计数、创建&#x2F;修改时间</td>
+</tr>
+</tbody></table>
+<h3 id="索引结点-inode：目录检索提速的关键"><a href="#索引结点-inode：目录检索提速的关键" class="headerlink" title="索引结点 inode：目录检索提速的关键"></a>索引结点 inode：目录检索提速的关键</h3><p>检索目录的本质是<strong>逐个比较目录项中的文件名</strong>：FCB 越大，一块磁盘能放的目录项越少，按名查找要读的盘块就越多。于是把 FCB 中<strong>除文件名外的全部信息</strong>抽出来放进<strong>索引结点（inode, index node）</strong>，目录项瘦身为”<strong>文件名 + inode 号</strong>“。</p>
+<p><strong>瘦身的收益（完整演算）</strong>：FCB 为 64B，盘块大小 1KB，目录共 640 项。</p>
+<ul>
+<li>不引入 inode：每块放 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">64</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span> 项，640 项占 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">640</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">40</span></span></span></span> 块；目标等概率出现在任意位置，平均读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">40</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">20</span></span></span></span> 次磁盘</li>
+<li>引入 inode：目录项 &#x3D; 14B 文件名 + 2B inode 号 &#x3D; 16B，每块放 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">16</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span> 项，占 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">640</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 块，平均读 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span> 次磁盘</li>
+<li>目录盘块数与平均访盘次数都降为原来的 <strong>1&#x2F;4</strong></li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：inode 的收益 &#x3D; <strong>目录变小 → 检索目录的磁盘 I&#x2F;O 次数成比例下降</strong>；目录小了也更容易常驻内存&#x2F;缓存，进一步加速按名检索。</p>
+</blockquote>
+<h3 id="磁盘-inode-与内存-inode"><a href="#磁盘-inode-与内存-inode" class="headerlink" title="磁盘 inode 与内存 inode"></a>磁盘 inode 与内存 inode</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">磁盘 inode</th>
+<th align="left">内存 inode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">存放位置</td>
+<td align="left">磁盘上的 inode 区</td>
+<td align="left">文件被<strong>打开</strong>时复制进内存</td>
+</tr>
+<tr>
+<td align="left">内容</td>
+<td align="left">文件类型、权限、物理地址、长度、<strong>链接计数</strong></td>
+<td align="left">磁盘 inode 全部内容 + <strong>打开标志、引用计数、锁标志、是否被修改</strong></td>
+</tr>
+<tr>
+<td align="left">作用</td>
+<td align="left">持久保存元数据</td>
+<td align="left">支持多进程并发打开、加快访问</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：内存 inode <strong>不是磁盘 inode 的简单副本</strong>——它多出”打开计数、锁标志、修改标志”等动态信息；文件是否写回磁盘由修改标志决定。</p>
+</blockquote>
+<h2 id="文件的操作与打开文件表"><a href="#文件的操作与打开文件表" class="headerlink" title="文件的操作与打开文件表"></a>文件的操作与打开文件表</h2><h3 id="文件的基本操作"><a href="#文件的基本操作" class="headerlink" title="文件的基本操作"></a>文件的基本操作</h3><table>
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">系统做的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>create</strong></td>
+<td align="left">分配 FCB 并在目录中登记目录项 + 分配外存空间</td>
+</tr>
+<tr>
+<td align="left"><strong>delete</strong></td>
+<td align="left">删除目录项 + 回收外存盘块</td>
+</tr>
+<tr>
+<td align="left"><strong>read &#x2F; write</strong></td>
+<td align="left">按物理结构在内存与外存间搬运数据（配合读写指针）</td>
+</tr>
+<tr>
+<td align="left"><strong>truncate</strong></td>
+<td align="left"><strong>长度置 0、保留属性</strong>（FCB 与目录项不动，空间重新分配）</td>
+</tr>
+<tr>
+<td align="left"><strong>seek</strong></td>
+<td align="left">调整读写指针位置，为读写定位</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：截断 ≠ 删除——删除连”外壳”（FCB&#x2F;目录项）一起删掉，截断只清空内容、保留属性。</p>
+</blockquote>
+<h3 id="open-的本质（高频）"><a href="#open-的本质（高频）" class="headerlink" title="open 的本质（高频）"></a>open 的本质（高频）</h3><p><code>open(&quot;file&quot;)</code> 做两件事：</p>
+<ol>
+<li><strong>检索目录</strong>：按路径逐级找到目录文件，比对文件名找到目录项，<strong>并检查该用户的访问权限</strong>；</li>
+<li><strong>复制登记</strong>：把该文件的 FCB（inode）<strong>复制到内存中的打开文件表</strong>，并把表项编号——<strong>文件描述符 fd</strong> 返回给用户。</li>
+</ol>
+<p>此后 <code>read(fd)/write(fd)</code> <strong>只凭 fd 定位打开文件表项，不再按名检索目录</strong>——这就是”打开之后访问更快”的原因：一次按名检索的代价被摊销到后续所有读写上。<strong>close</strong> 则反向收尾：删进程级表项 → 回收资源 → 系统表打开计数 <strong>count 减 1</strong>，<strong>count &#x3D; 0 时才删除系统级表项</strong>（文件被修改过则先写回磁盘）。</p>
+<h3 id="两级打开文件表"><a href="#两级打开文件表" class="headerlink" title="两级打开文件表"></a>两级打开文件表</h3><table>
+<thead>
+<tr>
+<th align="left">表</th>
+<th align="left">范围</th>
+<th align="left">内容</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>系统级打开文件表</strong></td>
+<td align="left">全系统一张</td>
+<td align="left">FCB 副本、<strong>打开计数 count</strong>、读写位置</td>
+<td align="left">多进程共享同一打开文件</td>
+</tr>
+<tr>
+<td align="left"><strong>进程级打开文件表</strong></td>
+<td align="left">每个进程一张</td>
+<td align="left"><strong>fd → 系统表项的索引</strong>、打开方式、各自读写指针</td>
+<td align="left">各进程独立定位与权限</td>
+</tr>
+</tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第4章 文件管理.assets/open-file-table.png" alt="文件系统在内存中的结构：fd、进程打开文件表与系统打开文件表" title="">
+                </div>
+                <div class="image-caption">文件系统在内存中的结构：fd、进程打开文件表与系统打开文件表</div>
+            </figure>
+
+<blockquote>
+<p><strong>考点</strong>：open &#x3D; 检索目录（含权限检查）+ FCB 复制进打开文件表 + 返回 fd；之后 read&#x2F;write 凭 fd 直接定位，<strong>不再检索目录</strong>。<br><strong>易错点</strong>：fd 是<strong>进程级表项的下标</strong>，不是磁盘地址；不同进程打开同一文件的 fd 可以不同，但最终指向<strong>同一系统级表项</strong>；其他进程仍打开该文件（count &gt; 0）时，系统级表项与磁盘 FCB 均不动。</p>
+</blockquote>
+<h2 id="文件的保护"><a href="#文件的保护" class="headerlink" title="文件的保护"></a>文件的保护</h2><p>目标是防止<strong>未经授权的访问与破坏</strong>，限制”谁能对文件做什么操作”，三种手段对比如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">原理</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>口令保护</strong></td>
+<td align="left">访问前验证口令（口令存 FCB 或专门文件）</td>
+<td align="left">实现简单、开销小</td>
+<td align="left"><strong>口令易泄露</strong>，安全性最差</td>
+</tr>
+<tr>
+<td align="left"><strong>加密保护</strong></td>
+<td align="left">文件<strong>内容加密</strong>存储，凭密钥解密</td>
+<td align="left">文件被窃也读不出（护内容）</td>
+<td align="left"><strong>加解密开销大</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>访问控制 ACL</strong></td>
+<td align="left">每个文件一张表，列出<strong>各用户及其允许的操作</strong></td>
+<td align="left"><strong>最灵活精确</strong>，可按用户授权</td>
+<td align="left">表项多时开销大</td>
+</tr>
+</tbody></table>
+<p><strong>精简 ACL（UNIX 9 位权限）</strong>：把用户归为**属主（Owner）&#x2F; 组（Group）&#x2F; 其他（Others）**三类，每类用 <strong>rwx</strong> 三位表示读&#x2F;写&#x2F;执行，共 9 位（如 <code>rwxr-x---</code>）。</p>
+<blockquote>
+<p><strong>考点</strong>：ACL 以<strong>文件</strong>为中心（”这个文件谁能访问”），<strong>收回权限容易</strong>（删掉该用户的表项即可）；与之相对的<strong>能力表</strong>以<strong>用户</strong>为中心（列出该用户能访问哪些文件），收回权限困难。访问类型不止 rwx，还有<strong>添加、删除、列表清单</strong>等。</p>
+</blockquote>
+<h2 id="文件的逻辑结构"><a href="#文件的逻辑结构" class="headerlink" title="文件的逻辑结构"></a>文件的逻辑结构</h2><p>逻辑结构是<strong>用户视角</strong>的文件组织形式，与物理存储无关。先分两大类：</p>
+<ul>
+<li><strong>无结构文件（流式文件）</strong>：字节流序列，无记录概念（.txt、可执行文件）；UNIX 把所有文件都看作字节流</li>
+<li><strong>有结构文件（记录式文件）</strong>：由记录组成，分为顺序文件、索引文件、索引顺序文件三种</li>
+</ul>
+<h3 id="顺序文件"><a href="#顺序文件" class="headerlink" title="顺序文件"></a>顺序文件</h3><p>记录按顺序排列。<strong>定长记录可随机存取</strong>：第 i 条记录的地址 &#x3D; 起始地址 + <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7429em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">i</span><span class="mord">×</span></span></span></span> 记录长度；<strong>变长记录只能顺序存取</strong>——不知道第 i 条从哪开始，只能从头逐条累加长度。</p>
+<h3 id="索引文件"><a href="#索引文件" class="headerlink" title="索引文件"></a>索引文件</h3><p>为<strong>每条记录</strong>建一个索引项（键值 → 记录指针），<strong>索引表本身定长、按关键字有序</strong>，可对索引表做二分查找；从而解决了<strong>变长记录的随机访问与快速检索</strong>问题，代价是索引表占用额外空间。适合变长记录且按键快速存取的场合（如数据库文件）。</p>
+<h3 id="索引顺序文件"><a href="#索引顺序文件" class="headerlink" title="索引顺序文件"></a>索引顺序文件</h3><p>记录<strong>分组</strong>，<strong>每组只留一个索引项</strong>（组内顺序查找）。检索代价从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0404em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 量级降到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span> 量级：</p>
+<ul>
+<li>10000 条记录不分组：顺序查找平均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10000</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 次</li>
+<li>分成 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.1328em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9072em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord">10000</span></span></span><span style="top:-2.8672em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1328em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span> 组、每组 100 条：先查索引（平均 50 次）定位组，再组内平均查 50 次，共约 <strong>100 次 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span></strong></li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：索引顺序文件取<strong>分组数 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span>、每组 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span> 条</strong>时检索代价最优，约为两次 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.383em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.038em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4739em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8059em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;"><span class="mord mathnormal mtight">n</span></span></span><span style="top:-2.7659em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2341em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 相加 ≈ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2397em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span>；分组多了索引变长、分组少了组内变长，都是次优。</p>
+</blockquote>
+<h3 id="三种有结构逻辑结构对比"><a href="#三种有结构逻辑结构对比" class="headerlink" title="三种有结构逻辑结构对比"></a>三种有结构逻辑结构对比</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">顺序文件</th>
+<th align="left">索引文件</th>
+<th align="left">索引顺序文件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">索引粒度</td>
+<td align="left">无索引</td>
+<td align="left"><strong>每条记录一个索引项</strong></td>
+<td align="left"><strong>每组一个索引项</strong></td>
+</tr>
+<tr>
+<td align="left">随机存取</td>
+<td align="left"><strong>定长可以、变长不行</strong></td>
+<td align="left">可以（查索引表）</td>
+<td align="left">先查索引定组、再组内顺序</td>
+</tr>
+<tr>
+<td align="left">检索代价</td>
+<td align="left">定长 O(1)，变长约 n&#x2F;2</td>
+<td align="left">O(log₂n)（索引有序）</td>
+<td align="left">≈ <strong>√n</strong></td>
+</tr>
+<tr>
+<td align="left">额外空间</td>
+<td align="left">无</td>
+<td align="left">索引表较大</td>
+<td align="left">索引表小</td>
+</tr>
+<tr>
+<td align="left">适用场合</td>
+<td align="left">成批顺序处理</td>
+<td align="left">变长记录、按键检索</td>
+<td align="left">记录多且按序使用的大型文件</td>
+</tr>
+</tbody></table>
+<h2 id="文件的物理结构（重点）"><a href="#文件的物理结构（重点）" class="headerlink" title="文件的物理结构（重点）"></a>文件的物理结构（重点）</h2><p>物理结构 &#x3D; 文件在盘块上的<strong>分配方式</strong>，决定”逻辑块号 → 物理块号”的映射速度与空间开销。</p>
+<h3 id="连续分配"><a href="#连续分配" class="headerlink" title="连续分配"></a>连续分配</h3><p>FCB 记<strong>起始块号 + 文件长度</strong>，物理块号 &#x3D; 起始块号 + 逻辑块号，<strong>一步寻址</strong>，顺序存取、随机存取都快。缺点：产生<strong>外部碎片</strong>（需紧凑搬移，代价大）、<strong>文件难以扩展</strong>（文件尾部空间可能已被占用）。</p>
+<h3 id="链接分配"><a href="#链接分配" class="headerlink" title="链接分配"></a>链接分配</h3><ul>
+<li><strong>隐式链接</strong>：每个盘块末尾藏<strong>下一块的指针</strong>，FCB 记<strong>首块号（+末块号）</strong>；只能<strong>顺序存取</strong>，某块损坏则<strong>断链</strong>、其后内容丢失，指针还占块内空间</li>
+<li><strong>显式链接（FAT）</strong>：把所有指针集中搬进<strong>文件分配表（FAT, File Allocation Table）</strong>，FCB 只记首块号；<strong>开机后 FAT 读入内存常驻</strong>，查表在内存进行，<strong>支持随机访问</strong>，代价是 FAT 占内存大（U 盘的 FAT32 即此结构）</li>
+</ul>
+<p><strong>FAT 占用空间小例</strong>：磁盘共 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span></span></span></span> 块、块大小 1KB（盘容量 1GB），每表项 4B → FAT 占 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> <strong>内存</strong>。</p>
+<h3 id="索引分配"><a href="#索引分配" class="headerlink" title="索引分配"></a>索引分配</h3><p>为每个文件建一个<strong>索引块</strong>（数据块号数组），FCB 记<strong>索引块地址</strong>。单级索引访问一个数据块 &#x3D; 读索引块 + 读数据块 &#x3D; <strong>2 次读盘</strong>；两级索引 &#x3D; 3 次，<strong>每多一级 +1 次</strong>。无外部碎片、扩展容易，但小文件也要付”多读索引块”的代价——于是引出混合索引。</p>
+<h3 id="物理结构四方式大对比（必背）"><a href="#物理结构四方式大对比（必背）" class="headerlink" title="物理结构四方式大对比（必背）"></a>物理结构四方式大对比（必背）</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">连续分配</th>
+<th align="left">隐式链接</th>
+<th align="left">显式链接（FAT）</th>
+<th align="left">索引分配</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">访问第 i 块读盘次数</td>
+<td align="left"><strong>1</strong>（直接算出）</td>
+<td align="left"><strong>i + 1</strong>（沿链逐块走）</td>
+<td align="left"><strong>1</strong>（FAT 在内存查 i 次）</td>
+<td align="left">单级 <strong>2</strong>，k 级 <strong>k + 1</strong></td>
+</tr>
+<tr>
+<td align="left">随机存取</td>
+<td align="left"><strong>支持</strong></td>
+<td align="left"><strong>不支持</strong>（只能顺序）</td>
+<td align="left">支持（查内存 FAT）</td>
+<td align="left"><strong>支持</strong></td>
+</tr>
+<tr>
+<td align="left">FCB&#x2F;目录项内容</td>
+<td align="left">起始块号 + 长度</td>
+<td align="left">首块号 + 末块号</td>
+<td align="left">首块号</td>
+<td align="left"><strong>索引块地址</strong></td>
+</tr>
+<tr>
+<td align="left">外部碎片</td>
+<td align="left"><strong>有</strong></td>
+<td align="left">无</td>
+<td align="left">无</td>
+<td align="left">无</td>
+</tr>
+<tr>
+<td align="left">文件扩展</td>
+<td align="left"><strong>困难</strong></td>
+<td align="left">容易</td>
+<td align="left">容易</td>
+<td align="left">容易</td>
+</tr>
+<tr>
+<td align="left">主要缺点</td>
+<td align="left">碎片 + 难扩展</td>
+<td align="left">只能顺序、断链</td>
+<td align="left">FAT 常驻内存、占空间</td>
+<td align="left">索引块占空间、小文件不划算</td>
+</tr>
+<tr>
+<td align="left">典型应用</td>
+<td align="left">早期系统</td>
+<td align="left">—</td>
+<td align="left">U 盘 FAT32</td>
+<td align="left">UNIX（混合索引）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：FAT 显式链接能”随机访问”的前提是 <strong>FAT 常驻内存</strong>——沿链查表不读盘，所以访问第 i 块仍只需 <strong>1 次读盘</strong>。<br><strong>易错点</strong>：隐式链接访问第 i 块需 <strong>i + 1 次读盘</strong>（读出第 j 块才知道第 j+1 块在哪）；索引分配读第 i 块的次数与 i <strong>无关</strong>。</p>
+</blockquote>
+<h3 id="UNIX-混合索引（必考计算）"><a href="#UNIX-混合索引（必考计算）" class="headerlink" title="UNIX 混合索引（必考计算）"></a>UNIX 混合索引（必考计算）</h3><p>UNIX 的 inode 中设 <strong>10 个直接地址 + 1 个一次间址 + 1 个二次间址 + 1 个三次间址</strong>：直接地址直接指向数据块；间址指向”装地址的索引块”。</p>
+<p><strong>例题</strong>：块大小 4KB，每个地址 4B。求最大文件长度；并判断偏移 5MB 处的字节位于第几级索引、读它需几次访盘。</p>
+<p><strong>第一步：每个索引块能装多少地址？</strong></p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8641em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">个地址</span></span></span></span></span></span>
+<p><strong>第二步：各级索引覆盖的数据块数与容量</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">索引级</th>
+<th align="left">数据块数</th>
+<th align="left">覆盖容量</th>
+<th align="left">累计容量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">直接地址 × 10</td>
+<td align="left">10</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">40</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></td>
+<td align="left">40KB</td>
+</tr>
+<tr>
+<td align="left">一次间址 × 1</td>
+<td align="left">1024</td>
+<td align="left">4MB</td>
+<td align="left">40KB + 4MB</td>
+</tr>
+<tr>
+<td align="left">二次间址 × 1</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">102</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1048576</span></span></span></span></td>
+<td align="left">4GB</td>
+<td align="left">4GB + 4MB + 40KB</td>
+</tr>
+<tr>
+<td align="left">三次间址 × 1</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">102</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1073741824</span></span></span></span></td>
+<td align="left">4TB</td>
+<td align="left"><strong>4TB + 4GB + 4MB + 40KB</strong></td>
+</tr>
+</tbody></table>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">最大文件</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9474em;vertical-align:-0.0833em;"></span><span class="mord">102</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1141em;vertical-align:-0.25em;"></span><span class="mord">102</span><span class="mord"><span class="mord">4</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0502em;">GB</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">40</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4.004</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></span>
+<p><strong>第三步：偏移 5MB 落在哪一级？</strong></p>
+<ul>
+<li>逻辑块号 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">5</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4</span><span class="mord mathnormal" style="margin-right:0.0715em;">K</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">5242880</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4096</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1280</span></span></span></span></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">1280</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> → 不在直接地址；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1280</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">1270</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span></span></span></span> → 也不在一次间址</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1270</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">246</span></span></span></span> → 在<strong>二次间址</strong>：二次间址块 → 第 0 个一次间址块 → 其第 246 项 → 数据块</li>
+</ul>
+<p><strong>验算</strong>：一次间址末端累计 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">40960</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4096</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">4239360</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord">4.04</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">5</span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>，而二次间址上限约 4GB ≫ 5MB ✓。读该字节需读盘：二次间址块 + 一次间址块 + 数据块 &#x3D; <strong>3 次</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">偏移示例</th>
+<th align="left">逻辑块号</th>
+<th align="left">所在索引级</th>
+<th align="left">读盘次数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">4095 B</td>
+<td align="left">0</td>
+<td align="left">直接块 0</td>
+<td align="left">1</td>
+</tr>
+<tr>
+<td align="left">1MB（1048576B）</td>
+<td align="left">256</td>
+<td align="left">一次间址第 246 项</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">5MB（5242880B）</td>
+<td align="left">1280</td>
+<td align="left">二次间址（其下第 0 个间址块的第 246 项）</td>
+<td align="left">3</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：混合索引兼顾<strong>小文件快</strong>（直接地址 1 次读盘）与<strong>大文件大</strong>（多级间址扩容）；判断级数的口诀——逻辑块号依次减去 10、1024、1024²，在哪一级<strong>首次减得动（非负）就在哪一级</strong>。<br><strong>易错点</strong>：题目常给变式（如 8 个地址项、块 1KB → 2009 真题答案 66053KB）；<strong>先算每块地址数（块大小 ÷ 地址大小）再逐级累加</strong>，间接级容量 &#x3D; 该级块数 × 块大小，别忘乘间址块个数。</p>
+</blockquote>
+<h2 id="目录管理"><a href="#目录管理" class="headerlink" title="目录管理"></a>目录管理</h2><h3 id="目录与目录项"><a href="#目录与目录项" class="headerlink" title="目录与目录项"></a>目录与目录项</h3><p><strong>目录本身也是文件</strong>——目录文件的内容是一张<strong>目录项表</strong>（FCB 或”文件名 + inode 号”），故称”<strong>目录 &#x3D; 特殊文件</strong>“。目录的作用：<strong>按名存取、加快检索、实现文件共享与保护</strong>。</p>
+<h3 id="树形目录与路径解析"><a href="#树形目录与路径解析" class="headerlink" title="树形目录与路径解析"></a>树形目录与路径解析</h3><ul>
+<li><strong>绝对路径</strong>：从<strong>根目录 &#x2F;</strong> 出发的完整路径；<strong>相对路径</strong>：从**当前目录（工作目录）**出发，<code>..</code> 表示上一级目录</li>
+<li>每个进程维护自己的当前目录；用相对路径访问其下的文件时，<strong>不必从根目录逐级查起，减少了目录检索（读盘）时间</strong></li>
+<li>树形目录层次清晰、便于分类管理，但<strong>不便于文件共享</strong>（一个文件只有一个父目录位置）→ 在树形上加共享链接构成<strong>无环图目录</strong>解决</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：从根到目标文件要逐级读多个目录文件；设置当前目录后按相对路径检索，<strong>中间层目录不必再查</strong>——这就是相对路径省时间的原理。目录的实现可用<strong>线性表</strong>（简单、查找慢）或<strong>哈希表</strong>（查找快、需处理冲突）。</p>
+</blockquote>
+<h3 id="硬链接与软链接"><a href="#硬链接与软链接" class="headerlink" title="硬链接与软链接"></a>硬链接与软链接</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第4章 文件管理.assets/hard-soft-link.png" alt="硬链接共享同一 inode，软链接存目标路径" title="">
+                </div>
+                <div class="image-caption">硬链接共享同一 inode，软链接存目标路径</div>
+            </figure>
+
+<p><strong>硬链接（基于索引结点的共享）</strong>：多个目录项指向<strong>同一个 inode</strong>，inode 中维护<strong>引用计数（link count）&#x3D; 指向它的目录项个数</strong>；删除其中某个名字只把计数 −1，<strong>计数为 0 才真正释放 inode 与数据块</strong>——因此”删除原文件”后其余硬链接依然完好，数据不丢。</p>
+<p><strong>软链接（符号链接）</strong>：一个<strong>独立的新文件</strong>（有自己的新 inode），内容是<strong>目标文件的路径名</strong>；访问它要先读出路径、再按路径检索目标（<strong>多一次目录检索&#x2F;访盘</strong>）；原文件被删除后它成为<strong>悬空链接</strong>，访问报错。类似 Windows 的快捷方式。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">硬链接</th>
+<th align="left">软链接</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">本质</td>
+<td align="left">多个目录项 → <strong>同一 inode</strong></td>
+<td align="left">新 inode，内容存<strong>目标路径</strong></td>
+</tr>
+<tr>
+<td align="left">共享层次</td>
+<td align="left">inode 层（直接共享元数据与数据）</td>
+<td align="left">路径层（间接跳转）</td>
+</tr>
+<tr>
+<td align="left">原文件删除后</td>
+<td align="left"><strong>仍有效</strong>（引用计数 −1）</td>
+<td align="left"><strong>失效（悬空链接）</strong></td>
+</tr>
+<tr>
+<td align="left">访问开销</td>
+<td align="left">1 次按名检索</td>
+<td align="left"><strong>2 次</strong>（读链接文件 + 按路径检索目标）</td>
+</tr>
+<tr>
+<td align="left">能否跨文件系统</td>
+<td align="left"><strong>不能</strong>（inode 号只在本卷内有效）</td>
+<td align="left"><strong>可以</strong>（路径可指向任何卷）</td>
+</tr>
+<tr>
+<td align="left">典型例子</td>
+<td align="left">UNIX <code>ln</code> 命令</td>
+<td align="left">UNIX <code>ln -s</code>、Windows 快捷方式</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：判断”删除后是否失效”看共享的是 <strong>inode 还是路径</strong>；inode 引用计数归零是真正删除的唯一条件。<br><strong>易错点</strong>：硬链接不能对<strong>目录</strong>建立（否则沿链接遍历会成环）、不能跨文件系统；软链接两者皆可，代价是访问慢且可能悬空。</p>
+</blockquote>
+<h2 id="文件系统的全局结构"><a href="#文件系统的全局结构" class="headerlink" title="文件系统的全局结构"></a>文件系统的全局结构</h2><h3 id="外存（磁盘）上的结构"><a href="#外存（磁盘）上的结构" class="headerlink" title="外存（磁盘）上的结构"></a>外存（磁盘）上的结构</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/OS第4章 文件管理.assets/disk-layout.png" alt="磁盘分区与 UNIX 文件系统在盘上的布局" title="">
+                </div>
+                <div class="image-caption">磁盘分区与 UNIX 文件系统在盘上的布局</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">区域</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>MBR 主引导记录</strong></td>
+<td align="left"><strong>磁盘 0 号扇区</strong>：磁盘引导程序 + <strong>分区表</strong>（各分区的起始与结束地址）</td>
+</tr>
+<tr>
+<td align="left"><strong>分区引导块</strong></td>
+<td align="left">每个分区开头，负责<strong>启动安装在该分区的操作系统</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>超级块 superblock</strong></td>
+<td align="left">分区的<strong>全部关键参数</strong>：块总数、块大小、空闲块数与指针、空闲 inode 数量等；<strong>系统启动&#x2F;文件系统首次使用时读入内存</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>空闲管理区</strong></td>
+<td align="left">位示图、成组链接等空闲块管理信息</td>
+</tr>
+<tr>
+<td align="left"><strong>inode 区</strong></td>
+<td align="left">每个文件一个磁盘 inode（FCB 瘦身后的主体）</td>
+</tr>
+<tr>
+<td align="left"><strong>根目录与数据区</strong></td>
+<td align="left">根目录文件以及各普通文件的数据块</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：MBR 在<strong>整块磁盘</strong>的 0 号扇区（全盘只有一个）；引导块与超级块在<strong>分区</strong>内（每个分区各一套）。FAT 文件系统用 FAT 表取代 inode 区，其余布局思想相同。</p>
+</blockquote>
+<h3 id="内存中的结构"><a href="#内存中的结构" class="headerlink" title="内存中的结构"></a>内存中的结构</h3><table>
+<thead>
+<tr>
+<th align="left">结构</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>安装表（mount table）</strong></td>
+<td align="left">每个已挂载的文件系统分区一条记录</td>
+</tr>
+<tr>
+<td align="left"><strong>目录缓存</strong></td>
+<td align="left">缓存最近访问的目录信息，加快目录检索</td>
+</tr>
+<tr>
+<td align="left"><strong>系统级打开文件表</strong></td>
+<td align="left">打开文件的 FCB 副本 + 打开计数</td>
+</tr>
+<tr>
+<td align="left"><strong>进程级打开文件表</strong></td>
+<td align="left">fd → 系统表项索引、读写指针</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：磁盘四件套 &#x3D; <strong>MBR（0 号扇区）→ 引导块 → 超级块 → 空闲管理区</strong>（再接 inode 区与数据区）；内存四件套 &#x3D; <strong>安装表 + 目录缓存 + 系统&#x2F;进程打开文件表</strong>。</p>
+</blockquote>
+<h2 id="外存空闲空间管理（重点）"><a href="#外存空闲空间管理（重点）" class="headerlink" title="外存空闲空间管理（重点）"></a>外存空闲空间管理（重点）</h2><h3 id="空闲表法"><a href="#空闲表法" class="headerlink" title="空闲表法"></a>空闲表法</h3><p>表项 &#x3D;（<strong>起始盘块号，连续空闲块数</strong>），分配算法与内存<strong>动态分区分配</strong>相同（首次适应&#x2F;最佳适应等），回收时相邻空闲区<strong>合并</strong>——适合连续分配方式的文件系统。</p>
+<h3 id="空闲链表法"><a href="#空闲链表法" class="headerlink" title="空闲链表法"></a>空闲链表法</h3><ul>
+<li><strong>空闲盘块链</strong>：所有空闲盘块逐个串成链（块内存下一块指针），分配&#x2F;回收以<strong>块</strong>为单位，简单但链长、难一次拿到连续空间</li>
+<li><strong>空闲盘区链</strong>：把<strong>连续的空闲盘区</strong>串成链（节点含区长度），可一次分配多个连续盘块</li>
+</ul>
+<h3 id="位示图法（必考计算）"><a href="#位示图法（必考计算）" class="headerlink" title="位示图法（必考计算）"></a>位示图法（必考计算）</h3><p>用 <strong>1 个二进制位对应 1 个盘块</strong>（0 &#x3D; 空闲，1 &#x3D; 已分配），位示图按<strong>字</strong>组织。<strong>编号口径有两种，做题必须先看清</strong>：</p>
+<p><strong>口径一（字号、位号、块号都从 0 开始，408 主流口径）</strong>，字长 32 位时：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">字号</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord mathnormal">i</span><span class="mord">/32</span><span class="mclose">⌋</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">位号</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">32</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">反求：</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">字号</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">位号</span></span></span></span></span>
+<p><strong>口径二（都从 1 开始编号）</strong>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">字号</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">/32</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">位号</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord cjk_fallback">反求：</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord cjk_fallback">字号</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">位号</span></span></span></span></span>
+<p><strong>例题</strong>：字长 32 位，求盘块 100 的字号与位号；再由”字 3、位 4”反求块号。</p>
+<table>
+<thead>
+<tr>
+<th align="left">口径</th>
+<th align="left">字号</th>
+<th align="left">位号</th>
+<th align="left">反求（字 3、位 4）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">从 0 编号</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">100/32</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">100</span></span></span></span> ✓</td>
+</tr>
+<tr>
+<td align="left">从 1 编号</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">99/32</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">99</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">68</span></span></span></span></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>（口径一）：字 0 覆盖块 0&#126;31，字 1 覆盖 32&#126;63，字 2 覆盖 64&#126;95，字 3 覆盖 96&#126;127；100 ∈ 96&#126;127 ✓，块内偏移 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">96</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> ✓</p>
+<blockquote>
+<p><strong>易错点</strong>：同一盘块在两种口径下<strong>字号差 1</strong>（位号多数情况相同）；”从 1 编号”必须<strong>先减 1 再取整&#x2F;取模，结果加 1</strong>——直接套 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord">100/32</span><span class="mclose">⌋</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> 在口径二下就是错的（应为 4）。</p>
+</blockquote>
+<h3 id="成组链接法（UNIX）"><a href="#成组链接法（UNIX）" class="headerlink" title="成组链接法（UNIX）"></a>成组链接法（UNIX）</h3><p>空闲盘块<strong>每 100 块左右分组</strong>：<strong>每组第一个盘块</strong>登记<strong>下一组的全部空闲块号</strong>（组内按栈管理）；<strong>超级块中的空闲栈</strong>只保存<strong>当前第一组</strong>的块号与数量——内存只需维护这一组。</p>
+<ul>
+<li><strong>分配</strong>：从栈顶取一个块号；当栈中只剩最后一个号时，该号其实是”下一组块号表所在的盘块”——先把其中内容<strong>读入超级块</strong>，再把这个盘块分配出去</li>
+<li><strong>回收</strong>：栈未满则直接压栈；<strong>栈满</strong>时把栈中全部内容<strong>写入这个回收的盘块</strong>，使它成为<strong>新一组的第一个盘块</strong></li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：成组链接 &#x3D; <strong>分组 + 栈</strong>，克服了位示图占空间、空闲链表太长的缺点，<strong>适合大型文件系统</strong>；分配与回收都发生在栈顶，O(1)。</p>
+</blockquote>
+<h3 id="空闲管理四方法对比"><a href="#空闲管理四方法对比" class="headerlink" title="空闲管理四方法对比"></a>空闲管理四方法对比</h3><table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">原理</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>空闲表法</strong></td>
+<td align="left">(起始块号， 连续块数) 表</td>
+<td align="left">可分配连续大区，算法现成</td>
+<td align="left">表项随分配&#x2F;回收变化，需合并</td>
+</tr>
+<tr>
+<td align="left"><strong>空闲链表法</strong></td>
+<td align="left">空闲盘块&#x2F;盘区串链</td>
+<td align="left">实现简单</td>
+<td align="left">链长查找慢，难快速分配连续区</td>
+</tr>
+<tr>
+<td align="left"><strong>位示图法</strong></td>
+<td align="left">1 位对应 1 盘块</td>
+<td align="left"><strong>占用空间小</strong>、易找连续块</td>
+<td align="left">大磁盘位图变大，需常驻内存</td>
+</tr>
+<tr>
+<td align="left"><strong>成组链接法</strong></td>
+<td align="left">分组 + 超级块空闲栈</td>
+<td align="left"><strong>适合超大磁盘</strong>、分配回收 O(1)</td>
+<td align="left">实现复杂（UNIX 采用）</td>
+</tr>
+</tbody></table>
+<h2 id="虚拟文件系统-VFS"><a href="#虚拟文件系统-VFS" class="headerlink" title="虚拟文件系统 VFS"></a>虚拟文件系统 VFS</h2><p><strong>VFS（Virtual File System）</strong>：在用户与各<strong>具体文件系统（ext4、FAT32、NTFS……）之间</strong>插入的抽象层，向上提供<strong>统一的系统调用接口</strong>（open&#x2F;read&#x2F;write&#x2F;close 与具体文件系统无关），向下通过<strong>函数指针表</strong>调用各文件系统的实现——<strong>同一套 API 即可访问任何已挂载的文件系统</strong>。</p>
+<p>VFS 定义四个核心对象（以 Linux 为例）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对象</th>
+<th align="left">对应概念</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>超级块对象 superblock</strong></td>
+<td align="left">一个已挂载的文件系统</td>
+<td align="left">文件系统整体信息</td>
+</tr>
+<tr>
+<td align="left"><strong>索引结点对象 inode</strong></td>
+<td align="left">一个具体文件</td>
+<td align="left">属性、数据块地址</td>
+</tr>
+<tr>
+<td align="left"><strong>目录项对象 dentry</strong></td>
+<td align="left">路径的一个组成部分</td>
+<td align="left">缓存路径解析结果，<strong>加速路径查找</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>文件对象 file</strong></td>
+<td align="left">一个<strong>已打开</strong>的文件</td>
+<td align="left">读写位置、打开方式（与 fd 对应）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：VFS 存在于<strong>内存</strong>中，随系统启动建立；UNIX 的 <strong>v-node</strong> 是其思想源头——进程打开文件得到 v-node，其中含指向<strong>具体文件系统函数表</strong>的指针，从而实现”接口统一、实现各异”。<br><strong>易错点</strong>：dentry 对应<strong>路径的一个分量</strong>（目录名或文件名），不是磁盘上目录项的本体；同一文件可对应多个 dentry（经不同路径访问），但 inode 只有一个——这正是硬链接在 VFS 层的体现。</p>
+</blockquote>
+<h2 id="文件系统挂载"><a href="#文件系统挂载" class="headerlink" title="文件系统挂载"></a>文件系统挂载</h2><p><strong>挂载（mount）</strong>：把一个文件系统（卷）的根**安装到全局目录树的某个目录（挂载点）**上，使其中的文件可按统一路径访问。<strong>挂载点必须是一个目录</strong>；挂载完成后，访问挂载点目录就等于访问该文件系统的根（挂到非空目录时，原内容被”遮住”）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">Windows</th>
+<th align="left">UNIX &#x2F; Linux</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">卷的标识</td>
+<td align="left"><strong>盘符</strong>（C:\、D:\，每卷各一棵树）</td>
+<td align="left"><strong>挂载点</strong>（所有卷拼成<strong>一棵目录树</strong>）</td>
+</tr>
+<tr>
+<td align="left">挂载操作</td>
+<td align="left">启动时自动分配盘符</td>
+<td align="left"><code>mount</code> 挂载 &#x2F; <code>umount</code> 卸载</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：挂载前先检查该文件系统的<strong>类型等元信息</strong>，并在<strong>安装表</strong>中登记；卸载时若卷上仍有文件<strong>被打开</strong>，则拒绝卸载。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">目录项与 FCB</td>
+<td align="left"><strong>目录项 &#x3D; FCB</strong>；检索目录 &#x3D; 逐项比较文件名，FCB 越大检索越慢</td>
+</tr>
+<tr>
+<td align="left">inode 瘦身</td>
+<td align="left">目录项 &#x3D; 文件名 + inode 号；640 项从 64B 瘦到 16B，平均访盘 <strong>20 → 5 次</strong></td>
+</tr>
+<tr>
+<td align="left">磁盘&#x2F;内存 inode</td>
+<td align="left">内存 inode 多<strong>打开计数、锁标志、修改标志</strong>等动态信息</td>
+</tr>
+<tr>
+<td align="left">open 与 close</td>
+<td align="left">open &#x3D; 检索目录 + <strong>FCB 复制进打开文件表</strong> + 返回 fd；close 删进程级表项，<strong>count &#x3D; 0 才删系统级表项</strong></td>
+</tr>
+<tr>
+<td align="left">fd</td>
+<td align="left"><strong>进程级打开文件表的下标</strong>，不是磁盘地址；不同进程 fd 可不同，指向同一系统表项</td>
+</tr>
+<tr>
+<td align="left">文件保护</td>
+<td align="left">口令易泄露、加密开销大、<strong>ACL 最灵活</strong>；UNIX 9 位 &#x3D; 属主&#x2F;组&#x2F;其他 × rwx</td>
+</tr>
+<tr>
+<td align="left">逻辑结构</td>
+<td align="left">顺序（<strong>定长可随机、变长只能顺序</strong>）&#x2F; 索引（每记录一项）&#x2F; 索引顺序（<strong>检索约 √n 次</strong>）</td>
+</tr>
+<tr>
+<td align="left">连续分配</td>
+<td align="left">访问任意块 <strong>1 次读盘</strong>；缺点是<strong>外部碎片 + 文件难扩展</strong></td>
+</tr>
+<tr>
+<td align="left">隐式 vs 显式链接</td>
+<td align="left">隐式只能顺序（第 i 块 <strong>i+1 次读盘</strong>）；<strong>FAT 常驻内存</strong>支持随机、仍 1 次读盘</td>
+</tr>
+<tr>
+<td align="left">索引分配</td>
+<td align="left">单级 <strong>2 次</strong>读盘、k 级 <strong>k+1 次</strong>；无外部碎片，索引块占空间</td>
+</tr>
+<tr>
+<td align="left">混合索引</td>
+<td align="left">10 直接 + 1024 + 1024² + 1024³ 块（4KB 块、4B 地址）→ 最大 <strong>4TB + 4GB + 4MB + 40KB</strong></td>
+</tr>
+<tr>
+<td align="left">硬链接 vs 软链接</td>
+<td align="left">硬：同一 inode、<strong>计数归零才真删</strong>；软：新 inode 存路径、原文件删则<strong>悬空</strong>、2 次访盘、可跨卷</td>
+</tr>
+<tr>
+<td align="left">相对路径</td>
+<td align="left">从<strong>当前目录</strong>检索，免去从根逐级查找，<strong>减少目录检索时间</strong></td>
+</tr>
+<tr>
+<td align="left">空闲管理四法</td>
+<td align="left">空闲表（动态分区式）&#x2F; 空闲链 &#x2F; <strong>位示图</strong> &#x2F; 成组链接（分组 + 栈、超大盘）</td>
+</tr>
+<tr>
+<td align="left">位示图换算</td>
+<td align="left">从 0 编号：字 &#x3D; ⌊i&#x2F;32⌋、位 &#x3D; i mod 32；从 1 编号<strong>先减 1 再算、结果加 1</strong></td>
+</tr>
+<tr>
+<td align="left">VFS 与挂载</td>
+<td align="left">VFS 统一接口 + <strong>superblock &#x2F; inode &#x2F; dentry &#x2F; file</strong> 四对象；<strong>挂载点必须是目录</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T07:07:48.282Z" itemprop="dateUpdated">2026-08-29 15:07:48</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" rel="tag">文件管理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&title=《文件管理》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&title=《文件管理》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《文件管理》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/IO%E7%AE%A1%E7%90%86%E4%B8%8E%E7%A3%81%E7%9B%98/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">IO管理与磁盘</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E4%B8%8E%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">虚拟内存与页面置换算法</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&title=《文件管理》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&title=《文件管理》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《文件管理》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

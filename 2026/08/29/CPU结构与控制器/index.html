@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>CPU结构与控制器 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,计算机组成原理">
+    <meta name="description" content="CPU（Central Processing Unit，中央处理器）由运算器和控制器两大部件组成，是程序的最终执行者：既负责数据加工（算术&#x2F;逻辑运算），又负责指挥全机（取指令、译码、按时序产生微操作控制信号、协调各部件）。408 对本部分的考查集中在：CPU 的功能与基本结构（寄存器辨析）、指令周期与各周期数据流、数据通路（单总线微操作序列推演）、硬布线控制器与微程序控制器。 CPU 的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CPU结构与控制器">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="CPU（Central Processing Unit，中央处理器）由运算器和控制器两大部件组成，是程序的最终执行者：既负责数据加工（算术&#x2F;逻辑运算），又负责指挥全机（取指令、译码、按时序产生微操作控制信号、协调各部件）。408 对本部分的考查集中在：CPU 的功能与基本结构（寄存器辨析）、指令周期与各周期数据流、数据通路（单总线微操作序列推演）、硬布线控制器与微程序控制器。 CPU 的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC5%E7%AB%A0%20%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8.assets/cpu-structure.jpg">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC5%E7%AB%A0%20%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8.assets/hardwired-controller.jpg">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC5%E7%AB%A0%20%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8.assets/microprogram-controller.png">
+<meta property="article:published_time" content="2026-08-29T14:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T08:16:22.357Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E8%AE%A1%E7%BB%84%E7%AC%AC5%E7%AB%A0%20%E4%B8%AD%E5%A4%AE%E5%A4%84%E7%90%86%E5%99%A8.assets/cpu-structure.jpg">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">CPU结构与控制器</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">CPU结构与控制器</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T14:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CPU-%E7%9A%84%E5%8A%9F%E8%83%BD%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="post-toc-number">1.</span> <span class="post-toc-text">CPU 的功能与基本结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CPU-%E7%9A%84%E4%BA%94%E5%A4%A7%E5%8A%9F%E8%83%BD"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">CPU 的五大功能</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CPU-%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%84%E6%88%90"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">CPU 的基本组成</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%80%E8%A7%88%E4%B8%8E%E2%80%9D%E9%80%8F%E6%98%8E%E2%80%9D%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">寄存器一览与”透明”概念</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8C%87%E4%BB%A4%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="post-toc-number">2.</span> <span class="post-toc-text">指令执行过程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%89%E7%BA%A7%E5%91%A8%E6%9C%9F"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">三级周期</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9B%E4%B8%AA%E5%AD%90%E5%91%A8%E6%9C%9F%E4%B8%8E%E6%95%B0%E6%8D%AE%E6%B5%81"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">四个子周期与数据流</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B8%E5%9E%8B%E6%8C%87%E4%BB%A4%E7%9A%84%E5%91%A8%E6%9C%9F%E5%B7%AE%E5%BC%82"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">典型指令的周期差异</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF%E7%9A%84%E5%8A%9F%E8%83%BD%E5%92%8C%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="post-toc-number">3.</span> <span class="post-toc-text">数据通路的功能和基本结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF%E4%B8%8E%E4%B8%A4%E7%B1%BB%E5%85%83%E4%BB%B6"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">数据通路与两类元件</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%86%85%E9%83%A8%E6%80%BB%E7%BA%BF%E4%B8%8E%E4%B8%89%E7%A7%8D%E9%80%9A%E8%B7%AF%E7%BB%93%E6%9E%84"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">内部总线与三种通路结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BE%AE%E6%93%8D%E4%BD%9C%E5%BA%8F%E5%88%97%E4%BE%8B%E9%A2%98%EF%BC%9A%E5%8D%95%E6%80%BB%E7%BA%BF%E6%89%A7%E8%A1%8C-ADD-R0-R1"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">微操作序列例题：单总线执行 ADD (R0), R1</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="post-toc-number">4.</span> <span class="post-toc-text">控制器的功能和工作原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A1%AC%E5%B8%83%E7%BA%BF%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">硬布线控制器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BE%AE%E5%91%BD%E4%BB%A4%E3%80%81%E5%BE%AE%E6%8C%87%E4%BB%A4%E4%B8%8E%E5%BE%AE%E7%A8%8B%E5%BA%8F%EF%BC%88%E6%A6%82%E5%BF%B5%E5%B1%82%E7%BA%A7%EF%BC%89"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">微命令、微指令与微程序（概念层级）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BE%AE%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E7%BB%84%E6%88%90%E4%B8%8E%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">微程序控制器的组成与执行流程</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BE%AE%E6%8C%87%E4%BB%A4%E7%9A%84%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">微指令的编码方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B0%B4%E5%B9%B3%E5%9E%8B%E4%B8%8E%E5%9E%82%E7%9B%B4%E5%9E%8B%E5%BE%AE%E6%8C%87%E4%BB%A4"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">水平型与垂直型微指令</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%BE%AE%E5%9C%B0%E5%9D%80%E7%9A%84%E5%BD%A2%E6%88%90%E6%96%B9%E5%BC%8F"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">微地址的形成方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A1%AC%E5%B8%83%E7%BA%BF-vs-%E5%BE%AE%E7%A8%8B%E5%BA%8F%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="post-toc-number">4.7.</span> <span class="post-toc-text">硬布线 vs 微程序控制器</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">5.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-CPU结构与控制器"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">CPU结构与控制器</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 22:00:00" datetime="2026-08-29T14:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">计算机组成原理</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>CPU（Central Processing Unit，中央处理器）<strong>由</strong>运算器</strong>和<strong>控制器</strong>两大部件组成，是程序的最终执行者：既负责<strong>数据加工</strong>（算术&#x2F;逻辑运算），又负责<strong>指挥全机</strong>（取指令、译码、按时序产生微操作控制信号、协调各部件）。408 对本部分的考查集中在：<strong>CPU 的功能与基本结构（寄存器辨析）、指令周期与各周期数据流、数据通路（单总线微操作序列推演）、硬布线控制器与微程序控制器</strong>。</p>
+<h2 id="CPU-的功能与基本结构"><a href="#CPU-的功能与基本结构" class="headerlink" title="CPU 的功能与基本结构"></a>CPU 的功能与基本结构</h2><h3 id="CPU-的五大功能"><a href="#CPU-的五大功能" class="headerlink" title="CPU 的五大功能"></a>CPU 的五大功能</h3><table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>指令控制</strong></td>
+<td align="left">控制<strong>程序按规定顺序</strong>执行：取指 → 分析 → 执行，遇转移指令改变执行顺序</td>
+</tr>
+<tr>
+<td align="left"><strong>操作控制</strong></td>
+<td align="left">对每条指令逐条产生相应的<strong>微操作控制信号</strong>，送往对应部件</td>
+</tr>
+<tr>
+<td align="left"><strong>时间控制</strong></td>
+<td align="left">各控制信号在<strong>规定时刻</strong>发出，各项操作严格按时序（节拍）配合</td>
+</tr>
+<tr>
+<td align="left"><strong>数据加工</strong></td>
+<td align="left">对数据进行<strong>算术运算和逻辑运算</strong>（ALU 的核心职责）</td>
+</tr>
+<tr>
+<td align="left"><strong>中断处理</strong></td>
+<td align="left">处理运算中的<strong>异常</strong>与外设发来的<strong>中断请求</strong></td>
+</tr>
+</tbody></table>
+<h3 id="CPU-的基本组成"><a href="#CPU-的基本组成" class="headerlink" title="CPU 的基本组成"></a>CPU 的基本组成</h3><p>CPU 内部 &#x3D; <strong>运算器 + 控制器 + 寄存器组 + 内部总线</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第5章 中央处理器.assets/cpu-structure.jpg" alt="CPU 内部结构" title="">
+                </div>
+                <div class="image-caption">CPU 内部结构</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">部件</th>
+<th align="left">主要组成</th>
+<th align="left">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>运算器</strong></td>
+<td align="left">ALU、暂存器、ACC、通用寄存器组、PSW</td>
+<td align="left">执行算术&#x2F;逻辑运算，暂存操作数与运算结果</td>
+</tr>
+<tr>
+<td align="left"><strong>控制器</strong></td>
+<td align="left">PC、IR、指令译码器 ID、时序产生器、微操作信号发生器（CU）</td>
+<td align="left">取指令、译码、产生控制信号、控制执行顺序</td>
+</tr>
+<tr>
+<td align="left"><strong>寄存器组</strong></td>
+<td align="left">通用寄存器 + 专用寄存器（PC&#x2F;IR&#x2F;MAR&#x2F;MDR&#x2F;PSW）</td>
+<td align="left">暂存指令、数据、地址与状态信息</td>
+</tr>
+<tr>
+<td align="left"><strong>内部总线</strong></td>
+<td align="left">单总线 &#x2F; 多总线</td>
+<td align="left">CPU 内部各部件之间的数据传输通路</td>
+</tr>
+</tbody></table>
+<h3 id="寄存器一览与”透明”概念"><a href="#寄存器一览与”透明”概念" class="headerlink" title="寄存器一览与”透明”概念"></a>寄存器一览与”透明”概念</h3><table>
+<thead>
+<tr>
+<th align="left">寄存器</th>
+<th align="left">全称</th>
+<th align="left">作用</th>
+<th align="left">位数</th>
+<th align="center">用户是否可见</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>PC</strong></td>
+<td align="left">程序计数器</td>
+<td align="left">存放<strong>下一条指令</strong>的地址；可自动 +1，也可接收转移地址</td>
+<td align="left">与<strong>主存地址位数</strong>一致</td>
+<td align="center">可见</td>
+</tr>
+<tr>
+<td align="left"><strong>IR</strong></td>
+<td align="left">指令寄存器</td>
+<td align="left">存放<strong>当前正在执行</strong>的指令</td>
+<td align="left">与<strong>指令字长</strong>一致</td>
+<td align="center"><strong>透明</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>PSW</strong></td>
+<td align="left">程序状态字</td>
+<td align="left">保存 OF&#x2F;SF&#x2F;ZF&#x2F;CF 等运算标志</td>
+<td align="left">与标志位有关</td>
+<td align="center">可见</td>
+</tr>
+<tr>
+<td align="left"><strong>ACC</strong></td>
+<td align="left">累加器</td>
+<td align="left">暂存 ALU 的操作数或运算结果</td>
+<td align="left">机器字长</td>
+<td align="center">可见</td>
+</tr>
+<tr>
+<td align="left"><strong>MAR</strong></td>
+<td align="left">存储器地址寄存器</td>
+<td align="left">存放<strong>要访问的主存单元地址</strong></td>
+<td align="left">与<strong>主存地址位数</strong>一致</td>
+<td align="center"><strong>透明</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>MDR</strong></td>
+<td align="left">存储器数据寄存器</td>
+<td align="left">存放与主存交换的<strong>指令或数据</strong></td>
+<td align="left">与<strong>存储字长</strong>一致</td>
+<td align="center"><strong>透明</strong></td>
+</tr>
+<tr>
+<td align="left">R0&#126;Rn</td>
+<td align="left">通用寄存器组</td>
+<td align="left">存放操作数、地址、中间结果</td>
+<td align="left">机器字长</td>
+<td align="center">可见</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：对程序员<strong>可见</strong>——通用寄存器、PC、PSW；<strong>透明（不可见）</strong>——MAR、MDR、IR（Cache、微程序结构也对用户透明）。汇编程序员能用转移指令”感知”并改变 PC，却无法直接读写 IR&#x2F;MAR&#x2F;MDR。<br><strong>易错点</strong>：MAR、MDR 按教材口径（唐朔飞）属于 <strong>CPU 内部的用户透明寄存器</strong>（也有教材把它们划归主存一侧，答题以题目给的口径为准，408 默认归 CPU）。”PC 自动 +1”中的 1 指<strong>一条指令的长度</strong>——变长指令系统下增量是本条指令的字节数，不一定是 1。</p>
+</blockquote>
+<h2 id="指令执行过程"><a href="#指令执行过程" class="headerlink" title="指令执行过程"></a>指令执行过程</h2><h3 id="三级周期"><a href="#三级周期" class="headerlink" title="三级周期"></a>三级周期</h3><table>
+<thead>
+<tr>
+<th align="left">层级</th>
+<th align="left">定义</th>
+<th align="left">关系</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>指令周期</strong></td>
+<td align="left">CPU <strong>取出并执行完一条指令</strong>所需的全部时间</td>
+<td align="left">含若干机器周期（不同指令的机器周期数可不同）</td>
+</tr>
+<tr>
+<td align="left"><strong>机器周期</strong>（CPU 周期）</td>
+<td align="left">完成一个<strong>基本操作</strong>的时间，常以**一次主存访问（存取周期）**为基准</td>
+<td align="left">含若干时钟周期</td>
+</tr>
+<tr>
+<td align="left"><strong>时钟周期</strong>（节拍）</td>
+<td align="left">主频的倒数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>，<strong>微操作的最小时间单位</strong></td>
+<td align="left">一个机器周期含若干节拍（T0、T1……）</td>
+</tr>
+</tbody></table>
+<p>即<strong>指令周期 ⊇ 机器周期 ⊇ 时钟周期</strong>。例如 3 GHz 主频的时钟周期约为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.33</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathrm">ns</span></span></span></span></span>；若一个机器周期含 4 个节拍、一条指令需 2 个机器周期，则指令周期为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">8</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>。</p>
+<h3 id="四个子周期与数据流"><a href="#四个子周期与数据流" class="headerlink" title="四个子周期与数据流"></a>四个子周期与数据流</h3><p>指令周期通常划分为<strong>取指、间址、执行、中断</strong>四种机器周期的组合：</p>
+<ul>
+<li><strong>取指周期</strong>：每条指令必有，完成”取指令 + PC+1 + 译码”，是所有指令的<strong>公操作</strong>；</li>
+<li><strong>间址周期</strong>：仅当采用（存储器）间接寻址时才有，取出的是<strong>有效地址 EA</strong> 而非操作数；</li>
+<li><strong>执行周期</strong>：完成指令规定的运算、访存或转移操作；</li>
+<li><strong>中断周期</strong>：在<strong>一条指令执行完毕后、下一条指令取指之前</strong>检测到中断请求时插入——不是每条指令都有。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">周期</th>
+<th align="center">节拍</th>
+<th align="left">数据流</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">取指</td>
+<td align="center">T0</td>
+<td align="left">(PC) → MAR，1 → R</td>
+<td align="left">指令地址送主存，CU 发读命令</td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T1</td>
+<td align="left">M(MAR) → MDR，(PC) + 1 → PC</td>
+<td align="left">指令从主存读出；<strong>PC+1 与访存并行</strong></td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T2</td>
+<td align="left">(MDR) → IR，OP(IR) → CU</td>
+<td align="left">指令进 IR，操作码送 CU 译码</td>
+</tr>
+<tr>
+<td align="left">间址</td>
+<td align="center">T0</td>
+<td align="left">Ad(IR) → MAR，1 → R</td>
+<td align="left">形式地址送 MAR</td>
+</tr>
+<tr>
+<td align="left">间址</td>
+<td align="center">T1</td>
+<td align="left">M(MAR) → MDR</td>
+<td align="left">从主存取出<strong>有效地址 EA</strong></td>
+</tr>
+<tr>
+<td align="left">间址</td>
+<td align="center">T2</td>
+<td align="left">(MDR) → Ad(IR)（或 → MAR）</td>
+<td align="left">EA 存回地址字段，供执行期直接访存</td>
+</tr>
+<tr>
+<td align="left">中断</td>
+<td align="center">T0</td>
+<td align="left">(SP) − 1 → SP，(SP) → MAR，1 → W</td>
+<td align="left">栈指针减 1 指向新栈顶，发写命令</td>
+</tr>
+<tr>
+<td align="left">中断</td>
+<td align="center">T1</td>
+<td align="left">(PC) → MDR</td>
+<td align="left">**断点（PC 的内容）**送 MDR</td>
+</tr>
+<tr>
+<td align="left">中断</td>
+<td align="center">T2</td>
+<td align="left">(MDR) → M(MAR)，中断向量 → PC</td>
+<td align="left">断点压栈，转向中断服务程序</td>
+</tr>
+</tbody></table>
+<p>（断点也可存入固定单元（如 0 号地址），硬件更简单；<strong>压栈方式支持多重中断嵌套</strong>，是现代主流。中断周期还隐含<strong>关中断、保存 PSW</strong> 等操作。）</p>
+<blockquote>
+<p><strong>考点</strong>：间址周期取的是<strong>有效地址</strong>、中断周期存的是<strong>断点（PC）</strong>——两条一句话就能拿分的结论。取指周期三拍是<strong>公操作</strong>，所有指令都执行。<br><strong>易错点</strong>：中断周期写入主存的是 <strong>PC 的值（下一条指令地址）</strong>，不是 IR 的内容；间址周期最后一步有的教材写 (MDR) → MAR，含义相同——EA 直达 MAR，执行期即可直接取操作数。</p>
+</blockquote>
+<h3 id="典型指令的周期差异"><a href="#典型指令的周期差异" class="headerlink" title="典型指令的周期差异"></a>典型指令的周期差异</h3><table>
+<thead>
+<tr>
+<th align="left">指令类型</th>
+<th align="center">需要间址周期</th>
+<th align="center">访存次数</th>
+<th align="left">机器周期数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MOV R0, R1（寄存器 → 寄存器）</td>
+<td align="center">无</td>
+<td align="center">1（仅取指）</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">LAD ACC, A（直接寻址取数）</td>
+<td align="center">无</td>
+<td align="center">2</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">LAD ACC, @A（存储器间接取数）</td>
+<td align="center"><strong>有</strong></td>
+<td align="center">3</td>
+<td align="left">3</td>
+</tr>
+<tr>
+<td align="left">STO A, ACC（写主存）</td>
+<td align="center">无</td>
+<td align="center">2</td>
+<td align="left">2</td>
+</tr>
+<tr>
+<td align="left">JMP A（无条件转移）</td>
+<td align="center">无</td>
+<td align="center">1</td>
+<td align="left">2</td>
+</tr>
+</tbody></table>
+<h2 id="数据通路的功能和基本结构"><a href="#数据通路的功能和基本结构" class="headerlink" title="数据通路的功能和基本结构"></a>数据通路的功能和基本结构</h2><h3 id="数据通路与两类元件"><a href="#数据通路与两类元件" class="headerlink" title="数据通路与两类元件"></a>数据通路与两类元件</h3><p><strong>数据通路（Datapath）</strong>：数据在指令执行过程中流经的<strong>路径及其上的全部部件</strong>（ALU、通用寄存器、状态寄存器、中断逻辑等）。控制部件（CU）按指令功能产生控制信号，决定数据”从哪里来、经过哪些部件、到哪里去”——数据通路的结构直接决定 CPU 性能。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类别</th>
+<th align="left">代表元件</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>组合逻辑元件</strong>（操作元件）</td>
+<td align="left">ALU、译码器、MUX、三态门</td>
+<td align="left">输出只取决于<strong>当前输入</strong>，无记忆、不受时钟控制</td>
+</tr>
+<tr>
+<td align="left"><strong>时序逻辑元件</strong>（状态元件）</td>
+<td align="left">通用寄存器、PC、PSW、Cache&#x2F;主存</td>
+<td align="left">含<strong>存储单元</strong>，必须在时钟节拍下工作</td>
+</tr>
+</tbody></table>
+<h3 id="内部总线与三种通路结构"><a href="#内部总线与三种通路结构" class="headerlink" title="内部总线与三种通路结构"></a>内部总线与三种通路结构</h3><ul>
+<li><strong>内部总线</strong>：CPU 内部各寄存器与 ALU 之间的连线（本节数据通路的讨论对象）；</li>
+<li><strong>系统总线</strong>：CPU、主存与外设之间的连线（地址&#x2F;数据&#x2F;控制总线）——两者不可混淆。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">结构</th>
+<th align="left">说明</th>
+<th align="left">性能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>单总线</strong></td>
+<td align="left">全部部件共享一条内部总线、<strong>分时使用</strong>：同一时刻<strong>只允许一个部件向总线发送</strong>，可同时有多个部件接收</td>
+<td align="left">结构简单、成本低；并行度低，一次加法需多个节拍</td>
+</tr>
+<tr>
+<td align="left"><strong>三总线</strong></td>
+<td align="left">两条总线分别向 ALU 送两个操作数，第三条回传结果</td>
+<td align="left"><strong>一个时钟周期</strong>即可完成加法</td>
+</tr>
+<tr>
+<td align="left"><strong>专用通路</strong></td>
+<td align="left">部件间用独立连线，多路传输可<strong>同时并行</strong></td>
+<td align="left">硬件开销大；现代高性能 CPU 与流水线采用</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> +----+  +----+  +-----+  +-----+  +-----+  +--------+</span><br><span class="line"> | PC |  | IR |  | MAR |  | MDR |  | ACC |  | R0..Rn |</span><br><span class="line"> +--+-+  +--+-+  +--+--+  +--+--+  +--+--+  +---+----+</span><br><span class="line">    |       |        |        |        |         |</span><br><span class="line">====+=======+========+========+========+=========+=====  internal bus</span><br><span class="line">    |          (Rout / Rin: tri-state gate + clock edge)</span><br><span class="line"> +--+---+                               +----+----+</span><br><span class="line"> |  Y   | -----&gt;  ALU  --------------&gt;  |    Z    |</span><br><span class="line"> +------+                               +---------+</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：ALU 是<strong>组合逻辑元件、没有存储功能</strong>，做加法时两个输入必须<strong>同时有效</strong>——单总线下第一个操作数要先锁入暂存器 <strong>Y</strong>；ALU 的输出也<strong>不能直接连到总线上</strong>（否则输出经总线反馈回 ALU 输入端形成<strong>振荡</strong>），必须先存入暂存器 <strong>Z</strong>，下一拍再写回目标寄存器。</p>
+</blockquote>
+<h3 id="微操作序列例题：单总线执行-ADD-R0-R1"><a href="#微操作序列例题：单总线执行-ADD-R0-R1" class="headerlink" title="微操作序列例题：单总线执行 ADD (R0), R1"></a>微操作序列例题：单总线执行 ADD (R0), R1</h3><p><strong>指令功能约定</strong>：<code>ADD (R0), R1</code> 表示 <strong>((R0)) + (R1) → R1</strong>——R0 的内容是主存操作数的地址（<strong>寄存器间接寻址</strong>），运算结果存回 R1。数据通路为单总线 + 暂存器 Y、Z。</p>
+<p>因为 (R0) 属于寄存器间接（地址已现成放在 R0 中），<strong>不需要独立的间址周期</strong>，取操作数并入执行周期；若操作数采用存储器间接 Ad(IR)，则应在取指与执行之间插入独立的间址周期。</p>
+<table>
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="center">节拍</th>
+<th align="left">微操作</th>
+<th align="left">有效控制信号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">取指</td>
+<td align="center">T0</td>
+<td align="left">(PC) → MAR</td>
+<td align="left">PCout、MARin</td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T0</td>
+<td align="left">1 → R</td>
+<td align="left">读命令（与上行相容，可并行发出）</td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T1</td>
+<td align="left">M(MAR) → MDR</td>
+<td align="left">MDRinE（E 表示从系统数据线接收）</td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T1</td>
+<td align="left">(PC) + 1 → PC</td>
+<td align="left">PC 自增（与访存并行）</td>
+</tr>
+<tr>
+<td align="left">取指</td>
+<td align="center">T2</td>
+<td align="left">(MDR) → IR</td>
+<td align="left">MDRout、IRin</td>
+</tr>
+<tr>
+<td align="left">执行</td>
+<td align="center">T0</td>
+<td align="left">(R0) → MAR</td>
+<td align="left">R0out、MARin</td>
+</tr>
+<tr>
+<td align="left">执行</td>
+<td align="center">T1</td>
+<td align="left">1 → R；M(MAR) → MDR</td>
+<td align="left">读命令、MDRinE</td>
+</tr>
+<tr>
+<td align="left">执行</td>
+<td align="center">T2</td>
+<td align="left">(MDR) → Y</td>
+<td align="left">MDRout、Yin</td>
+</tr>
+<tr>
+<td align="left">执行</td>
+<td align="center">T3</td>
+<td align="left">(R1) + (Y) → Z</td>
+<td align="left">R1out、ALU 做加法、Zin</td>
+</tr>
+<tr>
+<td align="left">执行</td>
+<td align="center">T4</td>
+<td align="left">(Z) → R1</td>
+<td align="left">Zout、R1in</td>
+</tr>
+</tbody></table>
+<p><strong>推演说明</strong>：</p>
+<ul>
+<li>每个节拍发出的微命令必须<strong>相容</strong>（一个部件发送、另一部件接收）；同一拍绝不能出现两个输出使能（相斥）——单总线同一时刻只容纳一个发送者。</li>
+<li>取指 3 拍是所有指令的公操作；执行期 T2、T3 之所以分开，是因为 MDR 中的操作数要<strong>先</strong>锁进 Y，R1 的内容才能与它一起进入 ALU。</li>
+<li>若去掉 Z 直接写”ALU → R1”，则 ALU 输出占用总线的同时仍在运算，反馈路径会造成错误——这正是 Z 暂存器存在的意义。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：写微操作序列三步法——<strong>拆功能</strong>（公操作取指 + 按寻址方式取数 + 运算写回）→ <strong>一拍只安排一个总线事务</strong> → <strong>成对标控制信号</strong>（<code>xout</code> + <code>yin</code>）。<br><strong>易错点</strong>：控制信号命名惯例 <code>Rout</code>（寄存器 → 总线）、<code>Rin</code>（总线 → 寄存器）；访存微操作（M(MAR) → MDR）受主存速度限制，不能与后续的总线传送挤在同一节拍。</p>
+</blockquote>
+<h2 id="控制器的功能和工作原理"><a href="#控制器的功能和工作原理" class="headerlink" title="控制器的功能和工作原理"></a>控制器的功能和工作原理</h2><p>控制器（CU）的<strong>输入</strong>：操作码译码信号、时序信号（机器周期电位 + 节拍 + 时钟脉冲）、PSW 状态标志、中断请求等；<strong>输出</strong>：两类微操作控制信号——送 CPU <strong>内部</strong>（寄存器传送、ALU 操作）与送 CPU <strong>外部</strong>（访存读写、I&#x2F;O）。产生这些控制信号的方式就是控制器的两种形态：<strong>硬布线</strong>与<strong>微程序</strong>。</p>
+<h3 id="硬布线控制器"><a href="#硬布线控制器" class="headerlink" title="硬布线控制器"></a>硬布线控制器</h3><p><strong>基本思想</strong>：把每条指令在每个节拍应发出的控制信号写成<strong>布尔表达式</strong>，用<strong>组合逻辑门电路</strong>直接产生——输入（操作码、时序、状态）一旦确定，输出即确定，因此又称<strong>组合逻辑控制器</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第5章 中央处理器.assets/hardwired-controller.jpg" alt="硬布线控制器结构方框图" title="">
+                </div>
+                <div class="image-caption">硬布线控制器结构方框图</div>
+            </figure>
+
+<p><strong>与时钟的配合</strong>：时序产生器输出机器周期电位（M1、M2……）与节拍电位（T0&#126;T3），每个控制信号在”<strong>哪个机器周期 + 哪个节拍</strong>“有效由操作时间表规定，寄存器在<strong>时钟脉冲</strong>边沿把总线上的数据打入——节拍电位保证操作”先后有序”，时钟脉冲保证”打入无误”。</p>
+<p><strong>设计三步</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">工作内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">① 列<strong>操作时间表</strong></td>
+<td align="left">列出每条指令在各机器周期、各节拍下应发的微操作控制信号（取指周期为公操作，所有指令共用）</td>
+</tr>
+<tr>
+<td align="left">② <strong>微操作信号综合</strong></td>
+<td align="left">把同一控制信号在不同指令&#x2F;节拍下的所有出现情形<strong>求或</strong>，写出逻辑表达式并化简</td>
+</tr>
+<tr>
+<td align="left">③ 画<strong>逻辑图</strong></td>
+<td align="left">用门电路实现每个控制信号的逻辑表达式</td>
+</tr>
+</tbody></table>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathrm">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathrm">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathrm">T</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathrm">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">OP</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∧</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">State</span></span></span></span></span></span>
+<p>其中 M 为机器周期电位、T 为节拍电位、P 为时钟脉冲、OP 为操作码译码信号、State 为状态标志（仅条件转移类指令用到）。</p>
+<p><strong>例</strong>（设 M1 为取指周期电位、M2 为执行周期电位，各助记符为指令译码输出）：</p>
+<ul>
+<li>取指读主存（所有指令共用）：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">RD</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></li>
+<li>打入 IR：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">LDIR</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></li>
+<li>打入 PC：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">LDPC</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">JMP</span></span></span></span></span>（取指期 PC+1 打入；执行期 JMP 装入转移地址）</li>
+<li>打入地址寄存器：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathrm">LDAR</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathrm">LAD</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathrm">STO</span></span><span class="mclose">)</span></span></span></span></li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：同一控制信号的逻辑表达式是<strong>若干”机器周期 × 节拍 × 操作码”项的或</strong>——这正是”微操作信号综合”的标准考法；取指周期的信号与操作码无关，可直接归并。<br><strong>易错点</strong>：硬布线<strong>速度快</strong>（仅一两级门延迟）但<strong>设计与修改困难</strong>——指令系统一变就要重新布线，故只适合指令<strong>少而规整</strong>的 RISC。</p>
+</blockquote>
+<h3 id="微命令、微指令与微程序（概念层级）"><a href="#微命令、微指令与微程序（概念层级）" class="headerlink" title="微命令、微指令与微程序（概念层级）"></a>微命令、微指令与微程序（概念层级）</h3><table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">定义</th>
+<th align="left">关系</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>微命令</strong></td>
+<td align="left">控制部件发出的<strong>最小</strong>（不可再分）控制信号，如 PCout、”ALU 加法”</td>
+<td align="left"><strong>微命令是”因”，微操作是”果”</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>微操作</strong></td>
+<td align="left">执行部件收到微命令后完成的<strong>基本操作</strong>，如 PC → MAR（需 PCout 与 MARin 同时有效）</td>
+<td align="left">一个微操作可由多个微命令共同驱动</td>
+</tr>
+<tr>
+<td align="left"><strong>微指令</strong></td>
+<td align="left"><strong>同一节拍</strong>内发出的<strong>一组相容微命令</strong>的集合 &#x3D; <strong>操作控制字段 + 顺序控制字段</strong></td>
+<td align="left">一条微指令对应一个节拍，<strong>微指令周期 &#x3D; 1 个时钟周期</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>微程序</strong></td>
+<td align="left">实现一条<strong>机器指令</strong>功能的<strong>微指令序列</strong></td>
+<td align="left"><strong>1 条机器指令 &#x3D; 1 段微程序 &#x3D; n 条微指令（n ≥ 1）</strong></td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PCout + MARin             micro-commands issued in one beat</span><br><span class="line">         v</span><br><span class="line">micro-instruction = control field + next-address field  (1 clock cycle)</span><br><span class="line">         v  (sequenced by)</span><br><span class="line">micro-program  ==  1 machine instruction (fetched from main memory)</span><br></pre></td></tr></table></figure>
+
+<p><strong>相容与相斥</strong>：<strong>相容</strong>微命令控制不同资源、可同时有效（如 PCout 与 MARin），可放进同一条微指令并行发出；<strong>相斥</strong>微命令争用同一资源、不能同时有效（如 PCout 与 MDRout、ALU 加与减、1 → R 与 1 → W）。<strong>互斥微命令编入同一字段</strong>——这是下面”字段编码”划分字段的根本依据。</p>
+<h3 id="微程序控制器的组成与执行流程"><a href="#微程序控制器的组成与执行流程" class="headerlink" title="微程序控制器的组成与执行流程"></a>微程序控制器的组成与执行流程</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/计组第5章 中央处理器.assets/microprogram-controller.png" alt="微程序控制器原理框图" title="">
+                </div>
+                <div class="image-caption">微程序控制器原理框图</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">部件</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>控制存储器 CM</strong></td>
+<td align="left">用 <strong>ROM</strong> 实现，固化<strong>全部机器指令对应的微程序</strong>，对用户透明</td>
+</tr>
+<tr>
+<td align="left"><strong>CMAR（μAR）</strong></td>
+<td align="left">微地址寄存器：存放<strong>即将读出</strong>的微指令在 CM 中的地址</td>
+</tr>
+<tr>
+<td align="left"><strong>CMDR（μIR）</strong></td>
+<td align="left">微指令寄存器：存放<strong>刚从 CM 读出</strong>的微指令（操作控制字段 + P 字段&#x2F;下址字段）</td>
+</tr>
+<tr>
+<td align="left"><strong>地址转移逻辑</strong></td>
+<td align="left">根据操作码、状态标志与 P 字段，生成<strong>下一条</strong>微指令的地址并写入 CMAR</td>
+</tr>
+</tbody></table>
+<p><strong>执行流程</strong>：</p>
+<ol>
+<li>执行<strong>取指公操作</strong>对应的微程序，把机器指令取入 IR；</li>
+<li><strong>操作码映射</strong>：OP(IR) 经映射逻辑（如操作码后拼接若干 0）变换为该指令微程序的<strong>入口微地址</strong>，装入 CMAR；</li>
+<li>按 CMAR 访问 CM，读出微指令存入 CMDR，其<strong>操作控制字段</strong>发出微命令驱动数据通路；</li>
+<li>同时 P 字段与状态标志经<strong>地址转移逻辑</strong>形成下一条微地址（顺序 +1 或按条件转移）；</li>
+<li>循环第 3、4 步，直到遇到”返回取指”的微指令——一条机器指令执行完毕。</li>
+</ol>
+<blockquote>
+<p><strong>考点</strong>：1 个<strong>机器周期包含多条微指令</strong>（微指令周期 &#x3D; 时钟周期）；CM 必须用 <strong>ROM</strong>（断电不丢失、出厂固化）；<strong>操作码映射</strong>只在每条机器指令开头发生一次，用于定位微程序入口。<br><strong>易错点</strong>：微程序控制器<strong>每个节拍都要先访问 CM 取微指令</strong>才能发出控制信号，因此比硬布线多一个 ROM 访问延迟；微指令、微程序对汇编程序员<strong>完全透明</strong>。</p>
+</blockquote>
+<h3 id="微指令的编码方式"><a href="#微指令的编码方式" class="headerlink" title="微指令的编码方式"></a>微指令的编码方式</h3><table>
+<thead>
+<tr>
+<th align="left">编码方式</th>
+<th align="left">原理</th>
+<th align="left">速度与字长</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>直接编码</strong></td>
+<td align="left">控制字段<strong>每一位</strong>对应一个微命令（1 发出 &#x2F; 0 不发出），<strong>不需要译码</strong></td>
+<td align="left">速度最快、并行能力最强；<strong>字长 &#x3D; 微命令总数</strong>，微指令最长</td>
+</tr>
+<tr>
+<td align="left"><strong>字段直接编码</strong></td>
+<td align="left">把<strong>互斥</strong>微命令编入同一字段，各字段经<strong>译码器</strong>译出微命令，字段之间仍可并行</td>
+<td align="left">n 位字段最多表示 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个互斥微命令——<strong>全 0 保留为”不发出任何命令”</strong>；字长大幅缩短，但增加译码延迟</td>
+</tr>
+<tr>
+<td align="left"><strong>字段间接编码</strong></td>
+<td align="left">某字段的含义还须由<strong>另一字段的编码</strong>来解释（二次译码）</td>
+<td align="left">字长进一步压缩；速度更慢、设计更复杂，只少量字段使用</td>
+</tr>
+</tbody></table>
+<p><strong>例</strong>：3 位字段按字段直接编码可定义 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">7</span></span></span></span> 个互斥微命令（000 表示不发命令）；同样的 7 个命令若用直接编码要占 7 位。</p>
+<blockquote>
+<p><strong>易错点</strong>：字段直接编码的 n 位字段能表示 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></strong> 个微命令而不是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span>（全 0 编码被”无操作”占用）；字段划分依据是<strong>互斥</strong>（不是相容）——相容命令必须放<strong>不同字段</strong>才能同时发出。<br><strong>考点</strong>：三种编码是”<strong>字长 ↔ 速度</strong>“的权衡：直接编码快而长、字段编码短而稍慢；实际机器常用<strong>混合方式</strong>（部分位直接控制、部分字段编码）。</p>
+</blockquote>
+<h3 id="水平型与垂直型微指令"><a href="#水平型与垂直型微指令" class="headerlink" title="水平型与垂直型微指令"></a>水平型与垂直型微指令</h3><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">水平型微指令</th>
+<th align="left">垂直型微指令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">编码思想</td>
+<td align="left">接近<strong>直接编码</strong>：一位（或短字段）直接对应微命令，不译码或轻译码</td>
+<td align="left">类似<strong>机器指令</strong>格式：微操作码 + 操作数描述字段，<strong>必须译码</strong></td>
+</tr>
+<tr>
+<td align="left">并行能力</td>
+<td align="left"><strong>强</strong>：一条可同时定义多个微命令</td>
+<td align="left">弱：一条只完成 1&#126;2 个微操作</td>
+</tr>
+<tr>
+<td align="left">微指令字长</td>
+<td align="left"><strong>长</strong></td>
+<td align="left"><strong>短</strong></td>
+</tr>
+<tr>
+<td align="left">微程序长度</td>
+<td align="left"><strong>短</strong>（微指令条数少）</td>
+<td align="left">长</td>
+</tr>
+<tr>
+<td align="left">执行速度</td>
+<td align="left"><strong>快</strong></td>
+<td align="left">慢</td>
+</tr>
+<tr>
+<td align="left">编写难度</td>
+<td align="left">难（需熟悉硬件细节）</td>
+<td align="left">易（与汇编指令相似）</td>
+</tr>
+</tbody></table>
+<h3 id="微地址的形成方式"><a href="#微地址的形成方式" class="headerlink" title="微地址的形成方式"></a>微地址的形成方式</h3><table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">原理</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>增量计数器法</strong></td>
+<td align="left">让 CMAR 兼作微地址计数器（μPC）：顺序执行时 <strong>μPC + 1</strong>；需要分支时由<strong>微地址转移逻辑</strong>按 P 字段测试的状态条件，把转移地址改写入 μPC</td>
+<td align="left">与机器指令的 PC 机制类似；顺序执行快、控制逻辑简单</td>
+</tr>
+<tr>
+<td align="left"><strong>断定方式</strong></td>
+<td align="left">下一条微指令地址由<strong>本条微指令的顺序控制字段（下址字段）直接”断定”</strong>，还可与状态标志经多路器组合实现多路分支</td>
+<td align="left">分支灵活（可多路转移）；微指令更长、下址字段占用位数多</td>
+</tr>
+</tbody></table>
+<p><strong>增量计数器法小例</strong>（入口由操作码映射、分支由 P 字段判定）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CM addr   micro-operation              next micro-address</span><br><span class="line">0000      PC -&gt; MAR, 1 -&gt; R            uPC + 1 = 0001</span><br><span class="line">0001      M(MAR) -&gt; MDR, (PC) + 1      uPC + 1 = 0002</span><br><span class="line">0002      MDR -&gt; IR, P1 tests opcode   opcode map: ADD -&gt; 1000 (load into uPC)</span><br><span class="line">1000      R0 -&gt; MAR, 1 -&gt; R            uPC + 1 = 1001</span><br><span class="line">1001      M(MAR) -&gt; MDR                uPC + 1 = 1002</span><br><span class="line">1002      MDR -&gt; Y                     uPC + 1 = 1003</span><br><span class="line">1003      (R1) + (Y) -&gt; Z, P2 tests ZF   ZF=1: next field 1200 -&gt; uPC</span><br><span class="line">                                       ZF=0: uPC + 1 = 1004</span><br><span class="line">1004      Z -&gt; R1                      back to fetch (micro-program ends)</span><br></pre></td></tr></table></figure>
+
+<p>顺序地址靠 μPC 自动 +1，只有 P1&#x2F;P2 测试点才由<strong>地址转移逻辑</strong>改写 μPC——这就是”增量 + 转移”的分工。</p>
+<h3 id="硬布线-vs-微程序控制器"><a href="#硬布线-vs-微程序控制器" class="headerlink" title="硬布线 vs 微程序控制器"></a>硬布线 vs 微程序控制器</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">硬布线控制器</th>
+<th align="left">微程序控制器</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">实现方式</td>
+<td align="left"><strong>组合逻辑门电路</strong>（+ 触发器）</td>
+<td align="left"><strong>ROM 存微程序</strong>，逐条读出产生控制信号</td>
+</tr>
+<tr>
+<td align="left">速度</td>
+<td align="left"><strong>快</strong>（仅 1&#126;2 级门延迟）</td>
+<td align="left"><strong>较慢</strong>（每个节拍都要先访问 CM）</td>
+</tr>
+<tr>
+<td align="left">规整性</td>
+<td align="left">差（门电路庞杂、不规整）</td>
+<td align="left"><strong>好</strong>（微指令格式统一，呈存储逻辑）</td>
+</tr>
+<tr>
+<td align="left">修改与扩展</td>
+<td align="left"><strong>难</strong>：改一条指令就要重新设计电路</td>
+<td align="left"><strong>易</strong>：修改 CM 中的微程序即可，可灵活增删指令</td>
+</tr>
+<tr>
+<td align="left">设计复杂度</td>
+<td align="left">高（布尔表达式综合化简繁琐）</td>
+<td align="left">低（”编程”式设计，规整）</td>
+</tr>
+<tr>
+<td align="left">硬件成本</td>
+<td align="left">低（简单机器尤其明显）</td>
+<td align="left">较高（需 CM、CMAR、CMDR 及译码电路）</td>
+</tr>
+<tr>
+<td align="left">故障诊断</td>
+<td align="left">难</td>
+<td align="left">易（微指令逐条可追踪）</td>
+</tr>
+<tr>
+<td align="left">典型应用</td>
+<td align="left"><strong>RISC</strong>（指令少、格式规整、追求速度）</td>
+<td align="left"><strong>CISC</strong>（指令复杂多变）；现代 CPU 常两者<strong>混合</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：核心权衡是<strong>速度 vs 规整性&#x2F;易修改</strong>——RISC 选硬布线、CISC 选微程序；”现代 CPU 混合使用：常用简单指令走硬布线、复杂指令走微程序”是简答题的常用结语。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">CPU 五大功能</td>
+<td align="left"><strong>指令控制、操作控制、时间控制、数据加工、中断处理</strong>——数据加工是唯一”干活”的，其余是”指挥”</td>
+</tr>
+<tr>
+<td align="left">寄存器可见性</td>
+<td align="left">可见：<strong>通用寄存器、PC、PSW</strong>；透明：<strong>MAR、MDR、IR</strong>（Cache、微程序结构也透明）</td>
+</tr>
+<tr>
+<td align="left">位数对应</td>
+<td align="left">PC、MAR 与<strong>主存地址位数</strong>一致；IR 与<strong>指令字长</strong>一致；MDR 与<strong>存储字长</strong>一致</td>
+</tr>
+<tr>
+<td align="left">PC 的两个动作</td>
+<td align="left">顺序执行<strong>自动 +1</strong>（增量 &#x3D; 指令字长）；转移时<strong>接收转移地址</strong>——PC 存的是<strong>下一条</strong>指令地址</td>
+</tr>
+<tr>
+<td align="left">三级周期</td>
+<td align="left"><strong>时钟周期（节拍）⊆ 机器周期（以存取周期为基准）⊆ 指令周期</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">四个子周期</td>
+<td align="left"><strong>取指（必有）+ 间址（间接寻址才有）+ 执行（必有）+ 中断（有请求才插入）</strong>；中断周期插在<strong>本条执行完、下条取指前</strong></td>
+</tr>
+<tr>
+<td align="left">取指数据流</td>
+<td align="left"><strong>PC→MAR，1→R，M(MAR)→MDR，MDR→IR，OP(IR)→CU，PC+1</strong>——公操作，PC+1 与访存并行</td>
+</tr>
+<tr>
+<td align="left">间址 vs 中断</td>
+<td align="left">间址周期取<strong>有效地址 EA</strong>（Ad(IR)→MAR，M(MAR)→MDR）；中断周期存<strong>断点 PC</strong>（压栈或存 0 号单元）并关中断</td>
+</tr>
+<tr>
+<td align="left">单总线规则</td>
+<td align="left">同一时刻<strong>只能一个部件发送</strong>、可多个接收；一拍一个总线事务；<code>xout</code> 与 <code>yin</code> 成对出现</td>
+</tr>
+<tr>
+<td align="left">Y&#x2F;Z 暂存器</td>
+<td align="left">两个操作数须<strong>同时有效</strong> → 先锁 <strong>Y</strong>；ALU 输出不能直连总线（<strong>反馈振荡</strong>） → 先锁 <strong>Z</strong></td>
+</tr>
+<tr>
+<td align="left">组合 vs 时序元件</td>
+<td align="left">组合：ALU、译码器、MUX、三态门（无记忆）；时序：寄存器、PC、主存（时钟控制）</td>
+</tr>
+<tr>
+<td align="left">微程序层级</td>
+<td align="left"><strong>微命令（最小控制信号）→ 微指令（一个节拍 &#x3D; 控制字段 + 顺序字段）→ 微程序（对应一条机器指令）</strong>；1 微指令周期 &#x3D; 1 时钟周期</td>
+</tr>
+<tr>
+<td align="left">微程序控制器</td>
+<td align="left"><strong>CM 用 ROM</strong> 固化微程序 + <strong>CMAR（微地址）+ CMDR（微指令）</strong>；入口由<strong>操作码映射</strong>定位；全部对用户透明</td>
+</tr>
+<tr>
+<td align="left">编码方式</td>
+<td align="left">直接编码（1 位 1 命令，快而长）；字段直接编码（互斥同段，n 位表 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个，全 0 &#x3D; 无操作）；字段间接编码（二次译码，最短最慢）</td>
+</tr>
+<tr>
+<td align="left">水平 vs 垂直</td>
+<td align="left">水平型：并行强、字长、条数少、<strong>快</strong>；垂直型：短、需译码、一次 1&#126;2 个微操作、易掌握</td>
+</tr>
+<tr>
+<td align="left">微地址形成</td>
+<td align="left"><strong>增量计数器法</strong>（μPC+1，转移由地址转移逻辑改写）+ <strong>断定方式</strong>（下址字段直接给出）；总口径：硬布线快难改（RISC）、微程序慢易改（CISC）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T08:16:22.357Z" itemprop="dateUpdated">2026-08-29 16:16:22</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" rel="tag">计算机组成原理</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&title=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&title=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E6%B5%81%E6%B0%B4%E7%BA%BF/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">指令流水线</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E6%8C%87%E4%BB%A4%E7%B3%BB%E7%BB%9F/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">指令系统</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&title=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&title=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CPU结构与控制器》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/CPU%E7%BB%93%E6%9E%84%E4%B8%8E%E6%8E%A7%E5%88%B6%E5%99%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
