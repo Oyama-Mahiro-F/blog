@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>物理层与数据通信基础 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,网络,物理层">
+    <meta name="description" content="物理层（Physical Layer）是计算机网络体系结构的最低层，任务是在传输介质上透明地传送比特流：它并不研究具体的传输介质本身，而是规定与介质接口的机械、电气、功能、过程特性，把比特流变换成信号、通过信道从信源送到信宿。408 对本章的考查集中在：基本概念辨析（码元&#x2F;比特、波特&#x2F;比特率、带宽）、奈奎斯特定理与香农定理的极限速率计算、编码与调制方式、电路&#x2F;报文&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="物理层与数据通信基础">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="物理层（Physical Layer）是计算机网络体系结构的最低层，任务是在传输介质上透明地传送比特流：它并不研究具体的传输介质本身，而是规定与介质接口的机械、电气、功能、过程特性，把比特流变换成信号、通过信道从信源送到信宿。408 对本章的考查集中在：基本概念辨析（码元&#x2F;比特、波特&#x2F;比特率、带宽）、奈奎斯特定理与香农定理的极限速率计算、编码与调制方式、电路&#x2F;报文&amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%89%A9%E7%90%86%E5%B1%82.assets/encoding-waveforms.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%89%A9%E7%90%86%E5%B1%82.assets/ask-fsk-psk.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%89%A9%E7%90%86%E5%B1%82.assets/switching-comparison.png">
+<meta property="article:published_time" content="2026-08-28T23:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:21:01.997Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="物理层">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%89%A9%E7%90%86%E5%B1%82.assets/encoding-waveforms.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">物理层与数据通信基础</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">物理层与数据通信基础</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-28T23:30:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.</span> <span class="post-toc-text">数据通信基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E3%80%81%E4%BF%A1%E5%8F%B7%E4%B8%8E%E9%80%9A%E4%BF%A1%E7%B3%BB%E7%BB%9F%E6%A8%A1%E5%9E%8B"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">数据、信号与通信系统模型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%A0%81%E5%85%83%E3%80%81%E6%AF%94%E7%89%B9%E3%80%81%E6%B3%A2%E7%89%B9%E4%B8%8E%E5%B8%A6%E5%AE%BD%EF%BC%88%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90%EF%BC%89"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">码元、比特、波特与带宽（概念辨析）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A5%88%E5%A5%8E%E6%96%AF%E7%89%B9%E5%AE%9A%E7%90%86%E4%B8%8E%E9%A6%99%E5%86%9C%E5%AE%9A%E7%90%86"><span class="post-toc-number">2.</span> <span class="post-toc-text">奈奎斯特定理与香农定理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A5%88%E5%A5%8E%E6%96%AF%E7%89%B9%E5%AE%9A%E7%90%86%EF%BC%88%E5%A5%88%E6%B0%8F%E5%87%86%E5%88%99%EF%BC%89"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">奈奎斯特定理（奈氏准则）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%A6%99%E5%86%9C%E5%AE%9A%E7%90%86"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">香农定理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A5%88%E6%B0%8F-vs-%E9%A6%99%E5%86%9C%EF%BC%88%E5%AF%B9%E6%AF%94%E8%BE%A8%E6%9E%90%EF%BC%89"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">奈氏 vs 香农（对比辨析）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BC%96%E7%A0%81%E4%B8%8E%E8%B0%83%E5%88%B6"><span class="post-toc-number">3.</span> <span class="post-toc-text">编码与调制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E5%AD%97%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%BA%E6%95%B0%E5%AD%97%E4%BF%A1%E5%8F%B7"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">数字数据编码为数字信号</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E5%AD%97%E6%95%B0%E6%8D%AE%E8%B0%83%E5%88%B6%E4%B8%BA%E6%A8%A1%E6%8B%9F%E4%BF%A1%E5%8F%B7"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">数字数据调制为模拟信号</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%94%B5%E8%B7%AF%E4%BA%A4%E6%8D%A2%E3%80%81%E6%8A%A5%E6%96%87%E4%BA%A4%E6%8D%A2%E4%B8%8E%E5%88%86%E7%BB%84%E4%BA%A4%E6%8D%A2"><span class="post-toc-number">4.</span> <span class="post-toc-text">电路交换、报文交换与分组交换</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8A%A5%E6%96%87%E4%BA%A4%E6%8D%A2-vs-%E5%88%86%E7%BB%84%E4%BA%A4%E6%8D%A2%EF%BC%9A%E6%97%B6%E5%BB%B6%E5%AF%B9%E6%AF%94%E4%BE%8B%E9%A2%98"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">报文交换 vs 分组交换：时延对比例题</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8"><span class="post-toc-number">5.</span> <span class="post-toc-text">传输介质</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AF%BC%E5%90%91%E6%80%A7%E4%BB%8B%E8%B4%A8%EF%BC%88%E6%9C%89%E7%BA%BF%EF%BC%89"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">导向性介质（有线）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%9D%9E%E5%AF%BC%E5%90%91%E6%80%A7%E4%BB%8B%E8%B4%A8%EF%BC%88%E6%97%A0%E7%BA%BF%EF%BC%89"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">非导向性介质（无线）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%89%A9%E7%90%86%E5%B1%82%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%89%B9%E6%80%A7"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">物理层接口的特性</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-物理层与数据通信基础"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">物理层与数据通信基础</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 07:30:00" datetime="2026-08-28T23:30:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>物理层（Physical Layer）<strong>是计算机网络体系结构的最低层，任务是在传输介质上</strong>透明地传送比特流</strong>：它并不研究具体的传输介质本身，而是规定与介质接口的<strong>机械、电气、功能、过程</strong>特性，把比特流变换成<strong>信号</strong>、通过<strong>信道</strong>从<strong>信源</strong>送到<strong>信宿</strong>。408 对本章的考查集中在：<strong>基本概念辨析（码元&#x2F;比特、波特&#x2F;比特率、带宽）、奈奎斯特定理与香农定理的极限速率计算、编码与调制方式、电路&#x2F;报文&#x2F;分组三种交换技术、传输介质与物理层接口特性</strong>，其中两大定理的计算几乎是必考题。</p>
+<h2 id="数据通信基本概念"><a href="#数据通信基本概念" class="headerlink" title="数据通信基本概念"></a>数据通信基本概念</h2><h3 id="数据、信号与通信系统模型"><a href="#数据、信号与通信系统模型" class="headerlink" title="数据、信号与通信系统模型"></a>数据、信号与通信系统模型</h3><p><strong>数据（Data）<strong>是传送信息的</strong>实体</strong>，<strong>信号（Signal）<strong>是数据的</strong>电气或电磁表现</strong>——数据回答”运什么”，信号回答”怎么运”。</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">含义</th>
+<th align="left">举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>模拟数据 &#x2F; 模拟信号</strong></td>
+<td align="left">取值<strong>连续</strong>变化</td>
+<td align="left">电话线上的语音电压波形</td>
+</tr>
+<tr>
+<td align="left"><strong>数字数据 &#x2F; 数字信号</strong></td>
+<td align="left">取值<strong>离散</strong></td>
+<td align="left">计算机输出的 0&#x2F;1 比特流</td>
+</tr>
+</tbody></table>
+<p>通信系统的一般模型：<strong>信源（Source）→ 发送器 → 信道（Channel）→ 接收器 → 信宿（Sink）</strong>，<strong>噪声源</strong>叠加在信道上：</p>
+<table>
+<thead>
+<tr>
+<th align="left">部件</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>信源</strong></td>
+<td align="left">产生和发送数据的源头</td>
+</tr>
+<tr>
+<td align="left"><strong>发送器</strong></td>
+<td align="left">把数据变换成<strong>适合信道传输</strong>的信号（编码&#x2F;调制）</td>
+</tr>
+<tr>
+<td align="left"><strong>信道</strong></td>
+<td align="left">信号的传输通道，<strong>噪声在此叠加</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>接收器</strong></td>
+<td align="left">把信号<strong>恢复</strong>成信宿可接收的形式（解码&#x2F;解调）</td>
+</tr>
+<tr>
+<td align="left"><strong>信宿</strong></td>
+<td align="left">接收数据的终点</td>
+</tr>
+</tbody></table>
+<p>调制解调器（Modem）同时具有发送器与接收器功能。信道按通信方向分为<strong>单工</strong>（只能单向）、<strong>半双工</strong>（双向但同一时刻只能一方发送）与<strong>全双工</strong>（同时双向收发）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">通信方式</th>
+<th align="left">方向性</th>
+<th align="left">实例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>单工</strong></td>
+<td align="left">只能<strong>一个方向</strong>传输</td>
+<td align="left">广播、电视</td>
+</tr>
+<tr>
+<td align="left"><strong>半双工</strong></td>
+<td align="left">双向但<strong>同一时刻只能一方</strong>发送</td>
+<td align="left">对讲机</td>
+</tr>
+<tr>
+<td align="left"><strong>全双工</strong></td>
+<td align="left"><strong>同时双向</strong>收发（需<strong>两条信道</strong>）</td>
+<td align="left">电话</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">含义</th>
+<th align="left">场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>基带信号（Baseband）</strong></td>
+<td align="left">信源发出的<strong>未经调制</strong>的原始信号</td>
+<td align="left">近距离传输（局域网）</td>
+</tr>
+<tr>
+<td align="left"><strong>宽带（频带）信号</strong></td>
+<td align="left">基带信号<strong>调制搬移</strong>到较高频段后的信号</td>
+<td align="left">远距离传输、频分复用</td>
+</tr>
+</tbody></table>
+<h3 id="码元、比特、波特与带宽（概念辨析）"><a href="#码元、比特、波特与带宽（概念辨析）" class="headerlink" title="码元、比特、波特与带宽（概念辨析）"></a>码元、比特、波特与带宽（概念辨析）</h3><p><strong>码元（Symbol，Code Element）</strong>：用一个<strong>固定时长的信号波形</strong>（数字脉冲）表示的基本波形，该时长称<strong>码元宽度</strong>。若码元有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 个离散状态（即 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 进制码元），则 <strong>1 个码元携带 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 比特</strong>信息（4 进制码元携 2 bit、16 进制码元携 4 bit）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">含义</th>
+<th align="left">单位</th>
+<th align="left">关系 &#x2F; 说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>码元（Symbol）</strong></td>
+<td align="left">固定时长的基本信号波形</td>
+<td align="left">个</td>
+<td align="left"><strong>与进制无关</strong>地数”波形个数”</td>
+</tr>
+<tr>
+<td align="left"><strong>比特（bit）</strong></td>
+<td align="left">信息量单位</td>
+<td align="left">bit</td>
+<td align="left">1 码元 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> bit</td>
+</tr>
+<tr>
+<td align="left"><strong>波特率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>（Baud）</strong></td>
+<td align="left">每秒传输的<strong>码元数</strong>（码元速率）</td>
+<td align="left">Baud</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>（T 为码元宽度），<strong>与进制无关</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>比特率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span></strong></td>
+<td align="left">每秒传输的<strong>比特数</strong>（信息速率&#x2F;数据率）</td>
+<td align="left">bit&#x2F;s</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left"><strong>带宽 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span></strong></td>
+<td align="left">信道能通过的<strong>频率范围宽度</strong>（最高−最低频率）</td>
+<td align="left"><strong>Hz</strong></td>
+<td align="left">决定信道极限速率（奈氏&#x2F;香农）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>波特率 × log₂(每码元离散状态数) &#x3D; 比特率</strong>，即 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span>。波特率与进制无关；<strong>码元速率一定时，进制越高每码元携带比特越多、比特率越大</strong>——这是多进制调制（如 QAM-16）提高数据率的根本手段。<br><strong>易错点</strong>：通信中的”带宽”单位是 <strong>Hz</strong>，日常说的”100 Mb&#x2F;s 带宽”指<strong>数据率（b&#x2F;s）</strong>，两者不是同一概念；提到”速率”必须先分清是<strong>波特率（Baud）<strong>还是</strong>比特率（b&#x2F;s）</strong>。</p>
+</blockquote>
+<p><strong>速率换算例题</strong>：某系统采用 <strong>QAM-16</strong>（16 种码元状态）调制，码元速率为 <strong>2400 波特</strong>，求比特率；若改用只有 2 种状态的 FSK 调制，比特率变为多少？</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">码元速率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span></td>
+<td align="left">2400 Baud</td>
+</tr>
+<tr>
+<td align="left">码元状态数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></td>
+<td align="left">16（QAM-16）&#x2F; 2（FSK）</td>
+</tr>
+<tr>
+<td align="left">每码元携带比特</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> bit &#x2F; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> bit</td>
+</tr>
+</tbody></table>
+<ul>
+<li>QAM-16：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span></span></span> <strong>9600 b&#x2F;s</strong></li>
+<li>FSK：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span></span></span> <strong>2400 b&#x2F;s</strong></li>
+<li><strong>验算</strong>：每秒传 2400 个码元、每码元 4 bit，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2400</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">9600</span></span></span></span> bit&#x2F;秒 ✓</li>
+<li><strong>结论</strong>：码元速率不变时，16 进制比 2 进制的比特率高 4 倍（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16/</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span>）。</li>
+</ul>
+<h2 id="奈奎斯特定理与香农定理"><a href="#奈奎斯特定理与香农定理" class="headerlink" title="奈奎斯特定理与香农定理"></a>奈奎斯特定理与香农定理</h2><p>信道能支持的传输速率存在极限：<strong>奈氏准则管”无噪声”，香农定理管”有噪声”</strong>。</p>
+<h3 id="奈奎斯特定理（奈氏准则）"><a href="#奈奎斯特定理（奈氏准则）" class="headerlink" title="奈奎斯特定理（奈氏准则）"></a>奈奎斯特定理（奈氏准则）</h3><p><strong>适用条件</strong>：<strong>理想低通（无噪声、带宽受限）<strong>信道。为避免</strong>码间串扰（ISI）</strong>，极限码元传输速率为：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mord text"><span class="mord cjk_fallback">（波特，</span><span class="mord">Baud</span><span class="mord cjk_fallback">）</span></span></span></span></span></span>
+<p>对应的极限数据传输率：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mord text"><span class="mord cjk_fallback">（</span><span class="mord">b/s</span><span class="mord cjk_fallback">）</span></span></span></span></span></span>
+<p>其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span> 为信道带宽（Hz），<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 为码元的离散状态数。奈氏准则<strong>只限制码元速率</strong>——码元速率一定时，可以提高 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 来提高比特率，但 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 受噪声与设备复杂度限制、不能无限增大。</p>
+<p><strong>奈氏极限例题</strong>：理想低通信道带宽 <strong>4000 Hz</strong>，码元取 <strong>16 个离散电平</strong>，求最大数据传输率。</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">带宽 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span></td>
+<td align="left">4000 Hz</td>
+</tr>
+<tr>
+<td align="left">离散电平数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></td>
+<td align="left">16</td>
+</tr>
+<tr>
+<td align="left">极限码元速率</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8000</span></span></span></span> 波特</td>
+</tr>
+<tr>
+<td align="left">每码元比特数</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> bit</td>
+</tr>
+</tbody></table>
+<p><strong>计算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span></span></span></span> <strong>32000 b&#x2F;s &#x3D; 32 kb&#x2F;s</strong></p>
+<p><strong>验算</strong>：极限码元速率 8000 波特 × 每码元 4 bit &#x3D; 32000 bit&#x2F;s ✓</p>
+<p><strong>结论</strong>：该理想信道极限数据率为 32 kb&#x2F;s；若电平数提高到 256（每码元 8 bit），可翻倍至 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64000</span></span></span></span> b&#x2F;s。</p>
+<h3 id="香农定理"><a href="#香农定理" class="headerlink" title="香农定理"></a>香农定理</h3><p><strong>适用条件</strong>：<strong>带宽受限且有高斯噪声</strong>的信道。信噪比越大，信道极限速率越高：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span><span class="mord text"><span class="mord cjk_fallback">（</span><span class="mord">b/s</span><span class="mord cjk_fallback">）</span></span></span></span></span></span>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> 为信号平均功率、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> 为噪声平均功率。信噪比常用分贝表示：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mopen">(</span><span class="mord text"><span class="mord">dB</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">l<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟺</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.938em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">dB</span></span><span class="mord mtight">/10</span></span></span></span></span></span></span></span></span></span></span></span></span>
+<blockquote>
+<p><strong>考点</strong>：<strong>30 dB → S&#x2F;N &#x3D; 1000</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.888em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">30/10</span></span></span></span></span></span></span></span></span></span></span></span>）是最常考的换算；题目给 dB 值时<strong>必须先换算成倍数</strong>再代入香农公式。</p>
+</blockquote>
+<p><strong>香农容量例题</strong>：某信道带宽 <strong>4000 Hz</strong>，信噪比 <strong>30 dB</strong>，求极限数据传输速率。</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">带宽 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span></td>
+<td align="left">4000 Hz</td>
+</tr>
+<tr>
+<td align="left">信噪比</td>
+<td align="left">30 dB → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.888em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">30/10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1000</span></span></span></span></td>
+</tr>
+</tbody></table>
+<p><strong>计算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1000</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1001</span></span></span></span>。由 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1024</span></span></span></span> 略大于 1001，取 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1001</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">9.97</span></span></span></span>，得 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4000</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">9.97</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span></span></span></span> <strong>39880 b&#x2F;s ≈ 40 kb&#x2F;s</strong></p>
+<p><strong>验算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">l<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">30</span></span></span></span> dB，dB 换算无误 ✓</p>
+<p><strong>结论</strong>：无论采用多么复杂的编码调制技术，该有噪信道的数据率都不可能超过约 40 kb&#x2F;s——香农给的是<strong>硬上限</strong>。</p>
+<h3 id="奈氏-vs-香农（对比辨析）"><a href="#奈氏-vs-香农（对比辨析）" class="headerlink" title="奈氏 vs 香农（对比辨析）"></a>奈氏 vs 香农（对比辨析）</h3><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">奈奎斯特定理</th>
+<th align="left">香农定理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">适用信道</td>
+<td align="left"><strong>理想无噪声</strong>低通信道</td>
+<td align="left"><strong>带宽受限且有噪声</strong>信道</td>
+</tr>
+<tr>
+<td align="left">限制对象</td>
+<td align="left"><strong>码元速率</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span>），经 V 间接限数据率</td>
+<td align="left"><strong>信息速率</strong>（直接给出数据率上限）</td>
+</tr>
+<tr>
+<td align="left">公式</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">提高速率手段</td>
+<td align="left">提高 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span>（多进制调制）</td>
+<td align="left">提高信噪比 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span> 或带宽 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span>，<strong>与 V 无关</strong></td>
+</tr>
+<tr>
+<td align="left">结果形态</td>
+<td align="left">理想情况下随 V 增大可无限大</td>
+<td align="left">噪声存在时是<strong>硬上限</strong></td>
+</tr>
+<tr>
+<td align="left">实际使用</td>
+<td align="left">两者<strong>同时满足，取较小者</strong></td>
+<td align="left">两者<strong>同时满足，取较小者</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：求实际信道极限速率时，<strong>分别用奈氏与香农计算，取较小者</strong>。如上面两例同一信道：奈氏（16 电平）&#x3D; 32000 b&#x2F;s &lt; 香农 ≈ 39880 b&#x2F;s，故实际极限为 <strong>32000 b&#x2F;s</strong>——香农是”天花板”，奈氏告诉你当前电平数下能摸多高。</p>
+</blockquote>
+<h2 id="编码与调制"><a href="#编码与调制" class="headerlink" title="编码与调制"></a>编码与调制</h2><p><strong>编码（Encoding）</strong>：数据变换为<strong>数字信号</strong>；<strong>调制（Modulation）</strong>：数据变换为<strong>模拟信号</strong>（搬移到合适频带）。</p>
+<h3 id="数字数据编码为数字信号"><a href="#数字数据编码为数字信号" class="headerlink" title="数字数据编码为数字信号"></a>数字数据编码为数字信号</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 物理层.assets/encoding-waveforms.png" alt="常见数字编码波形：NRZ、RZ、NRZI、曼彻斯特、差分曼彻斯特" title="">
+                </div>
+                <div class="image-caption">常见数字编码波形：NRZ、RZ、NRZI、曼彻斯特、差分曼彻斯特</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">编码方式</th>
+<th align="left">规则</th>
+<th align="left">每比特电平跳变</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>不归零 NRZ</strong></td>
+<td align="left">高 1 低 0，码元内电平不变</td>
+<td align="left">码元内<strong>不跳变</strong></td>
+<td align="left">实现最简单、无带宽浪费；<strong>无自同步能力</strong>（连续同码元无法分辨边界）</td>
+</tr>
+<tr>
+<td align="left"><strong>归零 RZ</strong></td>
+<td align="left">每码元<strong>后半段归零</strong></td>
+<td align="left">每码元归零 1 次</td>
+<td align="left">自同步强；但频带宽、效率低</td>
+</tr>
+<tr>
+<td align="left"><strong>NRZI（反向不归零）</strong></td>
+<td align="left">电平<strong>翻转</strong>表示 0、不翻转表示 1（看起点）</td>
+<td align="left">遇 0 才跳</td>
+<td align="left">差分特性、抗干扰；同步能力弱（USB 使用）</td>
+</tr>
+<tr>
+<td align="left"><strong>曼彻斯特</strong></td>
+<td align="left"><strong>每比特中间必跳变</strong>，跳变既定时钟又定数据</td>
+<td align="left"><strong>中间 1 次必跳</strong>（边界也可能跳）</td>
+<td align="left">自同步强；<strong>以太网默认编码</strong>；1 bit 占 2 个码元</td>
+</tr>
+<tr>
+<td align="left"><strong>差分曼彻斯特</strong></td>
+<td align="left">中间必跳变<strong>只作时钟</strong>；0&#x2F;1 看<strong>码元开始处有无跳变</strong></td>
+<td align="left">中间 1 次 + 边界视数据</td>
+<td align="left">抗干扰最强；令牌环等局域网</td>
+</tr>
+</tbody></table>
+<p>跳变方向的约定（哪种方向代表 1）各教材不同（上图采用”上 0 下 1”，IEEE 802.3 相反），<strong>考试以题目给定为准</strong>；关键是分清功能定位：曼彻斯特的中间跳变<strong>既定时钟又定数据</strong>，差分曼彻斯特的中间跳变<strong>只作时钟</strong>、数据由<strong>边界是否跳变</strong>决定。</p>
+<blockquote>
+<p><strong>考点</strong>：曼彻斯特与差分曼彻斯特每比特占 <strong>2 个码元</strong>，故<strong>波特率 &#x3D; 2 × 数据率</strong>、编码效率仅 <strong>50%</strong>；NRZ 效率 100% 但无自同步；<strong>4B&#x2F;5B</strong> 用 5 bit 编 4 bit 数据（效率 <strong>80%</strong>），打破连续 0&#x2F;1 以改善同步。<br><strong>易错点</strong>：以太网用<strong>曼彻斯特</strong>编码（不是差分曼彻斯特）；差分曼彻斯特看<strong>起始边界</strong>有无跳变判 0&#x2F;1。</p>
+</blockquote>
+<h3 id="数字数据调制为模拟信号"><a href="#数字数据调制为模拟信号" class="headerlink" title="数字数据调制为模拟信号"></a>数字数据调制为模拟信号</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 物理层.assets/ask-fsk-psk.png" alt="三种基本调制方法：ASK/FSK/PSK" title="">
+                </div>
+                <div class="image-caption">三种基本调制方法：ASK/FSK/PSK</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">调制方式</th>
+<th align="left">载波参数</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>调幅 ASK</strong>（幅移键控）</td>
+<td align="left">改变载波<strong>振幅</strong></td>
+<td align="left">实现简单；抗干扰最差</td>
+</tr>
+<tr>
+<td align="left"><strong>调频 FSK</strong>（频移键控）</td>
+<td align="left">改变载波<strong>频率</strong></td>
+<td align="left">抗干扰优于 ASK；低速通信常用</td>
+</tr>
+<tr>
+<td align="left"><strong>调相 PSK</strong>（相移键控）</td>
+<td align="left">改变载波<strong>相位</strong></td>
+<td align="left">抗干扰强、频带利用率高（2PSK 绝对调相 &#x2F; DPSK 相对调相）</td>
+</tr>
+</tbody></table>
+<p><strong>QAM（正交振幅调制，Quadrature Amplitude Modulation）</strong>：把<strong>调幅与调相结合</strong>——若用 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 种幅值、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 种相位，可产生 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 种码元，<strong>1 码元携带 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">mn</span><span class="mclose">)</span></span></span></span> bit</strong>。<strong>QAM-16</strong> 即 16 种码元状态、每码元 4 bit（前文换算例题即用到）。</p>
+<p>模拟数据数字化用<strong>脉码调制 PCM</strong>：<strong>抽样 → 量化 → 编码</strong>，其中<strong>采样频率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></strong>（采样定理），否则产生混叠失真。</p>
+<h2 id="电路交换、报文交换与分组交换"><a href="#电路交换、报文交换与分组交换" class="headerlink" title="电路交换、报文交换与分组交换"></a>电路交换、报文交换与分组交换</h2><ul>
+<li><strong>电路交换（Circuit Switching）</strong>：<strong>建立连接 → 通信 → 释放连接</strong>，通信期间<strong>独占</strong>端到端物理通路，数据直达、无存储转发（电话网）。</li>
+<li><strong>报文交换（Message Switching）</strong>：把<strong>整个报文</strong>作为一个单位，逐站<strong>存储转发</strong>，收完再发（电报网）。</li>
+<li><strong>分组交换（Packet Switching）</strong>：把报文<strong>拆成较小的分组</strong>，逐站存储转发、可<strong>流水线并行</strong>（因特网）；代价是每个分组带<strong>首部开销</strong>（信息量约增加 5&#126;10%）。</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 物理层.assets/switching-comparison.png" alt="三种交换方式的时序对比" title="">
+                </div>
+                <div class="image-caption">三种交换方式的时序对比</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">电路交换</th>
+<th align="left">报文交换</th>
+<th align="left">分组交换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>建立连接</strong></td>
+<td align="left"><strong>需要</strong>（建立&#x2F;释放）</td>
+<td align="left">不需要</td>
+<td align="left">数据报不需要；虚电路需要</td>
+</tr>
+<tr>
+<td align="left"><strong>传输单位</strong></td>
+<td align="left">比特流（直达）</td>
+<td align="left"><strong>整个报文</strong></td>
+<td align="left"><strong>分组</strong>（报文拆分）</td>
+</tr>
+<tr>
+<td align="left">存储转发</td>
+<td align="left">无</td>
+<td align="left">有（报文级）</td>
+<td align="left">有（分组级）</td>
+</tr>
+<tr>
+<td align="left"><strong>时延</strong></td>
+<td align="left">建立后<strong>最小</strong>、实时性最好</td>
+<td align="left"><strong>大</strong>（大报文逐站收完再发）</td>
+<td align="left"><strong>较小</strong>（小分组流水线并行）</td>
+</tr>
+<tr>
+<td align="left">线路占用</td>
+<td align="left"><strong>独占</strong>、利用率低</td>
+<td align="left">不独占、利用率较高</td>
+<td align="left"><strong>统计复用</strong>、利用率高</td>
+</tr>
+<tr>
+<td align="left">拥塞与开销</td>
+<td align="left">可能呼损（建连失败）</td>
+<td align="left">结点需<strong>大缓冲</strong></td>
+<td align="left">排队时延 + <strong>首部开销 5&#126;10%</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>适用场景</strong></td>
+<td align="left">数据量大、持续长时间通信</td>
+<td align="left">早期电报类业务</td>
+<td align="left"><strong>突发式计算机通信（因特网）</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：三种交换的根本区别在<strong>是否建立连接</strong>与<strong>传输单位</strong>——电路交换时延最小但利用率最低；报文与分组交换都采用存储转发，<strong>分组因单位小而时延远小于报文</strong>。分组交换的<strong>数据报与虚电路</strong>是网络层向传输层提供的两种服务，详见后续网络层文章。</p>
+</blockquote>
+<h3 id="报文交换-vs-分组交换：时延对比例题"><a href="#报文交换-vs-分组交换：时延对比例题" class="headerlink" title="报文交换 vs 分组交换：时延对比例题"></a>报文交换 vs 分组交换：时延对比例题</h3><p><strong>例题</strong>：一份 <strong>8000 bit</strong> 的报文从 A 经 B、C 转发到 D（<strong>3 段链路</strong>），每段链路速率 <strong>1000 b&#x2F;s</strong>，忽略传播时延、排队时延与首部开销。比较报文交换与”拆成 4 个等长分组”的分组交换的总时延。</p>
+<ul>
+<li><strong>报文交换</strong>：每段链路发送整个报文需 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">8000/1000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> s，3 段依次串行：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">24</span><span class="mord text"><span class="mord"> s</span></span></span></span></span></span>
+<ul>
+<li><strong>分组交换</strong>：每分组 2000 bit，单段发送时延 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2000/1000</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> s；第 1 个分组经 3 段后到达（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">6</span></span></span></span> s），之后每 2 s 到达一个（流水线并行）：</li>
+</ul>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord cjk_fallback mtight">组</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">12</span><span class="mord text"><span class="mord"> s</span></span></span></span></span></span>
+<ul>
+<li><strong>验算</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span> s ✓（第 1 组 6 s 到达，第 2&#126;4 组各再隔 2 s）</li>
+<li><strong>结论</strong>：同一报文，分组交换时延<strong>减半</strong>。一般地，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 段链路、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> 个等长分组：报文交换 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>，分组交换 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mord">/</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">pR</span><span class="mclose">)</span></span></span></span>——<strong>分组越小、流水线越充分，时延优势越明显</strong>（首部开销也随之增大）。</li>
+</ul>
+<h2 id="传输介质"><a href="#传输介质" class="headerlink" title="传输介质"></a>传输介质</h2><p><strong>传输介质不属于物理层</strong>（常称”第 0 层”），物理层通过规定电气特性来识别其上的比特流。介质分**导向性（有线）<strong>与</strong>非导向性（无线）**两大类。</p>
+<h3 id="导向性介质（有线）"><a href="#导向性介质（有线）" class="headerlink" title="导向性介质（有线）"></a>导向性介质（有线）</h3><table>
+<thead>
+<tr>
+<th align="left">介质</th>
+<th align="left">结构 &#x2F; 原理</th>
+<th align="left">抗干扰</th>
+<th align="left">距离与速率</th>
+<th align="left">典型应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>双绞线（UTP&#x2F;STP）</strong></td>
+<td align="left">两根绝缘铜线<strong>按规则绞合</strong>，绞合可<strong>减少电磁干扰</strong>；STP 另加金属屏蔽层</td>
+<td align="left">一般（绞合 + 屏蔽改善）</td>
+<td align="left">单段约 <strong>100 m</strong></td>
+<td align="left">电话线、局域网</td>
+</tr>
+<tr>
+<td align="left"><strong>同轴电缆</strong></td>
+<td align="left">内导体 + 绝缘层 + 网状外导体屏蔽 + 塑料外皮</td>
+<td align="left"><strong>优于双绞线</strong></td>
+<td align="left">更远、速率更高</td>
+<td align="left"><strong>50Ω 基带</strong>（早期局域网）、<strong>75Ω 宽带</strong>（有线电视）</td>
+</tr>
+<tr>
+<td align="left"><strong>光纤（Optical Fiber）</strong></td>
+<td align="left">光脉冲（<strong>有光 &#x3D; 1、无光 &#x3D; 0</strong>）在纤芯与包层交界面不断<strong>全反射</strong></td>
+<td align="left"><strong>极强</strong>：不受电磁干扰、损耗小、保密性好</td>
+<td align="left">带宽超高、适合长距离</td>
+<td align="left">骨干网、干线</td>
+</tr>
+</tbody></table>
+<p><strong>单模 vs 多模光纤</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">光源</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>单模光纤</strong></td>
+<td align="left"><strong>激光二极管</strong>（定向性好）</td>
+<td align="left">损耗小、带宽大，适合<strong>远距离</strong>干线；价格贵</td>
+</tr>
+<tr>
+<td align="left"><strong>多模光纤</strong></td>
+<td align="left"><strong>发光二极管</strong></td>
+<td align="left">存在模间色散、易失真，适合<strong>近距离</strong>；价格便宜</td>
+</tr>
+</tbody></table>
+<h3 id="非导向性介质（无线）"><a href="#非导向性介质（无线）" class="headerlink" title="非导向性介质（无线）"></a>非导向性介质（无线）</h3><table>
+<thead>
+<tr>
+<th align="left">介质</th>
+<th align="left">传播方式</th>
+<th align="left">特点</th>
+<th align="left">典型应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>无线电波</strong></td>
+<td align="left"><strong>全方向</strong>传播</td>
+<td align="left">穿透能力强；频段带宽有限、抗干扰差</td>
+<td align="left">手机、WLAN、蓝牙</td>
+</tr>
+<tr>
+<td align="left"><strong>微波</strong></td>
+<td align="left"><strong>直线（视距）传播</strong></td>
+<td align="left">频段宽、数据率高；不能穿透建筑物、受天气影响</td>
+<td align="left">地面微波接力（远距离需中继）、<strong>卫星通信</strong>（传播时延约 250&#126;270 ms）</td>
+</tr>
+<tr>
+<td align="left"><strong>红外 &#x2F; 激光</strong></td>
+<td align="left"><strong>定向直线</strong>传播</td>
+<td align="left">方向性强、防窃听；不能穿过障碍物</td>
+<td align="left">遥控器、短距点对点链路</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：卫星通信属于微波中继，<strong>端到端传播时延约 250&#126;270 ms</strong>（计算题常考）；无线介质中只有<strong>微波</strong>是直线视距传播。</p>
+</blockquote>
+<h3 id="物理层接口的特性"><a href="#物理层接口的特性" class="headerlink" title="物理层接口的特性"></a>物理层接口的特性</h3><p>物理层的主要任务之一是规定与传输媒体<strong>接口</strong>的四个特性：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">规定内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>机械特性</strong></td>
+<td align="left">接口的<strong>形状、尺寸、引脚数目与排列</strong>、固定与锁定方式</td>
+</tr>
+<tr>
+<td align="left"><strong>电气特性</strong></td>
+<td align="left">各引脚线上的<strong>电压范围</strong>、阻抗匹配、传输速率与距离限制</td>
+</tr>
+<tr>
+<td align="left"><strong>功能特性</strong></td>
+<td align="left">某一电平<strong>表示何种意义</strong>、各信号线（数据&#x2F;控制&#x2F;定时&#x2F;接地）的用途</td>
+</tr>
+<tr>
+<td align="left"><strong>过程（规程）特性</strong></td>
+<td align="left">各信号线的<strong>工作时序</strong>与事件出现的<strong>先后顺序</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：四特性分别对应”<strong>形状规格、电压电平、电平含义、工作时序</strong>“，口诀”机电功规”。</p>
+</blockquote>
+<p>物理层互连设备（<strong>中继器、集线器</strong>——集线器即多端口中继器，两者均不能隔离冲突域）按考纲归入数据链路层&#x2F;局域网部分讨论，详见局域网文章。</p>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">通信模型</td>
+<td align="left"><strong>信源→发送器→信道→接收器→信宿</strong>；噪声叠加于信道；Modem 兼发送&#x2F;接收</td>
+</tr>
+<tr>
+<td align="left">码元 vs 比特</td>
+<td align="left">码元 &#x3D; 固定时长的信号波形（与进制无关）；1 码元 &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> bit</td>
+</tr>
+<tr>
+<td align="left">速率换算</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span>；2400 波特 × QAM-16 → <strong>9600 b&#x2F;s</strong>；带宽（Hz）≠ 数据率（b&#x2F;s）</td>
+</tr>
+<tr>
+<td align="left">奈氏准则</td>
+<td align="left"><strong>无噪声限码元速率</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0502em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span>（4000 Hz、16 电平 → 32 kb&#x2F;s）</td>
+</tr>
+<tr>
+<td align="left">香农定理</td>
+<td align="left"><strong>有噪声限信息速率</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span>；<strong>30 dB → S&#x2F;N &#x3D; 1000</strong></td>
+</tr>
+<tr>
+<td align="left">双定理并用</td>
+<td align="left">实际极限<strong>取两者较小值</strong>；奈氏靠提高 V 提速率，香农只认带宽与信噪比</td>
+</tr>
+<tr>
+<td align="left">曼彻斯特</td>
+<td align="left">中间跳变<strong>既定时钟又定数据</strong>；效率 <strong>50%</strong>；<strong>波特率 &#x3D; 2×数据率</strong>；以太网默认</td>
+</tr>
+<tr>
+<td align="left">差分曼彻斯特</td>
+<td align="left">中间跳变<strong>只作时钟</strong>，0&#x2F;1 看<strong>边界有无跳变</strong>；抗干扰最强；令牌环</td>
+</tr>
+<tr>
+<td align="left">编码效率</td>
+<td align="left">NRZ 100%（无自同步）、曼彻斯特&#x2F;差分 50%、<strong>4B&#x2F;5B 80%</strong></td>
+</tr>
+<tr>
+<td align="left">调制与 PCM</td>
+<td align="left">ASK 调幅 &#x2F; FSK 调频 &#x2F; PSK 调相；<strong>QAM &#x3D; 调幅+调相</strong>（QAM-16 → 4 bit&#x2F;码元）；PCM 采样频率 ≥ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight"><span class="mtight">m</span><span class="mtight">a</span><span class="mtight">x</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">三种交换</td>
+<td align="left">电路：建连、独占、时延最小（电话网）；报文：整报文存储转发、时延大；分组：小单位流水线（因特网）</td>
+</tr>
+<tr>
+<td align="left">时延公式</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 段链路 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> 个分组：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord">×</span></span></span></span> 单分组单段发送时延（例：24 s → 12 s）</td>
+</tr>
+<tr>
+<td align="left">有线介质</td>
+<td align="left">双绞线（绞合抗干扰、约 100 m）；同轴（<strong>50Ω 基带 &#x2F; 75Ω 宽带</strong>）；光纤（<strong>单模远、多模近</strong>）</td>
+</tr>
+<tr>
+<td align="left">无线介质</td>
+<td align="left">无线电波全向、微波<strong>视距直线</strong>（卫星时延 250&#126;270 ms）、红外定向</td>
+</tr>
+<tr>
+<td align="left">接口四特性</td>
+<td align="left"><strong>机械</strong>（形状）、<strong>电气</strong>（电压）、<strong>功能</strong>（电平含义）、<strong>过程&#x2F;规程</strong>（时序）</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:21:01.997Z" itemprop="dateUpdated">2026-08-29 13:21:01</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%89%A9%E7%90%86%E5%B1%82/" rel="tag">物理层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&title=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&title=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据链路层：组帧与差错控制</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">计算机网络概述与体系结构</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&title=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&title=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《物理层与数据通信基础》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

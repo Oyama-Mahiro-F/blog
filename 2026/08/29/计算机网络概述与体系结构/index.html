@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>计算机网络概述与体系结构 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,网络,体系结构">
+    <meta name="description" content="计算机网络（Computer Network）是互连的、自治的计算机系统的集合，它以网络协议为核心，实现数据通信与资源共享。本章是整个计网的”总纲”：计算题集中在时延、时延带宽积等性能指标，概念题集中在分层结构、协议三要素、协议&#x2F;接口&#x2F;服务的辨析以及 OSI 与 TCP&#x2F;IP 两大参考模型的对比。 计算机网络的定义、组成与功能定义：将位置分散、具有独立功能的多台计算机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络概述与体系结构">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="计算机网络（Computer Network）是互连的、自治的计算机系统的集合，它以网络协议为核心，实现数据通信与资源共享。本章是整个计网的”总纲”：计算题集中在时延、时延带宽积等性能指标，概念题集中在分层结构、协议三要素、协议&#x2F;接口&#x2F;服务的辨析以及 OSI 与 TCP&#x2F;IP 两大参考模型的对比。 计算机网络的定义、组成与功能定义：将位置分散、具有独立功能的多台计算机">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.assets/sap-%E5%8D%8F%E8%AE%AE%E4%B8%8E%E6%9C%8D%E5%8A%A1.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.assets/osi-%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.assets/osi-tcpip-%E4%BA%94%E5%B1%82%E5%AF%B9%E6%AF%94.png">
+<meta property="article:published_time" content="2026-08-28T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:27:26.175Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="体系结构">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC1%E7%AB%A0%20%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84.assets/sap-%E5%8D%8F%E8%AE%AE%E4%B8%8E%E6%9C%8D%E5%8A%A1.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">计算机网络概述与体系结构</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">计算机网络概述与体系结构</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-28T23:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9A%E4%B9%89%E3%80%81%E7%BB%84%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD"><span class="post-toc-number">1.</span> <span class="post-toc-text">计算机网络的定义、组成与功能</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%84%E6%88%90"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">计算机网络的组成</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">主要功能</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%9A%84%E5%88%86%E7%B1%BB"><span class="post-toc-number">2.</span> <span class="post-toc-text">计算机网络的分类</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%88%86%E5%B8%83%E8%8C%83%E5%9B%B4"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">按分布范围</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E4%BA%A4%E6%8D%A2%E6%8A%80%E6%9C%AF%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">按交换技术（重点）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84%E3%80%81%E4%BC%A0%E8%BE%93%E6%8A%80%E6%9C%AF%E4%B8%8E%E4%BD%BF%E7%94%A8%E8%80%85"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">按拓扑结构、传输技术与使用者</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="post-toc-number">3.</span> <span class="post-toc-text">性能指标</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E9%80%9F%E7%8E%87%E3%80%81%E5%B8%A6%E5%AE%BD%E4%B8%8E%E5%90%9E%E5%90%90%E9%87%8F"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">速率、带宽与吞吐量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%97%B6%E5%BB%B6"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">时延</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9A%E6%97%B6%E5%BB%B6%E4%B8%8E%E6%97%B6%E5%BB%B6%E5%B8%A6%E5%AE%BD%E7%A7%AF%E8%AE%A1%E7%AE%97"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">例题：时延与时延带宽积计算</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%97%B6%E5%BB%B6%E5%B8%A6%E5%AE%BD%E7%A7%AF%E3%80%81%E5%BE%80%E8%BF%94%E6%97%B6%E5%BB%B6%E4%B8%8E%E5%88%A9%E7%94%A8%E7%8E%87"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">时延带宽积、往返时延与利用率</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%88%86%E5%B1%82%E7%BB%93%E6%9E%84"><span class="post-toc-number">4.</span> <span class="post-toc-text">分层结构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%8F%8A%E5%85%B6%E4%B8%89%E8%A6%81%E7%B4%A0"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">协议及其三要素</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8E%A5%E5%8F%A3%E3%80%81%E6%9C%8D%E5%8A%A1%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8E%9F%E8%AF%AD"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">接口、服务与服务原语</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8D%95%E5%85%83%EF%BC%9APDU%E3%80%81SDU-%E4%B8%8E-PCI"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">数据单元：PDU、SDU 与 PCI</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#OSI-%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B%EF%BC%88%E4%B8%83%E5%B1%82%EF%BC%89"><span class="post-toc-number">5.</span> <span class="post-toc-text">OSI 参考模型（七层）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#TCP-IP-%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B%EF%BC%88%E5%9B%9B%E5%B1%82%EF%BC%89"><span class="post-toc-number">6.</span> <span class="post-toc-text">TCP&#x2F;IP 参考模型（四层）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#OSI%E3%80%81TCP-IP-%E4%B8%8E%E4%BA%94%E5%B1%82%E6%95%99%E5%AD%A6%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94"><span class="post-toc-number">7.</span> <span class="post-toc-text">OSI、TCP&#x2F;IP 与五层教学模型对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">8.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-计算机网络概述与体系结构"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">计算机网络概述与体系结构</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 07:00:00" datetime="2026-08-28T23:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>计算机网络（Computer Network）<strong>是</strong>互连的、自治的</strong>计算机系统的集合，它以<strong>网络协议</strong>为核心，实现<strong>数据通信</strong>与<strong>资源共享</strong>。本章是整个计网的”总纲”：计算题集中在<strong>时延、时延带宽积等性能指标</strong>，概念题集中在<strong>分层结构、协议三要素、协议&#x2F;接口&#x2F;服务的辨析</strong>以及 <strong>OSI 与 TCP&#x2F;IP 两大参考模型的对比</strong>。</p>
+<h2 id="计算机网络的定义、组成与功能"><a href="#计算机网络的定义、组成与功能" class="headerlink" title="计算机网络的定义、组成与功能"></a>计算机网络的定义、组成与功能</h2><p><strong>定义</strong>：将位置分散、具有<strong>独立功能</strong>的多台计算机系统，通过<strong>通信设备与线路</strong>互连起来，由功能完善的<strong>网络软件（协议）<strong>实现</strong>资源共享和信息传递</strong>的系统。定义抓住两个关键词：</p>
+<table>
+<thead>
+<tr>
+<th align="left">关键词</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>互连</strong></td>
+<td align="left">通过通信链路互连，能互相交换信息</td>
+</tr>
+<tr>
+<td align="left"><strong>自治</strong></td>
+<td align="left">每台计算机<strong>独立运行、无主从关系</strong>，去掉任何一台其余仍能工作</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>“自治”</strong> 是计算机网络与<strong>多处理器系统</strong>（共享内存、由操作系统统一调度）的分界线；网络三要素是<strong>计算机、通信链路、网络协议</strong>，其中<strong>协议是核心</strong>。</p>
+</blockquote>
+<h3 id="计算机网络的组成"><a href="#计算机网络的组成" class="headerlink" title="计算机网络的组成"></a>计算机网络的组成</h3><table>
+<thead>
+<tr>
+<th align="left">视角</th>
+<th align="left">划分</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>组成部分</strong></td>
+<td align="left">硬件、软件、协议</td>
+<td align="left">主机、链路、路由器&#x2F;交换机；网络操作系统等软件；<strong>协议是核心</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>工作方式</strong></td>
+<td align="left">边缘部分 + 核心部分</td>
+<td align="left"><strong>边缘</strong> &#x3D; 主机（用户直接使用，C&#x2F;S 或 P2P）；<strong>核心</strong> &#x3D; 路由器 + 网络（为边缘提供分组转发）</td>
+</tr>
+<tr>
+<td align="left"><strong>功能组成</strong></td>
+<td align="left">通信子网 + 资源子网</td>
+<td align="left"><strong>通信子网</strong> &#x3D; OSI 低三层（负责传数据）；<strong>资源子网</strong> &#x3D; 高三层（负责供资源）</td>
+</tr>
+</tbody></table>
+<p>边缘部分主机的两种工作方式：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">C&#x2F;S 方式（客户&#x2F;服务器）</th>
+<th align="left">P2P 方式（对等）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">地位</td>
+<td align="left">客户<strong>请求</strong>、服务器<strong>响应</strong>，<strong>不对等</strong></td>
+<td align="left">每个节点<strong>既是客户又是服务器</strong>，对等</td>
+</tr>
+<tr>
+<td align="left">瓶颈</td>
+<td align="left">服务器承担全部负载，易成<strong>瓶颈</strong></td>
+<td align="left">无中心服务器，负载分散</td>
+</tr>
+<tr>
+<td align="left">典型应用</td>
+<td align="left">Web、FTP、电子邮件</td>
+<td align="left">BT 下载、即时通信</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>通信子网 &#x3D; 物理层 + 数据链路层 + 网络层</strong>（OSI 低三层），传输层是”承上启下”的边界层，<strong>不算</strong>通信子网。</p>
+</blockquote>
+<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>数据通信</strong></td>
+<td align="left"><strong>最基本、最重要</strong>的功能</td>
+</tr>
+<tr>
+<td align="left"><strong>资源共享</strong></td>
+<td align="left">硬件（打印机）、软件、数据共享，互联的<strong>最终目的</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>分布式处理</strong></td>
+<td align="left">多台计算机分担同一任务的不同部分（如 Hadoop）</td>
+</tr>
+<tr>
+<td align="left"><strong>提高可靠性</strong></td>
+<td align="left">一台故障，替代机继续工作</td>
+</tr>
+<tr>
+<td align="left"><strong>负载均衡</strong></td>
+<td align="left">任务分摊到各计算机，提高利用率</td>
+</tr>
+</tbody></table>
+<h2 id="计算机网络的分类"><a href="#计算机网络的分类" class="headerlink" title="计算机网络的分类"></a>计算机网络的分类</h2><h3 id="按分布范围"><a href="#按分布范围" class="headerlink" title="按分布范围"></a>按分布范围</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">全称</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>广域网 WAN</strong></td>
+<td align="left">Wide Area Network</td>
+<td align="left">跨国家&#x2F;地区，范围最大，因特网核心</td>
+</tr>
+<tr>
+<td align="left"><strong>城域网 MAN</strong></td>
+<td align="left">Metropolitan Area Network</td>
+<td align="left">覆盖一个城市，多以以太网技术实现</td>
+</tr>
+<tr>
+<td align="left"><strong>局域网 LAN</strong></td>
+<td align="left">Local Area Network</td>
+<td align="left">校园&#x2F;企业小范围，<strong>速率高、时延低</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>个人区域网 PAN</strong></td>
+<td align="left">Personal Area Network</td>
+<td align="left">个人身边数米内，蓝牙等</td>
+</tr>
+</tbody></table>
+<h3 id="按交换技术（重点）"><a href="#按交换技术（重点）" class="headerlink" title="按交换技术（重点）"></a>按交换技术（重点）</h3><table>
+<thead>
+<tr>
+<th align="left">交换方式</th>
+<th align="left">原理</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>电路交换</strong></td>
+<td align="left">建立专用通路 → 独占传输 → 释放</td>
+<td align="left">时延小、有序、无冲突、<strong>实时性强</strong></td>
+<td align="left">建连时间长、<strong>线路利用率低</strong>、无纠错</td>
+</tr>
+<tr>
+<td align="left"><strong>报文交换</strong></td>
+<td align="left">整个报文<strong>存储转发</strong></td>
+<td align="left">无需建连、利用率高、可动态选路</td>
+<td align="left">转发时延大、节点需大容量缓存</td>
+</tr>
+<tr>
+<td align="left"><strong>分组交换</strong></td>
+<td align="left">报文切成<strong>分组</strong>后存储转发</td>
+<td align="left">缓存易管理、重传代价小、时延较小</td>
+<td align="left">有转发时延、<strong>额外首部开销</strong>、可能失序&#x2F;丢失</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：<strong>因特网采用分组交换</strong>；报文交换与分组交换的本质区别是<strong>存储转发的单位</strong>（整个报文 vs 定长分组），分组更小使时延与缓存需求都下降。</p>
+</blockquote>
+<h3 id="按拓扑结构、传输技术与使用者"><a href="#按拓扑结构、传输技术与使用者" class="headerlink" title="按拓扑结构、传输技术与使用者"></a>按拓扑结构、传输技术与使用者</h3><table>
+<thead>
+<tr>
+<th align="left">分类标准</th>
+<th align="left">类型</th>
+<th align="left">要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">拓扑结构</td>
+<td align="left">总线 &#x2F; 星型 &#x2F; 环型 &#x2F; 网状</td>
+<td align="left"><strong>网状可靠性最高</strong>（广域网常用）；星型集中管理，中心节点故障全网瘫痪</td>
+</tr>
+<tr>
+<td align="left">传输技术</td>
+<td align="left"><strong>广播式网络</strong></td>
+<td align="left">共享公共信道，一主机发送全体收到（局域网典型）</td>
+</tr>
+<tr>
+<td align="left">传输技术</td>
+<td align="left"><strong>点对点网络</strong></td>
+<td align="left">分组经<strong>存储转发</strong>逐跳传递（广域网典型）</td>
+</tr>
+<tr>
+<td align="left">使用者</td>
+<td align="left">公用网 &#x2F; 专用网</td>
+<td align="left">付费即可用（电信运营商）&#x2F; 部门专建（军队、铁路、银行）</td>
+</tr>
+</tbody></table>
+<h2 id="性能指标"><a href="#性能指标" class="headerlink" title="性能指标"></a>性能指标</h2><h3 id="速率、带宽与吞吐量"><a href="#速率、带宽与吞吐量" class="headerlink" title="速率、带宽与吞吐量"></a>速率、带宽与吞吐量</h3><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">含义</th>
+<th align="left">要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>速率（数据率&#x2F;比特率）</strong></td>
+<td align="left">单位时间传送的<strong>比特数</strong></td>
+<td align="left">b&#x2F;s、kb&#x2F;s、Mb&#x2F;s，<strong>以 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span> 为底</strong>进位</td>
+</tr>
+<tr>
+<td align="left"><strong>带宽（Bandwidth）</strong></td>
+<td align="left">信道能通过的<strong>最高数据率</strong>（额定上限）</td>
+<td align="left">原指信号的<strong>频带宽度（Hz）</strong>，网络中引申为最高速率</td>
+</tr>
+<tr>
+<td align="left"><strong>吞吐量（Throughput）</strong></td>
+<td align="left">单位时间<strong>实际通过</strong>网络&#x2F;信道的数据量</td>
+<td align="left"><strong>实测值</strong>，受带宽额定速率限制</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：速率换算以 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></strong> 为底（1 Mb&#x2F;s &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> b&#x2F;s），<strong>存储容量</strong>换算以 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span></strong> 为底（1 KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span> B）——bit 用十进制、Byte 用二进制，选择题常在此设坑。</p>
+</blockquote>
+<h3 id="时延"><a href="#时延" class="headerlink" title="时延"></a>时延</h3><p>数据从网络一端传到另一端所需时间，由<strong>四部分</strong>组成：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">总时延</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">发送时延</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">传播时延</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">处理时延</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">排队时延</span></span></span></span></span>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">发送时延</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">发送速率（带宽）</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">数据长度</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:2em;"></span><span class="mord cjk_fallback">传播时延</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">电磁波传播速率</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord cjk_fallback">信道长度</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<table>
+<thead>
+<tr>
+<th align="left">时延</th>
+<th align="left">决定因素</th>
+<th align="left">特征</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>发送时延（传输时延）</strong></td>
+<td align="left">数据块长度、<strong>发送速率</strong></td>
+<td align="left"><strong>与距离无关</strong>，由发送端决定</td>
+</tr>
+<tr>
+<td align="left"><strong>传播时延</strong></td>
+<td align="left"><strong>信道长度</strong>、介质种类</td>
+<td align="left"><strong>与数据长度无关</strong>，由链路决定</td>
+</tr>
+<tr>
+<td align="left"><strong>处理时延</strong></td>
+<td align="left">节点检查首部、查找路由表</td>
+<td align="left">取决于路由器性能</td>
+</tr>
+<tr>
+<td align="left"><strong>排队时延</strong></td>
+<td align="left">输入&#x2F;输出队列中的等待</td>
+<td align="left">随流量波动，<strong>拥塞时剧增</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：电磁波在铜缆&#x2F;光纤中传播速率约 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span> m&#x2F;s</strong>（真空中为光速 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span> m&#x2F;s）；<strong>发送时延看发送端、传播时延看链路</strong>；习题通常默认忽略处理时延与排队时延，只算前两种。</p>
+</blockquote>
+<h3 id="例题：时延与时延带宽积计算"><a href="#例题：时延与时延带宽积计算" class="headerlink" title="例题：时延与时延带宽积计算"></a>例题：时延与时延带宽积计算</h3><p><strong>题目</strong>：主机 A 经 <strong>1000 km</strong> 链路向主机 B 发送 <strong>2 KB</strong> 数据，链路带宽 <strong>10 Mb&#x2F;s</strong>，信号传播速率为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span> m&#x2F;s。求发送时延、传播时延、总时延与时延带宽积。</p>
+<p><strong>分析</strong>：默认忽略处理&#x2F;排队时延，总时延 &#x3D; 发送时延 + 传播时延；所有长度统一换算成 <strong>bit</strong> 与 <strong>m</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">计算</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">数据长度</td>
+<td align="left">2 KB &#x3D; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></td>
+<td align="left"><strong>16384 bit</strong></td>
+</tr>
+<tr>
+<td align="left">发送时延</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16384</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span></span> s</td>
+<td align="left"><strong>1.6384 ms</strong></td>
+</tr>
+<tr>
+<td align="left">传播时延</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span></span> s</td>
+<td align="left"><strong>5 ms</strong></td>
+</tr>
+<tr>
+<td align="left">总时延</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.6384</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span></td>
+<td align="left"><strong>6.6384 ms</strong></td>
+</tr>
+<tr>
+<td align="left">时延带宽积</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">b/s</span></span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span> bit &#x3D; <strong>6250 B</strong></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：发送时延换字节法——发送速率为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span></span> b&#x2F;s &#x3D; <strong>1.25 MB&#x2F;s</strong>，2048 B ÷ 1.25 MB&#x2F;s &#x3D; 1.6384 ms ✓；总时延含义——<strong>最后一个比特</strong>在 1.6384 ms 时刻才发完，再经 5 ms 到达对端，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.6384</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">6.6384</span></span></span></span> ms ✓</p>
+<p><strong>结论</strong>：本题<strong>传播时延占主导</strong>（5 ms 远大于 1.6384 ms）——短数据 + 长链路时传播时延主导；反之发送大文件时发送时延主导。<strong>两类时延谁占主导没有普适结论，必须分别计算后再比较</strong>。</p>
+<h3 id="时延带宽积、往返时延与利用率"><a href="#时延带宽积、往返时延与利用率" class="headerlink" title="时延带宽积、往返时延与利用率"></a>时延带宽积、往返时延与利用率</h3><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">定义&#x2F;公式</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>时延带宽积</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">传播时延</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">带宽</span></span></span></span>，单位 <strong>bit</strong></td>
+<td align="left">“<strong>以比特为单位的链路长度</strong>“——链路上最多同时”容纳”的比特数（正在”飞行”的比特）</td>
+</tr>
+<tr>
+<td align="left"><strong>往返时延 RTT</strong></td>
+<td align="left">从<strong>发送数据开始</strong>到<strong>收到接收端确认</strong>的总时间</td>
+<td align="left">含往返传播时延 + 中间节点的处理&#x2F;排队时延</td>
+</tr>
+<tr>
+<td align="left"><strong>信道利用率</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">总时间</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">有数据通过的时间</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td>
+<td align="left">利用率并非越高越好</td>
+</tr>
+<tr>
+<td align="left"><strong>网络利用率</strong></td>
+<td align="left">全网信道利用率的加权平均</td>
+<td align="left">同上</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：时延带宽积可形象理解为”<strong>管道容积</strong>“——传播时延是管道长度、带宽是管道截面，乘积就是管道内能装下的比特数；发送方发出一个分组后，至少要经过<strong>一个传播时延</strong>它才到达对端。<br><strong>易错点</strong>：RTT 不等于两倍发送时延；<strong>信道利用率过高 → 排队时延急剧增大</strong>，这是网络接近拥塞的信号。</p>
+</blockquote>
+<h2 id="分层结构"><a href="#分层结构" class="headerlink" title="分层结构"></a>分层结构</h2><p>网络是一个复杂系统，<strong>分层</strong>把大问题拆成若干<strong>局部问题</strong>逐层解决。<strong>分层原则</strong>：</p>
+<ul>
+<li>每层实现一种<strong>相对独立</strong>的功能，降低系统复杂度</li>
+<li>层间界面<strong>自然清晰</strong>，跨层交互的信息尽量少</li>
+<li><strong>下层为上层提供服务</strong>，上层通过接口使用下层功能，下层细节对上层<strong>透明</strong></li>
+</ul>
+<p><strong>分层的好处（意义）</strong>：</p>
+<ul>
+<li><strong>各层相互独立</strong>：上层只需知道通过接口获得哪些服务，无需关心下层如何实现</li>
+<li><strong>灵活性好</strong>：某一层变化（只要接口不变）不影响其他层</li>
+<li><strong>易于实现和维护</strong>：复杂系统拆成小模块，便于调试、排错与更新</li>
+<li><strong>促进标准化</strong>：每层的功能与所提供的服务都有精确定义</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong>体系结构 &#x3D; 各层及其协议的集合</strong>，是对网络功能的<strong>抽象</strong>精确定义；<strong>实现</strong>是具体的软硬件。体系结构只规定”做什么”，不规定”怎么做”——体系结构是抽象的，实现是具体的。</p>
+</blockquote>
+<h3 id="协议及其三要素"><a href="#协议及其三要素" class="headerlink" title="协议及其三要素"></a>协议及其三要素</h3><p><strong>协议（Protocol）</strong>：控制<strong>对等实体</strong>（同层实体）之间通信的规则的集合，是<strong>水平</strong>的。</p>
+<table>
+<thead>
+<tr>
+<th align="left">要素</th>
+<th align="left">规定内容</th>
+<th align="left">典型例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>语法</strong></td>
+<td align="left">数据与控制信息的<strong>格式与结构</strong></td>
+<td align="left">报文首部各字段的长度、位置</td>
+</tr>
+<tr>
+<td align="left"><strong>语义</strong></td>
+<td align="left">发出何种信息、完成何种<strong>动作与应答</strong></td>
+<td align="left">收到差错报文时回送差错报告</td>
+</tr>
+<tr>
+<td align="left"><strong>同步（时序）</strong></td>
+<td align="left">事件实现的<strong>顺序</strong>与条件</td>
+<td align="left">建立连接的<strong>三次握手</strong>次序</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：三要素中**”同步&#x2F;时序”最容易漏答**；协议是<strong>水平</strong>的（对等实体间），服务是<strong>垂直</strong>的（相邻层间）。</p>
+</blockquote>
+<h3 id="接口、服务与服务原语"><a href="#接口、服务与服务原语" class="headerlink" title="接口、服务与服务原语"></a>接口、服务与服务原语</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第1章 计算机网络体系结构.assets/sap-协议与服务.png" alt="协议、服务与 SAP 的关系（协议水平、服务垂直）" title="">
+                </div>
+                <div class="image-caption">协议、服务与 SAP 的关系（协议水平、服务垂直）</div>
+            </figure>
+
+<p><strong>服务访问点 SAP（Service Access Point）</strong>：相邻两层实体交换信息的<strong>逻辑接口</strong>，如传输层的 SAP 是<strong>端口号</strong>。<strong>服务</strong>：下层通过 SAP 为<strong>紧邻的上层</strong>提供的功能；只有<strong>上层看得见的功能</strong>才算服务，实现细节对上层透明。</p>
+<p>上层使用下层服务需通过<strong>服务原语</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">原语</th>
+<th align="left">方向</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>请求 Request</strong></td>
+<td align="left">上 → 下</td>
+<td align="left">服务用户请求服务（如请求建立连接）</td>
+</tr>
+<tr>
+<td align="left"><strong>指示 Indication</strong></td>
+<td align="left">下 → 上</td>
+<td align="left">通知对端用户发生了某事件</td>
+</tr>
+<tr>
+<td align="left"><strong>响应 Response</strong></td>
+<td align="left">上 → 下</td>
+<td align="left">收到指示的一方作出回应</td>
+</tr>
+<tr>
+<td align="left"><strong>证实 Confirmation</strong></td>
+<td align="left">下 → 上</td>
+<td align="left">将请求的结果回告请求方</td>
+</tr>
+</tbody></table>
+<p><strong>面向连接 vs 无连接服务</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">面向连接服务</th>
+<th align="left">无连接服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">通信前</td>
+<td align="left">先<strong>建立连接</strong>，用后<strong>释放</strong>（如三次握手）</td>
+<td align="left"><strong>不建连接</strong>，直接发送</td>
+</tr>
+<tr>
+<td align="left">路由</td>
+<td align="left">分组沿同一路径<strong>按序</strong>到达</td>
+<td align="left">每个分组<strong>独立选路</strong>，可能失序、丢失</td>
+</tr>
+<tr>
+<td align="left">可靠性</td>
+<td align="left">可靠，含流量&#x2F;拥塞控制（<strong>TCP</strong>）</td>
+<td align="left">尽力而为 Best Effort（<strong>UDP</strong>、IP）</td>
+</tr>
+<tr>
+<td align="left">开销</td>
+<td align="left">建连&#x2F;释放开销大，灵活性差</td>
+<td align="left">开销小、灵活、快速</td>
+</tr>
+</tbody></table>
+<p>此外，服务还可按<strong>可靠性</strong>分为可靠&#x2F;不可靠服务，按<strong>确认机制</strong>分为有确认&#x2F;无确认服务（对应”有证实&#x2F;无证实”）。</p>
+<blockquote>
+<p><strong>考点</strong>：<strong>同一服务可由不同协议实现，同一协议也可提供不同服务</strong>；”有确认”是机制、”可靠”是效果，两者不是一回事。</p>
+</blockquote>
+<h3 id="数据单元：PDU、SDU-与-PCI"><a href="#数据单元：PDU、SDU-与-PCI" class="headerlink" title="数据单元：PDU、SDU 与 PCI"></a>数据单元：PDU、SDU 与 PCI</h3><table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">全称</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>PDU</strong></td>
+<td align="left">Protocol Data Unit，协议数据单元</td>
+<td align="left"><strong>对等层</strong>之间传送的数据单元</td>
+</tr>
+<tr>
+<td align="left"><strong>SDU</strong></td>
+<td align="left">Service Data Unit，服务数据单元</td>
+<td align="left">本层交给下层传送的”用户数据”</td>
+</tr>
+<tr>
+<td align="left"><strong>PCI</strong></td>
+<td align="left">Protocol Control Information，协议控制信息</td>
+<td align="left">控制信息（首部：地址、序号、校验等）</td>
+</tr>
+</tbody></table>
+<p><strong>关系</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">本层</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">本层</span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">本层</span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span>——上一层的 PDU 到本层就是 SDU，加首部（<strong>封装</strong>）后变成本层 PDU；接收端逐层<strong>去首部（解封装）</strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：封装链条——<strong>报文 → 报文段 → 数据报 → 帧 → 比特流</strong>；”上一层 PDU 是下一层 SDU”是选择题常客。</p>
+</blockquote>
+<h2 id="OSI-参考模型（七层）"><a href="#OSI-参考模型（七层）" class="headerlink" title="OSI 参考模型（七层）"></a>OSI 参考模型（七层）</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第1章 计算机网络体系结构.assets/osi-七层模型.png" alt="OSI 七层对等通信与各层协议" title="">
+                </div>
+                <div class="image-caption">OSI 七层对等通信与各层协议</div>
+            </figure>
+
+<p><strong>OSI（Open Systems Interconnection）参考模型</strong>是 ISO 提出的<strong>法律上的国际标准</strong>，自底向上为<strong>物理、数据链路、网络、传输、会话、表示、应用</strong>七层（口诀”物链网传会表应”）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">层</th>
+<th align="left">核心功能</th>
+<th align="left">传输单位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>应用层</strong></td>
+<td align="left">用户与网络的<strong>界面</strong>，提供应用服务（HTTP、FTP、SMTP）</td>
+<td align="left">报文</td>
+</tr>
+<tr>
+<td align="left"><strong>表示层</strong></td>
+<td align="left"><strong>数据格式转换</strong>、加密解密、压缩恢复</td>
+<td align="left">报文</td>
+</tr>
+<tr>
+<td align="left"><strong>会话层</strong></td>
+<td align="left">建立&#x2F;管理&#x2F;<strong>终止会话</strong>，设置<strong>校验点</strong>（断点续传）</td>
+<td align="left">报文</td>
+</tr>
+<tr>
+<td align="left"><strong>传输层</strong></td>
+<td align="left"><strong>端到端</strong>（进程间）通信，<strong>复用与分用</strong>、可靠传输、流量控制</td>
+<td align="left">报文段</td>
+</tr>
+<tr>
+<td align="left"><strong>网络层</strong></td>
+<td align="left"><strong>路由选择</strong>、流量&#x2F;拥塞控制、<strong>异构网络互联</strong></td>
+<td align="left">分组（数据报）</td>
+</tr>
+<tr>
+<td align="left"><strong>数据链路层</strong></td>
+<td align="left"><strong>成帧</strong>、差错控制、流量控制、MAC 寻址</td>
+<td align="left">帧</td>
+</tr>
+<tr>
+<td align="left"><strong>物理层</strong></td>
+<td align="left"><strong>比特流的透明传输</strong>，规定接口的机械&#x2F;电气&#x2F;功能&#x2F;规程特性</td>
+<td align="left">比特</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：<strong>传输层是端到端</strong>（主机<strong>进程</strong>之间），<strong>网络层及以下是点到点</strong>（主机—路由器—路由器等相邻节点之间）；OSI 层次理论完整但<strong>层次多、实现复杂</strong>，最终未成为事实标准。</p>
+</blockquote>
+<p>对等层之间的通信是<strong>逻辑（虚）通信</strong>：数据实际沿本系统逐层向下封装，经物理介质到达对端后再逐层向上解封装，<strong>物理层是唯一真正传输数据的层次</strong>。</p>
+<h2 id="TCP-IP-参考模型（四层）"><a href="#TCP-IP-参考模型（四层）" class="headerlink" title="TCP&#x2F;IP 参考模型（四层）"></a>TCP&#x2F;IP 参考模型（四层）</h2><table>
+<thead>
+<tr>
+<th align="left">层</th>
+<th align="left">功能</th>
+<th align="left">主要协议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>应用层</strong></td>
+<td align="left">面向用户的各种应用服务</td>
+<td align="left">HTTP、FTP、SMTP、DNS</td>
+</tr>
+<tr>
+<td align="left"><strong>传输层</strong></td>
+<td align="left">进程间端到端通信</td>
+<td align="left"><strong>TCP</strong>（面向连接、可靠）、<strong>UDP</strong>（无连接、不可靠）</td>
+</tr>
+<tr>
+<td align="left"><strong>网际层</strong></td>
+<td align="left">分组转发与路由选择</td>
+<td align="left"><strong>IP</strong>（核心）、ICMP、ARP</td>
+</tr>
+<tr>
+<td align="left"><strong>网络接口层</strong></td>
+<td align="left">与各种底层网络对接，<strong>未规定具体内容</strong></td>
+<td align="left">以太网、PPP 等</td>
+</tr>
+</tbody></table>
+<p>TCP&#x2F;IP 的核心设计思想是<strong>沙漏模型</strong>：<strong>网际层只留一个 IP 协议</strong>（最窄处），上层应用可无限扩展、下层可运行于任何网络技术——“<strong>IP over everything, everything over IP</strong>“。</p>
+<blockquote>
+<p><strong>考点</strong>：TCP&#x2F;IP <strong>先有协议、后有模型</strong>（与 OSI 相反）；其<strong>网络层只提供无连接</strong>服务，而 OSI 网络层面向连接与无连接均可；网络接口层不规定具体内容，正体现了 IP 屏蔽底层差异。</p>
+</blockquote>
+<h2 id="OSI、TCP-IP-与五层教学模型对比"><a href="#OSI、TCP-IP-与五层教学模型对比" class="headerlink" title="OSI、TCP&#x2F;IP 与五层教学模型对比"></a>OSI、TCP&#x2F;IP 与五层教学模型对比</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第1章 计算机网络体系结构.assets/osi-tcpip-五层对比.png" alt="OSI、TCP/IP 与五层混合模型" title="">
+                </div>
+                <div class="image-caption">OSI、TCP/IP 与五层混合模型</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">OSI 参考模型</th>
+<th align="left">TCP&#x2F;IP 参考模型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">层次数</td>
+<td align="left"><strong>7 层</strong></td>
+<td align="left"><strong>4 层</strong></td>
+</tr>
+<tr>
+<td align="left">产生顺序</td>
+<td align="left"><strong>先有模型，后有协议</strong></td>
+<td align="left"><strong>先有协议，后有模型</strong></td>
+</tr>
+<tr>
+<td align="left">地位</td>
+<td align="left">法律上的国际标准，理论完整但未流行</td>
+<td align="left"><strong>事实上的国际标准</strong></td>
+</tr>
+<tr>
+<td align="left">网络层</td>
+<td align="left">可面向连接，也可无连接</td>
+<td align="left"><strong>仅无连接</strong>（IP 数据报）</td>
+</tr>
+<tr>
+<td align="left">传输层</td>
+<td align="left">以面向连接为主</td>
+<td align="left"><strong>TCP &#x2F; UDP</strong> 两种并存</td>
+</tr>
+<tr>
+<td align="left">会话层 + 表示层</td>
+<td align="left">独立成层</td>
+<td align="left">并入<strong>应用层</strong></td>
+</tr>
+<tr>
+<td align="left">物理层 + 数据链路层</td>
+<td align="left">两层</td>
+<td align="left">合并为<strong>网络接口层</strong>（内容未定义）</td>
+</tr>
+</tbody></table>
+<p><strong>五层教学模型</strong>综合 OSI 的清晰层次与 TCP&#x2F;IP 的实用性，是 <strong>408 考试默认使用的模型</strong>（无特别说明按五层作答）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">层</th>
+<th align="left">核心功能</th>
+<th align="left">典型协议</th>
+<th align="left">典型设备</th>
+<th align="left">PDU</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>应用层</strong></td>
+<td align="left">用户接口、应用服务</td>
+<td align="left">HTTP、FTP、DNS</td>
+<td align="left">网关（最高可到应用层）</td>
+<td align="left">报文</td>
+</tr>
+<tr>
+<td align="left"><strong>传输层</strong></td>
+<td align="left">进程间端到端、复用分用</td>
+<td align="left">TCP、UDP</td>
+<td align="left">—</td>
+<td align="left">报文段</td>
+</tr>
+<tr>
+<td align="left"><strong>网络层</strong></td>
+<td align="left">路由选择、分组转发</td>
+<td align="left">IP、ICMP、ARP</td>
+<td align="left"><strong>路由器</strong></td>
+<td align="left">分组（数据报）</td>
+</tr>
+<tr>
+<td align="left"><strong>数据链路层</strong></td>
+<td align="left">成帧、差错&#x2F;流量控制</td>
+<td align="left">以太网、PPP</td>
+<td align="left"><strong>交换机、网桥</strong></td>
+<td align="left">帧</td>
+</tr>
+<tr>
+<td align="left"><strong>物理层</strong></td>
+<td align="left">比特流透明传输</td>
+<td align="left">曼彻斯特编码等</td>
+<td align="left"><strong>中继器、集线器</strong></td>
+<td align="left">比特</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：集线器在<strong>物理层</strong>（转发比特、不隔离冲突域），交换机在<strong>数据链路层</strong>（按 MAC 转发帧、隔离冲突域），路由器在<strong>网络层</strong>——“设备工作在哪个层次”是高频选择题；网关是<strong>网络层以上</strong>的设备。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">网络定义</td>
+<td align="left"><strong>互连的、自治的</strong>计算机集合；最基本功能<strong>数据通信</strong>、最终目的<strong>资源共享</strong></td>
+</tr>
+<tr>
+<td align="left">三要素</td>
+<td align="left"><strong>计算机、通信链路、协议</strong>（协议是核心）</td>
+</tr>
+<tr>
+<td align="left">分类</td>
+<td align="left">按范围 WAN&#x2F;MAN&#x2F;LAN&#x2F;PAN；按交换<strong>电路&#x2F;报文&#x2F;分组</strong>——因特网用<strong>分组交换</strong></td>
+</tr>
+<tr>
+<td align="left">速率换算</td>
+<td align="left">bit 以 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></strong> 为底、Byte 以 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span></strong> 为底，两者勿混</td>
+</tr>
+<tr>
+<td align="left">发送时延</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">数据长度</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">发送速率</span></span></span></span>，由发送端决定，<strong>与距离无关</strong></td>
+</tr>
+<tr>
+<td align="left">传播时延</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">信道长度</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">传播速率</span></span></span></span>（铜缆&#x2F;光纤约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span> m&#x2F;s），<strong>与数据长度无关</strong></td>
+</tr>
+<tr>
+<td align="left">时延带宽积</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord cjk_fallback">传播时延</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">带宽</span></span></span></span>，单位 <strong>bit</strong>——“<strong>以比特为单位的链路长度</strong>“</td>
+</tr>
+<tr>
+<td align="left">RTT 与利用率</td>
+<td align="left">RTT &#x3D; 发送数据到<strong>收到确认</strong>；<strong>利用率过高 → 时延急剧增大</strong></td>
+</tr>
+<tr>
+<td align="left">协议三要素</td>
+<td align="left"><strong>语法</strong>（格式）、<strong>语义</strong>（动作）、<strong>同步&#x2F;时序</strong>（顺序）</td>
+</tr>
+<tr>
+<td align="left">协议 vs 服务</td>
+<td align="left">协议<strong>水平</strong>（对等实体）、服务<strong>垂直</strong>（相邻层）；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal" style="margin-right:0.0785em;">I</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal" style="margin-right:0.109em;">U</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">服务原语</td>
+<td align="left"><strong>请求、指示、响应、证实</strong>四类；SAP 如<strong>端口号</strong></td>
+</tr>
+<tr>
+<td align="left">两种服务</td>
+<td align="left"><strong>面向连接</strong>（TCP：先建连、按序可靠）vs <strong>无连接</strong>（UDP&#x2F;IP：独立选路、尽力而为）</td>
+</tr>
+<tr>
+<td align="left">OSI 七层</td>
+<td align="left"><strong>物链网传会表应</strong>；传输层<strong>端到端</strong>、网络层及以下<strong>点到点</strong></td>
+</tr>
+<tr>
+<td align="left">OSI vs TCP&#x2F;IP</td>
+<td align="left">先模型后协议 vs 先协议后模型；网际层<strong>仅无连接</strong>；会表应并入应用层、链路物理并入网络接口层</td>
+</tr>
+<tr>
+<td align="left">五层模型与设备</td>
+<td align="left">应用&#x2F;传输&#x2F;网络&#x2F;链路&#x2F;物理（408 默认）；集线器—物理层、交换机—链路层、路由器—网络层、网关—网络层以上</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:27:26.175Z" itemprop="dateUpdated">2026-08-29 13:27:26</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" rel="tag">体系结构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&title=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&title=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">物理层与数据通信基础</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/26/IP%E5%8D%8F%E8%AE%AE/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">IP协议</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&title=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&title=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《计算机网络概述与体系结构》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%A6%82%E8%BF%B0%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

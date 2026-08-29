@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据链路层：组帧与差错控制 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,网络,数据链路层">
+    <meta name="description" content="数据链路层位于物理层之上、网络层之下，任务是把物理层送来的原始比特流组织成帧，并在相邻节点间的链路上正确交付。408 对它的考查集中在两大块：组帧（帧定界的四种方法）与差错控制（奇偶校验、CRC、海明码）——其中 CRC 与海明码的计算题几乎年年出现。流量控制与滑动窗口的具体协议（停止-等待、GBN、SR）已有三篇专文，本文不再重复，只谈功能概览、组帧与差错编码。 链路、数据链路与数据链路层的功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据链路层：组帧与差错控制">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="数据链路层位于物理层之上、网络层之下，任务是把物理层送来的原始比特流组织成帧，并在相邻节点间的链路上正确交付。408 对它的考查集中在两大块：组帧（帧定界的四种方法）与差错控制（奇偶校验、CRC、海明码）——其中 CRC 与海明码的计算题几乎年年出现。流量控制与滑动窗口的具体协议（停止-等待、GBN、SR）已有三篇专文，本文不再重复，只谈功能概览、组帧与差错编码。 链路、数据链路与数据链路层的功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/%E9%93%BE%E8%B7%AF%E5%B1%82-%E7%AE%80%E5%8D%95%E6%A8%A1%E5%9E%8B.png">
+<meta property="article:published_time" content="2026-08-29T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-29T05:23:16.468Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="数据链路层">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/%E9%93%BE%E8%B7%AF%E5%B1%82-%E7%AE%80%E5%8D%95%E6%A8%A1%E5%9E%8B.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据链路层：组帧与差错控制</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据链路层：组帧与差错控制</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-29T00:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%93%BE%E8%B7%AF%E3%80%81%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="post-toc-number">1.</span> <span class="post-toc-text">链路、数据链路与数据链路层的功能</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E5%9B%9B%E5%A4%A7%E5%8A%9F%E8%83%BD"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">数据链路层的四大功能</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%BA%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8F%90%E4%BE%9B%E7%9A%84%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%9E%8B"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">为网络层提供的服务类型</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B0%81%E8%A3%85%E6%88%90%E5%B8%A7%EF%BC%9A%E5%9B%9B%E7%A7%8D%E7%BB%84%E5%B8%A7%E6%96%B9%E6%B3%95%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">封装成帧：四种组帧方法（重点）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%97%E7%AC%A6%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">字符计数法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%97%E8%8A%82%E5%A1%AB%E5%85%85%E6%B3%95%EF%BC%88%E5%AD%97%E7%AC%A6%E5%A1%AB%E5%85%85%E6%B3%95%EF%BC%8C%E8%BD%AC%E4%B9%89%E5%AD%97%E7%AC%A6%EF%BC%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">字节填充法（字符填充法，转义字符）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AF%94%E7%89%B9%E5%A1%AB%E5%85%85%E6%B3%95%EF%BC%88%E9%9B%B6%E6%AF%94%E7%89%B9%E5%A1%AB%E5%85%85%EF%BC%89"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">比特填充法（零比特填充）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%BF%9D%E8%A7%84%E7%BC%96%E7%A0%81%E6%B3%95"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">违规编码法</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9B%9B%E7%A7%8D%E7%BB%84%E5%B8%A7%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94%EF%BC%88%E5%BF%85%E8%83%8C%EF%BC%89"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">四种组帧方法对比（必背）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6%EF%BC%9A%E6%A3%80%E9%94%99%E7%BC%96%E7%A0%81%EF%BC%88%E5%A5%87%E5%81%B6%E6%A0%A1%E9%AA%8C%E4%B8%8E-CRC%EF%BC%89"><span class="post-toc-number">3.</span> <span class="post-toc-text">差错控制：检错编码（奇偶校验与 CRC）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A5%87%E5%81%B6%E6%A0%A1%E9%AA%8C"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">奇偶校验</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CRC-%E5%BE%AA%E7%8E%AF%E5%86%97%E4%BD%99%E6%A0%A1%E9%AA%8C%EF%BC%88%E5%BF%85%E8%80%83%E8%AE%A1%E7%AE%97%EF%BC%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">CRC 循环冗余校验（必考计算）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6%EF%BC%9A%E7%BA%A0%E9%94%99%E7%BC%96%E7%A0%81%EF%BC%88%E6%B5%B7%E6%98%8E%E7%A0%81%EF%BC%89"><span class="post-toc-number">4.</span> <span class="post-toc-text">差错控制：纠错编码（海明码）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B5%B7%E6%98%8E%E8%B7%9D%E7%A6%BB%E4%B8%8E%E6%A3%80%E9%94%99-%E7%BA%A0%E9%94%99%E8%83%BD%E5%8A%9B"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">海明距离与检错&#x2F;纠错能力</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%A1%E9%AA%8C%E4%BD%8D%E6%95%B0%E7%9B%AE%E4%B8%8E%E6%91%86%E6%94%BE"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">校验位数目与摆放</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%B5%B7%E6%98%8E%E7%A0%81%E4%BE%8B%E9%A2%98%EF%BC%88%E5%AE%8C%E6%95%B4%E6%BC%94%E7%AE%97%EF%BC%89"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">海明码例题（完整演算）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8E%A5%E6%94%B6%E7%AB%AF%E6%A3%80%E9%94%99%E4%B8%8E%E7%BA%A0%E9%94%99%EF%BC%88%E6%96%B0%E6%A3%80%E6%B5%8B%E7%A0%81-S-%E6%8C%87%E5%87%BA%E9%94%99%E8%AF%AF%E4%BD%8D%E7%BD%AE%EF%BC%89"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">接收端检错与纠错（新检测码 S 指出错误位置）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A3%80%E9%94%99%E3%80%81%E7%BA%A0%E9%94%99%E4%B8%8E%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E7%9A%84%E8%BE%A8%E6%9E%90"><span class="post-toc-number">5.</span> <span class="post-toc-text">检错、纠错与可靠传输的辨析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-数据链路层：组帧与差错控制"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据链路层：组帧与差错控制</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-29 08:00:00" datetime="2026-08-29T00:00:00.000Z"  itemprop="datePublished">2026-08-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>数据链路层</strong>位于物理层之上、网络层之下，任务是把物理层送来的原始比特流<strong>组织成帧</strong>，并在<strong>相邻节点</strong>间的链路上正确交付。408 对它的考查集中在两大块：<strong>组帧（帧定界的四种方法）<strong>与</strong>差错控制（奇偶校验、CRC、海明码）</strong>——其中 CRC 与海明码的<strong>计算题</strong>几乎年年出现。流量控制与滑动窗口的具体协议（停止-等待、GBN、SR）已有三篇专文，本文不再重复，只谈功能概览、组帧与差错编码。</p>
+<h2 id="链路、数据链路与数据链路层的功能"><a href="#链路、数据链路与数据链路层的功能" class="headerlink" title="链路、数据链路与数据链路层的功能"></a>链路、数据链路与数据链路层的功能</h2><p><strong>链路（物理链路）<strong>是从一个节点到相邻节点的一段</strong>物理线路</strong>（中间没有任何其他交换节点）；<strong>数据链路</strong> &#x3D; 物理链路 + <strong>通信协议</strong>以及实现协议的<strong>硬件与软件</strong>。最典型的实现就是<strong>适配器（网卡）</strong>：它同时实现了数据链路层（成帧、差错检测、MAC）和物理层（比特收发）的功能。</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">链路（物理链路）</th>
+<th align="left">数据链路</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">组成</td>
+<td align="left">相邻节点间的<strong>物理线路</strong>（传输介质）</td>
+<td align="left">物理链路 + <strong>通信协议</strong>的硬件&#x2F;软件（<strong>适配器&#x2F;网卡</strong>）</td>
+</tr>
+<tr>
+<td align="left">传输单位</td>
+<td align="left"><strong>比特流</strong>（物理层职责）</td>
+<td align="left"><strong>帧</strong>（数据链路层职责）</td>
+</tr>
+<tr>
+<td align="left">能力</td>
+<td align="left">只提供一条原始比特传输通道</td>
+<td align="left">叠加了帧定界、差错控制等协议功能</td>
+</tr>
+</tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第3章 数据链路层.assets/链路层-简单模型.png" alt="数据链路层的简单模型：帧只在各段链路上的链路层流动" title="">
+                </div>
+                <div class="image-caption">数据链路层的简单模型：帧只在各段链路上的链路层流动</div>
+            </figure>
+
+<h3 id="数据链路层的四大功能"><a href="#数据链路层的四大功能" class="headerlink" title="数据链路层的四大功能"></a>数据链路层的四大功能</h3><table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">说明</th>
+<th align="left">关键词</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>封装成帧</strong></td>
+<td align="left">把网络层交下来的 IP 数据报加<strong>帧首部、帧尾部</strong>封装成帧，确定帧边界</td>
+<td align="left">帧定界、透明传输</td>
+</tr>
+<tr>
+<td align="left"><strong>差错控制</strong></td>
+<td align="left">检测（必要时纠正）传输中的比特差错</td>
+<td align="left">CRC 检错、海明纠错</td>
+</tr>
+<tr>
+<td align="left"><strong>流量控制</strong></td>
+<td align="left">协调收发速率，防止接收方来不及接收</td>
+<td align="left">滑动窗口（见姊妹专文）</td>
+</tr>
+<tr>
+<td align="left"><strong>传输管理（链路管理）</strong></td>
+<td align="left">数据链路的<strong>建立、维持、释放</strong></td>
+<td align="left">面向连接的三个阶段</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：王道强调的链路层”三个基本问题” &#x3D; <strong>封装成帧、透明传输、差错检测</strong>；透明传输（字节填充&#x2F;零比特填充）本质上是封装成帧的配套问题。<strong>位同步（比特时钟对齐）是物理层的事，帧同步（从比特流中识别帧的首尾）才是数据链路层的事</strong>——两者不要混。</p>
+</blockquote>
+<h3 id="为网络层提供的服务类型"><a href="#为网络层提供的服务类型" class="headerlink" title="为网络层提供的服务类型"></a>为网络层提供的服务类型</h3><table>
+<thead>
+<tr>
+<th align="left">服务类型</th>
+<th align="left">建立链路</th>
+<th align="left">确认与重传</th>
+<th align="left">可靠性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>无确认的无连接服务</strong></td>
+<td align="left">不需要</td>
+<td align="left">无确认，丢帧交上层处理</td>
+<td align="left">最低（<strong>以太网</strong>属此类）</td>
+</tr>
+<tr>
+<td align="left"><strong>有确认的无连接服务</strong></td>
+<td align="left">不需要</td>
+<td align="left">有确认，超时重传</td>
+<td align="left">较高</td>
+</tr>
+<tr>
+<td align="left"><strong>有确认的面向连接服务</strong></td>
+<td align="left"><strong>建链 → 传帧 → 释放</strong></td>
+<td align="left">每一帧都确认</td>
+<td align="left">最高</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：<strong>有连接就必带确认</strong>——不存在”无确认的面向连接服务”；三种服务可靠性排序：无确认无连接 &lt; 有确认无连接 &lt; 有确认的面向连接。</p>
+</blockquote>
+<h2 id="封装成帧：四种组帧方法（重点）"><a href="#封装成帧：四种组帧方法（重点）" class="headerlink" title="封装成帧：四种组帧方法（重点）"></a>封装成帧：四种组帧方法（重点）</h2><p><strong>帧 &#x3D; 帧首部 + 数据部分 + 帧尾部</strong>。首部与尾部存放<strong>帧定界标志</strong>、地址、长度等控制信息，帧尾部通常还带 <strong>FCS（帧检验序列，即 CRC 的计算结果）</strong>。接收方靠定界标志从比特流中”切”出一帧——<strong>帧定界是手段，帧同步是目的</strong>；定界一旦失败只能丢帧，靠确认重传恢复。数据部分长度需折中：太短 → 首尾部<strong>开销占比大</strong>；太长 → 一帧出错<strong>牵连面大</strong>——上限即 <strong>MTU</strong>（以太网 1500B）。</p>
+<h3 id="字符计数法"><a href="#字符计数法" class="headerlink" title="字符计数法"></a>字符计数法</h3><p><strong>原理</strong>：帧首部的第一个字段是<strong>计数字段</strong>，标明该帧的<strong>总字符数</strong>（王道约定含计数字段自身；个别题目约定不含，以题干为准），接收方按计数一次取完一帧。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">发送序列:  5  A  B  C  D   5  E  F  G  H   ...</span><br><span class="line">           ↑ 计数 5 = 计数字段自身 + 4 个数据字符</span><br><span class="line">接收取帧:  [5 A B C D]  [5 E F G H]  ...</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>优点</strong>：实现最简单，无需任何填充。</li>
+<li><strong>缺点（致命）</strong>：<strong>计数字段一旦出错</strong>（如 5 错成 4），接收方会把数据字符错当成下一帧的计数字段，从此<strong>全盘失去同步、无法恢复</strong>——后续所有帧全部报废。</li>
+</ul>
+<blockquote>
+<p><strong>易错点</strong>：计数字段出错不是”只错一帧”，而是<strong>全盘崩溃且无法再同步</strong>，因此字符计数法<strong>很少单独使用</strong>。</p>
+</blockquote>
+<h3 id="字节填充法（字符填充法，转义字符）"><a href="#字节填充法（字符填充法，转义字符）" class="headerlink" title="字节填充法（字符填充法，转义字符）"></a>字节填充法（字符填充法，转义字符）</h3><p><strong>原理</strong>：用<strong>特殊字符</strong>作定界符（如 PPP 的标志字节 <strong>0x7E</strong>）。数据中若撞上定界符或转义符，就在其前面插入<strong>转义字节 0x7D</strong>；接收方见到 0x7D 就把后一字节还原。</p>
+<table>
+<thead>
+<tr>
+<th align="left">原始字节</th>
+<th align="left">填充后</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">0x7E（定界符）</td>
+<td align="left"><strong>0x7D 0x5E</strong></td>
+<td align="left">标志自身也要转义</td>
+</tr>
+<tr>
+<td align="left">0x7D（转义符）</td>
+<td align="left"><strong>0x7D 0x5D</strong></td>
+<td align="left"><strong>转义字符本身也要转义</strong></td>
+</tr>
+<tr>
+<td align="left">控制字符 c（c &lt; 0x20）</td>
+<td align="left">0x7D + (c ⊕ 0x20)</td>
+<td align="left">如 0x03 → 0x7D 0x23</td>
+</tr>
+</tbody></table>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">原始数据:   A   0x7E    B   0x7D    C</span><br><span class="line">填充发送:   A   0x7D 0x5E  B   0x7D 0x5D  C</span><br><span class="line">接收还原:   A   0x7E    B   0x7D    C</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：数据中每个被转义的字节使帧增加 1B——<strong>填充后帧长 &#x3D; 原长 + 转义次数</strong>。<br><strong>易错点</strong>：转义字符 0x7D <strong>自己出现在数据里时同样要转义</strong>（0x7D → 0x7D 0x5D），漏转义会让接收方产生二义性。</p>
+</blockquote>
+<h3 id="比特填充法（零比特填充）"><a href="#比特填充法（零比特填充）" class="headerlink" title="比特填充法（零比特填充）"></a>比特填充法（零比特填充）</h3><p><strong>原理</strong>：用<strong>标志比特序列 01111110</strong> 定界（HDLC）。发送方扫描数据，<strong>每遇到 5 个连续的 1，就在其后插入一个 0</strong>；接收方逆操作——每收到 5 个连续 1，就<strong>删除其后的 0</strong>。这样信息字段中<strong>永远不会出现 6 个连续 1</strong>，不可能与标志混淆。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">原始数据:   0 1 1 1 1 1 1 0      （数据中恰好出现标志 01111110）</span><br><span class="line">填充发送:   0 1 1 1 1 1 0 1 0    （第 5 个 1 后插入 0 → 9 位）</span><br><span class="line">接收还原:   0 1 1 1 1 1 1 0      （5 个连续 1 后面的 0 被删除）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>优点</strong>：面向<strong>比特</strong>，与字符集编码无关，可传任意比特流；开销比字节填充小。</li>
+<li><strong>缺点</strong>：收发双方都要逐位扫描，有一定软硬件开销。</li>
+<li><strong>计算要点</strong>：数据中连续 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 个 1（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span>）共插入 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord">/5</span><span class="mclose">⌋</span></span></span></span> 个 0（如连续 11 个 1 插 2 个 0）；帧总长 &#x3D; 数据位数 + 2 个标志（16 位）+ 插入的 0 数。</li>
+</ul>
+<h3 id="违规编码法"><a href="#违规编码法" class="headerlink" title="违规编码法"></a>违规编码法</h3><p><strong>原理</strong>：借用物理层编码中<strong>不会出现的电平组合</strong>作定界。曼彻斯特编码每个码元<strong>中间必有电平跳变</strong>，因此”高-高、低-低（<strong>电平不跳变</strong>）”属于<strong>违规码</strong>，正常数据绝不会出现，可专用于帧定界（IEEE 802.5 令牌环用违规码 J、K）。</p>
+<ul>
+<li><strong>优点</strong>：不需要填充，不引入额外开销。</li>
+<li><strong>缺点</strong>：<strong>依赖特定的编码体系</strong>（要有冗余电平可用），通用性差。</li>
+</ul>
+<h3 id="四种组帧方法对比（必背）"><a href="#四种组帧方法对比（必背）" class="headerlink" title="四种组帧方法对比（必背）"></a>四种组帧方法对比（必背）</h3><table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th align="left">原理</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+<th align="left">典型应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>字符计数法</strong></td>
+<td align="left">首部计数字段标明帧总字符数，按数取帧</td>
+<td align="left">简单、无填充</td>
+<td align="left"><strong>计数出错 → 全盘失步、无法恢复</strong></td>
+<td align="left">很少单独使用</td>
+</tr>
+<tr>
+<td align="left"><strong>字节填充法</strong></td>
+<td align="left">特殊字符定界 0x7E，撞标志&#x2F;转义符就插 0x7D</td>
+<td align="left">实现直观</td>
+<td align="left">依赖字符集、有填充开销</td>
+<td align="left"><strong>PPP</strong>（异步链路）</td>
+</tr>
+<tr>
+<td align="left"><strong>比特填充法</strong></td>
+<td align="left">01111110 定界，每 5 个连续 1 后插 0</td>
+<td align="left">与字符集无关、可传任意比特流</td>
+<td align="left">有插 0 开销、需逐位扫描</td>
+<td align="left"><strong>HDLC</strong>、PPP（同步链路）</td>
+</tr>
+<tr>
+<td align="left"><strong>违规编码法</strong></td>
+<td align="left">借用编码中不出现的电平组合定界</td>
+<td align="left">无需填充、零开销</td>
+<td align="left">依赖特定编码方式</td>
+<td align="left"><strong>802.5 令牌环</strong>（曼彻斯特）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：字节填充面向<strong>字节</strong>（PPP），比特填充面向<strong>比特</strong>（HDLC），口诀”<strong>PPP 转义 0x7E，HDLC 五个一插零</strong>“；违规编码利用的是<strong>曼彻斯特编码码元中间不跳变</strong>的违规电平。</p>
+</blockquote>
+<h2 id="差错控制：检错编码（奇偶校验与-CRC）"><a href="#差错控制：检错编码（奇偶校验与-CRC）" class="headerlink" title="差错控制：检错编码（奇偶校验与 CRC）"></a>差错控制：检错编码（奇偶校验与 CRC）</h2><p>实际链路上比特差错（1 翻成 0 或相反）不可避免，一段时间内错误比特占总传输比特的比例即<strong>误码率 BER</strong>（与信噪比密切相关）。<strong>检错编码</strong>只负责”发现错了”，纠正靠丢弃 + 重传；<strong>纠错编码</strong>还能”定位并改正”。</p>
+<h3 id="奇偶校验"><a href="#奇偶校验" class="headerlink" title="奇偶校验"></a>奇偶校验</h3><p>在数据后加 1 位校验位，使整个码字中 1 的个数为<strong>奇数（奇校验）或偶数（偶校验）</strong>。</p>
+<ul>
+<li><strong>能力</strong>：只能检测<strong>奇数个</strong>比特错；<strong>偶数个错会互相抵消，检测不出</strong>；且<strong>不能纠错</strong>。</li>
+<li>水平垂直（二维）奇偶校验可改善检错能力，408 以一维结论为主。</li>
+</ul>
+<h3 id="CRC-循环冗余校验（必考计算）"><a href="#CRC-循环冗余校验（必考计算）" class="headerlink" title="CRC 循环冗余校验（必考计算）"></a>CRC 循环冗余校验（必考计算）</h3><p><strong>原理</strong>：收发双方约定<strong>生成多项式 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span></strong>（r 阶 → 对应 <strong>r+1 位</strong>二进制除数）。发送端在数据 M 后<strong>补 r 个 0</strong>（相当于 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span></span></span></span>），用除数做<strong>模 2 除法</strong>（按位异或、无进位借位），得 r 位余数 <strong>FCS（帧检验序列）<strong>拼在数据后发送——整个码字可被 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 整除。接收端对收到的</strong>整个帧</strong>再做一次模 2 除法：<strong>余数为 0 → 无差错；非 0 → 有错，丢弃</strong>。</p>
+<p><strong>例题</strong>：数据 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">101001</span></span></span></span>，生成多项式 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（对应除数 P &#x3D; <strong>1101</strong>），求 FCS 与发送帧。</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 最高次 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span> → r &#x3D; 3；除数 1101（r+1 &#x3D; 4 位）；被除数 &#x3D; 101001 + <strong>000</strong> &#x3D; <strong>101001000</strong></li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">商 Q = 1 1 0 1 0 1      （求 FCS 只看余数，商可省略）</span><br><span class="line"></span><br><span class="line">1 0 1 0 0 1 0 0 0        ← 被除数 = 数据 101001 + 补 3 个 0</span><br><span class="line">1 1 0 1                  ← 窗口 1010，首位 1 商 1：1010 ⊕ 1101 = 0111</span><br><span class="line">────────────────</span><br><span class="line">0 1 1 1 0                ← 首位 0 商 0，窗口右移 → 1110</span><br><span class="line">  1 1 0 1                ← 1110 ⊕ 1101 = 0011</span><br><span class="line">────────────────</span><br><span class="line">  0 0 1 1 1              ← 首位 0 商 0，窗口右移 → 1110</span><br><span class="line">    1 1 0 1              ← 1110 ⊕ 1101 = 0011</span><br><span class="line">────────────────</span><br><span class="line">    0 0 1 1 0            ← 首位 0 商 0，窗口右移 → 1100</span><br><span class="line">      1 1 0 1            ← 1100 ⊕ 1101 = 0001</span><br><span class="line">────────────────</span><br><span class="line">      0 0 0 1            ← 余数 0001 → 取低 3 位：FCS = 001</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>发送帧</strong> &#x3D; 101001 + <strong>001</strong> &#x3D; <strong>101001001</strong>（9 位）</li>
+<li><strong>接收端验证</strong>：对收到的 101001001（<strong>整个帧，含 FCS</strong>）再除 1101：</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1 0 1 0 0 1 0 0 1        ← 接收码字 101001001</span><br><span class="line">1 1 0 1                  ← 窗口 1010 ⊕ 1101 = 0111</span><br><span class="line">────────────────</span><br><span class="line">0 1 1 1 0                ← 首位 0 商 0，窗口右移 → 1110</span><br><span class="line">  1 1 0 1                ← 1110 ⊕ 1101 = 0011</span><br><span class="line">────────────────</span><br><span class="line">  0 0 1 1 1              ← 首位 0 商 0，窗口右移 → 1110</span><br><span class="line">    1 1 0 1              ← 1110 ⊕ 1101 = 0011</span><br><span class="line">────────────────</span><br><span class="line">    0 0 1 1 0            ← 首位 0 商 0，窗口右移 → 1101</span><br><span class="line">      1 1 0 1            ← 1101 ⊕ 1101 = 0000</span><br><span class="line">────────────────</span><br><span class="line">      0 0 0 0            ← 余数 = 0 → 判定无差错，接收 ✓</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论与考点</strong>：</p>
+<ul>
+<li><strong>FCS 位数 &#x3D; 生成多项式最高次数 r</strong>；被除数 &#x3D; 数据补 r 个 0；除数位数 &#x3D; r + 1。</li>
+<li>生成多项式转二进制按 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span></span></span></span></span></span></span></span> 的系数写出：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> → <strong>1101</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> → <strong>1011</strong>（两者极易混！）。</li>
+<li>接收端要把**整个收到的帧（含 FCS）**再除一次，<strong>不是只除数据部分</strong>。</li>
+<li><strong>CRC 只能检错、不能纠错</strong>——只知道”错了”，不知道”错在哪一位”。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：CRC 三步曲——<strong>补 r 个 0 → 模 2 除法（逐位异或）→ r 位余数拼到数据尾部</strong>；接收方<strong>整除即认为无差错</strong>。<br><strong>易错点</strong>：模 2 除法是<strong>异或</strong>不是普通除法；当前窗口首位为 0 时商 0、<strong>不写除数行</strong>直接右移。</p>
+</blockquote>
+<h2 id="差错控制：纠错编码（海明码）"><a href="#差错控制：纠错编码（海明码）" class="headerlink" title="差错控制：纠错编码（海明码）"></a>差错控制：纠错编码（海明码）</h2><h3 id="海明距离与检错-纠错能力"><a href="#海明距离与检错-纠错能力" class="headerlink" title="海明距离与检错&#x2F;纠错能力"></a>海明距离与检错&#x2F;纠错能力</h3><p><strong>海明距离（码距）</strong>：两个等长码字之间<strong>不同的位数</strong>；一个编码方案的码距取全部码字两两距离的<strong>最小值</strong> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">能力</th>
+<th align="left">条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">检测 d 位错</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">纠正 d 位错</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+</tr>
+</tbody></table>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>：可<strong>纠 1 位</strong>错，或<strong>检 2 位</strong>错（二者不可兼得）——<strong>海明码正是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></strong>。</li>
+</ul>
+<h3 id="校验位数目与摆放"><a href="#校验位数目与摆放" class="headerlink" title="校验位数目与摆放"></a>校验位数目与摆放</h3><p>设数据位 d 位、校验位 r 位，需满足 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8004em;vertical-align:-0.136em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span></span></span></span> 种校验结果要覆盖”无错 1 种 + d + r 个可能出错位”）。</p>
+<table>
+<thead>
+<tr>
+<th align="left">数据位 d</th>
+<th align="center">1</th>
+<th align="center">2&#126;4</th>
+<th align="center">5&#126;11</th>
+<th align="center">12&#126;26</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">校验位 r</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">5</td>
+</tr>
+</tbody></table>
+<ul>
+<li>校验位 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 放在<strong>位号 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span></strong>（第 1、2、4、8…位），数据位依序填入其余位置；<strong>位号从 1 开始</strong>。</li>
+<li><strong>分组规则</strong>：位号写成二进制后<strong>第 i 位为 1</strong> 的所有位归入第 i 个校验组，组内做<strong>偶校验</strong>（异或和为 0）。如位号 3 &#x3D; 0011 → 属 P1、P2 组；位号 10 &#x3D; 1010 → 属 P2、P4 组。</li>
+</ul>
+<h3 id="海明码例题（完整演算）"><a href="#海明码例题（完整演算）" class="headerlink" title="海明码例题（完整演算）"></a>海明码例题（完整演算）</h3><p>数据 <strong>D &#x3D; 10100110</strong>（D7&#x3D;1，D6&#x3D;0，D5&#x3D;1，D4&#x3D;0，D3&#x3D;0，D2&#x3D;1，D1&#x3D;1，D0&#x3D;0），d &#x3D; 8：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">13</span></span></span></span> ✓ → r &#x3D; 4，码长 12。</p>
+<p><strong>排放</strong>（校验位在位号 1、2、4、8；数据位按 D7→D0 依次填入其余位）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">位号</th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+<th align="center">8</th>
+<th align="center">9</th>
+<th align="center">10</th>
+<th align="center">11</th>
+<th align="center">12</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">内容</td>
+<td align="center"><strong>P1</strong></td>
+<td align="center"><strong>P2</strong></td>
+<td align="center">D0</td>
+<td align="center"><strong>P3</strong></td>
+<td align="center">D1</td>
+<td align="center">D2</td>
+<td align="center">D3</td>
+<td align="center"><strong>P4</strong></td>
+<td align="center">D4</td>
+<td align="center">D5</td>
+<td align="center">D6</td>
+<td align="center">D7</td>
+</tr>
+</tbody></table>
+<p><strong>分组求校验位</strong>（组 &#x3D; 位号二进制第 i 位为 1 的位）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">校验位</th>
+<th align="left">覆盖位号</th>
+<th align="left">偶校验方程（数据位代入）</th>
+<th align="center">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">P1</td>
+<td align="left">1、3、5、7、9、11</td>
+<td align="left">P1 &#x3D; D0 ⊕ D1 ⊕ D3 ⊕ D4 ⊕ D6 &#x3D; 0⊕1⊕0⊕0⊕0</td>
+<td align="center"><strong>1</strong></td>
+</tr>
+<tr>
+<td align="left">P2</td>
+<td align="left">2、3、6、7、10、11</td>
+<td align="left">P2 &#x3D; D0 ⊕ D2 ⊕ D3 ⊕ D5 ⊕ D6 &#x3D; 0⊕1⊕0⊕1⊕0</td>
+<td align="center"><strong>0</strong></td>
+</tr>
+<tr>
+<td align="left">P3</td>
+<td align="left">4、5、6、7、12</td>
+<td align="left">P3 &#x3D; D1 ⊕ D2 ⊕ D3 ⊕ D7 &#x3D; 1⊕1⊕0⊕1</td>
+<td align="center"><strong>1</strong></td>
+</tr>
+<tr>
+<td align="left">P4</td>
+<td align="left">8、9、10、11、12</td>
+<td align="left">P4 &#x3D; D4 ⊕ D5 ⊕ D6 ⊕ D7 &#x3D; 0⊕1⊕0⊕1</td>
+<td align="center"><strong>0</strong></td>
+</tr>
+</tbody></table>
+<p><strong>海明码</strong>（从 H12 写到 H1）&#x3D; D7 D6 D5 D4 P4 D3 D2 D1 P3 D0 P2 P1 &#x3D; <strong>101000111001</strong></p>
+<h3 id="接收端检错与纠错（新检测码-S-指出错误位置）"><a href="#接收端检错与纠错（新检测码-S-指出错误位置）" class="headerlink" title="接收端检错与纠错（新检测码 S 指出错误位置）"></a>接收端检错与纠错（新检测码 S 指出错误位置）</h3><p>接收方对收到的<strong>整个海明码</strong>按原分组重做偶校验，得新检测码 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">检测位</th>
+<th align="left">方程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">S1</td>
+<td align="left">H1 ⊕ H3 ⊕ H5 ⊕ H7 ⊕ H9 ⊕ H11</td>
+</tr>
+<tr>
+<td align="left">S2</td>
+<td align="left">H2 ⊕ H3 ⊕ H6 ⊕ H7 ⊕ H10 ⊕ H11</td>
+</tr>
+<tr>
+<td align="left">S3</td>
+<td align="left">H4 ⊕ H5 ⊕ H6 ⊕ H7 ⊕ H12</td>
+</tr>
+<tr>
+<td align="left">S4</td>
+<td align="left">H8 ⊕ H9 ⊕ H10 ⊕ H11 ⊕ H12</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>S 全 0 → 无差错</strong>；<strong>S ≠ 0 → S 的二进制值（高位在前）就是出错位号</strong>，将该位<strong>取反</strong>即纠正。</li>
+</ul>
+<p><strong>纠错演示</strong>：正确码字 101000111001 在传输中第 <strong>6</strong> 位（H6 &#x3D; D2）由 1 翻成 0，收到 101000<strong>0</strong>11001：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">S1 = H1⊕H3⊕H5⊕H7⊕H9⊕H11  = 1⊕0⊕1⊕0⊕0⊕0 = 0</span><br><span class="line">S2 = H2⊕H3⊕H6⊕H7⊕H10⊕H11 = 0⊕0⊕0⊕0⊕1⊕0 = 1</span><br><span class="line">S3 = H4⊕H5⊕H6⊕H7⊕H12     = 1⊕1⊕0⊕0⊕1   = 1</span><br><span class="line">S4 = H8⊕H9⊕H10⊕H11⊕H12   = 0⊕0⊕1⊕0⊕1   = 0</span><br><span class="line"></span><br><span class="line">S4S3S2S1 = 0110（二进制）= 6  →  新检测码 S 指出：第 6 位出错</span><br><span class="line">将 H6 取反：101000011001 → 101000111001，恢复正确码字 ✓</span><br></pre></td></tr></table></figure>
+
+<p>（若码字未出错，则 S1 &#x3D; S2 &#x3D; S3 &#x3D; S4 &#x3D; 0。）</p>
+<blockquote>
+<p><strong>考点</strong>：求 r 用 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8004em;vertical-align:-0.136em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>；校验位放 <strong>2 的幂次位</strong>（1、2、4、8…）；<strong>S 值即出错位号</strong>（高位在前），取反纠正。<br><strong>易错点</strong>：位号<strong>从 1 开始</strong>不是 0；海明码用<strong>偶校验</strong>（异或为 0）；海明码<strong>纠 1 位、检 2 位</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>），若真发生 2 位错，S 会”错指”位置——所以海明码只用于纠 1 位错的场景。</p>
+</blockquote>
+<h2 id="检错、纠错与可靠传输的辨析"><a href="#检错、纠错与可靠传输的辨析" class="headerlink" title="检错、纠错与可靠传输的辨析"></a>检错、纠错与可靠传输的辨析</h2><table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">奇偶校验</th>
+<th align="left">CRC</th>
+<th align="left">海明码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">类型</td>
+<td align="left">检错编码</td>
+<td align="left">检错编码</td>
+<td align="left"><strong>纠错编码</strong></td>
+</tr>
+<tr>
+<td align="left">能力</td>
+<td align="left">仅检<strong>奇数个</strong>错</td>
+<td align="left">检错能力极强，<strong>不能定位、不能纠错</strong></td>
+<td align="left">可<strong>纠正 1 位</strong>错、检 2 位错</td>
+</tr>
+<tr>
+<td align="left">冗余开销</td>
+<td align="left">1 位</td>
+<td align="left">r 位（FCS）</td>
+<td align="left">r 个校验位</td>
+</tr>
+<tr>
+<td align="left">典型应用</td>
+<td align="left">简单&#x2F;低速场合</td>
+<td align="left"><strong>以太网 FCS、PPP、HDLC</strong></td>
+<td align="left">内存 ECC、深空通信</td>
+</tr>
+</tbody></table>
+<p><strong>“无差错接受” vs “可靠传输”</strong>：</p>
+<ul>
+<li><strong>无差错接受</strong>：凡接收下来的帧都极大概率没有差错（有差错的帧直接<strong>丢弃</strong>）——<strong>CRC 检错 + 丢弃</strong>即可做到。</li>
+<li><strong>可靠传输</strong>：发送什么就收到什么（<strong>不丢、不重、不乱序</strong>）——必须在检错&#x2F;丢弃之上再加<strong>确认 + 超时重传（ARQ）</strong>。</li>
+<li><strong>逻辑链</strong>：链路层 CRC 检错 → 出错帧被丢弃 → 再配合确认重传（HDLC 等带确认的链路，或交给高层 TCP）→ 才构成可靠传输。<strong>CRC 只是其中”检错”一环，可靠传输 &#x3D; 检错编码 + 重传机制</strong>；重传机制的具体化（滑动窗口）即停止-等待、GBN、SR 三篇姊妹专文的内容。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：”数据链路层用了 CRC，就实现了可靠传输吗？”——<strong>否</strong>。CRC 只提供<strong>无差错接受</strong>；可靠传输必须<strong>检错 + 确认重传</strong>共同保证。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">链路 vs 数据链路</td>
+<td align="left">线路 vs <strong>线路 + 协议</strong>（由适配器&#x2F;网卡实现）</td>
+</tr>
+<tr>
+<td align="left">四大功能</td>
+<td align="left">封装成帧、差错控制、流量控制、传输管理（链路管理）</td>
+</tr>
+<tr>
+<td align="left">组帧四法</td>
+<td align="left">字符计数、字节填充、比特填充、违规编码</td>
+</tr>
+<tr>
+<td align="left">字符计数法</td>
+<td align="left">首部计数标帧长；<strong>计数错 → 全盘失步、无法恢复</strong>，很少单独用</td>
+</tr>
+<tr>
+<td align="left">字节填充</td>
+<td align="left">PPP：0x7E → 0x7D 0x5E；0x7D → <strong>0x7D 0x5D（转义符自身也转义）</strong></td>
+</tr>
+<tr>
+<td align="left">比特填充</td>
+<td align="left">HDLC 01111110 定界；<strong>每 5 个连续 1 后插 0</strong>、接收删 0；连续 k 个 1 插 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌊</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord">/5</span><span class="mclose">⌋</span></span></span></span> 个 0</td>
+</tr>
+<tr>
+<td align="left">违规编码</td>
+<td align="left">曼彻斯特编码”高-高&#x2F;低-低”<strong>码元中间不跳变</strong>作定界（802.5 令牌环）</td>
+</tr>
+<tr>
+<td align="left">CRC 计算</td>
+<td align="left">补 r 个 0 → <strong>模 2 除法（异或）</strong> → 余数即 FCS，<strong>位数 &#x3D; r</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> &#x3D; 1101</td>
+</tr>
+<tr>
+<td align="left">CRC 性质</td>
+<td align="left"><strong>只检错不纠错</strong>；接收方对<strong>整个帧</strong>再除，<strong>整除即无差错</strong></td>
+</tr>
+<tr>
+<td align="left">海明码位数</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8004em;vertical-align:-0.136em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">r</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>；校验位放 <strong>2 的幂次位</strong>（1、2、4、8…）</td>
+</tr>
+<tr>
+<td align="left">海明纠错</td>
+<td align="left">整码重做偶校验得 S：<strong>S 全 0 无错；非 0 的 S 值 &#x3D; 出错位号</strong>，取反纠正</td>
+</tr>
+<tr>
+<td align="left">码距</td>
+<td align="left">检 d 位错需 <strong>d + 1</strong>；纠 d 位错需 <strong>2d + 1</strong>；海明码 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>（纠 1 检 2）</td>
+</tr>
+<tr>
+<td align="left">可靠传输</td>
+<td align="left">CRC 只给”无差错接受”；可靠 &#x3D; <strong>检错 + 确认重传（ARQ）</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-08-29T05:23:16.468Z" itemprop="dateUpdated">2026-08-29 13:23:16</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" rel="tag">数据链路层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&title=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&title=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/29/%E4%BB%8B%E8%B4%A8%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">介质访问控制</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/29/%E7%89%A9%E7%90%86%E5%B1%82%E4%B8%8E%E6%95%B0%E6%8D%AE%E9%80%9A%E4%BF%A1%E5%9F%BA%E7%A1%80/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">物理层与数据通信基础</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&title=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&title=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据链路层：组帧与差错控制》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/29/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%EF%BC%9A%E7%BB%84%E5%B8%A7%E4%B8%8E%E5%B7%AE%E9%94%99%E6%8E%A7%E5%88%B6/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
