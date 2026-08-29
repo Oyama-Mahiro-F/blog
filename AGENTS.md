@@ -157,3 +157,13 @@ npx hexo generate           # 构建
 npx hexo clean              # 清空 public 与 db
 git -C D:\blog2 status      # 查看改动
 ```
+
+## 8. 思维导图（mindmaps/）
+
+- 位置：`source/mindmaps/`，每图两个文件：`<名>.md`（大纲源文件，可导入 XMind/幕布）+ `<名>.html`（Markmap 交互导图，`--offline` 自包含、离线可用）。
+- `_config.yml` 已设 `skip_render: mindmaps/**`——两个文件均原样发布到 `/blog/mindmaps/`，**不要**在里面写 Hexo 文章。
+- 改大纲后重新生成：
+  ```bash
+  npx -y markmap-cli "source/mindmaps/<名>.md" -o "source/mindmaps/<名>.html" --offline --no-open
+  ```
+- 导图节点用 `📖 [文章标题](/blog/2026/MM/DD/<文件名>/)` 链接到文章（URL 的 :title 用**文件名**，不是 front-matter title；中文与全角冒号可直用）。
