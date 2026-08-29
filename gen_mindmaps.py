@@ -72,13 +72,22 @@ SUBJECTS = {
 }
 
 HEAL_JS = (
-    # 个别环境下首次渲染布局会损坏（节点测量/fit 竞态）：load 后完整重渲染并复位视图兜底
-    '<script>(function(){function fix(){try{var s=document.getElementById("mindmap");'
+    # 个别环境下首次渲染布局会损坏（节点测量/fit 竞态）：修复直至布局健康（根节点位于视口内）后停止干预
+    '<script>(function(){var ok=0,tries=0;'
+    'function healthy(){try{var s=document.getElementById("mindmap");'
+    'var g=s.querySelector("g.markmap-node");if(!g)return false;'
+    'var r=g.getBoundingClientRect();'
+    'return r.width>0&&r.top>-40&&r.bottom<innerHeight+40&&r.left>-40&&r.right<innerWidth+40;}catch(e){return false;}}'
+    'function fix(){try{var s=document.getElementById("mindmap");'
     'if(!s||!window.mm)return;'
-    's.setAttribute("width",window.innerWidth);s.setAttribute("height",window.innerHeight);'
-    's.style.width=window.innerWidth+"px";s.style.height=window.innerHeight+"px";'
-    'window.mm.setData(window.mm.data);window.mm.ensureView();}catch(e){}}'
-    'window.addEventListener("load",function(){setTimeout(fix,300);setTimeout(fix,1500);setTimeout(fix,3500);});'
+    's.setAttribute("width",innerWidth);s.setAttribute("height",innerHeight);'
+    's.style.width=innerWidth+"px";s.style.height=innerHeight+"px";'
+    'try{var d=(window.mm.state&&window.mm.state.data)||window.mm.data;'
+    'if(d)window.mm.setData(d);}catch(e){}'
+    'try{window.mm.ensureView();}catch(e){}}catch(e){}}'
+    'function tick(){if(healthy()){if(++ok>=2)return;}else{ok=0;if(tries<30)fix();}'
+    'if(++tries<30)setTimeout(tick,1200);}'
+    'window.addEventListener("load",function(){setTimeout(tick,300);});'
     'window.addEventListener("resize",function(){setTimeout(fix,50);});})();</script>\n'
 )
 
