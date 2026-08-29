@@ -80,7 +80,7 @@ HEAL_JS = (
     's.style.width=innerWidth+"px";s.style.height=innerHeight+"px";'
     'try{var d=(window.mm.state&&window.mm.state.data)||window.mm.data;'
     'if(d)window.mm.setData(d);}catch(e){}'
-    'try{window.mm.ensureView();}catch(e){}}catch(e){}}'
+    'try{window.mm.ensureView(false);}catch(e1){try{window.mm.ensureView();}catch(e2){}}}catch(e){}}'
     'function healthy(){try{var s=document.getElementById("mindmap");'
     'var g=s.querySelector("g.markmap-node");if(!g)return false;'
     'var r=g.getBoundingClientRect();'
