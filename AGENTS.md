@@ -160,10 +160,12 @@ git -C D:\blog2 status      # 查看改动
 
 ## 8. 思维导图（mindmaps/）
 
-- 位置：`source/mindmaps/`，每图两个文件：`<名>.md`（大纲源文件，可导入 XMind/幕布）+ `<名>.html`（Markmap 交互导图，`--offline` 自包含、离线可用）。
-- `_config.yml` 已设 `skip_render: mindmaps/**`——两个文件均原样发布到 `/blog/mindmaps/`，**不要**在里面写 Hexo 文章。
-- 改大纲后重新生成：
+- 位置：`source/mindmaps/`，每图两个文件：`<名>.md`（大纲源文件，可导入 XMind/幕布）+ `<名>.html`（Markmap 交互导图，`--offline` 自包含、离线可用）；`index.html` 是四科入口页。
+- `_config.yml` 已设 `skip_render: mindmaps/**`——文件均原样发布到 `/blog/mindmaps/`，**不要**在里面写 Hexo 文章；顶部导航"思维导图"菜单项指向 `/mindmaps/`。
+- **批量生成/更新用脚本**（科目→分组→文章 的结构都维护在脚本 `SUBJECTS` 里，链接日期自动从 front matter 取）：
   ```bash
-  npx -y markmap-cli "source/mindmaps/<名>.md" -o "source/mindmaps/<名>.html" --offline --no-open
+  python gen_mindmaps.py        # 重新生成三科以上 md+html（数据结构/操作系统/计组）
+  # 计算机网络知识导图 未纳入脚本，单独更新：
+  npx -y markmap-cli "source/mindmaps/计算机网络知识导图.md" -o "source/mindmaps/计算机网络知识导图.html" --offline --no-open
   ```
 - 导图节点用 `📖 [文章标题](/blog/2026/MM/DD/<文件名>/)` 链接到文章（URL 的 :title 用**文件名**，不是 front-matter title；中文与全角冒号可直用）。

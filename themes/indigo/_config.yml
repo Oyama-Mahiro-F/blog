@@ -23,6 +23,9 @@ menu:
   th-list:
     text: 分类
     url: /categories
+  sitemap:
+    text: 思维导图
+    url: /mindmaps/
   github:
     text: GitHub
     url: https://github.com/Oyama-Mahiro-F
