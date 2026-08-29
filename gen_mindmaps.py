@@ -72,9 +72,13 @@ SUBJECTS = {
 }
 
 HEAL_JS = (
-    # 初始 fit 在个别环境下偶发失效（内容被平移出视口），load 后再校正一次
-    '<script>window.addEventListener("load",function(){setTimeout(function(){'
-    'try{window.mm&&window.mm.ensureView&&window.mm.ensureView();}catch(e){}},200);});</script>\n'
+    # 个别环境下初始 fit 失效（内容偏移/缩放错误）：显式设定 svg 像素尺寸并多次 ensureView 兜底
+    '<script>(function(){function fix(){try{var s=document.getElementById("mindmap");if(!s)return;'
+    's.setAttribute("width",window.innerWidth);s.setAttribute("height",window.innerHeight);'
+    's.style.width=window.innerWidth+"px";s.style.height=window.innerHeight+"px";'
+    'window.mm&&window.mm.ensureView&&window.mm.ensureView();}catch(e){}}'
+    'window.addEventListener("load",function(){setTimeout(fix,150);setTimeout(fix,800);setTimeout(fix,2000);});'
+    'window.addEventListener("resize",fix);})();</script>\n'
 )
 
 def postprocess(html_path, subject):
