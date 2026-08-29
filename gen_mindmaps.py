@@ -44,6 +44,15 @@ SUBJECTS = {
    '简单选择排序', '堆排序', '归并排序', '基数排序', '外部排序']),
  ('算法拓展', ['三数组最小距离']),
 ],
+'计算机网络知识导图': [
+ ('第1章 体系结构', ['计算机网络概述与体系结构']),
+ ('第2章 物理层', ['物理层与数据通信基础']),
+ ('第3章 数据链路层', ['数据链路层：组帧与差错控制', '停止-等待协议', '回退N帧协议',
+   '选择重传协议', '介质访问控制', '局域网、以太网与交换机']),
+ ('第4章 网络层', ['IP协议', 'ARP、DHCP与ICMP', '路由算法与路由协议', 'IPv6协议', 'IP组播与移动IP']),
+ ('第5章 传输层', ['传输层与UDP协议', 'TCP协议：报文段与连接管理', 'TCP可靠传输、流量控制与拥塞控制']),
+ ('第6章 应用层', ['DNS域名系统', 'FTP与电子邮件', 'HTTP与WWW']),
+],
 '操作系统知识导图': [
  ('概述', ['操作系统概述']),
  ('进程管理', ['进程与线程', 'CPU调度算法', '进程同步与互斥', '死锁']),
@@ -62,11 +71,27 @@ SUBJECTS = {
 ],
 }
 
+HEAL_JS = (
+    # 初始 fit 在个别环境下偶发失效（内容被平移出视口），load 后再校正一次
+    '<script>window.addEventListener("load",function(){setTimeout(function(){'
+    'try{window.mm&&window.mm.ensureView&&window.mm.ensureView();}catch(e){}},200);});</script>\n'
+)
+
+def postprocess(html_path, subject):
+    html = open(html_path, encoding='utf-8').read()
+    html = re.sub(r'<title>.*?</title>',
+                  '<title>%s思维导图 - 考研408</title>' % subject,
+                  html, count=1, flags=re.DOTALL)
+    html = html.replace('</body>', HEAL_JS + '</body>')
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(html)
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     failed = False
     for name, groups in SUBJECTS.items():
-        lines = ['# %s（408）' % name[:-4], '',
+        subject = name[:-4]
+        lines = ['# %s（408）' % subject, '',
                  '> 点击节点展开/折叠；点击 📖 进入对应文章。本文件为 Markmap 大纲源文件，可导入 XMind / 幕布。', '']
         for group, stems in groups:
             lines.append('## %s' % group)
@@ -83,6 +108,7 @@ def main():
         html = os.path.join(OUT, name + '.html')
         subprocess.run('npx -y markmap-cli "%s" -o "%s" --offline --no-open'
                        % (md, html), check=True, cwd=ROOT, shell=True)
+        postprocess(html, subject)
         print('OK %s (%d groups)' % (name, len(groups)))
     sys.exit(1 if failed else 0)
 
