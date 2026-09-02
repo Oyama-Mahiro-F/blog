@@ -7,4 +7,4 @@ db.json
 __pycache__/
 *.pyc
 .workbuddy/
-public_old_bak/
+public_old_bak*/
