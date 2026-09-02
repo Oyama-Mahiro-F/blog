@@ -30,7 +30,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/1a4e065af5d8655cf23bbb45657b3be5.webp">
 <meta property="article:published_time" content="2026-08-09T02:35:00.000Z">
-<meta property="article:modified_time" content="2026-08-11T14:54:49.516Z">
+<meta property="article:modified_time" content="2026-09-02T12:43:40.914Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="树">
@@ -185,7 +185,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">结点类型定义</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9A%E4%B9%89%E4%B8%8E%E6%9C%AF%E8%AF%AD"><span class="post-toc-number">2.</span> <span class="post-toc-text">定义与术语</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%B3%E8%A1%A1%E5%8C%96%E6%97%8B%E8%BD%AC%EF%BC%9A%E5%9B%9B%E7%A7%8D%E5%A4%B1%E8%A1%A1%E7%B1%BB%E5%9E%8B"><span class="post-toc-number">3.</span> <span class="post-toc-text">平衡化旋转：四种失衡类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E6%9F%A5%E6%89%BE"><span class="post-toc-number">4.</span> <span class="post-toc-text">AVL 树的查找</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">5.</span> <span class="post-toc-text">性能分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">6.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">结点类型定义</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%AE%9A%E4%B9%89%E4%B8%8E%E6%9C%AF%E8%AF%AD"><span class="post-toc-number">2.</span> <span class="post-toc-text">定义与术语</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%B3%E8%A1%A1%E5%8C%96%E6%97%8B%E8%BD%AC%EF%BC%9A%E5%9B%9B%E7%A7%8D%E5%A4%B1%E8%A1%A1%E7%B1%BB%E5%9E%8B"><span class="post-toc-number">3.</span> <span class="post-toc-text">平衡化旋转：四种失衡类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E6%9F%A5%E6%89%BE"><span class="post-toc-number">4.</span> <span class="post-toc-text">AVL 树的查找</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">5.</span> <span class="post-toc-text">性能分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">6.</span> <span class="post-toc-text">交互演示</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
         </nav>
     </aside>
 
@@ -327,6 +327,10 @@
 <blockquote>
 <p><strong>408 高频考点</strong>：给一组关键字，按顺序插入画出 AVL 构造过程（标注每次旋转的 BF 变化）。</p>
 </blockquote>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/avl.html" title="AVL 旋转" loading="lazy" allowfullscreen></iframe>
+</div>
+
 <h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
 <thead>
 <tr>
@@ -359,7 +363,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-11T14:54:49.516Z" itemprop="dateUpdated">2026-08-11 22:54:49</time>
+    最后更新时间：<time datetime="2026-09-02T12:43:40.914Z" itemprop="dateUpdated">2026-09-02 20:43:40</time>
 </span><br>
 
 

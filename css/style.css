@@ -3802,6 +3802,7 @@ pre .javascript .function {
 .post-content {
   padding-bottom: 20px;
   line-height: 1.8;
+  /* 算法可视化交互演示：iframe 嵌入 source/images/<章节>.assets/*.html */
 }
 .post-content > .highlight,
 .post-content > .image-bubble,
@@ -3901,6 +3902,18 @@ pre .javascript .function {
 }
 .post-content .video-container iframe {
   max-width: 100%;
+}
+.post-content .algo-demo {
+  margin-bottom: 20px;
+}
+.post-content .algo-demo iframe {
+  display: block;
+  width: 100%;
+  height: 780px;
+  max-width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
 }
 .post-content h1,
 .post-content h2,

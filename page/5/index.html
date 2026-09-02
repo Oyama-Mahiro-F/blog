@@ -440,106 +440,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-外部排序"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 12:45:00" datetime="2026-08-09T04:45:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/">外部排序（多路归并、败者树与最佳归并树）</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        当数据量大到无法全部放入内存时，需要进行外部排序。外排序的基本方法是归并排序法，分为两个步骤：
-(1) 生成若干初始归并段（顺串）——文件预处理：
-① 把含有 n 个记录的文件，按内存大小 w 分成若干长度为 w 的子文件（归并段）
-② 分别将各子文件调入内存，采用有效的内排序方法排序后送回外存。产生 m=⌈n/w⌉ 个初始归并段。
-(2) 多路归并：对这些初始归并段反复进行归并，直到得到整...
-    
-
-        <a href="/blog/2026/08/09/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-基数排序"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 12:40:00" datetime="2026-08-09T04:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/">基数排序</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        基数排序（Radix Sorting，又称桶排序或数字排序）：按待排序记录的关键字组成成分（或”位”）进行排序。它和前面各种内部排序方法完全不同——不需要进行关键字的比较和记录的移动，借助多关键字排序思想实现单逻辑关键字的排序。
-多关键字排序思想最高位优先（MSD, Most Significant Digit first）：先按第一个关键字 K1 排序分组，再对每个子序列按 K2 排序……...
-    
-
-        <a href="/blog/2026/08/09/%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-归并排序"
+            <article id="post-归并排序、基数排序与外部排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -557,7 +458,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/">归并排序</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E3%80%81%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/">归并排序、基数排序与外部排序</a>
     </h3>
   
 
@@ -567,11 +468,40 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        归并排序是分治算法：将两个有序子序列合并为一个有序序列。初始时每个元素看作一个长度为 1 的有序子序列，然后两两合并，直到整个序列有序。
-排序过程示例12345初始: 49  38  65  97  76  13  27         每个元素作为一个有序段第1趟归并(段长=1): [38   49] [65   97] [13   76] [27]第2趟归并(段长=2): [38   4...
+        这三种排序的共同点是都采用”分治&#x2F;归并”或”分配&#x2F;收集”的思路，而非逐个插入或交换：
+
+
+
+算法
+核心操作
+时间复杂度
+空间
+稳定性
+
+
+
+归并排序
+合并两个有序子序列
+O(nlogn)
+O(n)
+稳定
+
+
+基数排序
+按位”分配 → 收集”，不比较
+O(d(n+r))
+O(n+r)
+稳定
+
+
+外部排序
+多路归并 + 败者树
+取决于 I&#x2F;O 趟数
+内存工作区 w
+...
     
 
-        <a href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E3%80%81%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -587,62 +517,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-堆排序"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 12:30:00" datetime="2026-08-09T04:30:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%A0%86%E6%8E%92%E5%BA%8F/">堆排序</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        堆：一棵完全二叉树，满足任意非叶结点的关键字大于等于（大顶堆）或小于等于（小顶堆）其孩子结点的关键字。
-堆的四条性质：
-
-堆是一棵采用顺序存储结构的完全二叉树，k1​ 是根结点
-堆的根结点是关键字序列中的最小（或最大）值——小根堆（或大根堆）
-从根结点到每一叶子结点路径上的元素序列按值非递减（或非递增）
-堆中的任一子树也是堆
-
-利用堆顶记录关键字最大（或最小）的性质，从待排序记录中依次选取关...
-    
-
-        <a href="/blog/2026/08/09/%E5%A0%86%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-简单选择排序"
+            <article id="post-选择排序：简单选择与堆排序"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -660,7 +535,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/">简单选择排序</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F%EF%BC%9A%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E4%B8%8E%E5%A0%86%E6%8E%92%E5%BA%8F/">选择排序：简单选择与堆排序</a>
     </h3>
   
 
@@ -670,11 +545,30 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        每趟从待排序部分中选出最小元素，与待排序部分的第一个元素交换。
-排序过程示例123456789初始:  [49  38  65  97  76  13  27]第1趟: 选最小 13 → 与 49 交换 → [13]  38   65   97   76  49   27第2趟: 选最小 27 → 与 38 交换 → [13   27]  65   97   76  49   38第3趟: ...
+        选择排序族的共同思想是：每一趟从待排序部分选出关键字最小（或最大）的记录，放到已排序部分的末尾。两者的区别在于”怎么选最小值”：
+
+
+
+算法
+选最小值的方式
+时间复杂度
+
+
+
+简单选择排序
+线性扫描整个无序区
+O(n2)（每趟 O(n)）
+
+
+堆排序
+用堆维护最大值，取堆顶
+O(nlogn)（每趟 O(logn)）
+
+
+简单选择排序每趟从待排序部分中选出最小元素，与待排序部分的第一个元素交换...
     
 
-        <a href="/blog/2026/08/09/%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F%EF%BC%9A%E7%AE%80%E5%8D%95%E9%80%89%E6%8B%A9%E4%B8%8E%E5%A0%86%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -689,12 +583,205 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
 
         </li>
     
+        <li class="post-list-item fade">
+            <article id="post-交换排序：冒泡与快速"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:15:00" datetime="2026-08-09T04:15:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%BA%A4%E6%8D%A2%E6%8E%92%E5%BA%8F%EF%BC%9A%E5%86%92%E6%B3%A1%E4%B8%8E%E5%BF%AB%E9%80%9F/">交换排序：冒泡与快速</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        交换排序族的共同思想是：通过交换逆序的相邻（或跨距离）元素来消除逆序。冒泡排序每次只消除一个逆序对，快速排序则一次划分把一批逆序对”批量”消除，因此快得多。
+
+
+
+算法
+交换方式
+时间复杂度
+稳定性
+
+
+
+冒泡排序
+相邻元素逐个交换
+O(n2)
+稳定
+
+
+快速排序
+以枢轴为中心跨距离交换
+平均 O(nlogn)
+不稳定
+
+
+冒泡排序每趟从头到尾依次比较相邻元素，若逆序则交换——每趟把最大值”...
+    
+
+        <a href="/blog/2026/08/09/%E4%BA%A4%E6%8D%A2%E6%8E%92%E5%BA%8F%EF%BC%9A%E5%86%92%E6%B3%A1%E4%B8%8E%E5%BF%AB%E9%80%9F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-插入排序：直接插入、折半插入与希尔排序"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 12:00:00" datetime="2026-08-09T04:00:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%9A%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E3%80%81%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E4%B8%8E%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/">插入排序：直接插入、折半插入与希尔排序</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        插入排序族的共同思想是：每一步把一个待排序的记录，按关键字大小插入到前面已经排好序的子序列中，直到全部记录插入完为止。
+三者的区别在于”如何找到插入位置”：
+
+
+
+算法
+定位插入位置的方式
+移动方式
+
+
+
+直接插入排序
+从后往前逐个比较
+逐个后移
+
+
+折半插入排序
+对有序部分做折半查找
+逐个后移（不变）
+
+
+希尔排序
+按增量分组，组内直接插入
+跨距离跳跃移动
+
+
+直接插入排序将待排序的记录 ...
+    
+
+        <a href="/blog/2026/08/09/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%9A%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E3%80%81%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E4%B8%8E%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-散列表哈希表"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 11:55:00" datetime="2026-08-09T03:55:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%95%A3%E5%88%97%E8%A1%A8%E5%93%88%E5%B8%8C%E8%A1%A8/">散列表（哈希表）算法</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        前面所有查找方法都依赖于”比较”——通过多次关键字比较逐步缩小查找范围。散列表另辟蹊径：设计一个散列函数 H(key)，将关键字直接映射为存储地址，理想情况下一次计算即可定位，无需比较，时间复杂度 O(1)。
+
+核心思路：以空间换时间——预设一个足够大的表，用散列函数将关键字”分散”到不同地址
+冲突不可避免：当 H(k1​)=H(k2​) 且 k1​=k2​ 时发生冲突——需要冲突处理方法...
+    
+
+        <a href="/blog/2026/08/09/%E6%95%A3%E5%88%97%E8%A1%A8%E5%93%88%E5%B8%8C%E8%A1%A8/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
     </ul>
 
     
 <nav id="page-nav">
     <div class="inner">
-    <a class="extend prev" rel="prev" href="/blog/page/4/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><a class="page-number" href="/blog/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/blog/page/6/">6</a><a class="page-number" href="/blog/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/10/">10</a><a class="extend next" rel="next" href="/blog/page/6/">下一页</a>
+    <a class="extend prev" rel="prev" href="/blog/page/4/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><a class="page-number" href="/blog/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/blog/page/6/">6</a><a class="page-number" href="/blog/page/7/">7</a><a class="page-number" href="/blog/page/8/">8</a><a class="extend next" rel="next" href="/blog/page/6/">下一页</a>
     </div>
 </nav>
 

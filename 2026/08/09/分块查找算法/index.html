@@ -29,7 +29,7 @@
 <meta property="og:description" content="将数据分块，块间有序但块内无序。建立索引表记录每块的最大关键字和起始地址。查找分两步：① 在索引表中折半（或顺序）确定所在块 → ② 在块内顺序查找。 结构示意123456789101112index table:           data table (3 blocks, 3 elems each):┌────┬──────┐          ┌───┬───┬───┬───┬───┬──">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-08-09T03:40:00.000Z">
-<meta property="article:modified_time" content="2026-08-09T11:09:49.934Z">
+<meta property="article:modified_time" content="2026-09-02T12:43:40.991Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="查找">
@@ -183,7 +183,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F"><span class="post-toc-number">1.</span> <span class="post-toc-text">结构示意</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">2.</span> <span class="post-toc-text">性能分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">3.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F"><span class="post-toc-number">1.</span> <span class="post-toc-text">结构示意</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">2.</span> <span class="post-toc-text">性能分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">3.</span> <span class="post-toc-text">交互演示</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">4.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
         </nav>
     </aside>
 
@@ -284,6 +284,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <td align="left">需要额外的索引表空间</td>
 </tr>
 </tbody></table>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/block-search.html" title="分块查找" loading="lazy" allowfullscreen></iframe>
+</div>
+
 <h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
 <thead>
 <tr>
@@ -338,7 +342,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-09T11:09:49.934Z" itemprop="dateUpdated">2026-08-09 19:09:49</time>
+    最后更新时间：<time datetime="2026-09-02T12:43:40.991Z" itemprop="dateUpdated">2026-09-02 20:43:40</time>
 </span><br>
 
 

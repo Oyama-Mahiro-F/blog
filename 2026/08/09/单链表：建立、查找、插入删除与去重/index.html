@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>单链表：建立、查找、插入删除与去重 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,线性表">
+    <meta name="description" content="单链表通过”指针”将一个个零散的内存块（节点）串联起来。每个节点包含数据域 (data) 和指针域 (next)。 1234typedef struct LNode &#123;    ElemType data;        &#x2F;&#x2F; 数据域    struct LNode *next;   &#x2F;&#x2F; 指针域，指向下一个节点&#125; LNode, *LinkList;       &#x2F;&#x2F; LNode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单链表：建立、查找、插入删除与去重">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="单链表通过”指针”将一个个零散的内存块（节点）串联起来。每个节点包含数据域 (data) 和指针域 (next)。 1234typedef struct LNode &#123;    ElemType data;        &#x2F;&#x2F; 数据域    struct LNode *next;   &#x2F;&#x2F; 指针域，指向下一个节点&#125; LNode, *LinkList;       &#x2F;&#x2F; LNode">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120108.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/image-20260610200251684.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120528.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-121132.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-121132-17810938573874.png">
+<meta property="article:published_time" content="2026-08-09T01:05:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T12:43:40.590Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="线性表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC2%E7%AB%A0%20%E7%BA%BF%E6%80%A7%E8%A1%A8.assets/Pointer%20Relationship-2026-06-10-120108.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">单链表：建立、查找、插入删除与去重</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">单链表：建立、查找、插入删除与去重</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T01:05:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BB%BA%E7%AB%8B%EF%BC%9A%E5%A4%B4%E6%8F%92%E6%B3%95%E4%B8%8E%E5%B0%BE%E6%8F%92%E6%B3%95"><span class="post-toc-number">1.</span> <span class="post-toc-text">建立：头插法与尾插法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%B4%E6%8F%92%E6%B3%95%EF%BC%88%E9%80%86%E5%BA%8F%E5%BB%BA%E8%A1%A8%EF%BC%89"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">头插法（逆序建表）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B0%BE%E6%8F%92%E6%B3%95%EF%BC%88%E9%A1%BA%E5%BA%8F%E5%BB%BA%E8%A1%A8%EF%BC%89"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">尾插法（顺序建表）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9F%A5%E6%89%BE%EF%BC%9A%E6%8C%89%E5%BA%8F%E5%8F%B7%E4%B8%8E%E6%8C%89%E5%80%BC"><span class="post-toc-number">2.</span> <span class="post-toc-text">查找：按序号与按值</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%BA%8F%E5%8F%B7%E6%9F%A5%E6%89%BE"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">按序号查找</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%80%BC%E6%9F%A5%E6%89%BE"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">按值查找</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8F%92%E5%85%A5%E4%B8%8E%E5%88%A0%E9%99%A4"><span class="post-toc-number">3.</span> <span class="post-toc-text">插入与删除</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E4%BD%8D%E6%8F%92%E5%85%A5%EF%BC%88%E5%9C%A8%E7%AC%AC-i-%E4%B8%AA%E4%BD%8D%E7%BD%AE%E6%8F%92%E5%85%A5%E5%85%83%E7%B4%A0-e%EF%BC%89"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">按位插入（在第 i 个位置插入元素 e）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%BA%8F%E5%8F%B7%E5%88%A0%E9%99%A4%EF%BC%88%E5%88%A0%E9%99%A4%E7%AC%AC-i-%E4%B8%AA%E8%8A%82%E7%82%B9%EF%BC%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">按序号删除（删除第 i 个节点）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%80%BC%E5%88%A0%E9%99%A4%EF%BC%9A%E5%88%A0%E9%99%A4%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%80%BC%E4%B8%BA-key-%E7%9A%84%E8%8A%82%E7%82%B9"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">按值删除：删除第一个值为 key 的节点</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E5%80%BC%E5%88%A0%E9%99%A4%EF%BC%9A%E5%88%A0%E9%99%A4%E6%89%80%E6%9C%89%E5%80%BC%E4%B8%BA-key-%E7%9A%84%E8%8A%82%E7%82%B9"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">按值删除：删除所有值为 key 的节点</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BB%8F%E5%85%B8%E4%BE%8B%E9%A2%98%EF%BC%9A%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E8%8A%82%E7%82%B9"><span class="post-toc-number">4.</span> <span class="post-toc-text">经典例题：删除重复节点</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E6%88%98%E6%9C%AF%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E4%B8%89%E4%B8%AA%E6%8C%87%E9%92%88%EF%BC%9F"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">核心战术：为什么要用三个指针？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">算法实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B3%E9%94%AE%E7%BB%86%E8%8A%82"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">关键细节</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%93%8D%E4%BD%9C%E5%A4%8D%E6%9D%82%E5%BA%A6%E6%B1%87%E6%80%BB"><span class="post-toc-number">5.</span> <span class="post-toc-text">操作复杂度汇总</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">6.</span> <span class="post-toc-text">交互演示</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-单链表：建立、查找、插入删除与去重"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">单链表：建立、查找、插入删除与去重</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 09:05:00" datetime="2026-08-09T01:05:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>单链表通过”指针”将一个个零散的内存块（节点）串联起来。每个节点包含<strong>数据域 (data)</strong> 和<strong>指针域 (next)</strong>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">LNode</span> &#123;</span><br><span class="line">    ElemType data;        <span class="comment">// 数据域</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">LNode</span> *next;   <span class="comment">// 指针域，指向下一个节点</span></span><br><span class="line">&#125; LNode, *LinkList;       <span class="comment">// LNode 强调这是一个节点，LinkList 强调这是一个链表</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>头结点机制</strong>：头指针指向头结点；头结点不存放数据。</p>
+<ul>
+<li>有头结点：判空条件 <code>p-&gt;next == NULL</code></li>
+<li>无头结点：判空条件 <code>p == NULL</code></li>
+</ul>
+<blockquote>
+<p><strong>贯穿全文的两条铁律</strong>：<br>① <strong>钩链顺序</strong>永远是「先连后面大部队，再让前驱牵自己」——顺序反了会断链 + 内存泄漏。<br>② <strong>删除时前驱指针原地不动</strong>，只让探路指针接手 <code>p-&gt;next</code>，否则连续重复项会漏网。</p>
+</blockquote>
+<h2 id="建立：头插法与尾插法"><a href="#建立：头插法与尾插法" class="headerlink" title="建立：头插法与尾插法"></a>建立：头插法与尾插法</h2><h3 id="头插法（逆序建表）"><a href="#头插法（逆序建表）" class="headerlink" title="头插法（逆序建表）"></a>头插法（逆序建表）</h3><p>“后来居上”——每次新来的节点都抢占”第一名”的位置，紧紧贴在头结点后面。核心两步钩链：<strong>先连后面大部队，再让前驱牵自己</strong>（防止断链）。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 头插法创建单链表 (逆序建表)</span></span><br><span class="line"><span class="function">LinkList <span class="title">CreateList_Head</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 建立头结点</span></span><br><span class="line">    LinkList L = (LinkList)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LNode));</span><br><span class="line">    L-&gt;next = <span class="literal">NULL</span>; <span class="comment">// 致命防雷点：头结点必须置空，否则遍历会陷入野指针！</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 循环读取数据</span></span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;data);</span><br><span class="line">    <span class="keyword">while</span> (data != <span class="number">9999</span>) &#123; <span class="comment">// 假设 9999 为输入结束标志</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 申请新节点并赋值</span></span><br><span class="line">        LNode *s = (LNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LNode));</span><br><span class="line">        s-&gt;data = data;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3. 核心钩链：永远插在头结点之后</span></span><br><span class="line">        s-&gt;next = L-&gt;next;</span><br><span class="line">        L-&gt;next = s;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点</strong>：输入顺序与链表顺序相反（逆序建表），时间复杂度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<h3 id="尾插法（顺序建表）"><a href="#尾插法（顺序建表）" class="headerlink" title="尾插法（顺序建表）"></a>尾插法（顺序建表）</h3><p>“先来后到，排队上车”——核心在于维护一个<strong>尾指针 <code>r</code> (rear)</strong>，每来一个节点挂在最后面，然后尾指针后移。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 尾插法创建单链表 (正序建表)</span></span><br><span class="line"><span class="function">LinkList <span class="title">CreateList_Tail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 建立头结点</span></span><br><span class="line">    LinkList head = (LinkList)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LNode));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 极其关键：定义尾指针 r，初始状态下，头结点就是尾巴</span></span><br><span class="line">    LNode *s, *r = head;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 循环读取数据</span></span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;data);</span><br><span class="line">    <span class="keyword">while</span> (data != <span class="number">9999</span>) &#123; <span class="comment">// 假设 9999 为输入结束标志</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 申请新节点并赋值</span></span><br><span class="line">        s = (LNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LNode));</span><br><span class="line">        s-&gt;data = data;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 4. 核心钩链：永远插在尾指针 r 之后</span></span><br><span class="line">        r-&gt;next = s; <span class="comment">// 步骤一：把新节点 s 挂在当前尾巴 r 的后面</span></span><br><span class="line">        r = s;       <span class="comment">// 步骤二：尾指针 r 向后移动，重新指向新的尾巴 s</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 致命考点：循环结束后，必须亲手将尾节点的指针置空！</span></span><br><span class="line">    r-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>特点</strong>：输入顺序与链表顺序一致（顺序建表），时间复杂度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<h2 id="查找：按序号与按值"><a href="#查找：按序号与按值" class="headerlink" title="查找：按序号与按值"></a>查找：按序号与按值</h2><p>与顺序表（数组）<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 的随机访问不同，单链表的物理内存是分散的。要想找到第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 个元素，唯一办法就是”顺藤摸瓜”：从头结点开始，顺着 <code>next</code> 指针一节一节往后数。因此单链表只能<strong>顺序存取</strong>，查找复杂度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<p>遍历时指针移动的三种基本操作：</p>
+<ul>
+<li><strong><code>q = p</code>（共享同一节点）</strong>：没有产生新的物理节点，只是让 q 和 p 指向内存中的同一个实体：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-120108.png" alt="节点赋值 q = p" title="">
+                </div>
+                <div class="image-caption">节点赋值 q = p</div>
+            </figure>
+
+<ul>
+<li><strong><code>q = p-&gt;next</code>（探路）</strong>：q 越过 p，直接获取后继节点的地址，常用于遍历或删除前的”锁定”目标：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/image-20260610200251684.png" alt="赋值为直接后继 q = p->next" title="">
+                </div>
+                <div class="image-caption">赋值为直接后继 q = p->next</div>
+            </figure>
+
+<ul>
+<li><strong><code>p = p-&gt;next</code>（指针后移）</strong>：p 放弃当前节点，更新指向为下一个节点，是遍历链表的”履带行进”：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-120528.png" alt="指针向后移动 p = p->next" title="">
+                </div>
+                <div class="image-caption">指针向后移动 p = p->next</div>
+            </figure>
+
+<h3 id="按序号查找"><a href="#按序号查找" class="headerlink" title="按序号查找"></a>按序号查找</h3><p>返回带头结点的单链表 L 中第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 个位置的结点指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LNode* <span class="title">GetElem</span><span class="params">(LinkList L, <span class="type">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1. 极其关键的边界防雷</span></span><br><span class="line">    <span class="keyword">if</span> (i &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>; <span class="comment">// 位置不合法</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> L;    <span class="comment">// 如果 i=0，按惯例返回头结点（插入操作找前驱时非常有用）</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 初始化探路员 p 和计数器 j</span></span><br><span class="line">    <span class="type">int</span> j = <span class="number">1</span>;          <span class="comment">// j 表示当前 p 指向的是第几个真正的数据结点</span></span><br><span class="line">    LNode *p = L-&gt;next; <span class="comment">// p 初始指向第一个数据结点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 核心遍历：只要没找完，且前方还有路，就一直往下走</span></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span> &amp;&amp; j &lt; i) &#123;</span><br><span class="line">        p = p-&gt;next; <span class="comment">// 走到下一个结点</span></span><br><span class="line">        j++;         <span class="comment">// 计数器加 1</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 返回结果</span></span><br><span class="line">    <span class="comment">// 循环结束有两种情况：</span></span><br><span class="line">    <span class="comment">// 情况 A: j == i，找到了！此时 p 指向第 i 个结点。</span></span><br><span class="line">    <span class="comment">// 情况 B: p == NULL，还没数到 i 链表就断了，返回 NULL。</span></span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="按值查找"><a href="#按值查找" class="headerlink" title="按值查找"></a>按值查找</h3><p>查找值为 e 的第一个结点指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LNode* <span class="title">LocateElem</span><span class="params">(LinkList L, ElemType e)</span> </span>&#123;</span><br><span class="line">    LNode *p = L-&gt;next; <span class="comment">// p 初始指向第一个真实的数据结点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 只要 p 没走到尽头，且当前结点的值不是我们要找的 e，就继续往下走</span></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span> &amp;&amp; p-&gt;data != e) &#123;</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 循环结束时有两种可能：</span></span><br><span class="line">    <span class="comment">// 1. p 停在了 p-&gt;data == e 的结点上（找到了）</span></span><br><span class="line">    <span class="comment">// 2. p 走到了尽头变成了 NULL（没找到）</span></span><br><span class="line">    <span class="comment">// 无论哪种情况，直接返回 p 都是绝对正确的！</span></span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="插入与删除"><a href="#插入与删除" class="headerlink" title="插入与删除"></a>插入与删除</h2><p>单链表插入&#x2F;删除的核心都是”<strong>寻找前驱</strong>“。已知位置时插入&#x2F;删除仅需改指针，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；按位操作需先遍历找前驱，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<h3 id="按位插入（在第-i-个位置插入元素-e）"><a href="#按位插入（在第-i-个位置插入元素-e）" class="headerlink" title="按位插入（在第 i 个位置插入元素 e）"></a>按位插入（在第 i 个位置插入元素 e）</h3><p><strong>黄金法则</strong>：先连后面大部队，再让前驱牵自己——指针赋值顺序绝对不能反！</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-121132.png" alt="单链表插入节点" title="">
+                </div>
+                <div class="image-caption">单链表插入节点</div>
+            </figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">ListInsert</span><span class="params">(LinkList L, <span class="type">int</span> i, ElemType e)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (i &lt; <span class="number">1</span>) <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// 位置不合法</span></span><br><span class="line"></span><br><span class="line">    LNode *p = L; <span class="comment">// p 指向头结点</span></span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;    <span class="comment">// 当前 p 指向的是第几个节点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 寻找第 i-1 个节点（前驱节点）</span></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span> &amp;&amp; j &lt; i - <span class="number">1</span>) &#123;</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">        j++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (p == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// i 值超过了链表长度</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 创建新节点 s</span></span><br><span class="line">    LNode *s = (LNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LNode));</span><br><span class="line">    s-&gt;data = e;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3 &amp; 4. 核心钩链操作</span></span><br><span class="line">    s-&gt;next = p-&gt;next; <span class="comment">// 步骤一：新节点连上后面的大部队</span></span><br><span class="line">    p-&gt;next = s;       <span class="comment">// 步骤二：前驱节点连上新节点</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果先执行 <code>p-&gt;next = s;</code>，那么 p 原本后面的节点地址就彻底丢失了——内存泄漏 + 链表断裂！</p>
+</blockquote>
+<h3 id="按序号删除（删除第-i-个节点）"><a href="#按序号删除（删除第-i-个节点）" class="headerlink" title="按序号删除（删除第 i 个节点）"></a>按序号删除（删除第 i 个节点）</h3><p>删除解剖三步曲：<strong>长途跋涉找前驱 → 派驻哨兵防泄漏 → 逻辑跨越与物理超度</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第2章 线性表.assets/Pointer Relationship-2026-06-10-121132-17810938573874.png" alt="单链表删除节点" title="">
+                </div>
+                <div class="image-caption">单链表删除节点</div>
+            </figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">ListDelete_Index</span><span class="params">(LinkList L, <span class="type">int</span> i, ElemType *e)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">0</span>;</span><br><span class="line">    LNode *p = L; <span class="comment">// p 初始指向头结点（序号0）</span></span><br><span class="line">    LNode *q;     <span class="comment">// 用于锁定目标的辅助指针</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 寻找第 i-1 个节点（前驱）</span></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span> &amp;&amp; j &lt; i - <span class="number">1</span>) &#123;</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">        j++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 极其严格的边界防雷检查</span></span><br><span class="line">    <span class="comment">// p == NULL：i 远远超过了链表的长度</span></span><br><span class="line">    <span class="comment">// p-&gt;next == NULL：第 i-1 个节点后面没有第 i 个节点可删</span></span><br><span class="line">    <span class="comment">// j &gt; i - 1：拦截 i = 0 或负数不合法序号</span></span><br><span class="line">    <span class="keyword">if</span> (p == <span class="literal">NULL</span> || p-&gt;next == <span class="literal">NULL</span> || j &gt; i - <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// 删除失败，位置不合法</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 执行安全的删除手术</span></span><br><span class="line">    q = p-&gt;next;        <span class="comment">// 步骤一：哨兵 q 锁定第 i 个节点</span></span><br><span class="line">    p-&gt;next = q-&gt;next;  <span class="comment">// 步骤二：前驱 p 绕过 q，连向第 i+1 个节点</span></span><br><span class="line">    *e = q-&gt;data;       <span class="comment">// 步骤三：提取被删节点的数据交给 e</span></span><br><span class="line">    <span class="built_in">free</span>(q);            <span class="comment">// 步骤四：物理释放内存</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// 删除成功</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="按值删除：删除第一个值为-key-的节点"><a href="#按值删除：删除第一个值为-key-的节点" class="headerlink" title="按值删除：删除第一个值为 key 的节点"></a>按值删除：删除第一个值为 key 的节点</h3><p><strong>短路求值拦截崩溃</strong>：<code>while (q != NULL &amp;&amp; q-&gt;data != key)</code> 中，若链表中没有 key，q 最终变成 NULL，短路求值会直接跳出循环；顺序写反会因访问 <code>NULL-&gt;data</code> 崩溃！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeleteFirstKey</span><span class="params">(LinkList L, ElemType key)</span> </span>&#123;</span><br><span class="line">    LNode *p = L;           <span class="comment">// p 充当前驱指针，初始指向头结点</span></span><br><span class="line">    LNode *q = L-&gt;next;     <span class="comment">// q 充当探路指针，初始指向第一个有效节点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 探路员 q 在前搜索，前驱 p 在后紧跟</span></span><br><span class="line">    <span class="comment">// 安全铁律：必须先判断 q != NULL，再判断 q-&gt;data != key</span></span><br><span class="line">    <span class="keyword">while</span> (q != <span class="literal">NULL</span> &amp;&amp; q-&gt;data != key) &#123;</span><br><span class="line">        p = q;              <span class="comment">// p 挪到当前 q 的位置，成为新的前驱</span></span><br><span class="line">        q = q-&gt;next;        <span class="comment">// q 迈步走向下一个节点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 循环跳出后的边界检查</span></span><br><span class="line">    <span class="keyword">if</span> (q == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;       <span class="comment">// 查到了链表尽头也没找到 key</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 找到了！此时 q 停在第一个 key 节点上，p 稳站其前驱</span></span><br><span class="line">    p-&gt;next = q-&gt;next;      <span class="comment">// 核心断链：前驱 p 越过 q</span></span><br><span class="line">    <span class="built_in">free</span>(q);                <span class="comment">// 物理销毁</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;            <span class="comment">// 删除成功</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="按值删除：删除所有值为-key-的节点"><a href="#按值删除：删除所有值为-key-的节点" class="headerlink" title="按值删除：删除所有值为 key 的节点"></a>按值删除：删除所有值为 key 的节点</h3><p><strong>核心灵魂</strong>：删除发生时 <code>p</code> 绝对不能动！删除一个 key 后，<code>q</code> 接手 <code>p-&gt;next</code> 继续探测，防止连续相同 key 漏网。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">DeleteAllKeyNodes</span><span class="params">(LinkList L, ElemType key)</span> </span>&#123;</span><br><span class="line">    LNode *p = L;           <span class="comment">// p 充当前驱指针，初始指向头结点</span></span><br><span class="line">    LNode *q = L-&gt;next;     <span class="comment">// q 充当工作指针，用来遍历检查每个节点</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (q != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (q-&gt;data == key) &#123;</span><br><span class="line">            <span class="comment">// 【情况 A：命中目标，执行切除】</span></span><br><span class="line">            p-&gt;next = q-&gt;next; <span class="comment">// 前驱 p 越过 q</span></span><br><span class="line">            <span class="built_in">free</span>(q);           <span class="comment">// 物理释放</span></span><br><span class="line">            q = p-&gt;next;       <span class="comment">// 核心灵魂！q 重新指向新的后继，但 p 保持原地不动！</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 【情况 B：未命中目标，双指针安全同步后移】</span></span><br><span class="line">            p = q;             <span class="comment">// p 挪到当前 q 的位置</span></span><br><span class="line">            q = q-&gt;next;       <span class="comment">// q 迈步走向下一个节点</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="经典例题：删除重复节点"><a href="#经典例题：删除重复节点" class="headerlink" title="经典例题：删除重复节点"></a>经典例题：删除重复节点</h2><p>在无序链表中，重复的元素可能隔得很远（如 <code>10 -&gt; 20 -&gt; 30 -&gt; 10</code>）。彻底去重需要三个指针各司其职：”双层嵌套循环 + 三指针暴力扫荡”。</p>
+<h3 id="核心战术：为什么要用三个指针？"><a href="#核心战术：为什么要用三个指针？" class="headerlink" title="核心战术：为什么要用三个指针？"></a>核心战术：为什么要用三个指针？</h3><ol>
+<li><strong>锚点 <code>p</code>（基准）</strong>：站在原地的指挥官。如果 p 站在 10 上，它就向后下达命令：”后面所有人，谁也是 10，格杀勿论。”</li>
+<li><strong>巡视员 <code>ptr</code>（探路）</strong>：顺着链表往下挨个查身份证，看是否跟指挥官 p 的值一样。</li>
+<li><strong>行刑者 <code>q</code>（前驱）</strong>：ptr 的影子。删除操作永远离不开前驱节点，所以 q 必须死死跟在 ptr 后面，一旦 ptr 被核实为重复项，q 立即执行绕过和断链。</li>
+</ol>
+<h3 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 删除带头结点的单链表 L 中所有值重复的节点（保留首次出现的节点）</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">DeleteDuplicateNodes</span><span class="params">(LinkList L)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (L == <span class="literal">NULL</span> || L-&gt;next == <span class="literal">NULL</span>) <span class="keyword">return</span>; <span class="comment">// 空表或只有一个节点的表，直接返回</span></span><br><span class="line"></span><br><span class="line">    LNode *p = L-&gt;next; <span class="comment">// p 充当&quot;锚点(标尺)&quot;，逐个考察每一个节点</span></span><br><span class="line">    LNode *q, *ptr;     <span class="comment">// ptr 充当&quot;巡视员&quot;向后寻找重复值，q 是 ptr 的前驱</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (p != <span class="literal">NULL</span>) &#123; <span class="comment">// 外层循环：p 从头到尾锚定每一个基准节点</span></span><br><span class="line">        q = p;          <span class="comment">// 每次向后巡视前，q 初始指向当前的锚点 p</span></span><br><span class="line">        ptr = p-&gt;next;  <span class="comment">// ptr 从 p 的下一个节点开始向后巡视</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (ptr != <span class="literal">NULL</span>) &#123; <span class="comment">// 内层循环：ptr 检查 p 后面的所有节点</span></span><br><span class="line">            <span class="keyword">if</span> (ptr-&gt;data == p-&gt;data) &#123;</span><br><span class="line">                <span class="comment">// 【发现重复值！暗杀开始】</span></span><br><span class="line">                q-&gt;next = ptr-&gt;next; <span class="comment">// 前驱 q 绕过 ptr</span></span><br><span class="line">                <span class="built_in">free</span>(ptr);           <span class="comment">// 物理毁灭重复节点</span></span><br><span class="line">                ptr = q-&gt;next;       <span class="comment">// ptr 继续指向新的下一个节点（q 原地不动！）</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 【不是重复值，安全路过】</span></span><br><span class="line">                q = ptr;             <span class="comment">// q 跟上 ptr</span></span><br><span class="line">                ptr = ptr-&gt;next;     <span class="comment">// ptr 继续往下走</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 以 p 为基准的重复值已全部清洗干净</span></span><br><span class="line">        p = p-&gt;next; <span class="comment">// 锚点 p 往下挪一步，开始下一轮大清洗</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键细节"><a href="#关键细节" class="headerlink" title="关键细节"></a>关键细节</h3><ul>
+<li><strong>删除后 q 不动、ptr 接替</strong>：与”删所有 key”同理，<code>ptr = q-&gt;next</code> 保证连续重复也能被连续切除</li>
+<li><strong>保留首次出现</strong>：外层 p 逐个做基准，内层只删 p 之后的重复项，首次出现的节点天然保留</li>
+<li><strong>时间复杂度</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>（双层嵌套循环），空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></li>
+</ul>
+<h2 id="操作复杂度汇总"><a href="#操作复杂度汇总" class="headerlink" title="操作复杂度汇总"></a>操作复杂度汇总</h2><table>
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">时间复杂度</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">头插法建表</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">逆序建表</td>
+</tr>
+<tr>
+<td align="left">尾插法建表</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">顺序建表，结束须置 <code>r-&gt;next = NULL</code></td>
+</tr>
+<tr>
+<td align="left">按序号查找</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">只能顺序存取</td>
+</tr>
+<tr>
+<td align="left">按值查找</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">双条件短路</td>
+</tr>
+<tr>
+<td align="left">已知位置插入&#x2F;删除</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">仅改指针</td>
+</tr>
+<tr>
+<td align="left">按位插入&#x2F;删除</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">需先遍历找前驱</td>
+</tr>
+<tr>
+<td align="left">删除所有 key</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">一趟遍历</td>
+</tr>
+<tr>
+<td align="left">删除重复节点</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td>
+<td align="left">双层嵌套 + 三指针</td>
+</tr>
+</tbody></table>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><div class="algo-demo">
+  <iframe src="/blog/images/第2章 线性表.assets/linked-list.html" title="单链表基本操作" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">头插法建表</td>
+<td align="left"><strong>逆序建表</strong>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；头结点必须置 <code>L-&gt;next = NULL</code></td>
+</tr>
+<tr>
+<td align="left">尾插法建表</td>
+<td align="left"><strong>顺序建表</strong>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；结束必须<strong>置尾结点 next&#x3D;NULL</strong></td>
+</tr>
+<tr>
+<td align="left">钩链顺序</td>
+<td align="left">永远先 <code>s-&gt;next = p-&gt;next;</code> 再 <code>p-&gt;next = s;</code>——<strong>先连后面，再连前面</strong>，防止断链</td>
+</tr>
+<tr>
+<td align="left">按序号查找</td>
+<td align="left">从头结点出发顺藤摸瓜，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 返回头结点（找前驱用）</td>
+</tr>
+<tr>
+<td align="left">按值查找</td>
+<td align="left"><code>while (p != NULL &amp;&amp; p-&gt;data != e)</code> 双条件短路，直接返回 p</td>
+</tr>
+<tr>
+<td align="left">单链表插入</td>
+<td align="left"><strong>先连后面大部队，再让前驱牵自己</strong>（防断链）</td>
+</tr>
+<tr>
+<td align="left">单链表删除</td>
+<td align="left">派哨兵 <code>q</code> <strong>锁定目标</strong> → 绕过 → <code>free(q)</code></td>
+</tr>
+<tr>
+<td align="left">删除所有 key</td>
+<td align="left">删除后 <strong>p 原地不动</strong>，只让 q 接手 p-&gt;next 继续探路</td>
+</tr>
+<tr>
+<td align="left">删除重复结点</td>
+<td align="left"><strong>p&#x2F;ptr&#x2F;q 三指针</strong> + 双层嵌套循环，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>；p 锚点基准、ptr 巡视、q 当前驱</td>
+</tr>
+<tr>
+<td align="left">已知位置的插入&#x2F;删除</td>
+<td align="left">仅改指针，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；按位操作需找前驱，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T12:43:40.590Z" itemprop="dateUpdated">2026-09-02 20:43:40</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" rel="tag">线性表</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&title=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&title=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E5%BE%AA%E7%8E%AF%E9%93%BE%E8%A1%A8%E4%B8%8E%E5%8F%8C%E9%93%BE%E8%A1%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">循环链表与双链表</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E8%A1%A8%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">顺序表的基本操作</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&title=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&title=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《单链表：建立、查找、插入删除与去重》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%8D%95%E9%93%BE%E8%A1%A8%EF%BC%9A%E5%BB%BA%E7%AB%8B%E3%80%81%E6%9F%A5%E6%89%BE%E3%80%81%E6%8F%92%E5%85%A5%E5%88%A0%E9%99%A4%E4%B8%8E%E5%8E%BB%E9%87%8D/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

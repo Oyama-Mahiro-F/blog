@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="网络,408,应用层,DNS">
+    <meta name="keywords" content="408,网络,应用层,DNS">
     <meta name="description" content="DNS（Domain Name System，域名系统）是应用层最基础的协议之一，负责把便于人类记忆的域名（如 www.baidu.com）解析为 IP 地址（如 180.101.50.188），也可进行反向解析（IP → 域名，使用 in-addr.arpa 域）。域名与 IP 的映射分布存储在全世界多台域名服务器上，任何一台都不存储全部映射——因此 DNS 本质上是一个分布式数据库，采用 C&amp;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="DNS域名系统">
@@ -28,14 +28,16 @@
 <meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
 <meta property="og:description" content="DNS（Domain Name System，域名系统）是应用层最基础的协议之一，负责把便于人类记忆的域名（如 www.baidu.com）解析为 IP 地址（如 180.101.50.188），也可进行反向解析（IP → 域名，使用 in-addr.arpa 域）。域名与 IP 的映射分布存储在全世界多台域名服务器上，任何一台都不存储全部映射——因此 DNS 本质上是一个分布式数据库，采用 C&amp;">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%BA%94%E7%94%A8%E5%B1%82.assets/9e149f7a-776a-4f33-84b0-a4f3cf68241e.jpg">
 <meta property="article:published_time" content="2026-08-29T05:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-29T06:12:24.824Z">
+<meta property="article:modified_time" content="2026-09-02T12:45:29.589Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="DNS">
 <meta property="article:tag" content="应用层">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%BA%94%E7%94%A8%E5%B1%82.assets/9e149f7a-776a-4f33-84b0-a4f3cf68241e.jpg">
     
     <link rel="shortcut icon" href="/blog/img/avatar.jpg">
     <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
@@ -424,6 +426,14 @@
 </tr>
 </tbody></table>
 <p>实际使用中<strong>两者结合</strong>：主机对本地服务器用<strong>递归</strong>，本地服务器对根&#x2F;顶级&#x2F;权威用<strong>迭代</strong>（也可配置成全递归）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 应用层.assets/9e149f7a-776a-4f33-84b0-a4f3cf68241e.jpg" alt="递归查询与迭代查询过程对比" title="">
+                </div>
+                <div class="image-caption">递归查询与迭代查询过程对比</div>
+            </figure>
+
 <h3 id="域名解析全过程例题"><a href="#域名解析全过程例题" class="headerlink" title="域名解析全过程例题"></a>域名解析全过程例题</h3><p>主机要访问 <strong><a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a></strong>，本地缓存均未命中，走完整链路（所有查询&#x2F;应答均用 <strong>UDP 53</strong>）：</p>
 <table>
 <thead>
@@ -619,7 +629,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-29T06:12:24.824Z" itemprop="dateUpdated">2026-08-29 14:12:24</time>
+    最后更新时间：<time datetime="2026-09-02T12:45:29.589Z" itemprop="dateUpdated">2026-09-02 20:45:29</time>
 </span><br>
 
 

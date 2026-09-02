@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>队列：循环队列、链式队列与双端队列 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,队列">
+    <meta name="description" content="队列（Queue）是只允许在一端插入、另一端删除的线性表，遵循 FIFO（先进先出）。插入端叫队尾（rear），删除端叫队头（front）。 三种实现方式各有分工：    实现 存储 核心问题 判满    循环队列 顺序（数组） 假溢出 → 取模绕回解决 (rear+1) % MAXSIZE &#x3D;&#x3D; front   链式队列 链式（链表） 无假溢出，天然动态 不存在（除非内存耗尽）   双端队列 两">
+<meta property="og:type" content="article">
+<meta property="og:title" content="队列：循环队列、链式队列与双端队列">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="队列（Queue）是只允许在一端插入、另一端删除的线性表，遵循 FIFO（先进先出）。插入端叫队尾（rear），删除端叫队头（front）。 三种实现方式各有分工：    实现 存储 核心问题 判满    循环队列 顺序（数组） 假溢出 → 取模绕回解决 (rear+1) % MAXSIZE &#x3D;&#x3D; front   链式队列 链式（链表） 无假溢出，天然动态 不存在（除非内存耗尽）   双端队列 两">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T01:55:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T12:43:40.639Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="队列">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">队列：循环队列、链式队列与双端队列</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">队列：循环队列、链式队列与双端队列</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T01:55:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%EF%BC%88%E9%A1%BA%E5%BA%8F%E5%AE%9E%E7%8E%B0%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">循环队列（顺序实现）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E9%9A%BE%E7%82%B9%EF%BC%9A%E5%88%A4%E7%A9%BA-vs-%E5%88%A4%E6%BB%A1"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">核心难点：判空 vs 判满</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E6%93%8D%E4%BD%9C%EF%BC%88%E7%89%BA%E7%89%B2%E4%B8%80%E4%B8%AA%E5%8D%95%E5%85%83%E6%96%B9%E6%A1%88%EF%BC%8C408-%E9%BB%98%E8%AE%A4%EF%BC%89"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">核心操作（牺牲一个单元方案，408 默认）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#front-%E5%92%8C-rear-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E6%96%B9%E5%BC%8F%EF%BC%88%E8%80%83%E7%A0%94%E5%BF%85%E8%83%8C%EF%BC%89"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">front 和 rear 的初始化方式（考研必背）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97"><span class="post-toc-number">2.</span> <span class="post-toc-text">链式队列</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B8%A6%E5%A4%B4%E7%BB%93%E7%82%B9%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%EF%BC%88408-%E6%9C%80%E5%B8%B8%E8%80%83%EF%BC%8C%E9%80%BB%E8%BE%91%E7%BB%9F%E4%B8%80%EF%BC%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">带头结点链式队列（408 最常考，逻辑统一）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%8D%E5%B8%A6%E5%A4%B4%E7%BB%93%E7%82%B9%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">不带头结点链式队列</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%B8%A6%E5%A4%B4-vs-%E4%B8%8D%E5%B8%A6%E5%A4%B4%E5%AF%B9%E6%AF%94"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">带头 vs 不带头对比</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97-Deque"><span class="post-toc-number">3.</span> <span class="post-toc-text">双端队列 (Deque)</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9A%E4%B9%89"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%88%86%E7%B1%BB"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">分类</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%80%83%E7%A0%94%E6%A0%B8%E5%BF%83%E8%80%83%E7%82%B9%EF%BC%9A%E5%90%88%E6%B3%95%E5%BA%8F%E5%88%97%E5%88%A4%E6%96%AD"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">考研核心考点：合法序列判断</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%B8%89%E7%A7%8D%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E5%AF%B9%E6%AF%94"><span class="post-toc-number">4.</span> <span class="post-toc-text">三种队列实现对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A0%88-vs-%E9%98%9F%E5%88%97-%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93"><span class="post-toc-number">5.</span> <span class="post-toc-text">栈 vs 队列 对比总结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">6.</span> <span class="post-toc-text">交互演示</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-队列：循环队列、链式队列与双端队列"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">队列：循环队列、链式队列与双端队列</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 09:55:00" datetime="2026-08-09T01:55:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>队列（Queue）是<strong>只允许在一端插入、另一端删除</strong>的线性表，遵循 <strong>FIFO（先进先出）</strong>。插入端叫<strong>队尾（rear）</strong>，删除端叫<strong>队头（front）</strong>。</p>
+<p>三种实现方式各有分工：</p>
+<table>
+<thead>
+<tr>
+<th align="left">实现</th>
+<th align="left">存储</th>
+<th align="left">核心问题</th>
+<th align="left">判满</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">循环队列</td>
+<td align="left">顺序（数组）</td>
+<td align="left"><strong>假溢出</strong> → 取模绕回解决</td>
+<td align="left"><code>(rear+1) % MAXSIZE == front</code></td>
+</tr>
+<tr>
+<td align="left">链式队列</td>
+<td align="left">链式（链表）</td>
+<td align="left">无假溢出，天然动态</td>
+<td align="left">不存在（除非内存耗尽）</td>
+</tr>
+<tr>
+<td align="left">双端队列</td>
+<td align="left">两端都可入可出</td>
+<td align="left">合法输出序列判断</td>
+<td align="left">视受限类型而定</td>
+</tr>
+</tbody></table>
+<h2 id="循环队列（顺序实现）"><a href="#循环队列（顺序实现）" class="headerlink" title="循环队列（顺序实现）"></a>循环队列（顺序实现）</h2><p>顺序队列用数组存储，<code>rear</code> 只会单调递增，导致 <code>front</code> 之前腾出的空间无法被利用——这就是<strong>假溢出 (False Overflow)</strong> 问题。解决办法：<strong>循环队列</strong>——将数组逻辑上视为环形，当指针到达数组末尾时通过<strong>取模运算</strong>绕回头部：</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord text"><span class="mord">rear</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord">rear</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MAXSIZE</span></span></span></span></span></span><br><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">front</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord">front</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right:0.0556em;"></span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MAXSIZE</span></span></span></span></span></span></p>
+<h3 id="核心难点：判空-vs-判满"><a href="#核心难点：判空-vs-判满" class="headerlink" title="核心难点：判空 vs 判满"></a>核心难点：判空 vs 判满</h3><p>循环队列中 <code>front == rear</code> 既是空队条件也是满队条件，<strong>必须区分</strong>！三种经典方案：</p>
+<table>
+<thead>
+<tr>
+<th align="left">方案</th>
+<th align="left">判空条件</th>
+<th align="left">判满条件</th>
+<th align="left">元素个数</th>
+<th align="left">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>牺牲一个单元</strong></td>
+<td align="left"><code>Q.front == Q.rear</code></td>
+<td align="left"><code>(Q.rear + 1) % MAXSIZE == Q.front</code></td>
+<td align="left"><code>(Q.rear - Q.front + MAXSIZE) % MAXSIZE</code></td>
+<td align="left"><strong>408 最常考，默认方案</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>增设 size 变量</strong></td>
+<td align="left"><code>Q.size == 0</code></td>
+<td align="left"><code>Q.size == MAXSIZE</code></td>
+<td align="left"><code>Q.size</code></td>
+<td align="left">直观，需增加 size 字段</td>
+</tr>
+<tr>
+<td align="left"><strong>增设 tag 标记</strong></td>
+<td align="left"><code>front==rear &amp;&amp; tag==0</code></td>
+<td align="left"><code>front==rear &amp;&amp; tag==1</code></td>
+<td align="left">取决于 tag</td>
+<td align="left">tag&#x3D;0 上次出队，tag&#x3D;1 上次入队</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>考研默认采用<strong>牺牲一个单元</strong>方案。最大容纳元素数 &#x3D; <code>MAXSIZE - 1</code>。</p>
+</blockquote>
+<h3 id="核心操作（牺牲一个单元方案，408-默认）"><a href="#核心操作（牺牲一个单元方案，408-默认）" class="headerlink" title="核心操作（牺牲一个单元方案，408 默认）"></a>核心操作（牺牲一个单元方案，408 默认）</h3><p><code>front = rear = 0</code> 为初始值，<code>rear</code> 指向下一个空位。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAXSIZE 50          <span class="comment">// 定义队列中元素的最大个数</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="type">int</span> data[MAXSIZE];      <span class="comment">// 存放队列元素的静态数组</span></span><br><span class="line">    <span class="type">int</span> front;              <span class="comment">// 队头指针</span></span><br><span class="line">    <span class="type">int</span> rear;               <span class="comment">// 队尾指针</span></span><br><span class="line">&#125; SqQueue;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitQueue</span><span class="params">(SqQueue &amp;Q)</span> </span>&#123;</span><br><span class="line">    Q.front = Q.rear = <span class="number">0</span>;       <span class="comment">// 初始都指向下标 0，表示空队列</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueEmpty</span><span class="params">(SqQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Q.front == Q.rear;   <span class="comment">// 头尾指针重合即为空</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueFull</span><span class="params">(SqQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (Q.rear + <span class="number">1</span>) % MAXSIZE == Q.front;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">EnQueue</span><span class="params">(SqQueue &amp;Q, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ① 先判满</span></span><br><span class="line">    <span class="keyword">if</span> ((Q.rear + <span class="number">1</span>) % MAXSIZE == Q.front)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ② 存入 rear 指向的空位，③ rear 环形后移</span></span><br><span class="line">    Q.data[Q.rear] = x;</span><br><span class="line">    Q.rear = (Q.rear + <span class="number">1</span>) % MAXSIZE;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeQueue</span><span class="params">(SqQueue &amp;Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// ① 先判空</span></span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ② 取出队头元素，③ front 环形后移</span></span><br><span class="line">    x = Q.data[Q.front];</span><br><span class="line">    Q.front = (Q.front + <span class="number">1</span>) % MAXSIZE;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">QueueLength</span><span class="params">(SqQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (Q.rear - Q.front + MAXSIZE) % MAXSIZE;</span><br><span class="line">    <span class="comment">// +MAXSIZE 处理 rear 绕回后小于 front 的情况</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">GetHead</span><span class="params">(SqQueue Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;           <span class="comment">// 队空</span></span><br><span class="line">    x = Q.data[Q.front];        <span class="comment">// 直接读，不出队</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">核心步骤</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">入队</td>
+<td align="left"><code>Q.data[Q.rear] = x; Q.rear = (Q.rear + 1) % MAXSIZE</code>（先存再移），<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">出队</td>
+<td align="left"><code>x = Q.data[Q.front]; Q.front = (Q.front + 1) % MAXSIZE</code>（先取再移），<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">读队头</td>
+<td align="left"><code>x = Q.data[Q.front]</code>，<strong>不修改 front</strong>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody></table>
+<h3 id="front-和-rear-的初始化方式（考研必背）"><a href="#front-和-rear-的初始化方式（考研必背）" class="headerlink" title="front 和 rear 的初始化方式（考研必背）"></a>front 和 rear 的初始化方式（考研必背）</h3><table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="center">方式一 <code>f=r=0</code></th>
+<th align="center">方式二 <code>f=0,r=-1</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>rear 含义</strong></td>
+<td align="center">下一个空位</td>
+<td align="center">当前队尾元素</td>
+</tr>
+<tr>
+<td align="left"><strong>初始值</strong></td>
+<td align="center"><code>front = 0, rear = 0</code></td>
+<td align="center"><code>front = 0, rear = -1</code></td>
+</tr>
+<tr>
+<td align="left"><strong>判空</strong></td>
+<td align="center"><code>Q.front == Q.rear</code></td>
+<td align="center"><code>Q.front &gt; Q.rear</code></td>
+</tr>
+<tr>
+<td align="left"><strong>判满（牺牲单元）</strong></td>
+<td align="center"><code>(Q.rear + 1) % MAXSIZE == Q.front</code></td>
+<td align="center">不适用于循环队列</td>
+</tr>
+<tr>
+<td align="left"><strong>入队</strong></td>
+<td align="center">先存再移 rear</td>
+<td align="center">先移 rear 再存</td>
+</tr>
+<tr>
+<td align="left"><strong>出队</strong></td>
+<td align="center">先取再移 front</td>
+<td align="center">先取再移 front</td>
+</tr>
+<tr>
+<td align="left"><strong>元素个数</strong></td>
+<td align="center"><code>(Q.rear - Q.front + MAXSIZE) % MAXSIZE</code></td>
+<td align="center"><code>Q.rear - Q.front + 1</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考研提醒</strong>：408 默认采用<strong>方式一</strong>（<code>front = rear = 0</code>，rear 指向队尾下一位置，牺牲一个单元判满）。审题时先看清初始化值，再推导对应代码！</p>
+</blockquote>
+<h2 id="链式队列"><a href="#链式队列" class="headerlink" title="链式队列"></a>链式队列</h2><p>链式队列（Linked Queue）用链表实现队列，<code>front</code> 指向队头、<code>rear</code> 指向队尾。链式队列<strong>不会满</strong>、不需要循环——天然没有假溢出问题。</p>
+<blockquote>
+<p><strong>核心设计原则</strong>：入队在 <code>rear</code> 端（尾插法）、出队在 <code>front</code> 端（头删法），均为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>。队头必须设在链表头部（否则出队找前驱退化为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>）。</p>
+</blockquote>
+<h3 id="结构定义"><a href="#结构定义" class="headerlink" title="结构定义"></a>结构定义</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 队列的结点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">QNode</span> &#123;</span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">QNode</span> *next;</span><br><span class="line">&#125; QNode;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 链式队列（包含头尾指针）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">    QNode *front;    <span class="comment">// 指向队头（带头结点时指向头结点）</span></span><br><span class="line">    QNode *rear;     <span class="comment">// 指向队尾结点</span></span><br><span class="line">&#125; LinkQueue;</span><br></pre></td></tr></table></figure>
+
+<h3 id="带头结点链式队列（408-最常考，逻辑统一）"><a href="#带头结点链式队列（408-最常考，逻辑统一）" class="headerlink" title="带头结点链式队列（408 最常考，逻辑统一）"></a>带头结点链式队列（408 最常考，逻辑统一）</h3><p>头结点不存数据，<code>front</code> 永远指向头结点，第一个数据结点由 <code>front-&gt;next</code> 访问。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitQueue</span><span class="params">(LinkQueue &amp;Q)</span> </span>&#123;</span><br><span class="line">    Q.front = Q.rear = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    Q.front-&gt;next = <span class="literal">NULL</span>;       <span class="comment">// 头结点的 next 置空</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueEmpty</span><span class="params">(LinkQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Q.front == Q.rear;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">EnQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    QNode *s = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    s-&gt;data = x;</span><br><span class="line">    s-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    Q.rear-&gt;next = s;       <span class="comment">// ① 将新结点链到队尾之后</span></span><br><span class="line">    Q.rear = s;             <span class="comment">// ② rear 后移到新结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;            <span class="comment">// 链队不会满</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)          <span class="comment">// 判空</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    QNode *p = Q.front-&gt;next;       <span class="comment">// ① 锁定队头结点（头结点之后第一个）</span></span><br><span class="line">    x = p-&gt;data;                    <span class="comment">// ② 取出数据</span></span><br><span class="line">    Q.front-&gt;next = p-&gt;next;        <span class="comment">// ③ 头结点跳过 p</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.rear == p)                <span class="comment">// ★ 若出队的恰好是最后一个元素</span></span><br><span class="line">        Q.rear = Q.front;           <span class="comment">//    rear 指回头结点，恢复空队</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);                        <span class="comment">// ④ 释放结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">GetHead</span><span class="params">(LinkQueue Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == Q.rear)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;               <span class="comment">// 队空</span></span><br><span class="line">    x = Q.front-&gt;next-&gt;data;        <span class="comment">// 头结点之后第一个结点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始状态</td>
+<td align="left"><code>front</code> 和 <code>rear</code> 都指向新创建的头结点</td>
+</tr>
+<tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == Q.rear</code>（头尾指针重合）</td>
+</tr>
+<tr>
+<td align="left">入队核心</td>
+<td align="left"><code>Q.rear-&gt;next = s; Q.rear = s</code>（尾插法），空队插入无需特殊处理</td>
+</tr>
+<tr>
+<td align="left">出队核心</td>
+<td align="left"><code>p = front-&gt;next; front-&gt;next = p-&gt;next; free(p)</code></td>
+</tr>
+<tr>
+<td align="left">关键边界</td>
+<td align="left">出队最后一个元素后 <strong><code>Q.rear = Q.front</code></strong> 恢复空队</td>
+</tr>
+</tbody></table>
+<h3 id="不带头结点链式队列"><a href="#不带头结点链式队列" class="headerlink" title="不带头结点链式队列"></a>不带头结点链式队列</h3><p><code>front</code> 直接指向第一个数据结点。空队列时 <code>front = rear = NULL</code>。<strong>入队第一个元素需要特殊处理</strong>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">InitQueue</span><span class="params">(LinkQueue &amp;Q)</span> </span>&#123;</span><br><span class="line">    Q.front = Q.rear = <span class="literal">NULL</span>;    <span class="comment">// 两个指针都置空</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">QueueEmpty</span><span class="params">(LinkQueue Q)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Q.front == <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">EnQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">    QNode *s = (QNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(QNode));</span><br><span class="line">    s-&gt;data = x;</span><br><span class="line">    s-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.front == <span class="literal">NULL</span>) &#123;      <span class="comment">// ★ 空队列：首尾都指向新结点</span></span><br><span class="line">        Q.front = Q.rear = s;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;                    <span class="comment">// 非空队列：正常尾插</span></span><br><span class="line">        Q.rear-&gt;next = s;</span><br><span class="line">        Q.rear = s;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;                <span class="comment">// 链队不会满</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">DeQueue</span><span class="params">(LinkQueue &amp;Q, <span class="type">int</span> &amp;x)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Q.front == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;           <span class="comment">// 队空</span></span><br><span class="line"></span><br><span class="line">    QNode *p = Q.front;         <span class="comment">// ① 锁定队头</span></span><br><span class="line">    x = p-&gt;data;</span><br><span class="line">    Q.front = p-&gt;next;          <span class="comment">// ② front 后移</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (Q.rear == p)            <span class="comment">// ★ 出队最后一个元素</span></span><br><span class="line">        Q.rear = <span class="literal">NULL</span>;          <span class="comment">//    rear 也要置空</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == NULL</code></td>
+</tr>
+<tr>
+<td align="left">空队入队</td>
+<td align="left"><code>Q.front = Q.rear = s</code>（两指针都指向新结点）</td>
+</tr>
+<tr>
+<td align="left">出队最后元素</td>
+<td align="left">额外判断 <code>Q.rear == p</code> → <strong><code>Q.rear = NULL</code></strong></td>
+</tr>
+</tbody></table>
+<h3 id="带头-vs-不带头对比"><a href="#带头-vs-不带头对比" class="headerlink" title="带头 vs 不带头对比"></a>带头 vs 不带头对比</h3><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">带头结点</th>
+<th align="left">不带头结点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始值</td>
+<td align="left"><code>front = rear = malloc(…); front-&gt;next = NULL</code></td>
+<td align="left"><code>front = rear = NULL</code></td>
+</tr>
+<tr>
+<td align="left">判空</td>
+<td align="left"><code>Q.front == Q.rear</code></td>
+<td align="left"><code>Q.front == NULL</code></td>
+</tr>
+<tr>
+<td align="left">入队（空队）</td>
+<td align="left">无需特殊处理</td>
+<td align="left"><code>Q.front = Q.rear = s</code>（特殊处理）</td>
+</tr>
+<tr>
+<td align="left">出队（最后）</td>
+<td align="left"><code>Q.rear = Q.front</code></td>
+<td align="left"><code>Q.rear = NULL</code></td>
+</tr>
+<tr>
+<td align="left"><strong>考研倾向</strong></td>
+<td align="left"><strong>★ 408 最常考，逻辑统一</strong></td>
+<td align="left">需要多种边界判断</td>
+</tr>
+</tbody></table>
+<h2 id="双端队列-Deque"><a href="#双端队列-Deque" class="headerlink" title="双端队列 (Deque)"></a>双端队列 (Deque)</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>允许在<strong>两端</strong>都进行插入和删除操作。是栈和队列的泛化形式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dequeue &lt;- +---+---+---+---+---+ &lt;- enqueue</span><br><span class="line">enqueue -&gt; |   |   |   |   |   | -&gt; dequeue</span><br><span class="line">           +---+---+---+---+---+</span><br><span class="line">             left                right</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>图：双端队列示意——左端与右端均可进行入队与出队操作。</p>
+</blockquote>
+<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="center">左端入</th>
+<th align="center">左端出</th>
+<th align="center">右端入</th>
+<th align="center">右端出</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>双端队列</strong></td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="left">全功能，两端均可入可出</td>
+</tr>
+<tr>
+<td align="left"><strong>输入受限双端队列</strong></td>
+<td align="center">✗</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="left">只能从一端插入，两端均可删除</td>
+</tr>
+<tr>
+<td align="left"><strong>输出受限双端队列</strong></td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✗</td>
+<td align="left">两端均可插入，只能从一端删除</td>
+</tr>
+</tbody></table>
+<h3 id="考研核心考点：合法序列判断"><a href="#考研核心考点：合法序列判断" class="headerlink" title="考研核心考点：合法序列判断"></a>考研核心考点：合法序列判断</h3><blockquote>
+<p>给定输入序列 <code>1, 2, 3, 4</code>，判断某个输出序列能否由特定类型的双端队列生成。</p>
+</blockquote>
+<ul>
+<li><strong>解题关键</strong>：模拟过程，逐个检查目标序列中的元素是否可以从左端或右端合法进入&#x2F;离开。</li>
+<li><strong>常见结论</strong>：<ul>
+<li>普通队列（一端入一端出）：输出序列唯一（即输入序列本身）。</li>
+<li>双端队列：合法序列数量远超普通队列，但少于栈（卡特兰数）。</li>
+<li>具体题目中需画图模拟，不可记结论。</li>
+</ul>
+</li>
+</ul>
+<h2 id="三种队列实现对比"><a href="#三种队列实现对比" class="headerlink" title="三种队列实现对比"></a>三种队列实现对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">循环队列（顺序）</th>
+<th align="left">链式队列</th>
+<th align="left">双端队列</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">核心问题</td>
+<td align="left">假溢出 → 循环队列解决</td>
+<td align="left">无（天然动态）</td>
+<td align="left">合法输出序列判断</td>
+</tr>
+<tr>
+<td align="left">容量</td>
+<td align="left">有限（<code>MAXSIZE - 1</code>）</td>
+<td align="left">无限（仅受物理内存）</td>
+<td align="left">视实现而定</td>
+</tr>
+<tr>
+<td align="left">判满</td>
+<td align="left"><code>(rear+1) % MAXSIZE == front</code></td>
+<td align="left">不存在</td>
+<td align="left">视实现而定</td>
+</tr>
+<tr>
+<td align="left">入队&#x2F;出队</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>（偶尔扩容 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>）</td>
+<td align="left">严格 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">两端均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">元素个数可预估</td>
+<td align="left">元素个数未知、波动极大</td>
+<td align="left">需要两端操作（如滑动窗口）</td>
+</tr>
+</tbody></table>
+<h2 id="栈-vs-队列-对比总结"><a href="#栈-vs-队列-对比总结" class="headerlink" title="栈 vs 队列 对比总结"></a>栈 vs 队列 对比总结</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">栈 (Stack)</th>
+<th align="left">队列 (Queue)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">原则</td>
+<td align="left">LIFO 后进先出</td>
+<td align="left">FIFO 先进先出</td>
+</tr>
+<tr>
+<td align="left">插入端</td>
+<td align="left">栈顶 (<code>top</code>)</td>
+<td align="left">队尾 (<code>rear</code>)</td>
+</tr>
+<tr>
+<td align="left">删除端</td>
+<td align="left">栈顶 (<code>top</code>)</td>
+<td align="left">队头 (<code>front</code>)</td>
+</tr>
+<tr>
+<td align="left">顺序实现核心问题</td>
+<td align="left">上溢出 (overflow)</td>
+<td align="left"><strong>假溢出</strong> (false overflow)</td>
+</tr>
+<tr>
+<td align="left">顺序实现解决方案</td>
+<td align="left">动态扩容 &#x2F; 共享栈</td>
+<td align="left"><strong>循环队列</strong>（取模运算）</td>
+</tr>
+<tr>
+<td align="left">链式实现判空</td>
+<td align="left"><code>S.top-&gt;next == NULL</code></td>
+<td align="left"><code>Q.front == Q.rear</code></td>
+</tr>
+<tr>
+<td align="left">双端版本</td>
+<td align="left">—</td>
+<td align="left">双端队列 (Deque)</td>
+</tr>
+<tr>
+<td align="left">经典应用</td>
+<td align="left">括号匹配、表达式求值、DFS、函数调用</td>
+<td align="left">层次遍历、BFS、进程调度</td>
+</tr>
+</tbody></table>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><div class="algo-demo">
+  <iframe src="/blog/images/第4章 队列.assets/circular-queue.html" title="循环队列" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">顺序队列致命问题</td>
+<td align="left"><strong>假溢出</strong>：rear 单调递增，front 前方已空位置无法再利用</td>
+</tr>
+<tr>
+<td align="left">循环队列核心思想</td>
+<td align="left"><strong>取模运算</strong>绕回</td>
+</tr>
+<tr>
+<td align="left">判空（默认方案）</td>
+<td align="left"><code>front == rear</code></td>
+</tr>
+<tr>
+<td align="left">判满（牺牲单元）</td>
+<td align="left"><strong>(rear+1) % MAXSIZE &#x3D;&#x3D; front</strong>，最大容量 MAXSIZE-1</td>
+</tr>
+<tr>
+<td align="left">元素个数公式</td>
+<td align="left"><strong>(rear - front + MAXSIZE) % MAXSIZE</strong></td>
+</tr>
+<tr>
+<td align="left">size 变量方案</td>
+<td align="left">判空 size&#x3D;&#x3D;0、判满 size&#x3D;&#x3D;MAXSIZE</td>
+</tr>
+<tr>
+<td align="left">tag 标记方案</td>
+<td align="left"><strong>tag&#x3D;0 上次出队、tag&#x3D;1 上次入队</strong></td>
+</tr>
+<tr>
+<td align="left">链队设计原则</td>
+<td align="left">入队<strong>尾插法</strong>、出队<strong>头删法</strong>均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；<strong>队头必须设在链表头部</strong></td>
+</tr>
+<tr>
+<td align="left">带头结点链队</td>
+<td align="left">判空 front&#x3D;&#x3D;rear；<strong>出队最后元素令 rear&#x3D;front</strong> 恢复空队</td>
+</tr>
+<tr>
+<td align="left">不带头结点链队</td>
+<td align="left">判空 front&#x3D;&#x3D;NULL；<strong>空队入队 front&#x3D;rear&#x3D;s</strong> 特殊处理</td>
+</tr>
+<tr>
+<td align="left">不带头结点出队最后元素</td>
+<td align="left">判断 rear&#x3D;&#x3D;p 后令 <strong>rear&#x3D;NULL</strong></td>
+</tr>
+<tr>
+<td align="left">双端队列分类</td>
+<td align="left">输入受限（只能一端插、两端删）&#x2F; 输出受限（两端插、只能一端删）</td>
+</tr>
+<tr>
+<td align="left">双端队列合法序列</td>
+<td align="left">画图模拟，<strong>不可死记结论</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T12:43:40.639Z" itemprop="dateUpdated">2026-09-02 20:43:40</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E9%98%9F%E5%88%97/" rel="tag">队列</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&title=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&title=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86%E4%B8%8E%E7%BA%BF%E7%B4%A2%E5%8C%96/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">二叉树的遍历与线索化</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E6%A0%88%E7%9A%84%E5%BA%94%E7%94%A8%EF%BC%9A%E6%8B%AC%E5%8F%B7%E5%8C%B9%E9%85%8D%E3%80%81%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC%E4%B8%8E%E8%BF%9B%E5%88%B6%E8%BD%AC%E6%8D%A2/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">栈的应用：括号匹配、表达式求值与进制转换</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&title=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&title=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《队列：循环队列、链式队列与双端队列》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E9%98%9F%E5%88%97%EF%BC%9A%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97%E3%80%81%E9%93%BE%E5%BC%8F%E9%98%9F%E5%88%97%E4%B8%8E%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
