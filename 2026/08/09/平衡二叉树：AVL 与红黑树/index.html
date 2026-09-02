@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>平衡二叉树：AVL 与红黑树 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,树,查找">
+    <meta name="description" content="二叉排序树（BST）的查找效率取决于树高：理想情况 h&#x3D;⌈log2​(n+1)⌉，查找 O(logn)；但若按有序序列插入，BST 会退化为单链表（h&#x3D;n），查找降为 O(n)。平衡就是给 BST 加约束、把树高强行压回 O(logn) 的手段，主流有两条路线：    路线 平衡手段 树高上界 代价    AVL 树 严格：任意结点左右子树高度差 ≤1 ≈1.44log2​(n+1) 树最矮、查找">
+<meta property="og:type" content="article">
+<meta property="og:title" content="平衡二叉树：AVL 与红黑树">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="二叉排序树（BST）的查找效率取决于树高：理想情况 h&#x3D;⌈log2​(n+1)⌉，查找 O(logn)；但若按有序序列插入，BST 会退化为单链表（h&#x3D;n），查找降为 O(n)。平衡就是给 BST 加约束、把树高强行压回 O(logn) 的手段，主流有两条路线：    路线 平衡手段 树高上界 代价    AVL 树 严格：任意结点左右子树高度差 ≤1 ≈1.44log2​(n+1) 树最矮、查找">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/1a4e065af5d8655cf23bbb45657b3be5.webp">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/251730074203156.jpg">
+<meta property="article:published_time" content="2026-08-09T02:35:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T14:34:35.915Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="查找">
+<meta property="article:tag" content="树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/1a4e065af5d8655cf23bbb45657b3be5.webp">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">平衡二叉树：AVL 与红黑树</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">平衡二叉树：AVL 与红黑树</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T02:35:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E5%B9%B3%E8%A1%A1%E5%9B%A0%E5%AD%90"><span class="post-toc-number">1.</span> <span class="post-toc-text">AVL 树的定义与平衡因子</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">结点类型定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9A%E4%B9%89%E4%B8%8E%E6%9C%AF%E8%AF%AD"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">定义与术语</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%B3%E8%A1%A1%E5%8C%96%E6%97%8B%E8%BD%AC%EF%BC%9A%E5%9B%9B%E7%A7%8D%E5%A4%B1%E8%A1%A1%E7%B1%BB%E5%9E%8B"><span class="post-toc-number">2.</span> <span class="post-toc-text">平衡化旋转：四种失衡类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E6%8F%92%E5%85%A5%E8%B0%83%E6%95%B4"><span class="post-toc-number">3.</span> <span class="post-toc-text">AVL 树的插入调整</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%EF%BC%9A%E4%BE%9D%E6%AC%A1%E6%8F%92%E5%85%A5-16-3-7-11-9-26-18-14-15-%E6%9E%84%E9%80%A0-AVL-%E6%A0%91"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">例题：依次插入 16, 3, 7, 11, 9, 26, 18, 14, 15 构造 AVL 树</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E6%9F%A5%E6%89%BE"><span class="post-toc-number">4.</span> <span class="post-toc-text">AVL 树的查找</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-%E6%A0%91%E7%9A%84%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">5.</span> <span class="post-toc-text">AVL 树的性能分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E5%AE%9A%E4%B9%89%EF%BC%9A5-%E6%9D%A1%E6%80%A7%E8%B4%A8%EF%BC%88%E5%BF%85%E8%83%8C%EF%BC%89"><span class="post-toc-number">6.</span> <span class="post-toc-text">红黑树的定义：5 条性质（必背）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%AE%9A%E4%B9%89-1"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">结点类型定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%A7%E8%B4%A8"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">核心性质</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E6%8F%92%E5%85%A5%E8%B0%83%E6%95%B4%EF%BC%88%E4%B8%89%E7%B1%BB%E6%83%85%E5%86%B5%EF%BC%89"><span class="post-toc-number">7.</span> <span class="post-toc-text">红黑树的插入调整（三类情况）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91%E7%9A%84%E5%88%A0%E9%99%A4%E8%B0%83%E6%95%B4"><span class="post-toc-number">8.</span> <span class="post-toc-text">红黑树的删除调整</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#AVL-vs-%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="post-toc-number">9.</span> <span class="post-toc-text">AVL vs 红黑树</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">10.</span> <span class="post-toc-text">交互演示</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#AVL-%E6%97%8B%E8%BD%AC"><span class="post-toc-number">10.1.</span> <span class="post-toc-text">AVL 旋转</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="post-toc-number">10.2.</span> <span class="post-toc-text">红黑树</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">11.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-平衡二叉树：AVL 与红黑树"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">平衡二叉树：AVL 与红黑树</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 10:35:00" datetime="2026-08-09T02:35:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>二叉排序树（BST）的查找效率取决于树高：理想情况 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)⌉</span></span></span></span>，查找 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>；但若按有序序列插入，BST 会<strong>退化为单链表</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>），查找降为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。<strong>平衡</strong>就是给 BST 加约束、把树高强行压回 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 的手段，主流有两条路线：</p>
+<table>
+<thead>
+<tr>
+<th align="left">路线</th>
+<th align="left">平衡手段</th>
+<th align="left">树高上界</th>
+<th align="left">代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>AVL 树</strong></td>
+<td align="left">严格：任意结点左右子树高度差 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">树最矮、查找最快，但<strong>插入&#x2F;删除旋转频繁</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>红黑树</strong></td>
+<td align="left">宽松：红&#x2F;黑着色的 5 条规则</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left">树略高，但<strong>插入最多 2 次、删除最多 3 次旋转</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：两者<strong>查找、插入、删除都是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></strong>，区别不在数量级而在<strong>常数与旋转次数</strong>——查询为主选 AVL，增删频繁选红黑树。</p>
+</blockquote>
+<h2 id="AVL-树的定义与平衡因子"><a href="#AVL-树的定义与平衡因子" class="headerlink" title="AVL 树的定义与平衡因子"></a>AVL 树的定义与平衡因子</h2><p>AVL 在 BST 基础上添加<strong>平衡约束</strong>：任意结点左右子树高度差不超过 1，从而将树高控制在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。</p>
+<h3 id="结点类型定义"><a href="#结点类型定义" class="headerlink" title="结点类型定义"></a>结点类型定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">BSTNode</span> &#123;</span></span><br><span class="line">    KeyType key;                             <span class="comment">// 关键字域</span></span><br><span class="line">    <span class="type">int</span> Bfactor;                             <span class="comment">// 平衡因子域（hL - hR）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">BSTNode</span> *<span class="title">Lchild</span>, *<span class="title">Rchild</span>;</span>         <span class="comment">// 左、右孩子指针</span></span><br><span class="line">&#125; BSTNode;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>AVL 结点比普通 BST 结点多一个 <code>Bfactor</code> 字段。</p>
+</blockquote>
+<h3 id="定义与术语"><a href="#定义与术语" class="headerlink" title="定义与术语"></a>定义与术语</h3><table>
+<thead>
+<tr>
+<th align="left">术语</th>
+<th align="left">定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>平衡因子（BF）</strong></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0077em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，取值为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">AVL 条件</td>
+<td align="left">所有结点的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">最小不平衡子树</td>
+<td align="left">离插入点最近的、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的结点为根的子树</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：平衡因子是<strong>左高减右高</strong>，且<strong>空树高度记为 0</strong>。<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 就已失衡，不存在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> 的情形——因为每插入一个结点最多让某条路径长 1，发现失衡时立即调整。</p>
+</blockquote>
+<h2 id="平衡化旋转：四种失衡类型"><a href="#平衡化旋转：四种失衡类型" class="headerlink" title="平衡化旋转：四种失衡类型"></a>平衡化旋转：四种失衡类型</h2><p>插入&#x2F;删除后：</p>
+<ol>
+<li>沿路径向上更新平衡因子</li>
+<li>找到第一个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的结点 A（最小不平衡子树的根）<ul>
+<li>删除时：站在失衡节点 A 上，看左右子树谁更高——<strong>较高的孩子就是 B</strong>；再看 B 的左右子树谁更高——<strong>较高的孩子就是 C</strong>；若 B 两个孩子一样高，选<strong>和 A 到 B 同方向的那个</strong></li>
+</ul>
+</li>
+<li>根据插入位置选择旋转类型（LL &#x2F; RR &#x2F; LR &#x2F; RL）</li>
+<li>旋转后 A 的 BF 恢复为 -1&#x2F;0&#x2F;1，整个树恢复平衡</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">情况</th>
+<th align="left">插入位置</th>
+<th align="left">旋转方式</th>
+<th align="left">核心操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>LL</strong></td>
+<td align="left">左子树的左子树</td>
+<td align="left">右单旋</td>
+<td align="left">树的左边太重，顺时针向右”掰”</td>
+</tr>
+<tr>
+<td align="left"><strong>RR</strong></td>
+<td align="left">右子树的右子树</td>
+<td align="left">左单旋</td>
+<td align="left">树的右边太重，逆时针向左”掰”</td>
+</tr>
+<tr>
+<td align="left"><strong>LR</strong></td>
+<td align="left">左子树的右子树</td>
+<td align="left">先左后右双旋</td>
+<td align="left">先左旋捋直（变 LL 型），再整体右旋</td>
+</tr>
+<tr>
+<td align="left"><strong>RL</strong></td>
+<td align="left">右子树的左子树</td>
+<td align="left">先右后左双旋</td>
+<td align="left">先右旋捋直（变 RR 型），再整体左旋</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>旋转法则</strong>：被挤掉的节点，直接挂到降级节点的空缺位置上。</p>
+</blockquote>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第7章 查找.assets/1a4e065af5d8655cf23bbb45657b3be5.webp" alt="AVL 四种旋转图解" title="">
+                </div>
+                <div class="image-caption">AVL 四种旋转图解</div>
+            </figure>
+
+<p><strong>LL 旋转图解（右单旋）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">旋转前（A的BF=2）:          右旋 →          旋转后（B的BF=0）:</span><br><span class="line">        A                                      B</span><br><span class="line">       / \                                    / \</span><br><span class="line">      B   Ar                                Bl   A</span><br><span class="line">     / \                                        / \</span><br><span class="line">    Bl  Br                                     Br  Ar</span><br><span class="line">插入Bl导致失衡</span><br></pre></td></tr></table></figure>
+
+<p><strong>LR 旋转图解（先左后右双旋）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">旋转前（A的BF=2）:    先左旋B子树（→LL）    再右旋A:</span><br><span class="line">        A                  A                    C</span><br><span class="line">       / \                / \                  / \</span><br><span class="line">      B   Ar      →      C   Ar       →      B   A</span><br><span class="line">     / \                / \                  / \ / \</span><br><span class="line">    Bl  C              B  Cr               Bl Cl Cr Ar</span><br><span class="line">       / \            / \</span><br><span class="line">      Cl  Cr        Bl  Cl(?)</span><br><span class="line">插入C的子树导致失衡</span><br></pre></td></tr></table></figure>
+
+<p><strong>RR 与 RL 完全对称</strong>：把上面两张图左右镜像即可——RR 做左单旋（B 上升为根，A 变成 B 的左孩子，B 原左子树 Bl 挂到 A 的右侧）；RL 先对 B 做右旋变成 RR 型，再对 A 做左旋。</p>
+<blockquote>
+<p><strong>考点</strong>：判断旋转类型只看<strong>从失衡结点 A 出发到新插入结点的前两步方向</strong>（左左 &#x2F; 右右 &#x2F; 左右 &#x2F; 右左），<strong>不看后面的路径</strong>。</p>
+</blockquote>
+<h2 id="AVL-树的插入调整"><a href="#AVL-树的插入调整" class="headerlink" title="AVL 树的插入调整"></a>AVL 树的插入调整</h2><p>插入一个结点的完整流程：</p>
+<ol>
+<li><strong>按 BST 规则插入</strong>新结点（小于走左、大于走右，插为叶子）</li>
+<li><strong>回溯更新</strong> BF：从新结点的父结点开始向根方向更新</li>
+<li><strong>首个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的结点即 A</strong>，取 A 到插入点方向的前两步定型（LL&#x2F;RR&#x2F;LR&#x2F;RL）</li>
+<li><strong>旋转一次</strong>（单旋算 1 次、双旋算 1 次调整）后子树高度恢复为插入前的高度，<strong>上层 BF 自动全部复原</strong>——所以<strong>插入最多只需一次旋转</strong></li>
+</ol>
+<h3 id="例题：依次插入-16-3-7-11-9-26-18-14-15-构造-AVL-树"><a href="#例题：依次插入-16-3-7-11-9-26-18-14-15-构造-AVL-树" class="headerlink" title="例题：依次插入 16, 3, 7, 11, 9, 26, 18, 14, 15 构造 AVL 树"></a>例题：依次插入 16, 3, 7, 11, 9, 26, 18, 14, 15 构造 AVL 树</h3><p><strong>题目</strong>：从空树开始依次插入上述 9 个关键字，写出每步是否失衡、失衡类型与旋转结果，并画出最终 AVL 树。</p>
+<p><strong>过程</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="center">插入</th>
+<th align="center">失衡结点 A</th>
+<th align="center">类型</th>
+<th align="left">旋转后子树</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="center">16</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="left">根为 16</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="center">3</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="left">16 的左孩子为 3，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">16</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="center">7</td>
+<td align="center">16</td>
+<td align="center"><strong>LR</strong></td>
+<td align="left">先左旋 3、再右旋 16 → 7(3, 16)</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="center">11</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="left">挂到 16 的左孩子，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">7</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="center">9</td>
+<td align="center">16</td>
+<td align="center"><strong>LL</strong></td>
+<td align="left">右旋 16 → 11(9, 16)，树成 7(3, 11(9,16))</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="center">26</td>
+<td align="center">7</td>
+<td align="center"><strong>RR</strong></td>
+<td align="left">左旋 7 → 11(7(3,9), 16(-,26))</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="center">18</td>
+<td align="center">16</td>
+<td align="center"><strong>RL</strong></td>
+<td align="left">先右旋 26、再左旋 16 → 18(16, 26)</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="center">14</td>
+<td align="center">—</td>
+<td align="center">—</td>
+<td align="left">挂到 16 的左孩子，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">16</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="center">15</td>
+<td align="center">16</td>
+<td align="center"><strong>LR</strong></td>
+<td align="left">先左旋 14、再右旋 16 → 15(14, 16)</td>
+</tr>
+</tbody></table>
+<p><strong>结果</strong>：最终 AVL 树（高度 4）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">      11</span><br><span class="line">    /    \</span><br><span class="line">  7        18</span><br><span class="line"> / \      /   \</span><br><span class="line">3   9   15     26</span><br><span class="line">        / \</span><br><span class="line">      14   16</span><br></pre></td></tr></table></figure>
+
+<p><strong>验算</strong>：逐结点核对平衡因子——<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">3</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">9</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">14</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">16</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">26</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">7</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">15</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">18</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord">11</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span>，全部落在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span> ✓。高度校验：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">9</span></span></span></span> 时上界 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">4.78</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> ✓。中序遍历得 3, 7, 9, 11, 14, 15, 16, 18, 26，严格递增，仍是 BST ✓。</p>
+<blockquote>
+<p><strong>考点</strong>：本题一次覆盖了 <strong>LR、LL、RR、RL 四种旋转</strong>，是 408 最典型的手工构造题型。每次插入后<strong>只调整最小不平衡子树</strong>，其余部分不动。</p>
+</blockquote>
+<h2 id="AVL-树的查找"><a href="#AVL-树的查找" class="headerlink" title="AVL 树的查找"></a>AVL 树的查找</h2><p>查找过程与普通 BST <strong>完全一样</strong>——从根开始，小于走左、大于走右。</p>
+<ul>
+<li>和给定关键字比较的次数<strong>不超过树的深度</strong></li>
+<li>含有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个结点的 AVL 树最大深度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></li>
+<li>平均查找长度和 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span> 一个数量级</li>
+</ul>
+<h2 id="AVL-树的性能分析"><a href="#AVL-树的性能分析" class="headerlink" title="AVL 树的性能分析"></a>AVL 树的性能分析</h2><table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">含有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个结点的 AVL 最大高度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">查找</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">插入</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>（最多一次旋转，发生在最小不平衡子树根处）</td>
+</tr>
+<tr>
+<td align="left">删除</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>（可能多次旋转直到根）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>408 高频考点</strong>：给一组关键字，按顺序插入画出 AVL 构造过程（标注每次旋转的 BF 变化）。</p>
+</blockquote>
+<blockquote>
+<p><strong>易错点</strong>：<strong>插入最多 1 次旋转，删除可能 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 次</strong>——删除会让子树变矮，矮 1 层会把失衡向上传播，必须一路回溯到根。</p>
+</blockquote>
+<h2 id="红黑树的定义：5-条性质（必背）"><a href="#红黑树的定义：5-条性质（必背）" class="headerlink" title="红黑树的定义：5 条性质（必背）"></a>红黑树的定义：5 条性质（必背）</h2><p>AVL 通过严格的平衡因子（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用<strong>较为宽松的平衡条件</strong>——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。</p>
+<p><strong>红黑树</strong>是一棵满足以下 5 条性质的二叉排序树（BST）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">#</th>
+<th align="left">性质</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">①</td>
+<td align="left">每个结点是<strong>红色</strong>或<strong>黑色</strong></td>
+<td align="left">结点增加一个 <code>color</code> 字段</td>
+</tr>
+<tr>
+<td align="left">②</td>
+<td align="left"><strong>根结点</strong>是黑色</td>
+<td align="left">根必须为黑</td>
+</tr>
+<tr>
+<td align="left">③</td>
+<td align="left">每个**叶结点（NIL）**是黑色</td>
+<td align="left">外部结点统一视为黑</td>
+</tr>
+<tr>
+<td align="left">④</td>
+<td align="left"><strong>红结点不相邻</strong></td>
+<td align="left">红色结点的父结点和子结点必须是黑色</td>
+</tr>
+<tr>
+<td align="left">⑤</td>
+<td align="left">对每个结点，从该结点到其所有后代叶结点的路径上，<strong>黑色结点数相同</strong></td>
+<td align="left">即黑高（Black-Height）相等</td>
+</tr>
+</tbody></table>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第7章 查找.assets/251730074203156.jpg" alt="红黑树示例" title="">
+                </div>
+                <div class="image-caption">红黑树示例</div>
+            </figure>
+
+<h3 id="结点类型定义-1"><a href="#结点类型定义-1" class="headerlink" title="结点类型定义"></a>结点类型定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span> RED, BLACK &#125; ColorType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> &#123;</span></span><br><span class="line">    KeyType key;                             <span class="comment">// 关键字</span></span><br><span class="line">    ColorType color;                         <span class="comment">// 结点颜色</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> *<span class="title">Lchild</span>, *<span class="title">Rchild</span>;</span>          <span class="comment">// 左、右孩子</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">RBNode</span> *<span class="title">parent</span>;</span>                   <span class="comment">// 父结点（旋转时需回溯）</span></span><br><span class="line">&#125; RBNode;</span><br></pre></td></tr></table></figure>
+
+<h3 id="核心性质"><a href="#核心性质" class="headerlink" title="核心性质"></a>核心性质</h3><table>
+<thead>
+<tr>
+<th align="left">性质</th>
+<th align="left">结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">从根到叶的最长路径 ≤ 2 × 最短路径</td>
+<td align="left">最长：红黑交替；最短：全黑</td>
+</tr>
+<tr>
+<td align="left">含有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个结点的红黑树最大高度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">查找时间复杂度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">插入&#x2F;删除</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>，旋转次数<strong>少于 AVL</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：性质 ④ + ⑤ 联合起来才是”宽松平衡”的本质——黑高处处相等保证了下界，红结点不相邻保证红结点最多占一半路径长度，于是最长路径不超过最短路径的 2 倍，树高被限制在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 内。</p>
+</blockquote>
+<h2 id="红黑树的插入调整（三类情况）"><a href="#红黑树的插入调整（三类情况）" class="headerlink" title="红黑树的插入调整（三类情况）"></a>红黑树的插入调整（三类情况）</h2><p>插入新结点初始为<strong>红色</strong>（染红只可能破坏性质 ④，染黑必然破坏性质 ⑤，代价更大），然后根据父结点颜色判断是否需要调整：</p>
+<table>
+<thead>
+<tr>
+<th align="left">情况</th>
+<th align="left">父结点</th>
+<th align="left">叔结点</th>
+<th align="left">处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">①</td>
+<td align="left">黑色</td>
+<td align="left">—</td>
+<td align="left">不需调整（直接插入红色结点即可）</td>
+</tr>
+<tr>
+<td align="left">②</td>
+<td align="left">红色</td>
+<td align="left"><strong>红色</strong></td>
+<td align="left">父和叔变黑，祖父变红 → 向上递归检查</td>
+</tr>
+<tr>
+<td align="left">③</td>
+<td align="left">红色</td>
+<td align="left"><strong>黑色</strong></td>
+<td align="left">旋转 + 变色（LL&#x2F;RR&#x2F;LR&#x2F;RL，类 AVL）</td>
+</tr>
+</tbody></table>
+<p>情况 ③ 的旋转与 AVL 同名同形，只是旋转后要补一次变色：</p>
+<table>
+<thead>
+<tr>
+<th align="left">子情况</th>
+<th align="left">新结点位置</th>
+<th align="left">操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">LL</td>
+<td align="left">祖父的左孩子的左孩子</td>
+<td align="left">右单旋祖父 + 父变黑、祖父变红</td>
+</tr>
+<tr>
+<td align="left">RR</td>
+<td align="left">祖父的右孩子的右孩子</td>
+<td align="left">左单旋祖父 + 父变黑、祖父变红</td>
+</tr>
+<tr>
+<td align="left">LR</td>
+<td align="left">祖父的左孩子的右孩子</td>
+<td align="left">先左旋父转成 LL，再按 LL 处理</td>
+</tr>
+<tr>
+<td align="left">RL</td>
+<td align="left">祖父的右孩子的左孩子</td>
+<td align="left">先右旋父转成 RR，再按 RR 处理</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>插入最多进行 <strong>2 次旋转</strong>（情况 ③ 的双旋场景）即可恢复所有性质。</p>
+</blockquote>
+<blockquote>
+<p><strong>易错点</strong>：情况 ② 只变色不旋转，但把”红红冲突”向上推给了祖父，可能一路递归到根；<strong>根被染红时直接改回黑色</strong>，此时整棵树黑高 +1（唯一会让黑高变化的操作）。</p>
+</blockquote>
+<h2 id="红黑树的删除调整"><a href="#红黑树的删除调整" class="headerlink" title="红黑树的删除调整"></a>红黑树的删除调整</h2><p>删除先按 BST 规则化简：若待删结点有两个孩子，用其**中序后继（或前驱）**的值顶替，转为删除那个后继结点——后继最多只有一个孩子。于是只需处理”待删结点孩子数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>”：</p>
+<table>
+<thead>
+<tr>
+<th align="left">情形</th>
+<th align="left">处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">待删结点是<strong>红色</strong></td>
+<td align="left">直接删除，不影响任何性质（红结点不参与黑高）</td>
+</tr>
+<tr>
+<td align="left">待删结点是黑色、但有<strong>一个红孩子</strong></td>
+<td align="left">红孩子顶替其位置并<strong>染黑</strong>，黑高复原</td>
+</tr>
+<tr>
+<td align="left">待删结点是<strong>黑叶子</strong></td>
+<td align="left">删除后该路径黑高少 1，形成”<strong>双黑</strong>“缺陷，需按<strong>兄弟结点</strong>颜色分情况调整</td>
+</tr>
+</tbody></table>
+<p>“双黑”的调整（设缺陷结点为 x、其兄弟为 w）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">兄弟 w 的情况</th>
+<th align="left">操作</th>
+<th align="left">是否结束</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">w 为<strong>红</strong></td>
+<td align="left">旋转父结点 + w 与父换色 → 转化为下面两种情况</td>
+<td align="left">否（转情况）</td>
+</tr>
+<tr>
+<td align="left">w 为<strong>黑</strong>，且有<strong>红侄子</strong></td>
+<td align="left">旋转 + 变色（同 LL&#x2F;RR&#x2F;LR&#x2F;RL 型），黑高立即补回</td>
+<td align="left"><strong>是</strong></td>
+</tr>
+<tr>
+<td align="left">w 为<strong>黑</strong>，两侄子<strong>全黑</strong></td>
+<td align="left">w 染红，把一层黑”上交”父结点：父为红则父染黑结束；父为黑则缺陷上移到父，向上递归</td>
+<td align="left">父红则是，父黑则继续</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>删除最多进行 <strong>3 次旋转</strong>；变色可能沿路径向上传播 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 次，但<strong>旋转次数是常数</strong>——这正是红黑树优于 AVL 的地方。</p>
+</blockquote>
+<blockquote>
+<p><strong>考点</strong>：408 一般只考”删除红结点无影响、删除黑结点破坏黑高、删除最多 3 次旋转”这几个结论，不要求手工推完整删除过程；<strong>先记结论，再理解双黑上移</strong>。</p>
+</blockquote>
+<h2 id="AVL-vs-红黑树"><a href="#AVL-vs-红黑树" class="headerlink" title="AVL vs 红黑树"></a>AVL vs 红黑树</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">AVL</th>
+<th align="left">红黑树</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">平衡条件</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>（严格）</td>
+<td align="left">5 条颜色规则（宽松）</td>
+</tr>
+<tr>
+<td align="left">结点额外字段</td>
+<td align="left"><code>Bfactor</code>（整型）</td>
+<td align="left"><code>color</code>（1 bit）+ <code>parent</code></td>
+</tr>
+<tr>
+<td align="left">树高</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span>（更低）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span>（略高）</td>
+</tr>
+<tr>
+<td align="left">查找</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>（更快，树更矮）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">插入旋转</td>
+<td align="left">最多 <strong>1</strong> 次</td>
+<td align="left">最多 <strong>2</strong> 次</td>
+</tr>
+<tr>
+<td align="left">删除旋转</td>
+<td align="left">最多 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 次</td>
+<td align="left">最多 <strong>3</strong> 次</td>
+</tr>
+<tr>
+<td align="left">平衡维护开销</td>
+<td align="left">大（删除要一路回溯旋转）</td>
+<td align="left">小（旋转次数常数，主要靠变色）</td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">查询频繁</td>
+<td align="left"><strong>插入&#x2F;删除频繁</strong>（如 STL <code>map</code>、Java <code>TreeMap</code>）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>408 考点</strong>：红黑树 5 条性质记忆、根必黑&#x2F;红不相邻&#x2F;黑高等高、与 AVL 的适用场景对比。</p>
+</blockquote>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><h3 id="AVL-旋转"><a href="#AVL-旋转" class="headerlink" title="AVL 旋转"></a>AVL 旋转</h3><div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/avl.html" title="AVL 旋转" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/red-black-tree.html" title="红黑树" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">为什么要平衡</td>
+<td align="left">BST 按有序序列插入会退化成单链表，查找 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">AVL 平衡因子</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">L</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0077em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">−</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 处为最小不平衡子树根</td>
+</tr>
+<tr>
+<td align="left">AVL 四旋转</td>
+<td align="left"><strong>LL 右单旋、RR 左单旋、LR 先左后右、RL 先右后左</strong></td>
+</tr>
+<tr>
+<td align="left">旋转定型</td>
+<td align="left">只看 A 到插入点的<strong>前两步方向</strong>，与后续路径无关</td>
+</tr>
+<tr>
+<td align="left">AVL 旋转法则</td>
+<td align="left">被挤掉的结点挂到<strong>降级结点的空缺位置</strong></td>
+</tr>
+<tr>
+<td align="left">AVL 复杂度</td>
+<td align="left">高 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1.44</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；插入最多 <strong>1</strong> 次旋转、删除可 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 次</td>
+</tr>
+<tr>
+<td align="left">红黑树 5 性质</td>
+<td align="left">红黑着色、<strong>根黑</strong>、NIL 黑、<strong>红不相邻</strong>、<strong>黑高相等</strong></td>
+</tr>
+<tr>
+<td align="left">红黑树高度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；最长路径 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord">×</span></span></span></span> 最短路径；查找 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">红黑树插入</td>
+<td align="left">新结点<strong>染红</strong>；父黑免调；父叔红→变色上递；父红叔黑→旋转+变色；最多 <strong>2</strong> 次旋转</td>
+</tr>
+<tr>
+<td align="left">红黑树删除</td>
+<td align="left">删红无影响；删黑破坏黑高→”双黑”按兄弟颜色调整；最多 <strong>3</strong> 次旋转</td>
+</tr>
+<tr>
+<td align="left">红黑树 vs AVL</td>
+<td align="left">AVL 树矮查询快；红黑树插入&#x2F;删除旋转少，适用 STL <code>map</code>&#x2F;<code>TreeMap</code></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T14:34:35.915Z" itemprop="dateUpdated">2026-09-02 22:34:35</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&title=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&title=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">图的存储结构：邻接矩阵与邻接表</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91BST/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">二叉排序树（BST）的查找、插入与删除</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&title=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&title=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《平衡二叉树：AVL 与红黑树》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

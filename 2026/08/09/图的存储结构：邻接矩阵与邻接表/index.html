@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>图的存储结构：邻接矩阵与邻接表 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,图">
+    <meta name="description" content="图的存储要兼顾”判边快慢”与”空间开销”两件事。两种方式各有侧重：邻接矩阵用二维数组、$O(n^2)$ 空间换 $O(1)$ 判边，适合稠密图；邻接表用 $n$ 条单链表、$O(n+e)$ 空间换遍历邻接点的便利，适合稀疏图。    存储结构 空间 判边 适合    邻接矩阵 $O(n^2)$ $O(1)$ 稠密图   邻接表 $O(n+e)$ $O(\deg)$（遍历链表） 稀疏图   邻接矩阵">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图的存储结构：邻接矩阵与邻接表">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="图的存储要兼顾”判边快慢”与”空间开销”两件事。两种方式各有侧重：邻接矩阵用二维数组、$O(n^2)$ 空间换 $O(1)$ 判边，适合稠密图；邻接表用 $n$ 条单链表、$O(n+e)$ 空间换遍历邻接点的便利，适合稀疏图。    存储结构 空间 判边 适合    邻接矩阵 $O(n^2)$ $O(1)$ 稠密图   邻接表 $O(n+e)$ $O(\deg)$（遍历链表） 稀疏图   邻接矩阵">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/image-20260701235458869.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/image-20260702002303966.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_wac7k4wac7k4wac7.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_wl1g8owl1g8owl1g.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/image-20260702182320406.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/1062579-20171110191910653-695287627.png">
+<meta property="article:published_time" content="2026-08-09T02:40:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T14:31:36.708Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/image-20260701235458869.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">图的存储结构：邻接矩阵与邻接表</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">图的存储结构：邻接矩阵与邻接表</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T02:40:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5"><span class="post-toc-number">1.</span> <span class="post-toc-text">邻接矩阵</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B3%E9%94%AE%E6%80%A7%E8%B4%A8"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">关键性质</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">基本操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">复杂度</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%82%BB%E6%8E%A5%E8%A1%A8"><span class="post-toc-number">2.</span> <span class="post-toc-text">邻接表</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E7%82%B9%E7%BB%93%E6%9E%84"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">结点结构</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89-1"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">结构定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C-1"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">基本操作</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5-vs-%E9%82%BB%E6%8E%A5%E8%A1%A8"><span class="post-toc-number">3.</span> <span class="post-toc-text">邻接矩阵 vs 邻接表</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%BC%95%E5%AD%90%EF%BC%9A%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8"><span class="post-toc-number">4.</span> <span class="post-toc-text">引子：十字链表与邻接多重表</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">5.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-图的存储结构：邻接矩阵与邻接表"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">图的存储结构：邻接矩阵与邻接表</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 10:40:00" datetime="2026-08-09T02:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>图的存储要兼顾”判边快慢”与”空间开销”两件事。两种方式各有侧重：<strong>邻接矩阵</strong>用二维数组、<code>$O(n^2)$</code> 空间换 <code>$O(1)$</code> 判边，适合<strong>稠密图</strong>；<strong>邻接表</strong>用 <code>$n$</code> 条单链表、<code>$O(n+e)$</code> 空间换遍历邻接点的便利，适合<strong>稀疏图</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">存储结构</th>
+<th align="left">空间</th>
+<th align="left">判边</th>
+<th align="left">适合</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">邻接矩阵</td>
+<td align="left"><code>$O(n^2)$</code></td>
+<td align="left"><code>$O(1)$</code></td>
+<td align="left">稠密图</td>
+</tr>
+<tr>
+<td align="left">邻接表</td>
+<td align="left"><code>$O(n+e)$</code></td>
+<td align="left"><code>$O(\deg)$</code>（遍历链表）</td>
+<td align="left">稀疏图</td>
+</tr>
+</tbody></table>
+<h2 id="邻接矩阵"><a href="#邻接矩阵" class="headerlink" title="邻接矩阵"></a>邻接矩阵</h2><p>用二维数组 <code>adj[][]</code> 存储顶点间的边&#x2F;弧关系，物理上是一张 <code>$n\times n$</code> 的表。</p>
+<h3 id="结构定义"><a href="#结构定义" class="headerlink" title="结构定义"></a>结构定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_VEX 100              <span class="comment">// 最大顶点数</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INF 0x3f3f3f3f           <span class="comment">// 表示无边的&quot;无穷大&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span>                   <span class="comment">// 图的种类标志</span></span><br><span class="line">    DG,      <span class="comment">// 有向图</span></span><br><span class="line">    AG,      <span class="comment">// 无向图</span></span><br><span class="line">    WDG,     <span class="comment">// 有向网（带权）</span></span><br><span class="line">    WAG      <span class="comment">// 无向网（带权）</span></span><br><span class="line">&#125; GraphKind;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    GraphKind kind;              <span class="comment">// 图的种类标志</span></span><br><span class="line">    <span class="type">int</span> vexnum, arcnum;          <span class="comment">// 当前顶点数和弧/边数</span></span><br><span class="line">    <span class="type">int</span> vexs[MAX_VEX];           <span class="comment">// 顶点向量（存储顶点数据）</span></span><br><span class="line">    <span class="type">int</span> adj[MAX_VEX][MAX_VEX];   <span class="comment">// 邻接矩阵（存储边/弧信息）</span></span><br><span class="line">&#125; MGraph;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关键性质"><a href="#关键性质" class="headerlink" title="关键性质"></a>关键性质</h3><table>
+<thead>
+<tr>
+<th align="left">图类型</th>
+<th align="left">元素值</th>
+<th align="left">特殊性质</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">无向图</td>
+<td align="left">1 有边 &#x2F; 0 无边</td>
+<td align="left"><strong>对称矩阵</strong>；第 <code>$i$</code> 行非零数 &#x3D; 度；1 的总数 &#x3D; <code>$2e$</code></td>
+</tr>
+<tr>
+<td align="left">无向带权图</td>
+<td align="left"><code>$w_&#123;ij&#125;$</code> &#x2F; <code>$\infty$</code></td>
+<td align="left">对称矩阵；第 <code>$i$</code> 行非 <code>$\infty$</code> 数 &#x3D; 度；非 <code>$\infty$</code> 总数 &#x3D; <code>$2e$</code></td>
+</tr>
+<tr>
+<td align="left">有向带权图</td>
+<td align="left"><code>$w_&#123;ij&#125;$</code> &#x2F; <code>$\infty$</code></td>
+<td align="left">一般<strong>不对称</strong>；第 <code>$i$</code> 行非 <code>$\infty$</code> 数 &#x3D; 出度；第 <code>$j$</code> 列非 <code>$\infty$</code> 数 &#x3D; 入度</td>
+</tr>
+</tbody></table>
+<p><strong>无向图邻接矩阵示例</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/image-20260701235458869.png" alt="无向图邻接矩阵" title="">
+                </div>
+                <div class="image-caption">无向图邻接矩阵</div>
+            </figure>
+
+<p><strong>无向带权图（网）示例</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/image-20260702002303966.png" alt="无向带权图邻接矩阵" title="">
+                </div>
+                <div class="image-caption">无向带权图邻接矩阵</div>
+            </figure>
+
+<h3 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h3><p><strong>插入顶点</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">InsertVex</span><span class="params">(MGraph &amp;G, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k = G.vexnum;                  <span class="comment">// 新顶点的下标</span></span><br><span class="line">    G.vexs[G.vexnum++] = v;            <span class="comment">// 存入顶点向量，vexnum 自增</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (G.kind == DG || G.kind == AG) <span class="comment">// 不带权：邻接矩阵新行列置 0</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; j++)</span><br><span class="line">            G.adj[j][k] = G.adj[k][j] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span>                               <span class="comment">// 带权：置 ∞</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; j++)</span><br><span class="line">            G.adj[j][k] = G.adj[k][j] = INF;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> k;                          <span class="comment">// 返回新顶点的下标</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>插入边&#x2F;弧</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="type">int</span> vex1, vex2;                        <span class="comment">// 弧的两个端点</span></span><br><span class="line">    <span class="type">int</span> ArcVal;                            <span class="comment">// 权值</span></span><br><span class="line">&#125; ArcType;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">InsertArc</span><span class="params">(MGraph *G, ArcType *arc)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k = <span class="built_in">LocateVex</span>(*G, arc-&gt;vex1);      <span class="comment">// 定位弧尾下标</span></span><br><span class="line">    <span class="type">int</span> j = <span class="built_in">LocateVex</span>(*G, arc-&gt;vex2);      <span class="comment">// 定位弧头下标</span></span><br><span class="line">    <span class="keyword">if</span> (G-&gt;kind == DG || G-&gt;kind == WDG) &#123;  <span class="comment">// 有向图 / 有向网</span></span><br><span class="line">        G-&gt;adj[k][j] = arc-&gt;ArcVal;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;                                <span class="comment">// 无向图 / 无向网：对称赋值</span></span><br><span class="line">        G-&gt;adj[k][j] = arc-&gt;ArcVal;</span><br><span class="line">        G-&gt;adj[j][k] = arc-&gt;ArcVal;</span><br><span class="line">    &#125;</span><br><span class="line">    G-&gt;arcnum++;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;                               <span class="comment">// 返回 1 表示插入成功</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>求第一个&#x2F;下一个邻接点</strong>（遍历邻接点的标准接口）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">FirstAdjVex</span><span class="params">(MGraph G, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="built_in">LocateVex</span>(G, v);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; j++)</span><br><span class="line">        <span class="keyword">if</span> (G.adj[i][j] != <span class="number">0</span> &amp;&amp; G.adj[i][j] != INF)</span><br><span class="line">            <span class="keyword">return</span> j;                <span class="comment">// 返回第一个有边/弧的邻接点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;                       <span class="comment">// 没有邻接点</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">NextAdjVex</span><span class="params">(MGraph G, <span class="type">int</span> v, <span class="type">int</span> w)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="built_in">LocateVex</span>(G, v);</span><br><span class="line">    <span class="type">int</span> j = <span class="built_in">LocateVex</span>(G, w);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> k = j + <span class="number">1</span>; k &lt; G.vexnum; k++)</span><br><span class="line">        <span class="keyword">if</span> (G.adj[i][k] != <span class="number">0</span> &amp;&amp; G.adj[i][k] != INF)</span><br><span class="line">            <span class="keyword">return</span> k;                <span class="comment">// 返回 w 之后第一个有边的邻接点</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>删除顶点</strong>（压缩行、列）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">DeleteVex</span><span class="params">(MGraph &amp;G, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k = <span class="built_in">LocateVex</span>(G, v);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = k; i &lt; G.vexnum - <span class="number">1</span>; i++)    <span class="comment">// ① 压缩 vexs[]</span></span><br><span class="line">        G.vexs[i] = G.vexs[i + <span class="number">1</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = k; i &lt; G.vexnum - <span class="number">1</span>; i++)    <span class="comment">// ② 上移行</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; j++)</span><br><span class="line">            G.adj[i][j] = G.adj[i + <span class="number">1</span>][j];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = k; j &lt; G.vexnum - <span class="number">1</span>; j++)    <span class="comment">// ③ 左移列</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; G.vexnum; i++)</span><br><span class="line">            G.adj[i][j] = G.adj[i][j + <span class="number">1</span>];</span><br><span class="line">    G.vexnum--;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>删除边&#x2F;弧</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">DeleteArc</span><span class="params">(MGraph &amp;G, <span class="type">int</span> u, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="built_in">LocateVex</span>(G, u);</span><br><span class="line">    <span class="type">int</span> j = <span class="built_in">LocateVex</span>(G, v);</span><br><span class="line">    G.adj[i][j] = (G.kind &gt;= <span class="number">2</span>) ? INF : <span class="number">0</span>;  <span class="comment">// 有权图置 INF，无权置 0</span></span><br><span class="line">    <span class="keyword">if</span> (G.kind == AG || G.kind == WAG)</span><br><span class="line">        G.adj[j][i] = (G.kind &gt;= <span class="number">2</span>) ? INF : <span class="number">0</span>;</span><br><span class="line">    G.arcnum--;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h3><table>
+<thead>
+<tr>
+<th align="left">操作</th>
+<th align="left">时间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">插入顶点</td>
+<td align="left"><code>$O(n)$</code>（初始化新行列）</td>
+</tr>
+<tr>
+<td align="left">插入&#x2F;删除边</td>
+<td align="left"><code>$O(n)$</code>（LocateVex 遍历）&#x2F; <code>$O(1)$</code>（已知下标）</td>
+</tr>
+<tr>
+<td align="left">求第一个&#x2F;下一个邻接点</td>
+<td align="left"><code>$O(n)$</code>（遍历一行）</td>
+</tr>
+<tr>
+<td align="left">删除顶点</td>
+<td align="left"><code>$O(n^2)$</code>（双重循环压缩行列）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：邻接矩阵的”第 <code>$i$</code> 行非零数 &#x3D; 度”只对<strong>无向图</strong>成立；有向图的行统计的是<strong>出度</strong>、列统计的是<strong>入度</strong>，两者不等，审题时务必分清。</p>
+</blockquote>
+<h2 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h2><p>对图中每个顶点建立一个<strong>单链表</strong>，链表中结点存放该顶点的所有邻接点。<code>$n$</code> 个顶点就有 <code>$n$</code> 个链表。</p>
+<h3 id="结点结构"><a href="#结点结构" class="headerlink" title="结点结构"></a>结点结构</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vertex table (VNode)           edge node (ArcNode)</span><br><span class="line">┌────────┬──────────┐         ┌──────┬──────┬──────┐</span><br><span class="line">│  data  │ firstarc │────────→│adjvex│weight│ next │──→ ...</span><br><span class="line">└────────┴──────────┘         └──────┴──────┴──────┘</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>adjvex</code>：邻接点在顶点表中的<strong>下标</strong>（关键字段）</li>
+<li><code>weight</code>：边的权值（无权图可省略或置 1）</li>
+<li><code>next</code>：指向下一个边表结点（同一顶点的下一条出边）</li>
+</ul>
+<p><strong>无向图邻接表示例</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/Gemini_Generated_Image_wac7k4wac7k4wac7.png" alt="无向图邻接表" title="">
+                </div>
+                <div class="image-caption">无向图邻接表</div>
+            </figure>
+
+<p><strong>正邻接表与逆邻接表（有向图）</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/Gemini_Generated_Image_wl1g8owl1g8owl1g.png" alt="正邻接表与逆邻接表" title="">
+                </div>
+                <div class="image-caption">正邻接表与逆邻接表</div>
+            </figure>
+
+<p><strong>有向图 vs 无向图</strong>：</p>
+<ul>
+<li><strong>无向图</strong>：每条边 <code>$(u,v)$</code> 出现两次，边表结点总数 <code>$ = 2e$</code></li>
+<li><strong>有向图</strong>：每条弧只在弧尾的链表里出现一次，边表结点总数 <code>$ = e$</code></li>
+</ul>
+<h3 id="结构定义-1"><a href="#结构定义-1" class="headerlink" title="结构定义"></a>结构定义</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_VEX 100</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INF 0x3f3f3f3f</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> InfoType;                     <span class="comment">// 与边/弧相关的信息类型（如权值）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> VexType;                      <span class="comment">// 顶点数据类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* ---- 弧/边的结构定义 ---- */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> vex1, vex2;                       <span class="comment">// 弧或边所依附的两个顶点</span></span><br><span class="line">    InfoType info;                        <span class="comment">// 与边或弧相关的信息，如权值</span></span><br><span class="line">&#125; ArcType;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* ---- 邻接表的结点定义 ---- */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">LinkNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> adjvex;                           <span class="comment">// 邻接点在头结点数组中的位置（下标）</span></span><br><span class="line">    InfoType info;                        <span class="comment">// 与边或弧相关的信息，如权值</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">LinkNode</span> *<span class="title">nextarc</span>;</span>             <span class="comment">// 指向下一个表结点</span></span><br><span class="line">&#125; LinkNode;                               <span class="comment">// 表结点类型定义</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 顶点结点的结点定义 --- */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span>                          <span class="comment">// 顶点结点（头结点）</span></span><br><span class="line">    VexType data;                         <span class="comment">// 顶点数据</span></span><br><span class="line">    <span class="type">int</span> degree;                           <span class="comment">// 顶点的度（无向图）或出度（有向图）</span></span><br><span class="line">    LinkNode *firstarc;                   <span class="comment">// 第一条出边的链头</span></span><br><span class="line">&#125; VexNode;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* ----- 图的结构定义 ----- */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    GraphKind kind;                       <span class="comment">// 图的种类标志</span></span><br><span class="line">    <span class="type">int</span> vexnum;                           <span class="comment">// 顶点数</span></span><br><span class="line">    VexNode AdjList[MAX_VEX];             <span class="comment">// 邻接表（顶点数组）</span></span><br><span class="line">&#125; ALGraph;</span><br></pre></td></tr></table></figure>
+
+<h3 id="基本操作-1"><a href="#基本操作-1" class="headerlink" title="基本操作"></a>基本操作</h3><p><strong>增加顶点</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">AddVertex</span><span class="params">(ALGraph *G, VexType *vp)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k;</span><br><span class="line">    G-&gt;AdjList[G-&gt;vexnum].data = *vp;      <span class="comment">// 在末尾存入顶点数据</span></span><br><span class="line">    G-&gt;AdjList[G-&gt;vexnum].degree = <span class="number">0</span>;      <span class="comment">// 初始入/出度为 0</span></span><br><span class="line">    G-&gt;AdjList[G-&gt;vexnum].firstarc = <span class="literal">NULL</span>; <span class="comment">// 边链表初始为空</span></span><br><span class="line">    k = ++G-&gt;vexnum;                       <span class="comment">// 顶点数 +1，记录新下标</span></span><br><span class="line">    <span class="keyword">return</span> k;                              <span class="comment">// 返回新顶点的下标</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>增加弧</strong>（头插法，无向图插两条链）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">AddArc</span><span class="params">(ALGraph *G, ArcType *arc)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k, j;</span><br><span class="line">    LinkNode *p, *q;</span><br><span class="line">    k = <span class="built_in">LocateVex</span>(G, &amp;arc-&gt;vex1);            <span class="comment">// 定位弧尾下标</span></span><br><span class="line">    j = <span class="built_in">LocateVex</span>(G, &amp;arc-&gt;vex2);            <span class="comment">// 定位弧头下标</span></span><br><span class="line"></span><br><span class="line">    p = (LinkNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LinkNode));</span><br><span class="line">    p-&gt;adjvex = arc-&gt;vex1;                   <span class="comment">// 弧尾顶点</span></span><br><span class="line">    p-&gt;info = arc-&gt;info;</span><br><span class="line">    p-&gt;nextarc = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    q = (LinkNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(LinkNode));</span><br><span class="line">    q-&gt;adjvex = arc-&gt;vex2;                   <span class="comment">// 弧头顶点</span></span><br><span class="line">    q-&gt;info = arc-&gt;info;</span><br><span class="line">    q-&gt;nextarc = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (G-&gt;kind == AG || G-&gt;kind == WAG) &#123;   <span class="comment">// 无向图：头插两个链表</span></span><br><span class="line">        q-&gt;nextarc = G-&gt;AdjList[k].firstarc;</span><br><span class="line">        G-&gt;AdjList[k].firstarc = q;          <span class="comment">// 弧头插入弧尾顶点的边表</span></span><br><span class="line">        p-&gt;nextarc = G-&gt;AdjList[j].firstarc;</span><br><span class="line">        G-&gt;AdjList[j].firstarc = p;          <span class="comment">// 弧尾插入弧头顶点的边表</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;                                  <span class="comment">// 有向图：头插弧尾链表</span></span><br><span class="line">        q-&gt;nextarc = G-&gt;AdjList[k].firstarc;</span><br><span class="line">        G-&gt;AdjList[k].firstarc = q;          <span class="comment">// 建立正邻接链表</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;                                 <span class="comment">// 返回 1 表示插入成功</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>考点</strong>：邻接表插入边用<strong>头插法</strong>，新结点始终插在链表头部，复杂度严格 <code>$O(1)$</code>，与链表长度无关。</p>
+</blockquote>
+<h2 id="邻接矩阵-vs-邻接表"><a href="#邻接矩阵-vs-邻接表" class="headerlink" title="邻接矩阵 vs 邻接表"></a>邻接矩阵 vs 邻接表</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">邻接矩阵</th>
+<th align="left">邻接表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">空间</td>
+<td align="left"><code>$O(n^2)$</code></td>
+<td align="left"><code>$O(n+e)$</code></td>
+</tr>
+<tr>
+<td align="left">判边</td>
+<td align="left"><code>$O(1)$</code></td>
+<td align="left"><code>$O(\deg)$</code>（需遍历链表）</td>
+</tr>
+<tr>
+<td align="left">遍历邻接点</td>
+<td align="left"><code>$O(n)$</code></td>
+<td align="left"><code>$O(\deg_i)$</code></td>
+</tr>
+<tr>
+<td align="left">入度（有向图）</td>
+<td align="left">遍历列 <code>$O(n)$</code></td>
+<td align="left">需逆邻接表</td>
+</tr>
+<tr>
+<td align="left">适合</td>
+<td align="left">稠密图</td>
+<td align="left">稀疏图</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点</strong>：<strong>遍历结果唯一性不同</strong>——邻接矩阵（基于顶点下标顺序）的遍历结果<strong>唯一</strong>；邻接表依赖链表的内存&#x2F;插入顺序，遍历结果<strong>不唯一</strong>。</p>
+</blockquote>
+<h2 id="引子：十字链表与邻接多重表"><a href="#引子：十字链表与邻接多重表" class="headerlink" title="引子：十字链表与邻接多重表"></a>引子：十字链表与邻接多重表</h2><p>当两种基础结构各自有短板时，另有两种”升级版”链式存储专门补齐：</p>
+<ul>
+<li><strong>十字链表（有向图）</strong>：每个弧结点同时挂出弧链（<code>tlink</code>）与入弧链（<code>hlink</code>），可<strong>同时高效求得出度与入度</strong>。</li>
+<li><strong>邻接多重表（无向图）</strong>：每条边只存<strong>一次</strong>，删除边&#x2F;弧、判断两顶点是否邻接都更方便，避免了邻接表每条无向边存两次的冗余。</li>
+</ul>
+<p><strong>邻接多重表示例</strong>（无向图，每条边只存一次）：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/image-20260702182320406.png" alt="邻接多重表" title="">
+                </div>
+                <div class="image-caption">邻接多重表</div>
+            </figure>
+
+<p><strong>十字链表示例</strong>（有向图，出弧 tlink &#x2F; 入弧 hlink）：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/1062579-20171110191910653-695287627.png" alt="十字链表" title="">
+                </div>
+                <div class="image-caption">十字链表</div>
+            </figure>
+
+<blockquote>
+<p>十字链表与邻接多重表的<strong>结点定义、完整建图与操作</strong>见独立文章《十字链表与邻接多重表》，本文仅给出对比引子。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">邻接矩阵</td>
+<td align="left">空间 <code>$O(n^2)$</code>、判边 &#96;<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>，适合<strong>稠密图</strong></td>
+</tr>
+<tr>
+<td align="left">无向图矩阵</td>
+<td align="left">对称；第 <code>$i$</code> 行非零数 &#x3D; 度；1 总数 &#x3D; <code>$2e$</code></td>
+</tr>
+<tr>
+<td align="left">有向图矩阵</td>
+<td align="left">第 <code>$i$</code> 行非零数 &#x3D; <strong>出度</strong>、第 <code>$j$</code> 列非零数 &#x3D; <strong>入度</strong></td>
+</tr>
+<tr>
+<td align="left">邻接表</td>
+<td align="left">空间 <code>$O(n+e)$</code>、判边 &#96;<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">de<span style="margin-right:0.0139em;">g</span></span><span class="mclose">)</span></span></span></span>，适合<strong>稀疏图</strong></td>
+</tr>
+<tr>
+<td align="left">边表结点数</td>
+<td align="left">无向图边表结点 <code>$2e$</code> 个、有向图 <code>$e$</code> 个</td>
+</tr>
+<tr>
+<td align="left">头插法</td>
+<td align="left">新结点始终插入链表头部 <code>$O(1)</code>，不依赖链表长度</td>
+</tr>
+<tr>
+<td align="left">遍历唯一性</td>
+<td align="left">邻接矩阵结果<strong>唯一</strong>；邻接表<strong>不唯一</strong>（依赖链表顺序）</td>
+</tr>
+<tr>
+<td align="left">升级结构</td>
+<td align="left">有向图求入度用十字链表、无向图删边用邻接多重表</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T14:31:36.708Z" itemprop="dateUpdated">2026-09-02 22:31:36</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&title=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&title=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E9%81%8D%E5%8E%86%EF%BC%9ADFS%20%E4%B8%8E%20BFS/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">图的遍历：DFS 与 BFS</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">平衡二叉树：AVL 与红黑树</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&title=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&title=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《图的存储结构：邻接矩阵与邻接表》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

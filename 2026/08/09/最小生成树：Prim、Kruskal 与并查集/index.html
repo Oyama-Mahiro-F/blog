@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>最小生成树：Prim、Kruskal 与并查集 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,图">
+    <meta name="description" content="最小生成树（MST）：在带权连通无向图中，所有生成树中边权之和最小的那棵。恰有 $n-1$ 条边。 MST 性质（贪心理论基础）：设 $U$ 是 $V$ 的真子集。若边 $(u,v)$ 满足 $u \in U$、$v \in V-U$，且 $(u,v)$ 在所有这样的边中权值最小，则必存在一棵 MST 包含 $(u,v)$。Prim 与 Kruskal 都是这一性质的体现——只是一个”加点”、一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最小生成树：Prim、Kruskal 与并查集">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="最小生成树（MST）：在带权连通无向图中，所有生成树中边权之和最小的那棵。恰有 $n-1$ 条边。 MST 性质（贪心理论基础）：设 $U$ 是 $V$ 的真子集。若边 $(u,v)$ 满足 $u \in U$、$v \in V-U$，且 $(u,v)$ 在所有这样的边中权值最小，则必存在一棵 MST 包含 $(u,v)$。Prim 与 Kruskal 都是这一性质的体现——只是一个”加点”、一个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/2745283-20221107140303083-140056158.png">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/2745283-20221107140326521-464551758.png">
+<meta property="article:published_time" content="2026-08-09T02:20:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T14:32:56.469Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/2745283-20221107140303083-140056158.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">最小生成树：Prim、Kruskal 与并查集</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">最小生成树：Prim、Kruskal 与并查集</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T02:20:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Prim-%E7%AE%97%E6%B3%95%EF%BC%88%E5%8A%A0%E7%82%B9%E6%B3%95%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">Prim 算法（加点法）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">算法思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%E7%A4%BA%E4%BE%8B"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">执行过程示例</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">复杂度</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Kruskal-%E7%AE%97%E6%B3%95%EF%BC%88%E5%8A%A0%E8%BE%B9%E6%B3%95%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">Kruskal 算法（加边法）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3-1"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">算法思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">伪代码</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6-1"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">复杂度</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B9%B6%E6%9F%A5%E9%9B%86%EF%BC%88Union-Find%EF%BC%89"><span class="post-toc-number">3.</span> <span class="post-toc-text">并查集（Union-Find）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E4%B8%8E%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">存储结构与初始化</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%9F%A5%E6%89%BE-Find%EF%BC%88%E6%9C%B4%E7%B4%A0%E7%89%88%EF%BC%89"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">查找 Find（朴素版）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%90%88%E5%B9%B6-Union%EF%BC%88%E6%9C%B4%E7%B4%A0%E7%89%88%EF%BC%89"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">合并 Union（朴素版）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%B7%AF%E5%BE%84%E5%8E%8B%E7%BC%A9%E4%BC%98%E5%8C%96%EF%BC%88Find-%E4%BC%98%E5%8C%96%EF%BC%89"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">路径压缩优化（Find 优化）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6%E4%BC%98%E5%8C%96%EF%BC%88Union-%E4%BC%98%E5%8C%96%EF%BC%89"><span class="post-toc-number">3.5.</span> <span class="post-toc-text">按秩合并优化（Union 优化）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%8C%E6%95%B4%E5%AE%9E%E7%8E%B0%EF%BC%88%E8%B7%AF%E5%BE%84%E5%8E%8B%E7%BC%A9-%E6%8C%89%E7%A7%A9%E5%90%88%E5%B9%B6%EF%BC%89"><span class="post-toc-number">3.6.</span> <span class="post-toc-text">完整实现（路径压缩 + 按秩合并）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Prim-vs-Kruskal-%E5%AF%B9%E6%AF%94"><span class="post-toc-number">4.</span> <span class="post-toc-text">Prim vs Kruskal 对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MST-%E5%94%AF%E4%B8%80%E6%80%A7%E8%AE%A8%E8%AE%BA"><span class="post-toc-number">5.</span> <span class="post-toc-text">MST 唯一性讨论</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">6.</span> <span class="post-toc-text">交互演示</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Prim-%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">Prim 最小生成树</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Kruskal-%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">Kruskal 最小生成树</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">7.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-最小生成树：Prim、Kruskal 与并查集"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">最小生成树：Prim、Kruskal 与并查集</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 10:20:00" datetime="2026-08-09T02:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>最小生成树（MST）</strong>：在<strong>带权连通无向图</strong>中，所有生成树中<strong>边权之和最小</strong>的那棵。恰有 <code>$n-1$</code> 条边。</p>
+<p><strong>MST 性质（贪心理论基础）</strong>：设 <code>$U$</code> 是 <code>$V$</code> 的真子集。若边 <code>$(u,v)$</code> 满足 <code>$u \in U$</code>、<code>$v \in V-U$</code>，且 <code>$(u,v)$</code> 在所有这样的边中权值最小，则必存在一棵 MST 包含 <code>$(u,v)$</code>。Prim 与 Kruskal 都是这一性质的体现——只是一个”加点”、一个”加边”。</p>
+<table>
+<thead>
+<tr>
+<th align="left">算法</th>
+<th align="left">策略</th>
+<th align="left">时间</th>
+<th align="left">适合</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Prim</td>
+<td align="left">加点（维护候选边集）</td>
+<td align="left"><code>$O(n^2)$</code> 或 <code>$O(e\log n)$</code></td>
+<td align="left">稠密图</td>
+</tr>
+<tr>
+<td align="left">Kruskal</td>
+<td align="left">加边（排序 + 并查集防环）</td>
+<td align="left"><code>$O(e\log e)$</code></td>
+<td align="left">稀疏图</td>
+</tr>
+</tbody></table>
+<h2 id="Prim-算法（加点法）"><a href="#Prim-算法（加点法）" class="headerlink" title="Prim 算法（加点法）"></a>Prim 算法（加点法）</h2><h3 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h3><ul>
+<li><strong>类比</strong>：向一棵”生长中的树”不断添加最近的顶点，直到覆盖全部 <code>$n$</code> 个顶点</li>
+<li><strong>辅助结构</strong>：维护两个顶点集合——已选入 MST 的 <code>$U$</code> 和未选的 <code>$V-U$</code>，以及连接两集合的候选边</li>
+<li><strong>核心策略</strong>（贪心）：每轮从候选边中选<strong>权值最小</strong>的一条 <code>$(u,v)$</code>（<code>$u \in U, v \in V-U$</code>），将 <code>$v$</code> 纳入 <code>$U$</code>，并更新候选边</li>
+</ul>
+<p><strong>核心步骤</strong>：</p>
+<ol>
+<li>任选起始顶点 <code>$v_0$</code>，<code>$U = \&#123;v_0\&#125;$</code></li>
+<li>找连接 <code>$U$</code> 与 <code>$V-U$</code> 的最小权边 <code>$(u,v)$</code></li>
+<li>将 <code>$v$</code> 加入 <code>$U$</code>，将 <code>$(u,v)$</code> 加入 MST</li>
+<li>用 <code>$v$</code> 的新邻接边更新候选边集</li>
+<li>重复 ②~④ 直至 <code>$|U| = n$</code></li>
+</ol>
+<blockquote>
+<p>Prim 本质是 MST 性质的直接应用：每次贪心地选择跨越集合的最小边，共选 <code>$n-1$</code> 次。</p>
+</blockquote>
+<h3 id="执行过程示例"><a href="#执行过程示例" class="headerlink" title="执行过程示例"></a>执行过程示例</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/2745283-20221107140303083-140056158.png" alt="Prim 算法执行过程" title="">
+                </div>
+                <div class="image-caption">Prim 算法执行过程</div>
+            </figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">刚入树的顶点</th>
+<th align="left">本步选出的最小边</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">初始</td>
+<td align="left">A</td>
+<td align="left">A-B (1)</td>
+</tr>
+<tr>
+<td align="left">Step 1</td>
+<td align="left">B</td>
+<td align="left">A-D (4)</td>
+</tr>
+<tr>
+<td align="left">Step 2</td>
+<td align="left">D</td>
+<td align="left">D-F (2)</td>
+</tr>
+<tr>
+<td align="left">Step 3</td>
+<td align="left">F</td>
+<td align="left">A-C (5)</td>
+</tr>
+<tr>
+<td align="left">Step 4</td>
+<td align="left">C</td>
+<td align="left">C-E (3)</td>
+</tr>
+<tr>
+<td align="left">Step 5</td>
+<td align="left">E</td>
+<td align="left"><em>(生成树构建完成)</em></td>
+</tr>
+</tbody></table>
+<h3 id="复杂度"><a href="#复杂度" class="headerlink" title="复杂度"></a>复杂度</h3><table>
+<thead>
+<tr>
+<th align="left">实现方式</th>
+<th align="left">时间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">邻接矩阵</td>
+<td align="left"><code>$O(n^2)$</code></td>
+</tr>
+<tr>
+<td align="left">堆优化 + 邻接表</td>
+<td align="left"><code>$O(e\log n)$</code></td>
+</tr>
+</tbody></table>
+<p><strong>适合</strong>：稠密图</p>
+<h2 id="Kruskal-算法（加边法）"><a href="#Kruskal-算法（加边法）" class="headerlink" title="Kruskal 算法（加边法）"></a>Kruskal 算法（加边法）</h2><h3 id="算法思想-1"><a href="#算法思想-1" class="headerlink" title="算法思想"></a>算法思想</h3><ul>
+<li><strong>类比</strong>：将图中所有边按权值从小到大排序，依次”试探”每条边——能加就加，不能加（会成环）就跳过</li>
+<li><strong>辅助结构</strong>：<strong>并查集（Union-Find）</strong>——维护顶点所属的连通分量，快速判断两个顶点是否已在同一集合</li>
+<li><strong>核心策略</strong>（贪心）：每次从剩余的边中选<strong>权值最小</strong>且<strong>不会形成回路</strong>的边加入 MST</li>
+</ul>
+<p><strong>核心步骤</strong>：</p>
+<ol>
+<li>将所有边按权值升序排序</li>
+<li>初始化并查集，每个顶点自成一个集合</li>
+<li>依次取出每条边 <code>$(u,v)$</code>：<ul>
+<li>若 <code>$u$</code> 和 <code>$v$</code> <strong>不在同一集合</strong> → 加入 MST，合并两集合</li>
+<li>若 <code>$u$</code> 和 <code>$v$</code> <strong>已在同一集合</strong> → 跳过（加入会成环）</li>
+</ul>
+</li>
+<li>重复 ③ 直至选出 <code>$n-1$</code> 条边</li>
+</ol>
+<blockquote>
+<p>Kruskal 本质：全局范围内贪心选最小边，用并查集保证不破坏树结构（无环）。</p>
+</blockquote>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/2745283-20221107140326521-464551758.png" alt="Kruskal 算法执行过程" title="">
+                </div>
+                <div class="image-caption">Kruskal 算法执行过程</div>
+            </figure>
+
+<h3 id="伪代码"><a href="#伪代码" class="headerlink" title="伪代码"></a>伪代码</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1. 边集 E 按权值升序排序</span><br><span class="line">2. 初始化并查集（每个顶点独立）</span><br><span class="line">3. count = 0</span><br><span class="line">4. 对每条边 (u, v)（按序）：</span><br><span class="line">     if Find(u) != Find(v):        # 不成环</span><br><span class="line">         (u,v) 加入 MST</span><br><span class="line">         Union(u, v)</span><br><span class="line">         count++</span><br><span class="line">         if count == n-1: break</span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂度-1"><a href="#复杂度-1" class="headerlink" title="复杂度"></a>复杂度</h3><table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">时间复杂度</td>
+<td align="left"><code>$O(e\log e)$</code>（排序主导）</td>
+</tr>
+<tr>
+<td align="left">适合</td>
+<td align="left">稀疏图</td>
+</tr>
+</tbody></table>
+<h2 id="并查集（Union-Find）"><a href="#并查集（Union-Find）" class="headerlink" title="并查集（Union-Find）"></a>并查集（Union-Find）</h2><p>Kruskal 之所以能 <code>$O(1)$</code> 判环，靠的就是并查集。它用<strong>双亲表示法</strong>（树结构）管理不相交集合，支持<strong>查</strong>（Find，找根）和<strong>并</strong>（Union，合并）。</p>
+<blockquote>
+<p><strong>核心思想</strong>：每个集合用一棵树表示，树的根代表整个集合。<code>parent[i]</code> 存结点 i 的双亲，根结点的 <code>parent = -1</code>。</p>
+</blockquote>
+<h3 id="存储结构与初始化"><a href="#存储结构与初始化" class="headerlink" title="存储结构与初始化"></a>存储结构与初始化</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAXSIZE 100</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> parent[MAXSIZE];           <span class="comment">// 双亲数组，parent[i]=-1 表示 i 是根</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">InitSet</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        parent[i] = <span class="number">-1</span>;        <span class="comment">// 初始每个元素自成一个集合（各自的根）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查找-Find（朴素版）"><a href="#查找-Find（朴素版）" class="headerlink" title="查找 Find（朴素版）"></a>查找 Find（朴素版）</h3><p>沿着 parent 链一直向上，直到找到根（parent &#x3D; -1）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">Find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (parent[x] != <span class="number">-1</span>)</span><br><span class="line">        x = parent[x];         <span class="comment">// 沿着双亲链向上爬</span></span><br><span class="line">    <span class="keyword">return</span> x;                  <span class="comment">// 返回根的下标</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="合并-Union（朴素版）"><a href="#合并-Union（朴素版）" class="headerlink" title="合并 Union（朴素版）"></a>合并 Union（朴素版）</h3><p>将一棵树的根挂到另一棵树的根下面。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Union</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootA = Find(a);</span><br><span class="line">    <span class="type">int</span> rootB = Find(b);</span><br><span class="line">    <span class="keyword">if</span> (rootA != rootB)</span><br><span class="line">        parent[rootB] = rootA;  <span class="comment">// B 的根挂到 A 的根下面</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="路径压缩优化（Find-优化）"><a href="#路径压缩优化（Find-优化）" class="headerlink" title="路径压缩优化（Find 优化）"></a>路径压缩优化（Find 优化）</h3><p>查找时把沿途所有结点<strong>直接挂到根下面</strong>，摊还后接近 <code>$O(1)$</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">Find_Compress</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == <span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">return</span> parent[x] = Find_Compress(parent[x]);  <span class="comment">// 递归压缩，挂到根</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">压缩前：0→1→2→根3           压缩后：0→根3, 1→根3, 2→根3</span><br><span class="line">  [3]                            [3]</span><br><span class="line">   │                            / | \</span><br><span class="line">  [2]                          [0][1][2]</span><br><span class="line">   │</span><br><span class="line">  [1]</span><br><span class="line">   │</span><br><span class="line">  [0]</span><br></pre></td></tr></table></figure>
+
+<h3 id="按秩合并优化（Union-优化）"><a href="#按秩合并优化（Union-优化）" class="headerlink" title="按秩合并优化（Union 优化）"></a>按秩合并优化（Union 优化）</h3><p>将<strong>矮树</strong>挂到<strong>高树</strong>下面，避免退化成链。需要额外 <code>rank[]</code> 数组。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> rank[MAXSIZE];             <span class="comment">// rank[i] = 以 i 为根的树的高度（近似）</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">InitSet_Rank</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        parent[i] = <span class="number">-1</span>;</span><br><span class="line">        rank[i] = <span class="number">0</span>;           <span class="comment">// 初始高度为 0</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Union_Rank</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootA = Find_Compress(a);</span><br><span class="line">    <span class="type">int</span> rootB = Find_Compress(b);</span><br><span class="line">    <span class="keyword">if</span> (rootA == rootB) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rank[rootA] &lt; rank[rootB])</span><br><span class="line">        parent[rootA] = rootB;          <span class="comment">// 矮的挂到高的</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (rank[rootA] &gt; rank[rootB])</span><br><span class="line">        parent[rootB] = rootA;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        parent[rootB] = rootA;          <span class="comment">// 等高时任选，新根高度+1</span></span><br><span class="line">        rank[rootA]++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">按秩合并：把矮树挂高树下              不按秩：可能退化成链</span><br><span class="line">  高[0]  +  矮[2]                        [0]</span><br><span class="line">   / \       │                           /</span><br><span class="line"> [1] [3]    [4]                        [2]    → O(n) ❌</span><br><span class="line">                                       /</span><br><span class="line">  合并后树高 O(log n) ✓               [1]</span><br><span class="line">                                     /</span><br><span class="line">                                   [4]</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整实现（路径压缩-按秩合并）"><a href="#完整实现（路径压缩-按秩合并）" class="headerlink" title="完整实现（路径压缩 + 按秩合并）"></a>完整实现（路径压缩 + 按秩合并）</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">Find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == <span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">return</span> parent[x] = Find(parent[x]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Union</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="type">int</span> ra = Find(a), rb = Find(b);</span><br><span class="line">    <span class="keyword">if</span> (ra == rb) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span> (rank[ra] &lt; rank[rb])  parent[ra] = rb;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (rank[ra] &gt; rank[rb]) parent[rb] = ra;</span><br><span class="line">    <span class="keyword">else</span> &#123; parent[rb] = ra; rank[ra]++; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>双优化后 <code>Find</code> 和 <code>Union</code> 的摊还时间复杂度接近 <code>$O(\alpha(n))$</code>，其中 <code>$\alpha$</code> 是反阿克曼函数，实际中可视为常数。</p>
+</blockquote>
+<h2 id="Prim-vs-Kruskal-对比"><a href="#Prim-vs-Kruskal-对比" class="headerlink" title="Prim vs Kruskal 对比"></a>Prim vs Kruskal 对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">Prim</th>
+<th align="left">Kruskal</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">策略</td>
+<td align="left">加点（维护候选边集）</td>
+<td align="left">加边（排序 + 并查集防环）</td>
+</tr>
+<tr>
+<td align="left">时间</td>
+<td align="left"><code>$O(n^2)$</code> 或 <code>$O(e\log n)$</code></td>
+<td align="left"><code>$O(e\log e)$</code></td>
+</tr>
+<tr>
+<td align="left">适合</td>
+<td align="left">稠密图</td>
+<td align="left">稀疏图</td>
+</tr>
+<tr>
+<td align="left">依赖结构</td>
+<td align="left">邻接矩阵&#x2F;邻接表</td>
+<td align="left">并查集</td>
+</tr>
+</tbody></table>
+<h2 id="MST-唯一性讨论"><a href="#MST-唯一性讨论" class="headerlink" title="MST 唯一性讨论"></a>MST 唯一性讨论</h2><table>
+<thead>
+<tr>
+<th align="left">条件</th>
+<th align="left">唯一性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">图中<strong>所有边的权值互不相等</strong></td>
+<td align="left">MST <strong>一定唯一</strong></td>
+</tr>
+<tr>
+<td align="left">存在权值相等的边</td>
+<td align="left">MST <strong>不一定唯一</strong>（可能有多棵权值和相等的 MST）</td>
+</tr>
+</tbody></table>
+<p><strong>408 考点</strong>：</p>
+<ol>
+<li>唯一性判定：若所有边权值互异 → MST 唯一（充分非必要条件）</li>
+<li>不唯一时，不同 MST 的<strong>边权之和一定相等</strong></li>
+<li>对带权连通无向图，若任意两条边的权值均不相等，则 MST 唯一；反之不一定，还需看等权边是否构成”可替换圈”</li>
+</ol>
+<blockquote>
+<p><strong>核心记忆</strong>：权值全不同 → MST 唯一；有权值相等的边 → 不一定唯一，需具体分析。</p>
+</blockquote>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><h3 id="Prim-最小生成树"><a href="#Prim-最小生成树" class="headerlink" title="Prim 最小生成树"></a>Prim 最小生成树</h3><div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/prim.html" title="Prim 最小生成树" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h3 id="Kruskal-最小生成树"><a href="#Kruskal-最小生成树" class="headerlink" title="Kruskal 最小生成树"></a>Kruskal 最小生成树</h3><div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/kruskal.html" title="Kruskal 最小生成树" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">MST 定义</td>
+<td align="left">带权连通图边权和最小的生成树，<code>$n-1$</code> 条边</td>
+</tr>
+<tr>
+<td align="left">MST 性质</td>
+<td align="left">连接 <code>$U$</code> 与 <code>$V-U$</code> 的<strong>最小权边必属于某棵 MST</strong>（贪心基础）</td>
+</tr>
+<tr>
+<td align="left">Prim</td>
+<td align="left"><strong>加点法</strong>，<code>$O(n^2)$</code>、堆优化 &#96;<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>，适合稠密图</td>
+</tr>
+<tr>
+<td align="left">Kruskal</td>
+<td align="left"><strong>加边法</strong>+并查集防环，&#96;<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>，适合稀疏图</td>
+</tr>
+<tr>
+<td align="left">并查集查&#x2F;并</td>
+<td align="left">Find 找根（parent&#x3D;&#x3D;-1），Union 将一树根挂另一树根下</td>
+</tr>
+<tr>
+<td align="left">路径压缩</td>
+<td align="left">沿途结点<strong>直接挂到根</strong>下，摊还接近 <code>$O(1)$</code></td>
+</tr>
+<tr>
+<td align="left">按秩合并</td>
+<td align="left"><strong>矮树挂高树</strong>下，避免退化为链（<code>$O(\log n)$</code>）</td>
+</tr>
+<tr>
+<td align="left">并查集双优化</td>
+<td align="left">摊还复杂度接近 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">))</span></span></span></span></strong>，<code>$\alpha$</code> 为反阿克曼函数</td>
+</tr>
+<tr>
+<td align="left">MST 唯一性</td>
+<td align="left">边权全互异→<strong>一定唯一</strong>；有等权边→可能不唯一但<strong>权值和相等</strong></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T14:32:56.469Z" itemprop="dateUpdated">2026-09-02 22:32:56</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&title=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&title=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E5%93%88%E5%A4%AB%E6%9B%BC%E6%A0%91%E7%9A%84%E6%9E%84%E9%80%A0%E4%B8%8E%E7%BC%96%E7%A0%81/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">哈夫曼树的构造与哈夫曼编码</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86%E4%B8%8E%E7%BA%BF%E7%B4%A2%E5%8C%96/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">二叉树的遍历与线索化</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&title=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&title=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《最小生成树：Prim、Kruskal 与并查集》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -173,216 +173,7 @@
     <ul class="post-list">
     
         <li class="post-list-item fade">
-            <article id="post-B树与B加树"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:50:00" datetime="2026-08-09T03:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/">B树与B+树</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        大型数据库中数据存储在磁盘，磁盘 I&#x2F;O 次数是性能瓶颈。平衡 BST 每次比较可能访问一个新结点（一次磁盘 I&#x2F;O），log2​n 次 I&#x2F;O 无法接受。
-解决思路：让一个结点容纳多个关键字 → 多路查找树。一个结点大小 ≈ 一个磁盘页，一次 I&#x2F;O 读取多个关键字，大幅降低树高。
-
-R. Bayer 和 E. McCreight（1972）提出 B...
-    
-
-        <a href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-红黑树算法"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:45:00" datetime="2026-08-09T03:45:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E7%BA%A2%E9%BB%91%E6%A0%91%E7%AE%97%E6%B3%95/">红黑树算法</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        AVL 通过严格的平衡因子（∥BF∥≤1）保持平衡，但插入&#x2F;删除可能需要多次旋转。红黑树采用较为宽松的平衡条件——通过给结点着色（红&#x2F;黑）和一组规则约束树的结构，插入最多 2 次旋转即可恢复，删除最多 3 次，实际效率通常高于 AVL。
-定义：5 条性质（必背）红黑树是一棵满足以下 5 条性质的二叉排序树（BST）：
-
-
-
-#
-性质
-说明
-
-
-
-①
-每个结点是红色或黑色
-...
-    
-
-        <a href="/blog/2026/08/09/%E7%BA%A2%E9%BB%91%E6%A0%91%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-分块查找算法"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:40:00" datetime="2026-08-09T03:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">分块查找算法</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        将数据分块，块间有序但块内无序。建立索引表记录每块的最大关键字和起始地址。查找分两步：① 在索引表中折半（或顺序）确定所在块 → ② 在块内顺序查找。
-结构示意123456789101112index table:           data table (3 blocks, 3 elems each):┌────┬──────┐          ┌───┬───┬───┬───┬───...
-    
-
-        <a href="/blog/2026/08/09/%E5%88%86%E5%9D%97%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-折半查找算法"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:35:00" datetime="2026-08-09T03:35:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">折半查找算法</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        每次取中间位置元素与关键字比较，每次将查找范围缩小一半，直到找到或区间为空。
-
-前提：查找表必须有序，且采用顺序存储（随机访问）。
-
-算法实现1234567891011121314int BinarySearch(int a[], int n, int key) &#123;    int low = 0, high = n - 1, mid;    while (low &lt;= hig...
-    
-
-        <a href="/blog/2026/08/09/%E6%8A%98%E5%8D%8A%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-顺序查找算法"
+            <article id="post-线性查找：顺序、折半与分块"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -400,7 +191,7 @@ R. Bayer 和 E. McCreight（1972）提出 B...
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/">顺序查找算法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E7%BA%BF%E6%80%A7%E6%9F%A5%E6%89%BE%EF%BC%9A%E9%A1%BA%E5%BA%8F%E3%80%81%E6%8A%98%E5%8D%8A%E4%B8%8E%E5%88%86%E5%9D%97/">线性查找：顺序、折半与分块</a>
     </h3>
   
 
@@ -410,12 +201,13 @@ R. Bayer 和 E. McCreight（1972）提出 B...
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        从头到尾依次扫描，逐个比较关键字——最朴素的查找方法，对表的结构不做任何要求（顺序存储和链式存储均可）。
-算法实现不带哨兵版本：
-12345678int SeqSearch(int a[], int n, int key) &#123;    for (int i = 0; i &lt; n; i++) &#123;        if (a[i] == key) &#123;       ...
+        查找（Searching）是在数据集合中找出关键字等于给定值的记录。衡量查找算法优劣的核心指标是平均查找长度 ASL（Average Search Length）——查找过程中与关键字比较次数的期望：
+ASL=i=1∑n​pi​ci​
+其中 pi​ 是查找第 i 个记录的概率（通常假设等概率 pi​=1/n），ci​ 是找到第 i 个记录所需的比较次数。
+本文三种方法都建立在线性表上，区别只...
     
 
-        <a href="/blog/2026/08/09/%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E7%BA%BF%E6%80%A7%E6%9F%A5%E6%89%BE%EF%BC%9A%E9%A1%BA%E5%BA%8F%E3%80%81%E6%8A%98%E5%8D%8A%E4%B8%8E%E5%88%86%E5%9D%97/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -431,57 +223,7 @@ R. Bayer 和 E. McCreight（1972）提出 B...
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-关键路径算法"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:25:00" datetime="2026-08-09T03:25:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95/">关键路径算法（AOE 网）</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        AOE 网（Activity On Edge）：边表示活动的有向无环图。顶点表示事件（Event），每个事件表示在其前的所有活动已经完成、其后的活动可以开始；弧表示活动，弧上的权值表示相应活动所需的时间。
-与 AOE 有关的研究问题
-完成整个工程至少需要多少时间？→ 从起点到终点的最长路径长度（路径上各活动持续时间之和）
-哪些活动是关键活动？→ 长度最长的路径称为关键路径（Critical ...
-    
-
-        <a href="/blog/2026/08/09/%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-拓扑排序算法"
+            <article id="post-拓扑排序与关键路径 AOE"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -499,7 +241,7 @@ R. Bayer 和 E. McCreight（1972）提出 B...
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">拓扑排序算法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/">拓扑排序与关键路径 AOE</a>
     </h3>
   
 
@@ -509,28 +251,30 @@ R. Bayer 和 E. McCreight（1972）提出 B...
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        拓扑排序：由某个集合上的一个偏序得到该集合上的一个全序的操作。即有向图的拓扑排序——构造 AOV 网中顶点的一个拓扑线性序列，使得该线性序列满足两点：
-
-保持原来有向图中顶点之间的优先关系
-对原图中没有优先关系的顶点之间，也建立一种（人为的）优先关系
-
-基本概念
-
-
-概念
-说明
+        有向无环图（DAG）的两个典型应用：拓扑排序回答”工程能否顺利完成、活动按什么顺序做”（AOV 网），关键路径回答”最短工期多久、哪些活动一天都不能拖”（AOE 网）。两者都建立在 DAG 之上，且关键路径求 ve/vl 时还要依赖拓扑序。
 
 
 
-偏序
-集合中仅有部分元素之间可以比较先后
+网类型
+顶点
+边&#x2F;弧
+研究问题
+核心算法
 
 
-全序
-集合中任意两个元素之间都可以比较先后（拓扑排序后的线性序...
+
+AOV 网
+活动
+活动间的优先关系
+工程能否顺利完成？
+拓扑排序
+
+
+AOE 网
+事件（...
     
 
-        <a href="/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -546,60 +290,7 @@ R. Bayer 和 E. McCreight（1972）提出 B...
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-Floyd多源最短路径"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:15:00" datetime="2026-08-09T03:15:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/Floyd%E5%A4%9A%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/">Floyd 多源最短路径算法</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        求每一对顶点之间的最短路径。允许负权，不允许负环。
-
-核心递推式：dist[i][j]=min(dist[i][j], dist[i][k]+dist[k][j])
-
-基本思想Floyd 算法采用动态规划思想：依次尝试将每个顶点作为中转点，若从 Vi​ 先到 Vk​ 再到 Vj​ 比当前已知的 dist[i][j] 更短，则更新。
-
-初始：dist[i][j]=wij​（直接边的权值，无边则...
-    
-
-        <a href="/blog/2026/08/09/Floyd%E5%A4%9A%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-Dijkstra单源最短路径"
+            <article id="post-最短路径：Dijkstra 与 Floyd"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -617,7 +308,7 @@ R. Bayer 和 E. McCreight（1972）提出 B...
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/">Dijkstra 单源最短路径算法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%9ADijkstra%20%E4%B8%8E%20Floyd/">最短路径：Dijkstra 与 Floyd</a>
     </h3>
   
 
@@ -627,16 +318,31 @@ R. Bayer 和 E. McCreight（1972）提出 B...
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        问题描述：对于给定的有向图 G=(V,E) 及单个源点 Vs​，求 Vs​ 到其余各顶点的最短路径。
-Dijkstra（迪杰斯特拉）提出了一个按路径长度递增次序产生最短路径的算法。
-基本思想从源点到其他各顶点的最短路径中，按其长度的递增次序依次求出——先求出长度最小的一条，然后长度第二小的，依此类推。
-核心机制：
+        最短路径是图最常见的应用。Dijkstra 解决单源最短路径（一个源点到其余各点），采用贪心；Floyd 解决多源最短路径（每对顶点之间），采用动态规划。两者对负权边的态度截然不同，是 408 高频区分点。
 
-设 S 为已求得最短路径的终点集，初始 S={Vs​}
-关键结论：设下一条最...
+
+
+算法
+类型
+思想
+时间
+负权边
+
+
+
+Dijkstra
+单源
+贪心（按路径长度递增确定）
+$O(n^2)$ &#x2F; $O(e\log n)$
+❌
+
+
+Floyd
+多源
+动态规...
     
 
-        <a href="/blog/2026/08/09/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%9ADijkstra%20%E4%B8%8E%20Floyd/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -652,11 +358,11 @@ Dijkstra（迪杰斯特拉）提出了一个按路径长度递增次序产生最
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-Kruskal最小生成树算法"
+            <article id="post-图的遍历：DFS 与 BFS"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
-        <time class="post-time" title="2026-08-09 11:05:00" datetime="2026-08-09T03:05:00.000Z"  itemprop="datePublished">2026-08-09</time>
+        <time class="post-time" title="2026-08-09 10:50:00" datetime="2026-08-09T02:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
 
         
 	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
@@ -670,7 +376,7 @@ Dijkstra（迪杰斯特拉）提出了一个按路径长度递增次序产生最
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/Kruskal%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95/">Kruskal 最小生成树算法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E9%81%8D%E5%8E%86%EF%BC%9ADFS%20%E4%B8%8E%20BFS/">图的遍历：DFS 与 BFS</a>
     </h3>
   
 
@@ -680,16 +386,37 @@ Dijkstra（迪杰斯特拉）提出了一个按路径长度递增次序产生最
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        最小生成树（MST）：在带权连通无向图中，所有生成树中边权之和最小的那棵。恰有 n−1 条边。
-算法思想（加边法）
-类比：将图中所有边按权值从小到大排序，依次”试探”每条边——能加就加，不能加（会成环）就跳过
-辅助结构：并查集（Union-Find）——维护顶点所属的连通分量，快速判断两个顶点是否已在同一集合
-核心策略（贪心）：每次从剩余的边中选权值最小且不会形成回路的边加入 MST
+        图的遍历指从某顶点出发访问所有可达顶点各一次。DFS（深度优先）用栈类比先序遍历，BFS（广度优先）用队列类比层序遍历——两者只是邻接点的搜索次序不同，因此时间复杂度完全相同。
 
-核心...
+
+
+维度
+DFS
+BFS
+
+
+
+辅助结构
+栈（递归隐式系统栈）
+队列（FIFO）
+
+
+类比
+树的先序遍历
+树的层序遍历
+
+
+树高&#x2F;宽度
+树高，窄
+树低，宽
+
+
+非树边
+回边（Back Edge）
+横跨边（...
     
 
-        <a href="/blog/2026/08/09/Kruskal%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E9%81%8D%E5%8E%86%EF%BC%9ADFS%20%E4%B8%8E%20BFS/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -704,12 +431,395 @@ Dijkstra（迪杰斯特拉）提出了一个按路径长度递增次序产生最
 
         </li>
     
+        <li class="post-list-item fade">
+            <article id="post-图的存储结构：邻接矩阵与邻接表"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:40:00" datetime="2026-08-09T02:40:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/">图的存储结构：邻接矩阵与邻接表</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        图的存储要兼顾”判边快慢”与”空间开销”两件事。两种方式各有侧重：邻接矩阵用二维数组、$O(n^2)$ 空间换 $O(1)$ 判边，适合稠密图；邻接表用 $n$ 条单链表、$O(n+e)$ 空间换遍历邻接点的便利，适合稀疏图。
+
+
+
+存储结构
+空间
+判边
+适合
+
+
+
+邻接矩阵
+$O(n^2)$
+$O(1)$
+稠密图
+
+
+邻接表
+$O(n+e)$
+$O(\deg)$（遍历链表）
+稀疏图
+
+
+邻...
+    
+
+        <a href="/blog/2026/08/09/%E5%9B%BE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%EF%BC%9A%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5%E4%B8%8E%E9%82%BB%E6%8E%A5%E8%A1%A8/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-平衡二叉树：AVL 与红黑树"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:35:00" datetime="2026-08-09T02:35:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/">平衡二叉树：AVL 与红黑树</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        二叉排序树（BST）的查找效率取决于树高：理想情况 h=⌈log2​(n+1)⌉，查找 O(logn)；但若按有序序列插入，BST 会退化为单链表（h=n），查找降为 O(n)。平衡就是给 BST 加约束、把树高强行压回 O(logn) 的手段，主流有两条路线：
+
+
+
+路线
+平衡手段
+树高上界
+代价
+
+
+
+AVL 树
+严格：任意结点左右子树高度差 ≤1
+≈1.44log2​(n+1)
+树最矮...
+    
+
+        <a href="/blog/2026/08/09/%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%9AAVL%20%E4%B8%8E%E7%BA%A2%E9%BB%91%E6%A0%91/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-二叉排序树BST"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:30:00" datetime="2026-08-09T02:30:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91BST/">二叉排序树（BST）的查找、插入与删除</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        二叉排序树（Binary Search Tree, BST）将查找表组织为一棵有序的二叉树——利用”左小右大”的性质，每次比较后可排除左子树或右子树，将查找范围缩小一半。
+定义与性质
+左子树所有结点值 &lt; 根结点值
+右子树所有结点值 &gt; 根结点值
+左右子树也各是一棵 BST
+
+
+
+
+性质
+说明
+
+
+
+中序遍历 BST
+得到递增有序序列
+
+
+最小元素
+最左下结点（沿左链走到底）
+
+...
+    
+
+        <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91BST/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-哈夫曼树的构造与编码"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:25:00" datetime="2026-08-09T02:25:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E5%93%88%E5%A4%AB%E6%9B%BC%E6%A0%91%E7%9A%84%E6%9E%84%E9%80%A0%E4%B8%8E%E7%BC%96%E7%A0%81/">哈夫曼树的构造与哈夫曼编码</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        基本概念
+
+
+术语
+含义
+
+
+
+路径长度
+两结点间路径上的分支数
+
+
+权
+给结点赋予的数值
+
+
+带权路径长度 WPL
+∑wi​×li​，li​ 是从根到该结点的路径长度
+
+
+哈夫曼树
+n 个带权叶子构成的 WPL 最小的二叉树
+
+
+哈夫曼树构造（贪心）每次从集合中选取两个权值最小的结点合并，新结点的权为两者之和，重复直到只剩一棵树。
+123456789101112示例：叶子权值 &#123;...
+    
+
+        <a href="/blog/2026/08/09/%E5%93%88%E5%A4%AB%E6%9B%BC%E6%A0%91%E7%9A%84%E6%9E%84%E9%80%A0%E4%B8%8E%E7%BC%96%E7%A0%81/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-最小生成树：Prim、Kruskal 与并查集"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:20:00" datetime="2026-08-09T02:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/">最小生成树：Prim、Kruskal 与并查集</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        最小生成树（MST）：在带权连通无向图中，所有生成树中边权之和最小的那棵。恰有 $n-1$ 条边。
+MST 性质（贪心理论基础）：设 $U$ 是 $V$ 的真子集。若边 $(u,v)$ 满足 $u \in U$、$v \in V-U$，且 $(u,v)$ 在所有这样的边中权值最小，则必存在一棵 MST 包含 $(u,v)$。Prim 与 Kruskal 都是这一性质的体现——只是一个”加点”...
+    
+
+        <a href="/blog/2026/08/09/%E6%9C%80%E5%B0%8F%E7%94%9F%E6%88%90%E6%A0%91%EF%BC%9APrim%E3%80%81Kruskal%20%E4%B8%8E%E5%B9%B6%E6%9F%A5%E9%9B%86/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
+        <li class="post-list-item fade">
+            <article id="post-二叉树的遍历与线索化"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 10:05:00" datetime="2026-08-09T02:05:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86%E4%B8%8E%E7%BA%BF%E7%B4%A2%E5%8C%96/">二叉树的遍历与线索化</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        二叉树的遍历是整棵树所有操作的基础——查找、插入、删除、线索化，本质上都是遍历的变体。本篇覆盖四种遍历（递归三序 + 层序）、非递归实现，以及建立在遍历之上的线索二叉树。
+
+
+
+遍历
+辅助结构
+核心口诀
+
+
+
+先序 &#x2F; 中序 &#x2F; 后序（递归）
+递归栈
+按”根”的访问时机区分：根左右 &#x2F; 左根右 &#x2F; 左右根
+
+
+中序（非递归）
+栈
+一路向左压栈，左到头弹...
+    
+
+        <a href="/blog/2026/08/09/%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86%E4%B8%8E%E7%BA%BF%E7%B4%A2%E5%8C%96/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%A0%91/" rel="tag">树</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
     </ul>
 
     
 <nav id="page-nav">
     <div class="inner">
-    <a class="extend prev" rel="prev" href="/blog/page/5/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><a class="page-number" href="/blog/page/8/">8</a><a class="extend next" rel="next" href="/blog/page/7/">下一页</a>
+    <a class="extend prev" rel="prev" href="/blog/page/5/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/4/">4</a><a class="page-number" href="/blog/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/7/">下一页</a>
     </div>
 </nav>
 

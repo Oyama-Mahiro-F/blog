@@ -328,70 +328,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
         </li>
     
         <li class="post-list-item fade">
-            <article id="post-串的模式匹配-KMP算法"
-  class="article-card article-type-post" itemprop="blogPost">
-
-    <div class="post-meta">
-        <time class="post-time" title="2026-08-09 12:55:00" datetime="2026-08-09T04:55:00.000Z"  itemprop="datePublished">2026-08-09</time>
-
-        
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
-
-
-
-    </div>
-
-    
-
-
-  
-    <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-KMP%E7%AE%97%E6%B3%95/">串的模式匹配：KMP 算法</a>
-    </h3>
-  
-
-
-
-
-    <div class="post-content" id="post-content" itemprop="postContent">
-
-    
-        KMP 算法利用模式串自身的结构信息（next 数组），避免主串指针 i 的回溯，每次匹配失败时 j 回溯到 next[j]。匹配时间复杂度 O(n+m)。
-核心概念
-前缀：除最后一个字符外，字符串的所有头部子串
-后缀：除第一个字符外，字符串的所有尾部子串
-最长公共前后缀：前缀和后缀集合的交集中，最长的那个元素
-
-
-
-
-模式串 T
-前缀
-后缀
-最长公共前后缀长度
-
-
-
-&quot;a&quo...
-    
-
-        <a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-KMP%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
-            阅读全文…
-        </a>
-    </div>
-    
-    <div class="post-footer">
-        
-	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%B2/" rel="tag">串</a></li></ul>
-
-    </div>
-    
-</article>
-
-        </li>
-    
-        <li class="post-list-item fade">
-            <article id="post-串的模式匹配-BF算法"
+            <article id="post-串的模式匹配：BF 与 KMP"
   class="article-card article-type-post" itemprop="blogPost">
 
     <div class="post-meta">
@@ -409,7 +346,7 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
 
   
     <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-BF%E7%AE%97%E6%B3%95/">串的模式匹配：BF 算法</a>
+      <a class="post-title-link" href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/">串的模式匹配：BF 与 KMP</a>
     </h3>
   
 
@@ -419,12 +356,11 @@ D=∣ai​−bj​∣+∣bj​−ck​∣+∣ck​−ai​∣
     <div class="post-content" id="post-content" itemprop="postContent">
 
     
-        给定主串 S（长度为 n）和模式串 T（长度为 m，m≤n），在 S 中找到 T 首次出现的位置（1 索引）；匹配失败返回 0。
-算法思想从 S 的第 1 个字符开始，逐个与 T 比较，若匹配失败则 S 指针回溯到下一个位置重新开始。
-12345678910S = &quot;ababcabcacbab&quot;T = &quot;abcac&quot;第1趟: a b a b c a b...
+        给定主串 S（长度为 n）和模式串 T（长度为 m，m≤n），模式匹配的任务是：在 S 中找到 T 首次出现的位置（下文一律采用 1 索引）；若匹配失败则返回 0。
+最朴素的算法是 BF（Brute-Force，暴力匹配），失配时主串指针一路回溯；而 KMP 利用模式串自身的结构信息（next 数组），让主串指针永不回溯，从而把最坏复杂度从 O(nm) 降到 O(n+m)。两种方法的关系如下...
     
 
-        <a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D-BF%E7%AE%97%E6%B3%95/" class="post-more waves-effect waves-button">
+        <a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" class="post-more waves-effect waves-button">
             阅读全文…
         </a>
     </div>
@@ -776,12 +712,62 @@ O(n2)
 
         </li>
     
+        <li class="post-list-item fade">
+            <article id="post-B树与B加树"
+  class="article-card article-type-post" itemprop="blogPost">
+
+    <div class="post-meta">
+        <time class="post-time" title="2026-08-09 11:50:00" datetime="2026-08-09T03:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+        
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+    </div>
+
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/">B树与B+树</a>
+    </h3>
+  
+
+
+
+
+    <div class="post-content" id="post-content" itemprop="postContent">
+
+    
+        大型数据库中数据存储在磁盘，磁盘 I&#x2F;O 次数是性能瓶颈。平衡 BST 每次比较可能访问一个新结点（一次磁盘 I&#x2F;O），log2​n 次 I&#x2F;O 无法接受。
+解决思路：让一个结点容纳多个关键字 → 多路查找树。一个结点大小 ≈ 一个磁盘页，一次 I&#x2F;O 读取多个关键字，大幅降低树高。
+
+R. Bayer 和 E. McCreight（1972）提出 B...
+    
+
+        <a href="/blog/2026/08/09/B%E6%A0%91%E4%B8%8EB%E5%8A%A0%E6%A0%91/" class="post-more waves-effect waves-button">
+            阅读全文…
+        </a>
+    </div>
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%9F%A5%E6%89%BE/" rel="tag">查找</a></li></ul>
+
+    </div>
+    
+</article>
+
+        </li>
+    
     </ul>
 
     
 <nav id="page-nav">
     <div class="inner">
-    <a class="extend prev" rel="prev" href="/blog/page/4/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><a class="page-number" href="/blog/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/blog/page/6/">6</a><a class="page-number" href="/blog/page/7/">7</a><a class="page-number" href="/blog/page/8/">8</a><a class="extend next" rel="next" href="/blog/page/6/">下一页</a>
+    <a class="extend prev" rel="prev" href="/blog/page/4/">上一页</a><a class="page-number" href="/blog/">1</a><span class="space">&hellip;</span><a class="page-number" href="/blog/page/3/">3</a><a class="page-number" href="/blog/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/blog/page/6/">6</a><a class="page-number" href="/blog/page/7/">7</a><a class="extend next" rel="next" href="/blog/page/6/">下一页</a>
     </div>
 </nav>
 

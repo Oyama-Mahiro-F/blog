@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>拓扑排序与关键路径 AOE | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,图">
+    <meta name="description" content="有向无环图（DAG）的两个典型应用：拓扑排序回答”工程能否顺利完成、活动按什么顺序做”（AOV 网），关键路径回答”最短工期多久、哪些活动一天都不能拖”（AOE 网）。两者都建立在 DAG 之上，且关键路径求 ve&#x2F;vl 时还要依赖拓扑序。    网类型 顶点 边&#x2F;弧 研究问题 核心算法    AOV 网 活动 活动间的优先关系 工程能否顺利完成？ 拓扑排序   AOE 网 事件（Eve">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拓扑排序与关键路径 AOE">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="有向无环图（DAG）的两个典型应用：拓扑排序回答”工程能否顺利完成、活动按什么顺序做”（AOV 网），关键路径回答”最短工期多久、哪些活动一天都不能拖”（AOE 网）。两者都建立在 DAG 之上，且关键路径求 ve&#x2F;vl 时还要依赖拓扑序。    网类型 顶点 边&#x2F;弧 研究问题 核心算法    AOV 网 活动 活动间的优先关系 工程能否顺利完成？ 拓扑排序   AOE 网 事件（Eve">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png">
+<meta property="article:published_time" content="2026-08-09T03:20:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T14:34:26.415Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="图">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC6%E7%AB%A0%20%E5%9B%BE.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">拓扑排序与关键路径 AOE</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">拓扑排序与关键路径 AOE</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T03:20:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%EF%BC%88AOV-%E7%BD%91%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">拓扑排序（AOV 网）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">基本概念</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">算法思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">算法实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">算法分析</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%EF%BC%88AOE-%E7%BD%91%EF%BC%89"><span class="post-toc-number">2.</span> <span class="post-toc-text">关键路径（AOE 网）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%B8%8E-AOE-%E6%9C%89%E5%85%B3%E7%9A%84%E7%A0%94%E7%A9%B6%E9%97%AE%E9%A2%98"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">与 AOE 有关的研究问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#AOV-%E7%BD%91-vs-AOE-%E7%BD%91"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">AOV 网 vs AOE 网</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5%E4%B8%8E%E8%AE%A1%E7%AE%97"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">相关概念与计算</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E8%AE%A1%E7%AE%97%E6%AD%A5%E9%AA%A4"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">计算步骤</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%AE%9E%E4%BE%8B"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">实例</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">3.</span> <span class="post-toc-text">交互演示</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">拓扑排序</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">关键路径</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">4.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-拓扑排序与关键路径 AOE"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">拓扑排序与关键路径 AOE</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 11:20:00" datetime="2026-08-09T03:20:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>有向无环图（DAG）的两个典型应用：<strong>拓扑排序</strong>回答”工程能否顺利完成、活动按什么顺序做”（AOV 网），<strong>关键路径</strong>回答”最短工期多久、哪些活动一天都不能拖”（AOE 网）。两者都建立在 DAG 之上，且关键路径求 <code>ve/vl</code> 时还要依赖拓扑序。</p>
+<table>
+<thead>
+<tr>
+<th align="left">网类型</th>
+<th align="left">顶点</th>
+<th align="left">边&#x2F;弧</th>
+<th align="left">研究问题</th>
+<th align="left">核心算法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>AOV 网</strong></td>
+<td align="left">活动</td>
+<td align="left">活动间的优先关系</td>
+<td align="left">工程能否顺利完成？</td>
+<td align="left">拓扑排序</td>
+</tr>
+<tr>
+<td align="left"><strong>AOE 网</strong></td>
+<td align="left">事件（Event）</td>
+<td align="left">活动（Activity）</td>
+<td align="left">最短工期？关键活动？</td>
+<td align="left">关键路径</td>
+</tr>
+</tbody></table>
+<h2 id="拓扑排序（AOV-网）"><a href="#拓扑排序（AOV-网）" class="headerlink" title="拓扑排序（AOV 网）"></a>拓扑排序（AOV 网）</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p><strong>拓扑排序</strong>：由某个集合上的一个<strong>偏序</strong>得到该集合上的一个<strong>全序</strong>的操作。即有向图的拓扑排序——构造 AOV 网中顶点的一个拓扑线性序列，使得该线性序列满足两点：</p>
+<ol>
+<li><strong>保持</strong>原来有向图中顶点之间的优先关系</li>
+<li>对原图中<strong>没有优先关系</strong>的顶点之间，也建立一种（人为的）优先关系</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>偏序</strong></td>
+<td align="left">集合中仅有<strong>部分</strong>元素之间可以比较先后</td>
+</tr>
+<tr>
+<td align="left"><strong>全序</strong></td>
+<td align="left">集合中<strong>任意两个</strong>元素之间都可以比较先后（拓扑排序后的线性序列）</td>
+</tr>
+<tr>
+<td align="left"><strong>AOV 网</strong></td>
+<td align="left">顶点表示活动，弧表示活动间的优先关系</td>
+</tr>
+<tr>
+<td align="left"><strong>前驱&#x2F;后继</strong></td>
+<td align="left">存在弧 <code>$\langle i, j \rangle$</code>，则 <code>$i$</code> 是 <code>$j$</code> 的直接前驱</td>
+</tr>
+</tbody></table>
+<p><strong>核心条件</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">条件</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">图必须为 <strong>DAG</strong></td>
+<td align="left">有向无环图——若存在环，无法确定环上顶点的先后顺序</td>
+</tr>
+<tr>
+<td align="left">存在性</td>
+<td align="left">DAG 的拓扑序列<strong>一定存在</strong>（至少一个）</td>
+</tr>
+<tr>
+<td align="left">唯一性</td>
+<td align="left">拓扑序列通常<strong>不唯一</strong>（多入度为 0 时有多种选择）</td>
+</tr>
+</tbody></table>
+<p><strong>AOV 网不能有环</strong>：若存在环，则某项活动能否进行是以自身的完成作为前提条件，逻辑上不可能。检查方法——拓扑排序，<strong>若所有顶点都在拓扑有序序列中，则无环</strong>（否则存在环，拓扑排序失败）。</p>
+<h3 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第6章 图.assets/Gemini_Generated_Image_ylbi4uylbi4uylbi.png" alt="拓扑排序过程示意" title="">
+                </div>
+                <div class="image-caption">拓扑排序过程示意</div>
+            </figure>
+
+<p>① 在 AOV 网中选择一个<strong>没有前驱</strong>的顶点（入度为 0）并<strong>输出</strong>；</p>
+<p>② 在 AOV 网中<strong>删除</strong>该顶点以及从该顶点出发的所有有向弧（即邻接点入度 <code>$−1$</code>）；</p>
+<p>③ <strong>重复</strong> ①②，直到：</p>
+<ul>
+<li>图中<strong>全部顶点都已输出</strong> → 图中无环，拓扑排序成功</li>
+<li>图中<strong>不存在无前驱的顶点</strong>（但仍有顶点未输出）→ 图中必有环，拓扑排序失败</li>
+</ul>
+<h3 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h3><blockquote>
+<p>顶点结点需包含 <code>indegree</code> 字段。</p>
+</blockquote>
+<p><strong>(1) 统计各顶点入度</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">count_indegree</span><span class="params">(ALGraph *G)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> k;</span><br><span class="line">    LinkNode *p;</span><br><span class="line">    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; G-&gt;vexnum; k++)                  <span class="comment">// 顶点入度初始化</span></span><br><span class="line">        G-&gt;AdjList[k].indegree = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; G-&gt;vexnum; k++) &#123;                 <span class="comment">// 顶点入度统计</span></span><br><span class="line">        p = G-&gt;AdjList[k].firstarc;</span><br><span class="line">        <span class="keyword">while</span> (p != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            G-&gt;AdjList[p-&gt;adjvex].indegree++;         <span class="comment">// 邻接点入度 +1</span></span><br><span class="line">            p = p-&gt;nextarc;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2) 拓扑排序算法</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">TopologicSort</span><span class="params">(ALGraph *G, <span class="type">int</span> topol[])</span> </span>&#123;         <span class="comment">// topol[] 保存拓扑序列</span></span><br><span class="line">    <span class="type">int</span> k, no, vex_no, top = <span class="number">0</span>, count = <span class="number">0</span>, boolean = <span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> stack[MAX_VEX];                              <span class="comment">// 用作堆栈</span></span><br><span class="line">    LinkNode *p;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">count_indegree</span>(G);                               <span class="comment">// ① 统计各顶点的入度</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; G-&gt;vexnum; k++)                  <span class="comment">// ② 入度为 0 的顶点入栈</span></span><br><span class="line">        <span class="keyword">if</span> (G-&gt;AdjList[k].indegree == <span class="number">0</span>)</span><br><span class="line">            stack[++top] = G-&gt;AdjList[k].data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (top == <span class="number">0</span>) boolean = <span class="number">0</span>;                   <span class="comment">// 栈空 → 有环或无顶点可处理</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            no = stack[top--];                       <span class="comment">// 栈顶元素出栈</span></span><br><span class="line">            topol[++count] = no;                     <span class="comment">// 记录顶点序列</span></span><br><span class="line"></span><br><span class="line">            p = G-&gt;AdjList[no].firstarc;</span><br><span class="line">            <span class="keyword">while</span> (p != <span class="literal">NULL</span>) &#123;                      <span class="comment">// ③ 删除以该顶点为尾的弧</span></span><br><span class="line">                vex_no = p-&gt;adjvex;</span><br><span class="line">                G-&gt;AdjList[vex_no].indegree--;       <span class="comment">// 邻接点入度 -1</span></span><br><span class="line">                <span class="keyword">if</span> (G-&gt;AdjList[vex_no].indegree == <span class="number">0</span>)</span><br><span class="line">                    stack[++top] = vex_no;           <span class="comment">// 新的无前驱顶点入栈</span></span><br><span class="line">                p = p-&gt;nextarc;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">while</span> (boolean == <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (count &lt; G-&gt;vexnum) <span class="keyword">return</span> <span class="number">-1</span>;                <span class="comment">// 有环，拓扑排序失败</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="number">1</span>;                                    <span class="comment">// 成功</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="算法分析"><a href="#算法分析" class="headerlink" title="算法分析"></a>算法分析</h3><p>设 AOV 网有 <code>$n$</code> 个顶点、<code>$e$</code> 条边：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">操作</th>
+<th align="left">时间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">统计各顶点入度</td>
+<td align="left">遍历所有顶点和边</td>
+<td align="left"><code>$O(n+e)$</code></td>
+</tr>
+<tr>
+<td align="left">入度为 0 的顶点入栈</td>
+<td align="left">遍历所有顶点</td>
+<td align="left"><code>$O(n)$</code></td>
+</tr>
+<tr>
+<td align="left">排序过程</td>
+<td align="left">顶点入栈&#x2F;出栈 <code>$n$</code> 次 + 入度减 1 共 <code>$e$</code> 次</td>
+<td align="left"><code>$O(n+e)$</code></td>
+</tr>
+<tr>
+<td align="left"><strong>总计</strong></td>
+<td align="left"></td>
+<td align="left"><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span></strong></td>
+</tr>
+</tbody></table>
+<p>空间复杂度：<code>$O(n)$</code>（栈 + 入度数组）。</p>
+<blockquote>
+<p><strong>考点</strong>：拓扑排序既能<strong>给出活动顺序</strong>，又能<strong>检测有环</strong>——全部顶点输出则 DAG 无环，否则有环。其时间复杂度 <code>$O(n+e)$</code> 与 DFS&#x2F;BFS 遍历同阶。</p>
+</blockquote>
+<h2 id="关键路径（AOE-网）"><a href="#关键路径（AOE-网）" class="headerlink" title="关键路径（AOE 网）"></a>关键路径（AOE 网）</h2><h3 id="与-AOE-有关的研究问题"><a href="#与-AOE-有关的研究问题" class="headerlink" title="与 AOE 有关的研究问题"></a>与 AOE 有关的研究问题</h3><ul>
+<li>完成整个工程<strong>至少需要多少时间</strong>？→ 从起点到终点的<strong>最长路径长度</strong>（路径上各活动持续时间之和）</li>
+<li>哪些活动是<strong>关键活动</strong>？→ 长度最长的路径称为<strong>关键路径</strong>（Critical Path），其上的活动一天都不能延迟</li>
+</ul>
+<h3 id="AOV-网-vs-AOE-网"><a href="#AOV-网-vs-AOE-网" class="headerlink" title="AOV 网 vs AOE 网"></a>AOV 网 vs AOE 网</h3><table>
+<thead>
+<tr>
+<th align="left">网类型</th>
+<th align="left">顶点</th>
+<th align="left">边&#x2F;弧</th>
+<th align="left">研究问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>AOV 网</strong></td>
+<td align="left">活动</td>
+<td align="left">活动间的优先关系</td>
+<td align="left">工程能否顺利完成？（拓扑排序）</td>
+</tr>
+<tr>
+<td align="left"><strong>AOE 网</strong></td>
+<td align="left">事件（Event）</td>
+<td align="left">活动（Activity）</td>
+<td align="left">最短工期？关键活动是什么？</td>
+</tr>
+</tbody></table>
+<h3 id="相关概念与计算"><a href="#相关概念与计算" class="headerlink" title="相关概念与计算"></a>相关概念与计算</h3><table>
+<thead>
+<tr>
+<th align="left">术语</th>
+<th align="left">计算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>ve(k)</strong> 事件最早发生</td>
+<td align="left">从源点正向递推，取 max（所有前驱事件完成才能开始）</td>
+</tr>
+<tr>
+<td align="left"><strong>vl(k)</strong> 事件最迟发生</td>
+<td align="left">从汇点反向递推，取 min（不推迟工期的前提下）</td>
+</tr>
+<tr>
+<td align="left"><strong>e(i)</strong> 活动最早开始</td>
+<td align="left">&#x3D; <code>ve(活动起点)</code></td>
+</tr>
+<tr>
+<td align="left"><strong>l(i)</strong> 活动最迟开始</td>
+<td align="left">&#x3D; <code>vl(活动终点) - 活动时长</code></td>
+</tr>
+<tr>
+<td align="left"><strong>关键活动</strong></td>
+<td align="left"><code>e(i) == l(i)</code> 的活动——一天都不能延迟</td>
+</tr>
+<tr>
+<td align="left"><strong>关键路径</strong></td>
+<td align="left">由关键活动组成的路径，决定工期</td>
+</tr>
+</tbody></table>
+<h3 id="计算步骤"><a href="#计算步骤" class="headerlink" title="计算步骤"></a>计算步骤</h3><ol>
+<li><strong>正向拓扑序求 ve</strong>：从源点出发，<code>$ve(j) = \max\&#123;ve(i) + w(i,j)\&#125;$</code>（取所有前驱事件中的最大值）</li>
+<li><strong>反向逆拓扑序求 vl</strong>：从汇点出发，<code>$vl(i) = \min\&#123;vl(j) - w(i,j)\&#125;$</code>（取所有后继事件中的最小值）</li>
+<li><strong>求活动的时间</strong>：<code>$e(i) = ve(\text&#123;起点&#125;)$</code>，<code>$l(i) = vl(\text&#123;终点&#125;) - \text&#123;时长&#125;$</code></li>
+<li><strong>找关键活动</strong>：<code>$e(i) = l(i)$</code> 的活动即关键活动，连成的路径即关键路径</li>
+</ol>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">顶点=事件（①~④），边=活动/天数</span><br><span class="line"></span><br><span class="line">① →(a1=3)→ ② →(a2=2)→ ④</span><br><span class="line">① →(a3=4)→ ③ →(a4=1)→ ②</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="center">①</th>
+<th align="center">②</th>
+<th align="center">③</th>
+<th align="center">④</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ve</td>
+<td align="center">0</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">7</td>
+</tr>
+<tr>
+<td align="left">vl</td>
+<td align="center">0</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">7</td>
+</tr>
+</tbody></table>
+<p><em>关键路径：①→③→②→④（长度&#x3D;8天）。非关键活动 a1&#x2F;a4 有松弛时间。</em></p>
+<blockquote>
+<p><strong>考点</strong>：<code>ve</code> 正向取 <strong>max</strong>、<code>vl</code> 反向取 <strong>min</strong>——记反了关键活动就全错。关键路径长度 &#x3D; 工程最短工期，关键路径上的活动松弛时间为 0。</p>
+</blockquote>
+<h2 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h2><h3 id="拓扑排序"><a href="#拓扑排序" class="headerlink" title="拓扑排序"></a>拓扑排序</h3><div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/topological-sort.html" title="拓扑排序" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h3 id="关键路径"><a href="#关键路径" class="headerlink" title="关键路径"></a>关键路径</h3><div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/critical-path.html" title="关键路径" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">拓扑排序</td>
+<td align="left">反复输出入度 0 顶点并删弧（入度 <code>$−1$），时间 </code><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">e</span><span class="mclose">)</span></span></span></span>&#96;</td>
+</tr>
+<tr>
+<td align="left">拓扑环检测</td>
+<td align="left">全部顶点输出→DAG 无环；仍有入度均 <code>$&gt;0$</code> 的顶点→有环</td>
+</tr>
+<tr>
+<td align="left">拓扑唯一性</td>
+<td align="left">DAG 一定有拓扑序列；通常<strong>不唯一</strong>（多入度 0 时）</td>
+</tr>
+<tr>
+<td align="left">应用场景</td>
+<td align="left">课程先修关系排课、工程任务调度、编译依赖分析</td>
+</tr>
+<tr>
+<td align="left">AOE 网</td>
+<td align="left">顶点&#x3D;事件、弧&#x3D;活动、权&#x3D;时间；工期&#x3D;<strong>最长路径</strong>长度</td>
+</tr>
+<tr>
+<td align="left">ve&#x2F;vl</td>
+<td align="left">ve 正向取 <strong>max</strong>，vl 反向取 <strong>min</strong></td>
+</tr>
+<tr>
+<td align="left">关键活动</td>
+<td align="left"><code>$e(i)=ve$(起点)、</code><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span></span></span></span>(终点)<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">−</span></span></span></span>时长；<code>$e(i)=l(i)$</code> 即关键活动</td>
+</tr>
+<tr>
+<td align="left">关键路径</td>
+<td align="left">由关键活动组成，决定工程最短工期</td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T14:34:26.415Z" itemprop="dateUpdated">2026-09-02 22:34:26</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E5%9B%BE/" rel="tag">图</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&title=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&title=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/09/%E7%BA%BF%E6%80%A7%E6%9F%A5%E6%89%BE%EF%BC%9A%E9%A1%BA%E5%BA%8F%E3%80%81%E6%8A%98%E5%8D%8A%E4%B8%8E%E5%88%86%E5%9D%97/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">线性查找：顺序、折半与分块</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%EF%BC%9ADijkstra%20%E4%B8%8E%20Floyd/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">最短路径：Dijkstra 与 Floyd</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&title=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&title=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《拓扑排序与关键路径 AOE》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%85%B3%E9%94%AE%E8%B7%AF%E5%BE%84%20AOE/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

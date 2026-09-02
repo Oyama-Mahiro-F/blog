@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>串的模式匹配：BF 与 KMP | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="408,串">
+    <meta name="description" content="给定主串 S（长度为 n）和模式串 T（长度为 m，m≤n），模式匹配的任务是：在 S 中找到 T 首次出现的位置（下文一律采用 1 索引）；若匹配失败则返回 0。 最朴素的算法是 BF（Brute-Force，暴力匹配），失配时主串指针一路回溯；而 KMP 利用模式串自身的结构信息（next 数组），让主串指针永不回溯，从而把最坏复杂度从 O(nm) 降到 O(n+m)。两种方法的关系如下：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="串的模式匹配：BF 与 KMP">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="给定主串 S（长度为 n）和模式串 T（长度为 m，m≤n），模式匹配的任务是：在 S 中找到 T 首次出现的位置（下文一律采用 1 索引）；若匹配失败则返回 0。 最朴素的算法是 BF（Brute-Force，暴力匹配），失配时主串指针一路回溯；而 KMP 利用模式串自身的结构信息（next 数组），让主串指针永不回溯，从而把最坏复杂度从 O(nm) 降到 O(n+m)。两种方法的关系如下：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-08-09T04:50:00.000Z">
+<meta property="article:modified_time" content="2026-09-02T14:31:23.958Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="串">
+<meta name="twitter:card" content="summary">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">串的模式匹配：BF 与 KMP</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">串的模式匹配：BF 与 KMP</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-08-09T04:50:00.000Z" itemprop="datePublished" class="page-time">
+  2026-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#BF-%E7%AE%97%E6%B3%95%EF%BC%88%E6%9A%B4%E5%8A%9B%E5%8C%B9%E9%85%8D%EF%BC%89"><span class="post-toc-number">1.</span> <span class="post-toc-text">BF 算法（暴力匹配）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">算法思想</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">算法实现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">性能分析</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#KMP-%E7%AE%97%E6%B3%95"><span class="post-toc-number">2.</span> <span class="post-toc-text">KMP 算法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">核心概念</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#next-%E6%95%B0%E7%BB%84%E5%AE%9A%E4%B9%89"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">next 数组定义</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#next-%E6%95%B0%E7%BB%84%E7%9A%84%E6%89%8B%E5%B7%A5%E6%8E%A8%E5%AF%BC%EF%BC%88%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%EF%BC%89"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">next 数组的手工推导（高频考点）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#KMP-%E5%8C%B9%E9%85%8D%E8%BF%87%E7%A8%8B%EF%BC%88C-%E4%BB%A3%E7%A0%81%EF%BC%89"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">KMP 匹配过程（C++ 代码）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#next-%E6%95%B0%E7%BB%84%E7%9A%84%E6%B1%82%E6%B3%95%EF%BC%88%E9%80%92%E6%8E%A8%E4%BB%A3%E7%A0%81%EF%BC%89"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">next 数组的求法（递推代码）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#nextval-%E6%95%B0%E7%BB%84%EF%BC%88%E6%94%B9%E8%BF%9B%E7%89%88%EF%BC%89"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">nextval 数组（改进版）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BA%A4%E4%BA%92%E6%BC%94%E7%A4%BA"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">交互演示</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#BF-%E4%B8%8E-KMP-%E5%AF%B9%E6%AF%94"><span class="post-toc-number">3.</span> <span class="post-toc-text">BF 与 KMP 对比</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">4.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-串的模式匹配：BF 与 KMP"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">串的模式匹配：BF 与 KMP</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-08-09 12:50:00" datetime="2026-08-09T04:50:00.000Z"  itemprop="datePublished">2026-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AE%97%E6%B3%95/">数据结构&算法</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>给定主串 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span>（长度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>）和模式串 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>（长度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>），<strong>模式匹配</strong>的任务是：在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> 中找到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> <strong>首次出现</strong>的位置（下文一律采用 1 索引）；若匹配失败则返回 0。</p>
+<p>最朴素的算法是 <strong>BF（Brute-Force，暴力匹配）</strong>，失配时主串指针一路回溯；而 <strong>KMP</strong> 利用模式串自身的结构信息（<code>next</code> 数组），让主串指针永不回溯，从而把最坏复杂度从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span> 降到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>。两种方法的关系如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">BF</th>
+<th align="left">KMP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">主串回溯</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 回溯</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> <strong>不回溯</strong></td>
+</tr>
+<tr>
+<td align="left">时间复杂度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>（最好）&#x2F; <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span>（最坏）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">额外空间</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>（next 数组）</td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">模式串短、偶发匹配</td>
+<td align="left">模式串长 &#x2F; 字符集小、海量文本</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：模式匹配题默认 <strong>1 索引</strong>（严蔚敏教材约定）；返回值是<strong>主串中模式串首字符的下标</strong>，不是比较次数。</p>
+</blockquote>
+<h2 id="BF-算法（暴力匹配）"><a href="#BF-算法（暴力匹配）" class="headerlink" title="BF 算法（暴力匹配）"></a>BF 算法（暴力匹配）</h2><h3 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h3><p>从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> 的第 1 个字符开始，逐个与 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> 比较；一旦某位失配，就<strong>放弃本轮已匹配的字符</strong>，把 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> 的指针回溯到本轮起始位置的下一个位置、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> 的指针重置为 1，重新开始。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">S = &quot;ababcabcacbab&quot;</span><br><span class="line">T = &quot;abcac&quot;</span><br><span class="line"></span><br><span class="line">第1趟: a b a b c a b c a c b a b</span><br><span class="line">      a b c a c               → S[3]!=T[3], 失败（本轮从 S[1] 起算）</span><br><span class="line"></span><br><span class="line">第2趟: a b a b c a b c a c b a b</span><br><span class="line">        a b c a c             → S[2]!=T[1], 失败（本轮从 S[2] 起算）</span><br><span class="line"></span><br><span class="line">...最终在第 6 位匹配成功</span><br></pre></td></tr></table></figure>
+
+<h3 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">Index_BF</span><span class="params">(SString S, SString T)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, j = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt;= S.length &amp;&amp; j &lt;= T.length) &#123;</span><br><span class="line">        <span class="keyword">if</span> (S.ch[i] == T.ch[j]) &#123;</span><br><span class="line">            i++; j++;                        <span class="comment">// 继续比较下一字符</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            i = i - j + <span class="number">2</span>;                   <span class="comment">// i 回溯到本轮起始的下一个位置</span></span><br><span class="line">            j = <span class="number">1</span>;                           <span class="comment">// j 回溯到模式串起点</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (j &gt; T.length) <span class="keyword">return</span> i - T.length;   <span class="comment">// 匹配成功，返回首位置</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;                                 <span class="comment">// 匹配失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>关键</strong>：失配时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 回溯到本轮起始位置的下一个位置（<code>i = i - j + 2</code>），<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 重置为 1。注意是 <code>i - j + 2</code> 而非 <code>i - j + 1</code>——因为从 1 开始的索引要”跳过整个本轮”再前进一格。</p>
+</blockquote>
+<h3 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h3><table>
+<thead>
+<tr>
+<th align="left">时间复杂度</th>
+<th align="left">最好 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>（首轮即匹配），最坏 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">空间复杂度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">失配代价</td>
+<td align="left">每轮失配 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 都要大幅回退，已比较的字符<strong>全部作废</strong></td>
+</tr>
+</tbody></table>
+<p><strong>最坏情况示例</strong>：主串 <code>&quot;0000000001&quot;</code>、模式串 <code>&quot;0001&quot;</code>——每趟都要比到最后一位才知道失败，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 反复回头，总比较次数接近 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>。</p>
+<blockquote>
+<p><strong>易错点</strong>：BF 的”回溯”指的是<strong>主串指针 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 回退</strong>。很多同学把 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 重置当成重点，但真正拖垮复杂度的是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 的反复后退——这正是 KMP 要消除的。</p>
+</blockquote>
+<h2 id="KMP-算法"><a href="#KMP-算法" class="headerlink" title="KMP 算法"></a>KMP 算法</h2><p>KMP 算法<strong>利用模式串自身的结构信息</strong>（<code>next</code> 数组），避免主串指针 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 的回溯：每次失配时不再重头开始，而是让 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 回溯到 <code>next[j]</code>，主串的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 原地不动继续往后走，匹配时间复杂度降为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>。</p>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><p>理解 <code>next</code> 数组，先要分清三个概念：</p>
+<ul>
+<li><strong>前缀</strong>：除最后一个字符外，字符串的所有头部子串</li>
+<li><strong>后缀</strong>：除第一个字符外，字符串的所有尾部子串</li>
+<li><strong>最长公共前后缀</strong>：前缀和后缀集合的交集中，长度最大的那个元素</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">模式串 T</th>
+<th align="left">前缀</th>
+<th align="left">后缀</th>
+<th align="center">最长公共前后缀长度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>&quot;a&quot;</code></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6633em;vertical-align:-0.0817em;"></span><span class="mord amsrm">∅</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6633em;vertical-align:-0.0817em;"></span><span class="mord amsrm">∅</span></span></span></span></td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="left"><code>&quot;ab&quot;</code></td>
+<td align="left"><code>{a}</code></td>
+<td align="left"><code>{b}</code></td>
+<td align="center">0</td>
+</tr>
+<tr>
+<td align="left"><code>&quot;aba&quot;</code></td>
+<td align="left"><code>{a, ab}</code></td>
+<td align="left"><code>{a, ba}</code></td>
+<td align="center">1（<code>&quot;a&quot;</code>）</td>
+</tr>
+<tr>
+<td align="left"><code>&quot;abab&quot;</code></td>
+<td align="left"><code>{a, ab, aba}</code></td>
+<td align="left"><code>{b, ab, bab}</code></td>
+<td align="center">2（<code>&quot;ab&quot;</code>）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：前缀<strong>不含最后一个字符</strong>、后缀<strong>不含第一个字符</strong>，二者都不取完整串。这是手工算 <code>next</code> 时最容易漏的地方。</p>
+</blockquote>
+<h3 id="next-数组定义"><a href="#next-数组定义" class="headerlink" title="next 数组定义"></a>next 数组定义</h3><p>在模式串中（下标从 1 开始），<code>next[j]</code> 表示：以模式串第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 处字符结尾的子串，其<strong>最大相同前后缀的长度</strong>。</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:4.32em;vertical-align:-1.91em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35em;"><span style="top:-2.2em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.192em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-3.15em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.292em;"><span class="pstrut" style="height:3.15em;"></span><span style="height:0.316em;width:0.8889em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.8889em" height="0.316em" style="width:0.8889em" viewBox="0 0 888.89 316" preserveAspectRatio="xMinYMin"><path d="M384 0 H504 V316 H384z M384 0 H504 V316 H384z"/></svg></span></span><span style="top:-4.6em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.85em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">0</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mop">max</span><span class="mopen">{</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mord text"><span class="mord"> </span><span class="mord cjk_fallback">且</span><span class="mord"> </span></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord">1..</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1..</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span><span class="mclose">]}</span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">当</span><span class="mord"> </span></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">当此集合非空</span></span></span></span><span style="top:-1.53em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord cjk_fallback">其他情况</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.91em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">模式串 T = &quot;abcac&quot; 的 next 数组:</span><br><span class="line"></span><br><span class="line">j:       1            2            3            4            5</span><br><span class="line">T[j]:    a            b            c            a            c</span><br><span class="line">next[j]: 0            1            1            1            2</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>易错点</strong>：<code>next[1] = 0</code> 是<strong>固定值</strong>（失配时 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 退到 0，配合代码中 <code>j == 0</code> 的分支让 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 同时前移）；其余位置若没有公共前后缀则取 <code>1</code>，<strong>不是</strong>取 0。</p>
+</blockquote>
+<h3 id="next-数组的手工推导（高频考点）"><a href="#next-数组的手工推导（高频考点）" class="headerlink" title="next 数组的手工推导（高频考点）"></a>next 数组的手工推导（高频考点）</h3><p>手工推导 <code>next</code> 时，<strong>逐位</strong>观察”以 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">]</span></span></span></span> 结尾的子串”的最长公共前后缀即可。下面用两个例题完整演示。</p>
+<p><strong>例题 1</strong>：<code>T = &quot;abcac&quot;</code>（用”<code>T[1..j-1]</code> 的最长公共前后缀长 +1”记法逐位推）</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>：固定 <code>next[1] = 0</code></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>：考察 <code>T[1..1]=&quot;a&quot;</code>，无真前后缀 → 长 0 → <code>next[2] = 1</code></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>：考察 <code>T[1..2]=&quot;ab&quot;</code>，前后缀无公共 → 长 0 → <code>next[3] = 1</code></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span>：考察 <code>T[1..3]=&quot;abc&quot;</code>，前后缀无公共 → 长 0 → <code>next[4] = 1</code></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span>：考察 <code>T[1..4]=&quot;abca&quot;</code>，公共 <code>&quot;a&quot;</code> 长 1 → <code>next[5] = 1+1 = 2</code></li>
+</ul>
+<p>即 <strong><code>next = 0 1 1 1 2</code></strong>，与上方定义框结果一致。</p>
+<p><strong>例题 2</strong>：<code>T = &quot;ABCDABD&quot;</code>（KMP 最常考，务必会手推）</p>
+<p>逐位看子串 <code>T[1..j-1]</code> 的最长公共前后缀：</p>
+<table>
+<thead>
+<tr>
+<th align="left">j</th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">T[j]</td>
+<td align="center">A</td>
+<td align="center">B</td>
+<td align="center">C</td>
+<td align="center">D</td>
+<td align="center">A</td>
+<td align="center">B</td>
+<td align="center">D</td>
+</tr>
+<tr>
+<td align="left">考察子串 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord">1..</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span></td>
+<td align="center">—</td>
+<td align="center"><code>A</code></td>
+<td align="center"><code>AB</code></td>
+<td align="center"><code>ABC</code></td>
+<td align="center"><code>ABCD</code></td>
+<td align="center"><code>ABCDA</code></td>
+<td align="center"><code>ABCDAB</code></td>
+</tr>
+<tr>
+<td align="left">最长公共前后缀</td>
+<td align="center">—</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center"><code>A</code>(1)</td>
+<td align="center"><code>AB</code>(2)</td>
+</tr>
+<tr>
+<td align="left">next[j]</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+</tr>
+</tbody></table>
+<p>即 <strong><code>next = 0 1 1 1 1 2 3</code></strong>。</p>
+<blockquote>
+<p><strong>考点</strong>：手推 <code>next</code> 用”<code>T[1..j-1]</code> 的最长公共前后缀长度 +1”最不易错；<code>next[1]=0</code> 永远固定，其余无公共前后缀时一律为 <code>1</code>。</p>
+</blockquote>
+<h3 id="KMP-匹配过程（C-代码）"><a href="#KMP-匹配过程（C-代码）" class="headerlink" title="KMP 匹配过程（C++ 代码）"></a>KMP 匹配过程（C++ 代码）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">Index_KMP</span><span class="params">(SString S, SString T, <span class="type">int</span> next[])</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, j = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt;= S.length &amp;&amp; j &lt;= T.length) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || S.ch[i] == T.ch[j]) &#123;</span><br><span class="line">            i++; j++;                         <span class="comment">// 匹配（或 j==0 时双指针齐进）</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            j = next[j];                      <span class="comment">// i 不回溯，j 回溯到 next[j]</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (j &gt; T.length) <span class="keyword">return</span> i - T.length;    <span class="comment">// 匹配成功</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;                                 <span class="comment">// 匹配失败</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>关键</strong>：<code>j == 0</code> 分支对应 <code>next[1] = 0</code>——此时说明模式串第 1 个字符就不匹配，于是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 同时前移一格，绝不像 BF 那样让 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 大幅回退。</p>
+</blockquote>
+<h3 id="next-数组的求法（递推代码）"><a href="#next-数组的求法（递推代码）" class="headerlink" title="next 数组的求法（递推代码）"></a>next 数组的求法（递推代码）</h3><p><code>next</code> 本身也能用和匹配几乎一样的双指针递推在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 内求出：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Get_Next</span><span class="params">(SString T, <span class="type">int</span> next[])</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, j = <span class="number">0</span>;</span><br><span class="line">    next[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; T.length) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || T.ch[i] == T.ch[j]) &#123;</span><br><span class="line">            i++; j++;</span><br><span class="line">            next[i] = j;                      <span class="comment">// 记录最长公共前后缀长度</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            j = next[j];                      <span class="comment">// 失配时回溯 j</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>双指针递推：相等则 <code>i++</code>、<code>j++</code> 且 <code>next[i]=j</code>；不等则 <code>j = next[j]</code>。它的逻辑与 KMP 主匹配循环完全对称，只是把主串 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span> 换成了模式串自身 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span>。</p>
+</blockquote>
+<p><strong>匹配关键点</strong>（主串 <code>&quot;BBC ABCDAB ABCDABCDABDE&quot;</code>，模式串 <code>&quot;ABCDABD&quot;</code>）：</p>
+<p>前面已推出 <code>next = 0 1 1 1 1 2 3</code>。当 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">[</span><span class="mord">12..17</span><span class="mclose">]</span></span></span></span> &#x3D; <code>&quot;ABCDAB&quot;</code> 已匹配 6 个字符后，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">[</span><span class="mord">18</span><span class="mclose">]</span></span></span></span> ≠ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord">7</span><span class="mclose">]</span></span></span></span>，由于 <code>next[7]=3</code>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 回退到 3——利用已匹配的 <code>&quot;AB&quot;</code> 前缀，<strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 不动</strong>继续比较 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">[</span><span class="mord">18</span><span class="mclose">]</span></span></span></span> 和 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord">3</span><span class="mclose">]</span></span></span></span>。这一步正是 KMP 比 BF 高效的核心：主串指针从没后退过。</p>
+<h3 id="nextval-数组（改进版）"><a href="#nextval-数组（改进版）" class="headerlink" title="nextval 数组（改进版）"></a>nextval 数组（改进版）</h3><p>普通 <code>next</code> 仍有冗余：当 <code>T[i] == T[next[i]]</code> 时，回溯到 <code>next[i]</code> 必然<strong>再次失配</strong>。nextval 在此基础上”跳得更远”——若回溯后还是同一个字符，就一路继承到更远的 <code>nextval[next[i]]</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Get_NextVal</span><span class="params">(SString T, <span class="type">int</span> nextval[])</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, j = <span class="number">0</span>;</span><br><span class="line">    nextval[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; T.length) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j == <span class="number">0</span> || T.ch[i] == T.ch[j]) &#123;</span><br><span class="line">            i++; j++;</span><br><span class="line">            <span class="keyword">if</span> (T.ch[i] != T.ch[j])</span><br><span class="line">                nextval[i] = j;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                nextval[i] = nextval[j];      <span class="comment">// 相等时继承，跳过必然失配</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            j = nextval[j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>nextval 图解</strong>（仍以 <code>T = &quot;ABCDABD&quot;</code> 为例，先有 <code>next = 0 1 1 1 1 2 3</code>）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">T[j]:    A   B   C   D   A   B   D</span><br><span class="line">next:    0   1   1   1   1   2   3</span><br><span class="line"></span><br><span class="line">j=5:  T[5]=A, next[5]=1, T[1]=A</span><br><span class="line">      A = A  → nextval[5] = nextval[1] = 0   ← 避免回溯后再比同一个 A</span><br><span class="line"></span><br><span class="line">j=6:  T[6]=B, next[6]=2, T[2]=B</span><br><span class="line">      B = B  → nextval[6] = nextval[2] = 1   ← 避免回溯后再比同一个 B</span><br><span class="line"></span><br><span class="line">结果:  nextval = 0   1   1   1   0   1   3</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>nextval 改进原理</strong>：若 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span><span class="mclose">]]</span></span></span></span>，即回溯后还是同一个字符，必然再次失配——直接跳到更远的 <code>nextval[next[j]]</code>，少走冤枉路。nextval 不改变匹配结果，只减少无效比较。</p>
+</blockquote>
+<h3 id="交互演示"><a href="#交互演示" class="headerlink" title="交互演示"></a>交互演示</h3><div class="algo-demo">
+  <iframe src="/blog/images/第10章 串.assets/kmp.html" title="KMP 匹配过程" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<h2 id="BF-与-KMP-对比"><a href="#BF-与-KMP-对比" class="headerlink" title="BF 与 KMP 对比"></a>BF 与 KMP 对比</h2><table>
+<thead>
+<tr>
+<th align="left">维度</th>
+<th align="left">BF</th>
+<th align="left">KMP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">主串回溯</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 回溯</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> <strong>不回溯</strong></td>
+</tr>
+<tr>
+<td align="left">时间复杂度</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span>（最坏）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">额外空间</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>（next 数组）</td>
+</tr>
+<tr>
+<td align="left">适用场景</td>
+<td align="left">模式串短</td>
+<td align="left">模式串长 &#x2F; 字符集小</td>
+</tr>
+<tr>
+<td align="left">核心手段</td>
+<td align="left">失配即重头</td>
+<td align="left"><code>next</code> 跳过已知匹配前缀</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：KMP 的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 是<strong>最坏</strong>复杂度，且<strong>空间换时间</strong>——多用 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 的 <code>next</code> 数组；BF 空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 但最坏退化到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span>。考试常让你<strong>同时写出两者的复杂度</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">匹配问题定义</td>
+<td align="left">主串长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>、模式串长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>）；成功返回首位置，失败返回 0（默认 1 索引）</td>
+</tr>
+<tr>
+<td align="left">BF 算法</td>
+<td align="left">失配时主串指针 <strong>i 回溯</strong>重试；最好 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>、最坏 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span></strong>，空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">KMP 思想</td>
+<td align="left"><strong>i 永不回溯</strong>，失配时 j 跳到 <code>next[j]</code>，利用模式串自身结构；匹配时间 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span></strong></td>
+</tr>
+<tr>
+<td align="left">next 定义</td>
+<td align="left"><code>next[j]</code> &#x3D; 子串 <code>T[1..j-1]</code> 的最长公共前后缀长度 +1；<code>next[1]=0</code>，其余无公共前后缀为 1</td>
+</tr>
+<tr>
+<td align="left">next 手工推导</td>
+<td align="left">逐位看 <code>T[1..j-1]</code> 的最长公共前后缀；”<code>ABCDABD</code>“ → <strong>0 1 1 1 1 2 3</strong></td>
+</tr>
+<tr>
+<td align="left">next 实例</td>
+<td align="left"><code>&quot;abcac&quot;</code>：next &#x3D; <strong>0 1 1 1 2</strong>；”<code>j==0</code> 分支让 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span></span> 齐进</td>
+</tr>
+<tr>
+<td align="left">nextval 改进</td>
+<td align="left">若 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mord mathnormal">e</span><span class="mord mathnormal">x</span><span class="mord mathnormal">t</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]]</span></span></span></span>，则 <code>nextval[i]=nextval[next[i]]</code>——<strong>跳过必然再次失配</strong>的回溯</td>
+</tr>
+<tr>
+<td align="left">nextval 实例</td>
+<td align="left">“<code>ABCDABD</code>“：nextval &#x3D; <strong>0 1 1 1 0 1 3</strong>；不改变结果，只减无效比较</td>
+</tr>
+<tr>
+<td align="left">KMP 空间</td>
+<td align="left">next（nextval）数组 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span></strong>；BF 仅 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">BF vs KMP</td>
+<td align="left">BF 主串回溯、空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>；KMP 主串不回溯、空间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span>；复杂度 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">nm</span><span class="mclose">)</span></span></span></span> vs <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span></td>
+</tr>
+</tbody></table>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-09-02T14:31:23.958Z" itemprop="dateUpdated">2026-09-02 22:31:23</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E4%B8%B2/" rel="tag">串</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&title=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&title=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2026/08/12/%E4%B8%89%E6%95%B0%E7%BB%84%E6%9C%80%E5%B0%8F%E8%B7%9D%E7%A6%BB/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">三数组最小距离</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/09/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E3%80%81%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">归并排序、基数排序与外部排序</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&title=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&title=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《串的模式匹配：BF 与 KMP》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/08/09/%E4%B8%B2%E7%9A%84%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%EF%BC%9ABF%20%E4%B8%8E%20KMP/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
