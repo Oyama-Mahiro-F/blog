@@ -6,7 +6,7 @@
 - 生成后自检所有链接对应的源文章是否存在
 - 用法：python gen_mindmaps.py
 """
-import os, re, subprocess, sys
+import os, re, subprocess, sys, urllib.parse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 POSTS = os.path.join(ROOT, 'source', '_posts')
@@ -20,8 +20,9 @@ def post_date(stem):
     return m.group(1)
 
 def L(stem):
-    d = post_date(stem).replace('-', '/')
-    return '📖 [%s](/blog/%s/%s/)' % (stem, d, stem)
+    # URL 必须百分号编码：文件名含空格（如 "BF 与 KMP"）时，markdown 链接会在第一个空格处截断
+    url = urllib.parse.quote('/blog/%s/%s/' % (post_date(stem).replace('-', '/'), stem), safe='/:')
+    return '📖 [%s](%s)' % (stem, url)
 
 SUBJECTS = {
 '数据结构知识导图': [
@@ -122,7 +123,22 @@ def main():
         subprocess.run('npx -y markmap-cli "%s" -o "%s" --offline --no-open'
                        % (md, html), check=True, cwd=ROOT, shell=True)
         postprocess(html, subject)
-        print('OK %s (%d groups)' % (name, len(groups)))
+        # 自检：md 里的链接必须全部出现在 html（空格未编码会被 markmap 截断丢失）
+        md_links = set(urllib.parse.unquote(m) for m in re.findall(r'\((/blog/[^)]+)\)', open(md, encoding='utf-8').read()))
+        html_text = open(html, encoding='utf-8', errors='ignore').read()
+        B = chr(92)
+        html_links = set()
+        i = 0; marker = 'href=' + B + '"'
+        while True:
+            i = html_text.find(marker, i)
+            if i < 0: break
+            start = i + len(marker); end = html_text.find(B + '"', start)
+            html_links.add(urllib.parse.unquote(html_text[start:end])); i = start
+        lost = md_links - html_links
+        if lost:
+            print('[FAIL] %s 丢失 %d 个链接（文件名含空格/特殊字符?）: %s' % (name, len(lost), sorted(lost)))
+            sys.exit(1)
+        print('OK %s (%d groups, %d links)' % (name, len(groups), len(html_links)))
     sys.exit(1 if failed else 0)
 
 if __name__ == '__main__':

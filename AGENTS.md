@@ -182,8 +182,7 @@ git -C D:\blog2 status      # 查看改动
 - `_config.yml` 已设 `skip_render: mindmaps/**`——文件均原样发布到 `/blog/mindmaps/`，**不要**在里面写 Hexo 文章；顶部导航"思维导图"菜单项指向 `/mindmaps/`。
 - **批量生成/更新用脚本**（科目→分组→文章 的结构都维护在脚本 `SUBJECTS` 里，链接日期自动从 front matter 取）：
   ```bash
-  python gen_mindmaps.py        # 重新生成三科以上 md+html（数据结构/操作系统/计组）
-  # 计算机网络知识导图 未纳入脚本，单独更新：
-  npx -y markmap-cli "source/mindmaps/计算机网络知识导图.md" -o "source/mindmaps/计算机网络知识导图.html" --offline --no-open
+  python gen_mindmaps.py        # 重新生成全部四科 md+html（脚本生成后自检链接数）
   ```
 - 导图节点用 `📖 [文章标题](/blog/2026/MM/DD/<文件名>/)` 链接到文章（URL 的 :title 用**文件名**，不是 front-matter title；中文与全角冒号可直用）。
+- ⚠️ **链接 URL 必须百分号编码**（脚本已处理）：文件名含**空格**（如"串的模式匹配：BF 与 KMP"）时，markdown 链接会在第一个空格处截断，markmap 会静默丢链——生成后脚本自检 md/html 链接数一致，不一致会退出非零。
