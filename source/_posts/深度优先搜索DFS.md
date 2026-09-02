@@ -74,6 +74,12 @@ void DFS_traverse_Graph(ALGraph *G) {
 
 ![深度优先生成森林示例](/blog/images/第6章 图.assets/image-20260703151738055.png)
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/dfs.html" title="DFS 深度优先搜索" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

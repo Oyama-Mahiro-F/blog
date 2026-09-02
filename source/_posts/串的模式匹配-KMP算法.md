@@ -136,6 +136,12 @@ j=6:  T[6]=B, next[6]=2, T[2]=B
 | 额外空间 | $O(1)$ | $O(m)$（next 数组） |
 | 适用场景 | 模式串短 | 模式串长 / 字符集小 |
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第10章 串.assets/kmp.html" title="KMP 匹配过程" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

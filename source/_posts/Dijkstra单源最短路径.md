@@ -102,6 +102,12 @@ void Dijkstra_path(AdjGraph *G, int v) {     // 从图 G 中的顶点 v 出发�
 - 外层循环 $n$ 轮，每轮：选 dist 最小顶点 $O(n)$ + 松弛 $n$ 个邻接点 $O(n)$
 - 总计：$O(n) + n \times O(n) = O(n^2)$
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/dijkstra.html" title="Dijkstra 最短路径" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

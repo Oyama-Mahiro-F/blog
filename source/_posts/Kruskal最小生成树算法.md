@@ -70,6 +70,12 @@ tags:
 
 > **核心记忆**：权值全不同 → MST 唯一；有权值相等的边 → 不一定唯一，需具体分析。
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/kruskal.html" title="Kruskal 最小生成树" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

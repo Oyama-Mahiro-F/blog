@@ -89,6 +89,12 @@ void BFS_traverse_Graph(ALGraph *G) {
 | 非树边类型 | 回边（Back Edge） | 横跨边（Cross Edge） |
 | 根到顶点路径 | 不保证最短 | **最短路径**（无权图） |
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/bfs.html" title="BFS 广度优先搜索" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

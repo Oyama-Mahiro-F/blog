@@ -95,6 +95,12 @@ typedef struct BSTNode {
 
 > **408 高频考点**：给一组关键字，按顺序插入画出 AVL 构造过程（标注每次旋转的 BF 变化）。
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/avl.html" title="AVL 旋转" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

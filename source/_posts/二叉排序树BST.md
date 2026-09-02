@@ -176,6 +176,12 @@ void BST_Delete(BSTNode *&T, KeyType key) {
 
 > **关键因素**：BST 的形状取决于**关键字的插入次序**——按有序序列插入会**退化为单链表**（$h=n$），查找效率降为 $O(n)$。
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/bst.html" title="二叉排序树" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

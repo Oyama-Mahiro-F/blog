@@ -114,6 +114,12 @@ void PrintPath(int j, int k) {
 
 > **408 核心记忆**：Dijkstra **不能有负权边**；Floyd **可以有负权边，不能有负权回路**；Bellman-Ford **不能有负权回路，但可以检测负权回路**（第 $n$ 轮仍有更新则存在负环）。
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/floyd.html" title="Floyd 多源最短路径" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

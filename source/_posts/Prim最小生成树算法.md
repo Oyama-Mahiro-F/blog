@@ -48,6 +48,12 @@ tags:
 
 **适合**：稠密图
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第6章 图.assets/prim.html" title="Prim 最小生成树" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |

@@ -131,6 +131,12 @@ $$
 
 > **408 考点**：B 树的高度公式、插入分裂过程、B 树 vs B+ 树区别、B+ 树的范围查询优势。
 
+## 交互演示
+
+<div class="algo-demo">
+  <iframe src="/blog/images/第7章 查找.assets/b-tree.html" title="B 树插入与删除" loading="lazy" allowfullscreen></iframe>
+</div>
+
 ## 高频考点速记
 
 | 考点 | 记忆 |
