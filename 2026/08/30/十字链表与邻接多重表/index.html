@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="408,图,数据结构">
+    <meta name="keywords" content="408,数据结构,图">
     <meta name="description" content="邻接矩阵与邻接表（含逆邻接表）是图最常用的两种存储结构，但各有短板：邻接矩阵空间 O(n2)，稀疏图太浪费；邻接表虽省空间，却有向图难找入边（要另建逆邻接表）、无向图每条边要存两份。为此考纲引入两种专用链式存储：十字链表（Orthogonal List）把邻接表与逆邻接表合二为一，专用于有向图；邻接多重表（Adjacency Multilist）让每条边只存一个结点，专用于无向图。两者空间复杂度均">
 <meta property="og:type" content="article">
 <meta property="og:title" content="十字链表与邻接多重表">
@@ -663,6 +663,39 @@
 </div>
 
 
+
+<script>
+/* 算法演示 iframe 自适应高度：iframe 与站点同源，直接按内容高度撑开，
+   避免 article.less 里的固定 780px 把演示截断或逼出内部滚动条。 */
+(function () {
+    function fit(frame) {
+        if (!frame) return;
+        try {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            var h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+            if (h > 200) frame.style.height = Math.min(h + 4, 2400) + 'px';
+        } catch (e) { /* 跨域则保持 CSS 高度 */ }
+    }
+    function fitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), fit);
+    }
+    function init() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), function (frame) {
+            fit(frame);
+            frame.addEventListener('load', function () {
+                fit(frame);
+                setTimeout(function () { fit(frame); }, 400);
+                setTimeout(function () { fit(frame); }, 1500);
+            });
+        });
+        fitAll();
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+    window.addEventListener('resize', fitAll);
+})();
+</script>
 
 
     <script src="/blog/js/waves.min.js"></script>

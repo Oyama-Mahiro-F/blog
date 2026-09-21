@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="网络,408,数据链路层,滑动窗口">
+    <meta name="keywords" content="408,网络,数据链路层,滑动窗口">
     <meta name="description" content="选择重传协议（SR, Selective Repeat）针对 GBN 的浪费做了改进：接收方缓存乱序帧，发送方只重传超时的那一帧，凑齐后按序交付上层，窗口再滑动。代价是接收方要缓存多个帧、确认要逐个发，协议更复杂。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="选择重传协议（SR）">
@@ -547,6 +547,39 @@
 </div>
 
 
+
+<script>
+/* 算法演示 iframe 自适应高度：iframe 与站点同源，直接按内容高度撑开，
+   避免 article.less 里的固定 780px 把演示截断或逼出内部滚动条。 */
+(function () {
+    function fit(frame) {
+        if (!frame) return;
+        try {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            var h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+            if (h > 200) frame.style.height = Math.min(h + 4, 2400) + 'px';
+        } catch (e) { /* 跨域则保持 CSS 高度 */ }
+    }
+    function fitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), fit);
+    }
+    function init() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), function (frame) {
+            fit(frame);
+            frame.addEventListener('load', function () {
+                fit(frame);
+                setTimeout(function () { fit(frame); }, 400);
+                setTimeout(function () { fit(frame); }, 1500);
+            });
+        });
+        fitAll();
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+    window.addEventListener('resize', fitAll);
+})();
+</script>
 
 
     <script src="/blog/js/waves.min.js"></script>

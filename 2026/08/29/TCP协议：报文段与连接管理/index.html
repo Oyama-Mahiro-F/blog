@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="网络,408,传输层,TCP">
+    <meta name="keywords" content="408,网络,传输层,TCP">
     <meta name="description" content="TCP（Transmission Control Protocol，传输控制协议）是面向连接的可靠传输协议：它把应用交来的数据看成无边界的字节流，给每个字节编号，用序号 + 确认 + 重传保证可靠交付。408 对本部分的考查集中在两块：TCP 报文段首部字段（逐个含义）与连接管理（三次握手、四次挥手、状态转换、序号消耗规则）。可靠传输&#x2F;流量控制&#x2F;拥塞控制的机制细节见另文。 TC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TCP协议：报文段与连接管理">
@@ -881,6 +881,39 @@
 </div>
 
 
+
+<script>
+/* 算法演示 iframe 自适应高度：iframe 与站点同源，直接按内容高度撑开，
+   避免 article.less 里的固定 780px 把演示截断或逼出内部滚动条。 */
+(function () {
+    function fit(frame) {
+        if (!frame) return;
+        try {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            var h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+            if (h > 200) frame.style.height = Math.min(h + 4, 2400) + 'px';
+        } catch (e) { /* 跨域则保持 CSS 高度 */ }
+    }
+    function fitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), fit);
+    }
+    function init() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), function (frame) {
+            fit(frame);
+            frame.addEventListener('load', function () {
+                fit(frame);
+                setTimeout(function () { fit(frame); }, 400);
+                setTimeout(function () { fit(frame); }, 1500);
+            });
+        });
+        fitAll();
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+    window.addEventListener('resize', fitAll);
+})();
+</script>
 
 
     <script src="/blog/js/waves.min.js"></script>

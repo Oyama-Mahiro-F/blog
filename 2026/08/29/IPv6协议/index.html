@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="网络,408,网络层,IPv6">
+    <meta name="keywords" content="408,网络,网络层,IPv6">
     <meta name="description" content="IPv4 的 32 位地址早已捉襟见肘，IPv6（IP version 6）用 128 位地址从根本上解决地址枯竭问题，并对首部、分片、安全、配置等机制做了系统性改造。地址长度、冒号十六进制记法等基础对比见《IP协议》一文，本文聚焦 408 考纲要求深化掌握的部分：基本首部 40B 的 8 个字段、地址表示规则与地址类型（单播&#x2F;组播&#x2F;任播）、与 IPv4 首部的逐字段对比、双协">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IPv6协议">
@@ -823,6 +823,39 @@
 </div>
 
 
+
+<script>
+/* 算法演示 iframe 自适应高度：iframe 与站点同源，直接按内容高度撑开，
+   避免 article.less 里的固定 780px 把演示截断或逼出内部滚动条。 */
+(function () {
+    function fit(frame) {
+        if (!frame) return;
+        try {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            var h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+            if (h > 200) frame.style.height = Math.min(h + 4, 2400) + 'px';
+        } catch (e) { /* 跨域则保持 CSS 高度 */ }
+    }
+    function fitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), fit);
+    }
+    function init() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), function (frame) {
+            fit(frame);
+            frame.addEventListener('load', function () {
+                fit(frame);
+                setTimeout(function () { fit(frame); }, 400);
+                setTimeout(function () { fit(frame); }, 1500);
+            });
+        });
+        fitAll();
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+    window.addEventListener('resize', fitAll);
+})();
+</script>
 
 
     <script src="/blog/js/waves.min.js"></script>
