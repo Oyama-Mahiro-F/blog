@@ -64,6 +64,26 @@
       height: 52px;
     }
 
+    /* 状态面板：窄屏 / 博客 iframe 内不撑破卡片、长内容不串行 */
+    #stateInfo > div {
+      min-width: 0;
+    }
+    #stateInfo .stat-value {
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    /* 日志栏：宽屏在右侧，窄屏(博客 iframe ≈666px)落到下方并限高 */
+    #logPanel {
+      max-height: calc(100vh - 150px);
+    }
+    @media (max-width: 1023px) {
+      #logPanel {
+        max-height: 260px;
+      }
+    }
+
     /* 日志条目滚动条美化 */
     #logContainer::-webkit-scrollbar {
       width: 5px;
@@ -146,10 +166,10 @@
   </div>
 
   <!-- ==================== 主体内容区 ==================== -->
-  <div class="max-w-7xl mx-auto flex gap-0 p-6">
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-0 p-6">
 
     <!-- 左侧：可视化区域 -->
-    <div class="flex-1 pr-6 min-w-0">
+    <div class="flex-1 lg:pr-6 min-w-0">
 
       <!-- ===== 数组可视化容器 ===== -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
@@ -166,7 +186,7 @@
       <!-- ===== 状态信息面板 ===== -->
       <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
         <h2 class="text-base font-semibold text-gray-700 mb-3">&#x1F4CB; 当前状态</h2>
-        <div id="stateInfo" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        <div id="stateInfo" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-sm">
           <!-- JS 动态渲染 -->
         </div>
       </div>
@@ -203,9 +223,10 @@
       </div>
     </div>
 
-    <!-- 右侧：执行日志侧边栏 (w-80 ≈ 320px) -->
-    <div class="w-80 flex-shrink-0 flex flex-col bg-white rounded-xl shadow-md border border-gray-200"
-         style="max-height: calc(100vh - 150px);">
+    <!-- 右侧：执行日志侧边栏（宽屏 w-80 ≈ 320px；窄屏落到下方） -->
+    <div id="logPanel"
+         class="w-full lg:w-80 lg:flex-shrink-0 flex flex-col bg-white rounded-xl shadow-md
+                border border-gray-200 mt-6 lg:mt-0">
 
       <!-- 日志标题 + 状态徽章 -->
       <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
@@ -487,29 +508,29 @@
       $stateInfo.innerHTML = `
         <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
           <div class="text-xs text-blue-400 mb-0.5">当前趟数</div>
-          <div class="text-lg font-bold text-blue-700">第 <span class="text-2xl">${passNum}</span> 趟</div>
+          <div class="stat-value text-lg font-bold text-blue-700">第 <span class="text-2xl">${passNum}</span> 趟</div>
         </div>
         <div class="bg-purple-50 rounded-lg p-3 border border-purple-100">
           <div class="text-xs text-purple-400 mb-0.5">当前子步骤</div>
-          <div class="text-lg font-bold text-purple-700">${phaseDesc}</div>
+          <div class="stat-value text-lg font-bold text-purple-700">${phaseDesc}</div>
         </div>
         <div class="bg-orange-50 rounded-lg p-3 border border-orange-100">
           <div class="text-xs text-orange-400 mb-0.5">待插入元素</div>
-          <div class="text-lg font-bold text-orange-700">R[${appState === 'RUNNING' ? i : '—'}] = ${elementVal}</div>
+          <div class="stat-value text-lg font-bold text-orange-700">R[${appState === 'RUNNING' ? i : '—'}] = ${elementVal}</div>
         </div>
         <div class="bg-teal-50 rounded-lg p-3 border border-teal-100">
           <div class="text-xs text-teal-400 mb-0.5">指针</div>
-          <div class="text-lg font-bold text-teal-700">
+          <div class="stat-value text-lg font-bold text-teal-700">
             i=${appState === 'RUNNING' ? i : '—'} &nbsp; j=${jVal}
           </div>
         </div>
         <div class="bg-rose-50 rounded-lg p-3 border border-rose-100">
           <div class="text-xs text-rose-400 mb-0.5">哨兵 R[0]</div>
-          <div class="text-lg font-bold text-rose-700">${sentinelVal}</div>
+          <div class="stat-value text-lg font-bold text-rose-700">${sentinelVal}</div>
         </div>
         <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
           <div class="text-xs text-emerald-400 mb-0.5">已排序长度</div>
-          <div class="text-lg font-bold text-emerald-700">${sortedUpTo} / ${n}</div>
+          <div class="stat-value text-lg font-bold text-emerald-700">${sortedUpTo} / ${n}</div>
         </div>
       `;
     }

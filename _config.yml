@@ -29,7 +29,13 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-skip_render: mindmaps/**
+# 逐字拷贝、不参与渲染的文件。
+# images/ 下全是静态资源（算法演示 HTML/SVG、图片）。Hexo 为 .html/.svg 注册了
+# 内置 plain 渲染器，若不跳过，它们会走 before_post_render/after_post_render 滤镜，
+# 演示页内联 JS 里的 `${...}` 会被当成 $...$ 行内公式抽走，页面显示成红色报错源码。
+skip_render:
+  - mindmaps/**
+  - images/**
 
 # Writing
 new_post_name: :title.md # File name of new posts

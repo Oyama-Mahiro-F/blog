@@ -94,7 +94,18 @@ function renderInto(html, store) {
   return html;
 }
 
+// Only markdown documents carry math. Hexo registers its built-in `plain`
+// renderer for `.html` / `.svg`, so these filters also fire for static assets
+// copied out of source/ (e.g. the interactive demos in source/images/**).
+// Those files contain inline JS whose `${...}` template literals look exactly
+// like `$...$` inline math: extraction ate the JS and KaTeX's error fallback
+// painted the raw source in red inside the demo. Never touch non-markdown.
+function isMarkdownDoc(data) {
+  return /\.(md|markdown|mkd|mkdn|mdown)$/i.test(data.source || '');
+}
+
 hexo.extend.filter.register('before_post_render', function (data) {
+  if (!isMarkdownDoc(data)) return data;
   if (!data.content || !data.content.includes('$')) return data;
   const { md, store } = extractMath(data.content);
   data.content = md;
@@ -103,6 +114,7 @@ hexo.extend.filter.register('before_post_render', function (data) {
 });
 
 hexo.extend.filter.register('after_post_render', function (data) {
+  if (!isMarkdownDoc(data)) return data;
   const store = data[STORE_KEY];
   if (!store || !store.length) return data;
   if (data.content) data.content = renderInto(data.content, store);
