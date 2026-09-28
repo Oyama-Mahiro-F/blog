@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="查找,408">
+    <meta name="keywords" content="408,查找">
     <meta name="description" content="大型数据库中数据存储在磁盘，磁盘 I&#x2F;O 次数是性能瓶颈。平衡 BST 每次比较可能访问一个新结点（一次磁盘 I&#x2F;O），log2​n 次 I&#x2F;O 无法接受。 解决思路：让一个结点容纳多个关键字 → 多路查找树。一个结点大小 ≈ 一个磁盘页，一次 I&#x2F;O 读取多个关键字，大幅降低树高。  R. Bayer 和 E. McCreight（1972）提出 B 树（">
 <meta property="og:type" content="article">
 <meta property="og:title" content="B树与B+树">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/v2-b2af4427b9264cac1956f6d0f31e570b_1440w.jpg">
 <meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC7%E7%AB%A0%20%E6%9F%A5%E6%89%BE.assets/image-20260706021748989.png">
 <meta property="article:published_time" content="2026-08-09T03:50:00.000Z">
-<meta property="article:modified_time" content="2026-09-02T12:43:40.940Z">
+<meta property="article:modified_time" content="2026-09-28T07:13:44.880Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="查找">
@@ -328,13 +328,13 @@
 </thead>
 <tbody><tr>
 <td align="left">根结点关键字数</td>
-<td align="left">1 ~ (m-1)</td>
-<td align="left">1 ~ m</td>
+<td align="left">1 &#126; (m-1)</td>
+<td align="left">1 &#126; m</td>
 </tr>
 <tr>
 <td align="left">中间结点关键字数</td>
-<td align="left">⌈m&#x2F;2⌉-1 ~ m-1</td>
-<td align="left">⌈m&#x2F;2⌉ ~ m</td>
+<td align="left">⌈m&#x2F;2⌉-1 &#126; m-1</td>
+<td align="left">⌈m&#x2F;2⌉ &#126; m</td>
 </tr>
 <tr>
 <td align="left">结点重复</td>
@@ -411,7 +411,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-09-02T12:43:40.940Z" itemprop="dateUpdated">2026-09-02 20:43:40</time>
+    最后更新时间：<time datetime="2026-09-28T07:13:44.880Z" itemprop="dateUpdated">2026-09-28 15:13:44</time>
 </span><br>
 
 

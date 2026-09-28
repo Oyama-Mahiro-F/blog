@@ -20,7 +20,7 @@
     <meta name="theme-color" content="#3F51B5">
     
     
-    <meta name="keywords" content="408,网络,传输层,TCP">
+    <meta name="keywords" content="网络,408,传输层,TCP">
     <meta name="description" content="TCP 的可靠传输、流量控制与拥塞控制是传输层三大核心机制：可靠传输在 IP 尽力而为的服务之上保证字节流”不丢、不重、不乱序”，靠序号 + 确认 + 超时重传 + 滑动窗口实现；流量控制防止发送过快导致接收方缓存溢出（点对点，用 rwnd）；拥塞控制防止过多数据注入网络造成全局拥塞（用 cwnd）。408 对这部分考查极密集：RTO 计算、发送窗口取 min(rwnd, cwnd)、四种算法下">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TCP可靠传输、流量控制与拥塞控制">
