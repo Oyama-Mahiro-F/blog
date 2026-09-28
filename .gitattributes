@@ -1,0 +1,26 @@
+# 行尾归一：默认 LF。
+# 本仓库曾出现工作区 CRLF / 索引 LF 混用，导致 105 个文件整篇“被修改”的
+# 假 diff（内容零变化）。`text=auto` 让 git 按文本/二进制自动判定，
+# `eol=lf` 固定检出与索引一致，杜绝此类噪音。
+* text=auto eol=lf
+
+# Windows 批处理必须保留 CRLF：LF 可能破坏 label/goto 的解析。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制资源：显式声明，禁止任何行尾转换。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.bmp binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
