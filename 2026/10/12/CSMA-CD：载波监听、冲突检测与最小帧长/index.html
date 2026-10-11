@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>CSMA/CD：载波监听、冲突检测与最小帧长 | 义务教育漏网之鱼&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="网络,408,数据链路层,CSMA/CD">
+    <meta name="description" content="CSMA&#x2F;CD（Carrier Sense Multiple Access &#x2F; Collision Detection，载波监听多点接入&#x2F;冲突检测）是经典以太网（IEEE 802.3）的介质访问控制协议，解决的是”多个站点共享一条广播式总线（或用集线器连成的共享介质）时，谁可以发、什么时候发“的问题。408 对本知识点的考查几乎全在结论与计算上：争用期 2τ 的物理含">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSMA&#x2F;CD：载波监听、冲突检测与最小帧长">
+<meta property="og:url" content="https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/index.html">
+<meta property="og:site_name" content="义务教育漏网之鱼&#39;s blog">
+<meta property="og:description" content="CSMA&#x2F;CD（Carrier Sense Multiple Access &#x2F; Collision Detection，载波监听多点接入&#x2F;冲突检测）是经典以太网（IEEE 802.3）的介质访问控制协议，解决的是”多个站点共享一条广播式总线（或用集线器连成的共享介质）时，谁可以发、什么时候发“的问题。408 对本知识点的考查几乎全在结论与计算上：争用期 2τ 的物理含">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/csma-cd-%E4%BA%89%E7%94%A8%E6%9C%9F.png">
+<meta property="article:published_time" content="2026-10-12T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-11T23:57:23.639Z">
+<meta property="article:author" content="义务教育漏网之鱼">
+<meta property="article:tag" content="408">
+<meta property="article:tag" content="CSMA&#x2F;CD">
+<meta property="article:tag" content="数据链路层">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/csma-cd-%E4%BA%89%E7%94%A8%E6%9C%9F.png">
+    
+    <link rel="shortcut icon" href="/blog/img/avatar.jpg">
+    <link rel="stylesheet" href="/blog/css/style.css?v=1.7.2">
+    
+    <link rel="stylesheet" href="/blog/css/katex.min.css">
+    
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/blog/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">义务教育漏网之鱼</h5>
+          <a href="mailto:614682480@qq.com" title="614682480@qq.com" class="mail">614682480@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/about"  >
+                <i class="icon icon-lg icon-user"></i>
+                关于
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/mindmaps/"  >
+                <i class="icon icon-lg icon-sitemap"></i>
+                思维导图
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Oyama-Mahiro-F" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                GitHub
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://oyama-mahiro-f.github.io/11408-notes-web/" target="_blank" >
+                <i class="icon icon-lg icon-book"></i>
+                笔记
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">CSMA/CD：载波监听、冲突检测与最小帧长</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">CSMA/CD：载波监听、冲突检测与最小帧长</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2026-10-12T00:00:00.000Z" itemprop="datePublished" class="page-time">
+  2026-10-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%85%B1%E4%BA%AB%E4%BF%A1%E9%81%93%E4%B8%8A%E7%9A%84%E5%86%B2%E7%AA%81"><span class="post-toc-number">1.</span> <span class="post-toc-text">共享信道上的冲突</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CSMA-CD-%E7%9A%84%E4%BA%94%E4%B8%AA%E5%8A%A8%E4%BD%9C"><span class="post-toc-number">2.</span> <span class="post-toc-text">CSMA&#x2F;CD 的五个动作</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%86%B2%E7%AA%81%E6%98%AF%E6%80%8E%E4%B9%88%E2%80%9D%E5%90%AC%E2%80%9D%E5%87%BA%E6%9D%A5%E7%9A%84"><span class="post-toc-number">3.</span> <span class="post-toc-text">冲突是怎么”听”出来的</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BA%89%E7%94%A8%E6%9C%9F%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%85%B3%E9%94%AE%E6%97%B6%E9%97%B4%E6%98%AF%E5%BE%80%E8%BF%94-2%5Ctau"><span class="post-toc-number">4.</span> <span class="post-toc-text">争用期：为什么关键时间是往返 2τ</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF%EF%BC%9AL_%7Bmin%7D%20=%202%5Ctau%20%5Ctimes%20R"><span class="post-toc-number">5.</span> <span class="post-toc-text">最小帧长：Lmin​&#x3D;2τ×R</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%E4%B8%80%EF%BC%9A%E6%A0%87%E5%87%86%E4%BB%A5%E5%A4%AA%E7%BD%91%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-64-B"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">例题一：标准以太网为什么是 64 B</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%E4%BA%8C%EF%BC%9A1-km%E3%80%811-Gbps-%E7%9A%84%E6%80%BB%E7%BA%BF"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">例题二：1 km、1 Gbps 的总线</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BE%8B%E9%A2%98%E4%B8%89%EF%BC%9A%E5%8F%8D%E8%BF%87%E6%9D%A5%E6%B1%82%E7%BD%91%E6%AE%B5%E9%95%BF%E5%BA%A6"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">例题三：反过来求网段长度</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%88%AA%E6%96%AD%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%8C%87%E6%95%B0%E9%80%80%E9%81%BF"><span class="post-toc-number">6.</span> <span class="post-toc-text">截断二进制指数退避</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%80%9F%E7%8E%87%E6%8F%90%E9%AB%98%E5%90%8E%E7%9A%84%E8%BF%9E%E9%94%81%E5%8F%8D%E5%BA%94%EF%BC%9A%E4%BB%8E-64-B-%E5%88%B0%E8%BD%BD%E6%B3%A2%E5%BB%B6%E4%BC%B8"><span class="post-toc-number">7.</span> <span class="post-toc-text">速率提高后的连锁反应：从 64 B 到载波延伸</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%B8%8D%E9%9C%80%E8%A6%81-CSMA-CD"><span class="post-toc-number">8.</span> <span class="post-toc-text">什么时候不需要 CSMA&#x2F;CD</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%B8%B8%E8%80%83%E9%A2%98%E5%9E%8B%E5%B0%8F%E7%BB%93"><span class="post-toc-number">9.</span> <span class="post-toc-text">常考题型小结</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E9%AB%98%E9%A2%91%E8%80%83%E7%82%B9%E9%80%9F%E8%AE%B0"><span class="post-toc-number">10.</span> <span class="post-toc-text">高频考点速记</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-CSMA-CD：载波监听、冲突检测与最小帧长"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">CSMA/CD：载波监听、冲突检测与最小帧长</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2026-10-12 08:00:00" datetime="2026-10-12T00:00:00.000Z"  itemprop="datePublished">2026-10-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/blog/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p><strong>CSMA&#x2F;CD（Carrier Sense Multiple Access &#x2F; Collision Detection，载波监听多点接入&#x2F;冲突检测）<strong>是经典以太网（IEEE 802.3）的介质访问控制协议，解决的是”<strong>多个站点共享一条广播式总线（或用集线器连成的共享介质）时，谁可以发、什么时候发</strong>“的问题。408 对本知识点的考查几乎全在</strong>结论与计算</strong>上：<strong>争用期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 的物理含义、最小帧长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>、截断二进制指数退避的取值范围、以及”全双工交换式以太网为什么不再需要 CSMA&#x2F;CD”</strong>。</p>
+<h2 id="共享信道上的冲突"><a href="#共享信道上的冲突" class="headerlink" title="共享信道上的冲突"></a>共享信道上的冲突</h2><p>共享式以太网中，所有站点<strong>共用一条传输介质</strong>，任一时刻信道上只能有一个站的信号：</p>
+<ul>
+<li>两个站<strong>同时发送</strong> → 两路信号在信道中<strong>叠加</strong>，波形畸变 → 接收方<strong>无法还原任何一个帧</strong>，两帧全部作废，这叫<strong>冲突（碰撞，Collision）</strong>。</li>
+<li>冲突不可能靠”约定”消除（各站地位平等、没有中心控制），只能靠一套<strong>争用规则</strong>把冲突控制在可接受的范围：发现冲突→停止→随机等待→重发。</li>
+</ul>
+<p>从”完全不管”到”先听再发”再到”边发边听”，随机访问协议一步步逼近”既能自由竞争、又能及时发现冲突”：</p>
+<table>
+<thead>
+<tr>
+<th align="left">协议</th>
+<th align="left">发送前是否监听</th>
+<th align="left">能否检测冲突</th>
+<th align="left">冲突的代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>纯 ALOHA</strong></td>
+<td align="left">否（想发就发）</td>
+<td align="left">否</td>
+<td align="left">冲突后只能靠<strong>超时</strong>发现，利用率 ≈ 18.4%</td>
+</tr>
+<tr>
+<td align="left"><strong>时隙 ALOHA</strong></td>
+<td align="left">否（只在时隙起点发）</td>
+<td align="left">否</td>
+<td align="left">冲突减半，利用率 ≈ 36.8%</td>
+</tr>
+<tr>
+<td align="left"><strong>CSMA</strong></td>
+<td align="left"><strong>是</strong>（先听后发）</td>
+<td align="left">否</td>
+<td align="left">冲突减少，但 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 内的冲突仍不可避免</td>
+</tr>
+<tr>
+<td align="left"><strong>CSMA&#x2F;CD</strong></td>
+<td align="left"><strong>是</strong>（先听后发）</td>
+<td align="left"><strong>能</strong>（边发边听）</td>
+<td align="left">冲突<strong>当场发现、立即止损</strong>，不等确认</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：CSMA 只做到”<strong>先听后发</strong>“，监听解决不了<strong>传播时延内的冲突</strong>（对方信号还在路上，我听到的是”空闲”）；CSMA&#x2F;CD 加上”<strong>边发边听</strong>“才第一次做到<strong>主动发现冲突</strong>。CD 的 D 是 <strong>Detection（检测）</strong>，不是 Avoidance。</p>
+</blockquote>
+<p>名字里的三个词正好对应三件事：</p>
+<table>
+<thead>
+<tr>
+<th align="left">组成部分</th>
+<th align="left">英文</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>载波监听</strong></td>
+<td align="left">Carrier Sense</td>
+<td align="left">发送<strong>前</strong>听信道，忙则等待——“<strong>先听后发</strong>“</td>
+</tr>
+<tr>
+<td align="left"><strong>多点接入</strong></td>
+<td align="left">Multiple Access</td>
+<td align="left">多站<strong>共享同一条广播介质</strong>（不是点对点链路）</td>
+</tr>
+<tr>
+<td align="left"><strong>冲突检测</strong></td>
+<td align="left">Collision Detection</td>
+<td align="left">发送<strong>中</strong>持续收听，发现冲突立即停发——“<strong>边听边发</strong>“</td>
+</tr>
+</tbody></table>
+<h2 id="CSMA-CD-的五个动作"><a href="#CSMA-CD-的五个动作" class="headerlink" title="CSMA&#x2F;CD 的五个动作"></a>CSMA&#x2F;CD 的五个动作</h2><p>口诀：<strong>先听后发、边听边发、冲突即停、强化干扰、退避重发</strong>。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">站有数据要发送</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">① 载波监听 ──信道忙──► 继续监听（等信道空闲）</span><br><span class="line">   │ 信道空闲</span><br><span class="line">   ▼</span><br><span class="line">② 发送数据帧，同时边发边听、检测冲突</span><br><span class="line">   ├─ 始终未检测到冲突 → ③ 发送成功，结束</span><br><span class="line">   └─ 检测到冲突 → ④ 立即停止发送 + 发出 32 位 JAM 强化信号</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">   ⑤ 截断二进制指数退避：随机等待 r 个争用期 2τ</span><br><span class="line">        │</span><br><span class="line">        ▼</span><br><span class="line">   重传次数 +1，期满后重新监听信道，空闲则重发（累计 16 次失败则放弃）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>① 先听后发</strong>：信道忙则<strong>持续监听</strong>直到空闲，绝不”抢发”。</li>
+<li><strong>② 边听边发</strong>：发送的<strong>同时</strong>接收信道信号做冲突检测（详见下节）。</li>
+<li><strong>③ 成功</strong>：整个发送过程（加上最后一比特的往返时间）都没有检测到冲突，帧就算发出去了——以太网<strong>不确认</strong>，可靠性交给高层。</li>
+<li><strong>④ 冲突即停 + 强化干扰</strong>：立即停止发送，并发出 <strong>32 位 JAM（冲突强化）信号</strong>，让全网都确认”刚才发生了冲突”、把残帧丢掉。</li>
+<li><strong>⑤ 退避重发</strong>：按<strong>截断二进制指数退避</strong>随机等待若干个争用期，期满后<strong>重新监听</strong>，信道空闲才重传。</li>
+</ul>
+<p>此外，802.3 还规定了两帧之间的<strong>帧间最小间隔 9.6 μs</strong>（10 Mbps 下 &#x3D; 96 比特时间）：发完一帧后必须再静默 9.6 μs 才能发下一帧，好让接收方来得及处理上一帧、也避免一个站独占信道。</p>
+<blockquote>
+<p><strong>考点</strong>：五个动作的顺序不能乱——<strong>先听（①）→ 边发边听（②）→ 停发并强化（④）→ 退避重发（⑤）</strong>；<strong>帧间最小间隔 9.6 μs</strong> 是”发完一帧必须歇一会儿”，不是争用期。</p>
+</blockquote>
+<h2 id="冲突是怎么”听”出来的"><a href="#冲突是怎么”听”出来的" class="headerlink" title="冲突是怎么”听”出来的"></a>冲突是怎么”听”出来的</h2><p><strong>冲突检测的物理依据是电平比较</strong>：发送站在发送数据的同时<strong>也接收</strong>信道上的信号，比较<strong>发送电平与接收电平</strong>。</p>
+<ul>
+<li>正常情况下，自己发出的信号在信道上不叠加，接收电平与发送电平基本一致（或按衰减规律一致）。</li>
+<li>一旦另一站也在发送，两路信号<strong>叠加</strong>，接收到的电平会<strong>异常升高</strong>（或波形明显畸变），超过正常阈值 → 判定冲突。</li>
+<li>这就是”<strong>边发边听</strong>“：不需要等对方回确认，冲突<strong>当场就能发现</strong>，立刻停发止损。</li>
+</ul>
+<p><strong>为什么还要额外发 JAM 强化信号</strong>：</p>
+<ul>
+<li>若冲突各方”各自默默停发”，冲突信号可能<strong>持续时间很短</strong>，有的发送方（尤其离冲突点远的站）可能<strong>漏检</strong>，误以为自己的帧发完了。</li>
+<li>发出 <strong>32 位 JAM</strong> 使冲突持续时间被人为拉长，保证<strong>所有正在发送的站都能可靠检测到冲突</strong>，同时让接收方<strong>丢弃各自的残帧</strong>。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：碰撞检测三要素——<strong>边发边听（电平比较）、32 位 JAM 冲突强化信号、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 争用期内必能听到冲突</strong>；缺任何一条都会出现”漏报冲突”。</p>
+</blockquote>
+<h2 id="争用期：为什么关键时间是往返-2\tau"><a href="#争用期：为什么关键时间是往返-2\tau" class="headerlink" title="争用期：为什么关键时间是往返 2\tau"></a>争用期：为什么关键时间是往返 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></h2><p>设总线上相距<strong>最远</strong>的两站为 A、B，信号在介质上单程传播时延为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>（端到端）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/blog/images/第3章 数据链路层.assets/csma-cd-争用期.png" alt="CSMA/CD 争用期与冲突检测" title="">
+                </div>
+                <div class="image-caption">CSMA/CD 争用期与冲突检测</div>
+            </figure>
+
+<p>考虑<strong>最坏情况</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">t = 0                 t = τ−ε            t = τ            t = 2τ</span><br><span class="line">A ── 开始发送数据帧 ──────────────────────────────────────────────►</span><br><span class="line">                      信号还在路上（尚未到达 B）</span><br><span class="line">B                                        ├─ 此刻监听：信道&quot;空闲&quot;</span><br><span class="line">                                         └─ 开始发送 → 与 A 的信号叠加，冲突！</span><br><span class="line">A ◄──────────────────────────────────────────────────── 冲突信号再花 τ 传回</span><br><span class="line">                                           A 最迟在 t = 2τ 才知道&quot;刚才冲突了&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>A 在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 开始发送，信号最迟 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 后到达 B。</li>
+<li>B 若恰好在信号到达<strong>前一刻</strong>（<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span>）监听，听到的是”空闲”，于是也开始发送 → 两信号在信道上相遇，<strong>冲突</strong>产生。</li>
+<li>冲突产生的信号要再经过约 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 才能传回 A，因此 <strong>A 最迟在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 才检测到冲突</strong>。</li>
+</ul>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 称为<strong>争用期</strong>（又称<strong>冲突窗口</strong>，contention period &#x2F; collision window）：</p>
+<ul>
+<li><strong>发帧后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 内没有检测到冲突 ⇒ 这个帧一定发送成功</strong>——因为此刻网上所有站都已经”看到”了 A 的信号，不会再有人误判空闲而开抢。</li>
+<li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 内载波监听必然失效</strong>：监听只能感知”<strong>此刻</strong>信道上有没有信号”，看不到”<strong>还在路上</strong>的帧”；只要有传播时延，先听后发就消除不了冲突——这正是 CSMA 必须升级为 CSMA&#x2F;CD 的原因。</li>
+<li>争用期由网络规模决定：经典 10 Mbps 以太网最远 2500 m（5 段 × 500 m，加 4 个中继器），规定 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">512</span></span></span></span> 比特时间</strong>（10 Mbps 下 1 比特时间 &#x3D; 0.1 μs）。</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span> 同时也是退避算法的<strong>时隙（slot time）</strong>：退避等待的时间单位就是它。</li>
+</ul>
+<blockquote>
+<p><strong>考点</strong>：<strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 是往返时延</strong>（不是单程 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>）；发帧后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 无冲突即成功；10 Mbps 以太网争用期 <strong>51.2 μs &#x3D; 512 bit 时间</strong>。<br><strong>易错点</strong>：把”监听失效”误解为”设备坏了”——它是<strong>传播时延的物理结果</strong>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 越大越容易失效。</p>
+</blockquote>
+<h2 id="最小帧长：L_{min} = 2\tau \times R"><a href="#最小帧长：L_{min} = 2\tau \times R" class="headerlink" title="最小帧长：L_{min} = 2\tau \times R"></a>最小帧长：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span></h2><p>冲突检测要求<strong>在帧还没发完之前</strong>就能听到冲突。如果帧太短，发送方<strong>已经发完、停止检测</strong>，冲突信号才传回来，发送方就会<strong>误判”发送成功”</strong>，而接收方收到的只是一段冲突碎片。</p>
+<p>因此要求<strong>发送一帧的时间 ≥ 争用期</strong>：</p>
+<span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6684em;vertical-align:-0.024em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟹</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span></span>
+<p>其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> 为数据率，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 即往返传播时延。等价说法：<strong>最小帧长 &#x3D; 争用期 × 数据率</strong>，即”网上一来一回最多能容纳多少比特”。</p>
+<h3 id="例题一：标准以太网为什么是-64-B"><a href="#例题一：标准以太网为什么是-64-B" class="headerlink" title="例题一：标准以太网为什么是 64 B"></a>例题一：标准以太网为什么是 64 B</h3><p>已知 10 Mbps 以太网 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">计算</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">最小帧长</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">51.2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">bps</span></span></span></span></span></td>
+<td align="left">$512\ \text{bit} &#x3D; $ <strong>64 B</strong></td>
+</tr>
+<tr>
+<td align="left">争用期（比特数）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace"> </span><span class="mord text"><span class="mord">Mbps</span></span></span></span></span></td>
+<td align="left"><strong>512 bit 时间</strong></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：64 B 的帧在 10 Mbps 上发送时延 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">512</span><span class="mspace"> </span><span class="mord text"><span class="mord">bit</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace"> </span><span class="mord text"><span class="mord">Mbps</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> ✓ 恰好”发完的同时”能听到冲突。</p>
+<p>这就是以太网<strong>最短帧 64 B</strong> 的由来：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">18</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">46</span></span></span></span> B，正是 MAC 帧<strong>数据字段下限 46 B</strong>（不足要填充）的来源（开销 18 B &#x3D; 目的 6 + 源 6 + 类型 2 + FCS 4）。</p>
+<h3 id="例题二：1-km、1-Gbps-的总线"><a href="#例题二：1-km、1-Gbps-的总线" class="headerlink" title="例题二：1 km、1 Gbps 的总线"></a>例题二：1 km、1 Gbps 的总线</h3><p>总线长 <strong>1 km</strong>，信号传播速率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span></span> m&#x2F;s，数据率 <strong>1 Gbps</strong>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">计算</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">单程传播时延 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">m</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">m/s</span></span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">争用期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">最小帧长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">bps</span></span></span></span></span></td>
+<td align="left">$10^{4}\ \text{bit} &#x3D; $ <strong>1250 B</strong></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：1250 B &#x3D; 10 000 bit，在 1 Gbps 上发送时延 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> ✓ 刚好在发完的瞬间能检测到冲突。</p>
+<blockquote>
+<p><strong>结论</strong>：<strong>数据率越高、网络覆盖范围越大，要求的最小帧长越长</strong>。1 Gbps 下若还想沿用 64 B，就必须把网段缩短到原来的 1&#x2F;10——这正是高速以太网被逼着”缩短冲突域”的原因。</p>
+</blockquote>
+<h3 id="例题三：反过来求网段长度"><a href="#例题三：反过来求网段长度" class="headerlink" title="例题三：反过来求网段长度"></a>例题三：反过来求网段长度</h3><p>已知某以太网<strong>最小帧长 64 B、数据率 100 Mbps</strong>，求冲突域直径的最大值。</p>
+<table>
+<thead>
+<tr>
+<th align="left">步骤</th>
+<th align="left">计算</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">帧发送时延（&#x3D; 允许的最大 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>）</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord">512</span><span class="mspace"> </span><span class="mord text"><span class="mord">bit</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">100</span><span class="mspace"> </span><span class="mord text"><span class="mord">Mbps</span></span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5.12</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">单程传播时延上限 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5.12</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2.56</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+</tr>
+<tr>
+<td align="left">端到端距离上限</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.56</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace"> </span><span class="mord text"><span class="mord">m/s</span></span></span></span></span></td>
+<td align="left"><strong>512 m</strong></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：512 m 往返的传播时延 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">512</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">5.12</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>，刚好等于 64 B 在 100 Mbps 上的发送时延 ✓</p>
+<p><strong>注意</strong>：512 m 只是”只算传播时延”的理论上限；实际还要扣除<strong>中继器与收发器的处理时延</strong>，所以 100BASE-TX 标准把冲突域直径限制在 <strong>205 m 左右</strong>（每段双绞线 100 m）。</p>
+<blockquote>
+<p><strong>考点</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>；单位换算 <strong>μs × Mbps &#x3D; bit</strong>（bit ÷ 8 &#x3D; B）。<br><strong>易错点</strong>：公式里是<strong>往返 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></strong>，不是单程 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>；<strong>数据率提高而网段不变 → 最小帧长变长</strong>（10 M → 100 M 时 64 B → 640 B，不是变短）；64 B 指 <strong>MAC 帧本体</strong>，不含物理层额外加的 8 B 前导码。<br><strong>碎片</strong>：长度 <strong>小于 64 B</strong> 的帧一定是<strong>冲突碎片（残帧）</strong>，接收方<strong>直接丢弃</strong>，不交给上层。</p>
+</blockquote>
+<h2 id="截断二进制指数退避"><a href="#截断二进制指数退避" class="headerlink" title="截断二进制指数退避"></a>截断二进制指数退避</h2><p>检测到冲突后不能”立刻重发”（大家都立刻重发必然再撞），也不能”固定等一会儿”（同步重发还会再撞），于是用<strong>随机化 + 冲突越多范围越大</strong>的策略——<strong>截断二进制指数退避（Binary Exponential Backoff）</strong>。</p>
+<p><strong>算法</strong>（设该帧已连续冲突 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 次，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 从 1 计）：</p>
+<ol>
+<li>取 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mclose">)</span></span></span></span>；</li>
+<li>从整数集合 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1925em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span> 中<strong>等概率随机</strong>选一个整数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>；</li>
+<li>退避 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 个<strong>争用期（时隙）</strong>，即等待 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>；</li>
+<li>期满后<strong>重新监听</strong>信道，空闲则重传、忙则继续监听；</li>
+<li>累计 <strong>16 次</strong>重传仍不成功 → <strong>丢弃该帧并向高层报告</strong>，不无限重试。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">重传次数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span></th>
+<th align="left">取值个数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9425em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></th>
+<th align="left">随机范围 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span>（个争用期）</th>
+<th align="left">最大退避时间（10 Mbps，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">0&#126;1</td>
+<td align="left">51.2 μs</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">4</td>
+<td align="left">0&#126;3</td>
+<td align="left">153.6 μs</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">8</td>
+<td align="left">0&#126;7</td>
+<td align="left">358.4 μs</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">16</td>
+<td align="left">0&#126;15</td>
+<td align="left">768 μs</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">1024</td>
+<td align="left">0&#126;1023</td>
+<td align="left">约 52.4 ms</td>
+</tr>
+<tr>
+<td align="left">大于 10</td>
+<td align="left">1024（<strong>截断</strong>，不再翻倍）</td>
+<td align="left">0&#126;1023</td>
+<td align="left">约 52.4 ms</td>
+</tr>
+<tr>
+<td align="left">第 16 次仍失败</td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><strong>放弃发送，报告高层</strong></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>“指数”</strong>：范围按 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9425em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span> 增长（2、4、8、16…），冲突越多、可选等待越长，把各站的重发时刻<strong>随机错开</strong>，避免反复撞车。</li>
+<li><strong>“截断”</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 超过 10 后范围<strong>封顶在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1023</span></span></span></span></strong>，防止退避时间无限膨胀。</li>
+<li>平均退避时隙数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3055em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6195em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>：冲突次数少的站等得短、恢复快，<strong>自适应</strong>地把信道让给先来者。</li>
+</ul>
+<p><strong>退避算例</strong>：某帧已连续冲突 <strong>3 次</strong>，则 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>：</p>
+<table>
+<thead>
+<tr>
+<th align="left">项目</th>
+<th align="left">计算</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">随机范围</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span></td>
+<td align="left">共 <strong>8</strong> 个整数</td>
+</tr>
+<tr>
+<td align="left">若选中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+<td align="left">退避 <strong>256 μs</strong></td>
+</tr>
+<tr>
+<td align="left">选中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span> 的概率</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/8</span></span></span></span></td>
+<td align="left">12.5%</td>
+</tr>
+<tr>
+<td align="left">平均退避</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">179.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span></td>
+</tr>
+</tbody></table>
+<p><strong>验算</strong>：8 个取值的平均值为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">7</span><span class="mclose">)</span><span class="mord">/2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3.5</span></span></span></span> 个时隙 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">×</span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">179.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span> ✓</p>
+<blockquote>
+<p><strong>考点</strong>：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord text"><span class="mord cjk_fallback">重传次数</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mclose">)</span></span></span></span>；随机范围是 <strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9425em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span> 个整数</strong>（上界 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0258em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>）；单位是<strong>争用期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></strong>；<strong>16 次放弃</strong>。<br><strong>易错点</strong>：第 1 次重传的范围是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span>（<strong>含 0</strong>，可能不退避）；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 后<strong>不再翻倍</strong>；退避时间的乘数是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>，不是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>。</p>
+</blockquote>
+<h2 id="速率提高后的连锁反应：从-64-B-到载波延伸"><a href="#速率提高后的连锁反应：从-64-B-到载波延伸" class="headerlink" title="速率提高后的连锁反应：从 64 B 到载波延伸"></a>速率提高后的连锁反应：从 64 B 到载波延伸</h2><p>最小帧长公式 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> 一旦写死，<strong>提高数据率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> 就必须同时缩短 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>（网段）或加长帧</strong>。各代以太网正是这么取舍的：</p>
+<table>
+<thead>
+<tr>
+<th align="left">以太网</th>
+<th align="left">数据率</th>
+<th align="left">若沿用 64 B 帧</th>
+<th align="left">工程做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>10BASE5</strong></td>
+<td align="left">10 Mbps</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace"> </span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span></span></span></span>，网段最远 2500 m</td>
+<td align="left">标准 64 B 最小帧</td>
+</tr>
+<tr>
+<td align="left"><strong>100BASE-TX</strong></td>
+<td align="left">100 Mbps</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 必须 ≤ 5.12 μs → 理论直径 512 m</td>
+<td align="left"><strong>缩短冲突域</strong>至约 205 m（每段 100 m 双绞线）</td>
+</tr>
+<tr>
+<td align="left"><strong>千兆以太网（半双工）</strong></td>
+<td align="left">1000 Mbps</td>
+<td align="left">64 B 只需 0.512 μs 发完，远小于 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left"><strong>载波延伸（Carrier Extension）</strong>：把帧补到 <strong>512 B</strong> 再发完；配合**帧突发（Frame Bursting）**提高利用率</td>
+</tr>
+<tr>
+<td align="left"><strong>万兆以太网</strong></td>
+<td align="left">10 Gbps</td>
+<td align="left">—</td>
+<td align="left"><strong>只支持全双工</strong>，点对点无冲突，<strong>不用 CSMA&#x2F;CD</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>考点</strong>：数据率提高 10 倍、网段不变 → 最小帧长提高 10 倍（10 M→100 M：64 B→640 B）；千兆半双工靠<strong>载波延伸（帧长补到 512 B）</strong>；<strong>万兆只全双工</strong>。</p>
+</blockquote>
+<h2 id="什么时候不需要-CSMA-CD"><a href="#什么时候不需要-CSMA-CD" class="headerlink" title="什么时候不需要 CSMA&#x2F;CD"></a>什么时候不需要 CSMA&#x2F;CD</h2><p>CSMA&#x2F;CD 的前提是”<strong>多站共享同一条半双工介质</strong>“。前提不成立时，它就没有用武之地：</p>
+<table>
+<thead>
+<tr>
+<th align="left">场景</th>
+<th align="left">是否共享介质</th>
+<th align="left">是否需要 CSMA&#x2F;CD</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">集线器连成的共享式以太网</td>
+<td align="left">是（半双工，一个冲突域）</td>
+<td align="left"><strong>需要</strong></td>
+<td align="left">集线器是物理层设备，只放大转发，<strong>不隔离冲突域</strong>（反而扩大）</td>
+</tr>
+<tr>
+<td align="left"><strong>交换式以太网（全双工）</strong></td>
+<td align="left">否（每端口独享链路）</td>
+<td align="left"><strong>不需要</strong></td>
+<td align="left">收发在不同线对上同时进行，<strong>根本不存在冲突</strong>；每个端口一个冲突域</td>
+</tr>
+<tr>
+<td align="left">点对点链路（PPP）</td>
+<td align="left">否（只有两个站）</td>
+<td align="left"><strong>不需要</strong></td>
+<td align="left">无争用，也<strong>没有最短帧长的限制</strong></td>
+</tr>
+<tr>
+<td align="left">无线局域网（802.11）</td>
+<td align="left">是（广播信道）</td>
+<td align="left">不用 CD，用 <strong>CSMA&#x2F;CA</strong></td>
+<td align="left">无线<strong>无法边发边听</strong>，只能”避免”冲突</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>现代以太网几乎都是全双工交换式</strong>：双绞线四对线中收发各用一对，发送与接收互不干扰，同一时刻双方都能发——<strong>冲突在物理上不存在</strong>，自然不需要检测，也不需要最小帧长来兜底。CSMA&#x2F;CD 因此成为”只在半双工共享介质时代才需要”的历史机制（408 仍把它当重点考）。</li>
+<li><strong>CSMA&#x2F;CA（Collision Avoidance）用于无线</strong>：无线环境下自己发射的信号强度远大于远处来的信号（<strong>无法边发边听</strong>），又存在<strong>隐蔽站</strong>问题（发送方听不到全部竞争者，冲突发生在接收端），所以改为<strong>碰撞避免</strong>：帧间间隔 IFS + 随机退避 + <strong>ACK 确认</strong> + 可选的 <strong>RTS&#x2F;CTS 预约（NAV）</strong>。</li>
+</ul>
+<p>CSMA&#x2F;CD 与 CSMA&#x2F;CA 的分工可对照记忆：</p>
+<table>
+<thead>
+<tr>
+<th align="left">对比项</th>
+<th align="left">CSMA&#x2F;CD（有线以太网）</th>
+<th align="left">CSMA&#x2F;CA（802.11 无线）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">能否检测冲突</td>
+<td align="left"><strong>能</strong>：边发边听、比较电平</td>
+<td align="left"><strong>不能</strong>：自身信号淹没对方 + 隐蔽站</td>
+</tr>
+<tr>
+<td align="left">核心思想</td>
+<td align="left">冲突<strong>检测</strong>，发现后停发退避</td>
+<td align="left">冲突<strong>避免</strong>：先预约、再发送</td>
+</tr>
+<tr>
+<td align="left">可靠性</td>
+<td align="left">以太网本身<strong>不确认</strong>，靠高层</td>
+<td align="left">链路层 <strong>ACK + 超时重传</strong></td>
+</tr>
+<tr>
+<td align="left">典型机制</td>
+<td align="left">JAM 强化信号、二进制指数退避</td>
+<td align="left">IFS、随机退避、RTS&#x2F;CTS、NAV</td>
+</tr>
+</tbody></table>
+<h2 id="常考题型小结"><a href="#常考题型小结" class="headerlink" title="常考题型小结"></a>常考题型小结</h2><table>
+<thead>
+<tr>
+<th align="left">题型</th>
+<th align="left">已知</th>
+<th align="left">求解思路</th>
+<th align="left">公式&#x2F;要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>① 求最小帧长</strong></td>
+<td align="left">距离 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>、传播速率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span>、数据率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span></td>
+<td align="left">先求 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span>，再求 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>；结果比 64 B 大才说明标准帧长不够用</td>
+</tr>
+<tr>
+<td align="left"><strong>② 求最大网段长度</strong></td>
+<td align="left">最小帧长 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、数据率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span></td>
+<td align="left">令 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>，反推 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span></span></span></span>（注意除以 2：往返变单程）</td>
+</tr>
+<tr>
+<td align="left"><strong>③ 求退避时间</strong></td>
+<td align="left">冲突次数 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span>、<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mclose">)</span></span></span></span>，范围 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0258em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span> 个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></td>
+<td align="left">最大 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1925em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>；平均 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.3055em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6195em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>；某值概率 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1925em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>
+</tr>
+<tr>
+<td align="left"><strong>④ 帧长与填充</strong></td>
+<td align="left">网络层数据报长度</td>
+<td align="left">帧长 &#x3D; 数据 + 18 B，不足 46 B 要填充</td>
+<td align="left">帧长 64&#126;1518 B；详见《局域网、以太网与交换机》</td>
+</tr>
+<tr>
+<td align="left"><strong>⑤ 判是否需要 CSMA&#x2F;CD</strong></td>
+<td align="left">场景描述</td>
+<td align="left">看是否”多站共享半双工介质”</td>
+<td align="left">全双工交换式 &#x2F; PPP 点对点 → <strong>不需要</strong>；无线 → 用 CA</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>易错点合集</strong>：① 争用期是<strong>往返 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span></strong>；② 退避单位是<strong>争用期</strong>不是单程 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>；③ 第 1 次重传范围是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span>（<strong>可为 0</strong>）；④ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 后范围<strong>截断</strong>在 1023；⑤ 最小帧长与 <strong>MTU 无关</strong>（MTU 管上限）；⑥ <strong>前导码 8 B 不计入帧长</strong>。</p>
+</blockquote>
+<h2 id="高频考点速记"><a href="#高频考点速记" class="headerlink" title="高频考点速记"></a>高频考点速记</h2><table>
+<thead>
+<tr>
+<th align="left">考点</th>
+<th align="left">记忆</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">协议全称</td>
+<td align="left"><strong>Carrier Sense Multiple Access &#x2F; Collision Detection</strong>，载波监听多点接入&#x2F;冲突检测</td>
+</tr>
+<tr>
+<td align="left">五个动作</td>
+<td align="left"><strong>先听后发、边听边发、冲突即停、强化干扰、退避重发</strong></td>
+</tr>
+<tr>
+<td align="left">冲突检测原理</td>
+<td align="left">边发边听，比较<strong>发送电平与接收电平</strong>，叠加异常即冲突</td>
+</tr>
+<tr>
+<td align="left">JAM 强化信号</td>
+<td align="left"><strong>32 位</strong>，让所有站都确认冲突、丢弃残帧</td>
+</tr>
+<tr>
+<td align="left">争用期</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>（<strong>往返</strong>）；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 内无冲突则<strong>本帧必然成功</strong>；<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> 内监听失效</td>
+</tr>
+<tr>
+<td align="left">标准以太网争用期</td>
+<td align="left"><strong>51.2 μs &#x3D; 512 比特时间</strong>（10 Mbps），也是退避的时隙</td>
+</tr>
+<tr>
+<td align="left">最小帧长</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span>；10 Mbps → <strong>64 B</strong>；小于 64 B 是<strong>冲突碎片</strong></td>
+</tr>
+<tr>
+<td align="left">帧长关系</td>
+<td align="left">数据 46&#126;1500 B ↔ 帧长 64&#126;1518 B（开销 18 B）；前导码 8 B 不计入</td>
+</tr>
+<tr>
+<td align="left">退避算法</td>
+<td align="left">第 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 次冲突取 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">10</span><span class="mclose">)</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 等概率取自 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0258em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9425em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span> 个争用期</td>
+</tr>
+<tr>
+<td align="left">退避上限</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 范围翻倍，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> <strong>截断</strong>在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1023</span></span></span></span>；<strong>16 次放弃</strong></td>
+</tr>
+<tr>
+<td align="left">速率提高的影响</td>
+<td align="left"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> 升 10 倍且网段不变 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 升 10 倍（64 B → 640 B），故缩短冲突域</td>
+</tr>
+<tr>
+<td align="left">千兆半双工</td>
+<td align="left"><strong>载波延伸</strong>（帧补到 512 B）+ <strong>帧突发</strong>；万兆<strong>只全双工</strong>、不用 CSMA&#x2F;CD</td>
+</tr>
+<tr>
+<td align="left">何时不用</td>
+<td align="left"><strong>全双工交换式</strong>（无冲突）、<strong>PPP 点对点</strong>（无争用）、无线改用 <strong>CSMA&#x2F;CA</strong></td>
+</tr>
+</tbody></table>
+<p>姊妹篇目：<strong>《介质访问控制》</strong>（ALOHA、CSMA 三种坚持策略、CSMA&#x2F;CA、CDMA、令牌传递）、<strong>《局域网、以太网与交换机》</strong>（MAC 帧格式、交换机与冲突域）、<strong>《数据链路层：组帧与差错控制》</strong>（帧定界与 CRC）。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2026-10-11T23:57:23.639Z" itemprop="dateUpdated">2026-10-12 07:57:23</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" target="_blank" rel="external">https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://oyama-mahiro-f.github.io/blog">
+            <img src="/blog/img/avatar.jpg" alt="义务教育漏网之鱼">
+            义务教育漏网之鱼
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/408/" rel="tag">408</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/CSMA-CD/" rel="tag">CSMA&#x2F;CD</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" rel="tag">数据链路层</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&title=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&title=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2026/08/30/%E5%8D%81%E5%AD%97%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%82%BB%E6%8E%A5%E5%A4%9A%E9%87%8D%E8%A1%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">十字链表与邻接多重表</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license noopener" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>义务教育漏网之鱼 &copy; 2015 - 2026</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&title=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&pic=https://oyama-mahiro-f.github.io/blog/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&title=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&source=考研复习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《CSMA/CD：载波监听、冲突检测与最小帧长》 — 义务教育漏网之鱼's blog&url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/&via=https://oyama-mahiro-f.github.io/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://oyama-mahiro-f.github.io/blog/2026/10/12/CSMA-CD%EF%BC%9A%E8%BD%BD%E6%B3%A2%E7%9B%91%E5%90%AC%E3%80%81%E5%86%B2%E7%AA%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E6%9C%80%E5%B0%8F%E5%B8%A7%E9%95%BF/" alt="微信分享二维码">
+</div>
+
+
+
+<script>
+/* 算法演示 iframe 自适应高度：iframe 与站点同源，直接按内容高度撑开，
+   避免 article.less 里的固定 780px 把演示截断或逼出内部滚动条。 */
+(function () {
+    function fit(frame) {
+        if (!frame) return;
+        try {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            var h = Math.max(doc.documentElement.scrollHeight, doc.body.scrollHeight);
+            if (h > 200) frame.style.height = Math.min(h + 4, 2400) + 'px';
+        } catch (e) { /* 跨域则保持 CSS 高度 */ }
+    }
+    function fitAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), fit);
+    }
+    function init() {
+        Array.prototype.forEach.call(document.querySelectorAll('.algo-demo iframe'), function (frame) {
+            fit(frame);
+            frame.addEventListener('load', function () {
+                fit(frame);
+                setTimeout(function () { fit(frame); }, 400);
+                setTimeout(function () { fit(frame); }, 1500);
+            });
+        });
+        fitAll();
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+    window.addEventListener('resize', fitAll);
+})();
+</script>
+
+
+    <script src="/blog/js/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="/blog/js/main.min.js?v=1.7.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/blog/js/search.min.js?v=1.7.2" async></script>
+
+
+
+<!-- Math rendered server-side by markdown-it-katex, no client-side JS needed -->
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/802.11-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
 <meta property="og:image" content="https://oyama-mahiro-f.github.io/blog/images/%E7%AC%AC3%E7%AB%A0%20%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82.assets/ppp-%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
 <meta property="article:published_time" content="2026-08-29T01:00:00.000Z">
-<meta property="article:modified_time" content="2026-08-29T05:39:57.613Z">
+<meta property="article:modified_time" content="2026-10-11T23:57:37.849Z">
 <meta property="article:author" content="义务教育漏网之鱼">
 <meta property="article:tag" content="408">
 <meta property="article:tag" content="以太网">
@@ -266,7 +266,7 @@
 <blockquote>
 <p><strong>考点</strong>：局域网中数据链路层 &#x3D; <strong>LLC 子层 + MAC 子层</strong>；<strong>以太网（V2）只保留 MAC 子层</strong>（用”类型”字段取代了 LLC 功能）。802.3 有线用 <strong>CSMA&#x2F;CD</strong>，802.11 无线用 <strong>CSMA&#x2F;CA</strong>。</p>
 </blockquote>
-<h2 id="以太网与-IEEE-802-3"><a href="#以太网与-IEEE-802-3" class="headerlink" title="以太网与 IEEE 802.3"></a>以太网与 IEEE 802.3</h2><p><strong>以太网（Ethernet）<strong>提供</strong>无连接、不编号、不确认</strong>的<strong>不可靠交付</strong>（尽最大努力），差错恢复交给高层（TCP）完成。经典共享式以太网用 <strong>CSMA&#x2F;CD</strong> 协调信道（先听后发、边发边听，机制详见《介质访问控制》一文）；现代<strong>全双工交换式以太网不再需要 CSMA&#x2F;CD</strong>。</p>
+<h2 id="以太网与-IEEE-802-3"><a href="#以太网与-IEEE-802-3" class="headerlink" title="以太网与 IEEE 802.3"></a>以太网与 IEEE 802.3</h2><p><strong>以太网（Ethernet）<strong>提供</strong>无连接、不编号、不确认</strong>的<strong>不可靠交付</strong>（尽最大努力），差错恢复交给高层（TCP）完成。经典共享式以太网用 <strong>CSMA&#x2F;CD</strong> 协调信道（先听后发、边发边听，机制详见《CSMA&#x2F;CD：载波监听、冲突检测与最小帧长》一文）；现代<strong>全双工交换式以太网不再需要 CSMA&#x2F;CD</strong>。</p>
 <h3 id="MAC-地址"><a href="#MAC-地址" class="headerlink" title="MAC 地址"></a>MAC 地址</h3><p>**MAC 地址（物理地址）**长 <strong>48 位（6 字节）</strong>，出厂固化在网卡 ROM 中，全球唯一，常用十六进制连字符表示（如 <code>00-1A-2B-3C-4D-5E</code>）。</p>
 <ul>
 <li>前 <strong>3 字节 &#x3D; OUI（组织唯一标识符）</strong>：由 IEEE 分配给网卡厂商；后 3 字节由厂商自行分配。</li>
@@ -331,7 +331,7 @@
 </blockquote>
 <h3 id="最小帧长与帧长计算（例题）"><a href="#最小帧长与帧长计算（例题）" class="headerlink" title="最小帧长与帧长计算（例题）"></a>最小帧长与帧长计算（例题）</h3><p><strong>最小帧长为什么是 64B</strong>：CSMA&#x2F;CD 要求发送方在<strong>帧尚未发完</strong>时就能检测到冲突，即发送时延不得小于争用期 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>：</p>
 <span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">最短帧长</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord cjk_fallback">数据率</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">51.2</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">μ</span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Mbps</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord">512</span><span class="mspace"> </span><span class="mord text"><span class="mord">bit</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">64</span><span class="mspace"> </span><span class="mord text"><span class="mord">B</span></span></span></span></span></span>
-<p>数据字段下限 46B 正是”凑够 64B”凑出来的：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">18</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">46</span></span></span></span>（18B &#x3D; 6 + 6 + 2 + 4 的首尾开销）。</p>
+<p>数据字段下限 46B 正是”凑够 64B”凑出来的：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">18</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">46</span></span></span></span>（18B &#x3D; 6 + 6 + 2 + 4 的首尾开销）。争用期、退避与最小帧长的完整推导见《CSMA&#x2F;CD：载波监听、冲突检测与最小帧长》一文。</p>
 <p><strong>例题：三种长度的 IP 数据报封装成 MAC 帧</strong>：</p>
 <table>
 <thead>
@@ -823,7 +823,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2026-08-29T05:39:57.613Z" itemprop="dateUpdated">2026-08-29 13:39:57</time>
+    最后更新时间：<time datetime="2026-10-11T23:57:37.849Z" itemprop="dateUpdated">2026-10-12 07:57:37</time>
 </span><br>
 
 
